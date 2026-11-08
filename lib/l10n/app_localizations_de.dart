@@ -6345,4 +6345,8 @@ class SDe extends S {
   @override
   String get stickerPublishFailed =>
       'Die Veröffentlichung wurde nicht bestätigt. Prüfe die Gruppe vor einem erneuten Versuch.';
+
+  @override
+  String get stickerPublishReceiptMissing =>
+      'Veröffentlicht, aber der Link wurde nicht gespeichert. Teile oder kopiere ihn, bevor du diese Seite verlässt.';
 }

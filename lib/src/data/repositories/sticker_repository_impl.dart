@@ -2,6 +2,7 @@ import 'dart:typed_data';
 import 'dart:async';
 
 import '../../domain/entities/sticker_pack_entity.dart';
+import '../../domain/entities/sticker_publication_receipt_failure.dart';
 import '../../domain/repositories/sticker_repository.dart';
 import '../datasources/matrix/matrix_sticker_datasource.dart';
 import '../datasources/bundled_sticker_packs.dart';
@@ -9,6 +10,7 @@ import '../services/matrix_sticker_publication.dart';
 import '../../core/utils/debug_log.dart';
 import '../../core/utils/sticker_suggestion_utils.dart';
 import '../../core/utils/matrix_sticker_pack_link.dart';
+import '../../core/utils/sticker_pack_fingerprint.dart';
 
 /// 贴纸仓库实现
 class StickerRepositoryImpl implements IStickerRepository {
@@ -423,10 +425,26 @@ class StickerRepositoryImpl implements IStickerRepository {
   }
 
   @override
-  Future<String?> getPackShareUrl(String packId) async {
+  Future<String?> getPackShareUrl(
+    String packId, {
+    StickerPack? reviewedPack,
+  }) async {
     final scope = _dataSource.accountScope;
     final pack = await getPackById(packId);
-    return _dataSource.accountScope == scope ? pack?.origin?.shareUrl : null;
+    if (_dataSource.accountScope != scope ||
+        pack == null ||
+        (reviewedPack != null && pack != reviewedPack)) {
+      return null;
+    }
+    final snapshot = pack.copyWith(stickers: List.unmodifiable(pack.stickers));
+    final fingerprint = stickerPackFingerprint(snapshot);
+    final link = snapshot.source == StickerPackSource.custom
+        ? await _dataSource.getPublicationReceipt(snapshot)
+        : snapshot.origin?.shareUrl;
+    return _dataSource.accountScope == scope &&
+            stickerPackFingerprint(pack) == fingerprint
+        ? link
+        : null;
   }
 
   @override
@@ -453,12 +471,24 @@ class StickerRepositoryImpl implements IStickerRepository {
         !identical(publisher.lifecycle.currentAccountGeneration, generation)) {
       return null;
     }
-    final origin = await publisher.publish(pack, roomId);
+    final snapshot = pack.copyWith(stickers: List.unmodifiable(pack.stickers));
+    final origin = await publisher.publish(snapshot, roomId);
     if (_dataSource.accountScope != scope ||
         !generation.isCurrent ||
         !identical(publisher.lifecycle.currentAccountGeneration, generation)) {
       return null;
     }
+    bool current() =>
+        _dataSource.accountScope == scope &&
+        generation.isCurrent &&
+        identical(publisher.lifecycle.currentAccountGeneration, generation);
+    final saved = await _dataSource.savePublicationReceipt(
+      snapshot,
+      origin,
+      isCurrent: current,
+    );
+    if (!current()) return null;
+    if (!saved) throw StickerPublicationReceiptFailure(origin.shareUrl);
     return origin.shareUrl;
   }
 

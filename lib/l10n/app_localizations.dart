@@ -11578,6 +11578,12 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Publication was not confirmed. Check the group before trying again.'**
   String get stickerPublishFailed;
+
+  /// No description provided for @stickerPublishReceiptMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Published, but the link was not saved. Share or copy it before leaving this page.'**
+  String get stickerPublishReceiptMissing;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

@@ -6306,4 +6306,8 @@ class SCs extends S {
   @override
   String get stickerPublishFailed =>
       'Zveřejnění nebylo potvrzeno. Před dalším pokusem zkontrolujte skupinu.';
+
+  @override
+  String get stickerPublishReceiptMissing =>
+      'Zveřejněno, ale odkaz se neuložil. Před opuštěním stránky jej sdílejte nebo zkopírujte.';
 }

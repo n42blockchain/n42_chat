@@ -6326,4 +6326,8 @@ class SUk extends S {
   @override
   String get stickerPublishFailed =>
       'Публікацію не підтверджено. Перевірте групу перед повторною спробою.';
+
+  @override
+  String get stickerPublishReceiptMissing =>
+      'Опубліковано, але посилання не збережено. Поділіться ним або скопіюйте його, перш ніж залишити сторінку.';
 }

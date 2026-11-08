@@ -2909,5 +2909,6 @@
   "stickerPackSourceRoom": "Discussion d’origine",
   "stickerPackImages": "Images",
   "stickerPublishNotice": "Publiez ce pack dans le groupe sélectionné. Ses images et métadonnées ne sont pas chiffrées de bout en bout. Les personnes pouvant lire l’état du groupe peuvent y accéder.",
-  "stickerPublishFailed": "La publication n’a pas été confirmée. Vérifiez le groupe avant de réessayer."
+  "stickerPublishFailed": "La publication n’a pas été confirmée. Vérifiez le groupe avant de réessayer.",
+  "stickerPublishReceiptMissing": "Publié, mais le lien n’a pas été enregistré. Partagez-le ou copiez-le avant de quitter cette page."
 }

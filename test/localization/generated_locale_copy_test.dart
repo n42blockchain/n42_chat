@@ -14,6 +14,7 @@ final _labels = <(String, String Function(S))>[
   ('stickerImportAccountChanged', (s) => s.stickerImportAccountChanged),
   ('stickerPackSourceRoom', (s) => s.stickerPackSourceRoom),
   ('stickerPackImages', (s) => s.stickerPackImages),
+  ('stickerPublishReceiptMissing', (s) => s.stickerPublishReceiptMissing),
   ('stickerPublishNotice', (s) => s.stickerPublishNotice),
   ('stickerPublishFailed', (s) => s.stickerPublishFailed),
   ('scheduledMessagesTitle', (s) => s.scheduledMessagesTitle),
@@ -2443,7 +2444,7 @@ void main() {
     expect((await S.delegate.load(const Locale('zh', 'TW'))).groupPublish, '發佈');
   });
   test('all supported locales provide readable labels', () async {
-    expect(_labels, hasLength(1705));
+    expect(_labels, hasLength(1706));
     expect(_formattedLabels, hasLength(182));
     expect(_labels.map((entry) => entry.$1).toSet(), hasLength(_labels.length));
     final emptyLabels = <String>[];

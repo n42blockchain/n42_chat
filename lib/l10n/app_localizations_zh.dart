@@ -6114,6 +6114,9 @@ class SZh extends S {
 
   @override
   String get stickerPublishFailed => '未能确认发布结果。请先检查群聊，再决定是否重试。';
+
+  @override
+  String get stickerPublishReceiptMissing => '已发布，但链接未能保存。离开此页面前，请先分享或复制链接。';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -12226,4 +12229,7 @@ class SZhTw extends SZh {
 
   @override
   String get stickerPublishFailed => '無法確認發佈結果。請先檢查群組，再決定是否重試。';
+
+  @override
+  String get stickerPublishReceiptMissing => '已發佈，但連結未能儲存。離開此頁面前，請先分享或複製連結。';
 }

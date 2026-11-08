@@ -6155,4 +6155,8 @@ class SJa extends S {
 
   @override
   String get stickerPublishFailed => '公開結果を確認できませんでした。再試行する前にグループを確認してください。';
+
+  @override
+  String get stickerPublishReceiptMissing =>
+      '公開されましたが、リンクを保存できませんでした。このページを離れる前に共有またはコピーしてください。';
 }

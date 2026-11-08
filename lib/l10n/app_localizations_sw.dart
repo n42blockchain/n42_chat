@@ -6328,4 +6328,8 @@ class SSw extends S {
   @override
   String get stickerPublishFailed =>
       'Uchapishaji haujathibitishwa. Angalia kikundi kabla ya kujaribu tena.';
+
+  @override
+  String get stickerPublishReceiptMissing =>
+      'Imechapishwa, lakini kiungo hakijahifadhiwa. Kishiriki au ukinakili kabla ya kuondoka kwenye ukurasa huu.';
 }

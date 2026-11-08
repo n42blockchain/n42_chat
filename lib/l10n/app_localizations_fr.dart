@@ -6362,4 +6362,8 @@ class SFr extends S {
   @override
   String get stickerPublishFailed =>
       'La publication n’a pas été confirmée. Vérifiez le groupe avant de réessayer.';
+
+  @override
+  String get stickerPublishReceiptMissing =>
+      'Publié, mais le lien n’a pas été enregistré. Partagez-le ou copiez-le avant de quitter cette page.';
 }

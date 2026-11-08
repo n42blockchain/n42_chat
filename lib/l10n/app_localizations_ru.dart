@@ -6326,4 +6326,8 @@ class SRu extends S {
   @override
   String get stickerPublishFailed =>
       'Публикация не подтверждена. Проверьте группу перед повторной попыткой.';
+
+  @override
+  String get stickerPublishReceiptMissing =>
+      'Опубликовано, но ссылка не сохранена. Поделитесь ею или скопируйте её, прежде чем покинуть страницу.';
 }

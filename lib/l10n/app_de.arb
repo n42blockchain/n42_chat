@@ -2909,5 +2909,6 @@
   "stickerPackSourceRoom": "Ursprünglicher Chat",
   "stickerPackImages": "Bilder",
   "stickerPublishNotice": "Veröffentliche dieses Paket in der ausgewählten Gruppe. Bilder und Metadaten sind nicht Ende-zu-Ende-verschlüsselt. Personen, die den Gruppenstatus lesen können, können darauf zugreifen.",
-  "stickerPublishFailed": "Die Veröffentlichung wurde nicht bestätigt. Prüfe die Gruppe vor einem erneuten Versuch."
+  "stickerPublishFailed": "Die Veröffentlichung wurde nicht bestätigt. Prüfe die Gruppe vor einem erneuten Versuch.",
+  "stickerPublishReceiptMissing": "Veröffentlicht, aber der Link wurde nicht gespeichert. Teile oder kopiere ihn, bevor du diese Seite verlässt."
 }

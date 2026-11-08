@@ -6292,4 +6292,8 @@ class SMr extends S {
   @override
   String get stickerPublishFailed =>
       'प्रकाशनाची खात्री झाली नाही. पुन्हा प्रयत्न करण्यापूर्वी गट तपासा.';
+
+  @override
+  String get stickerPublishReceiptMissing =>
+      'प्रकाशित झाले, पण दुवा जतन झाला नाही. हे पृष्ठ सोडण्यापूर्वी दुवा शेअर किंवा कॉपी करा.';
 }

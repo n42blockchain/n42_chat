@@ -2909,5 +2909,6 @@
   "stickerPackSourceRoom": "Chat sumber",
   "stickerPackImages": "Gambar",
   "stickerPublishNotice": "Publikasikan paket ini ke grup yang dipilih. Gambar dan metadatanya tidak dienkripsi dari ujung ke ujung. Orang yang dapat membaca status grup mungkin dapat mengaksesnya.",
-  "stickerPublishFailed": "Publikasi belum dikonfirmasi. Periksa grup sebelum mencoba lagi."
+  "stickerPublishFailed": "Publikasi belum dikonfirmasi. Periksa grup sebelum mencoba lagi.",
+  "stickerPublishReceiptMissing": "Sudah dipublikasikan, tetapi tautan tidak tersimpan. Bagikan atau salin tautan sebelum meninggalkan halaman ini."
 }

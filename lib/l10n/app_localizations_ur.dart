@@ -6308,4 +6308,8 @@ class SUr extends S {
   @override
   String get stickerPublishFailed =>
       'اشاعت کی تصدیق نہیں ہوئی۔ دوبارہ کوشش کرنے سے پہلے گروپ دیکھیں۔';
+
+  @override
+  String get stickerPublishReceiptMissing =>
+      'شائع ہو گیا، لیکن لنک محفوظ نہیں ہوا۔ اس صفحے سے جانے سے پہلے اسے شیئر یا کاپی کریں۔';
 }

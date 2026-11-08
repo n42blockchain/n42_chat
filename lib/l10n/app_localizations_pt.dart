@@ -6329,6 +6329,10 @@ class SPt extends S {
   @override
   String get stickerPublishFailed =>
       'A publicação não foi confirmada. Verifique o grupo antes de tentar novamente.';
+
+  @override
+  String get stickerPublishReceiptMissing =>
+      'Publicado, mas a ligação não foi guardada. Partilhe-a ou copie-a antes de sair desta página.';
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).
@@ -12656,4 +12660,8 @@ class SPtBr extends SPt {
   @override
   String get stickerPublishFailed =>
       'A publicação não foi confirmada. Verifique o grupo antes de tentar novamente.';
+
+  @override
+  String get stickerPublishReceiptMissing =>
+      'Publicado, mas o link não foi salvo. Compartilhe ou copie o link antes de sair desta página.';
 }

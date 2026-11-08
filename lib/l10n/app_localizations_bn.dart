@@ -6295,4 +6295,8 @@ class SBn extends S {
   @override
   String get stickerPublishFailed =>
       'প্রকাশ নিশ্চিত করা যায়নি। আবার চেষ্টা করার আগে গ্রুপটি দেখুন।';
+
+  @override
+  String get stickerPublishReceiptMissing =>
+      'প্রকাশিত হয়েছে, কিন্তু লিঙ্ক সংরক্ষিত হয়নি। এই পৃষ্ঠা ছাড়ার আগে লিঙ্কটি শেয়ার বা কপি করুন।';
 }

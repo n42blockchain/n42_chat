@@ -10,6 +10,7 @@ import '../../../core/utils/matrix_utils.dart';
 import '../../../domain/entities/sticker_pack_entity.dart';
 import '../../../domain/entities/sticker_pack_origin.dart';
 import '../../../core/utils/matrix_sticker_pack_link.dart';
+import '../../../core/utils/sticker_pack_fingerprint.dart';
 import '../bundled_sticker_packs.dart';
 import 'matrix_client_manager.dart';
 import '../../../core/utils/debug_log.dart';
@@ -256,6 +257,69 @@ class MatrixStickerDataSource {
         ],
       ),
     ];
+  }
+
+  /// Save a recovery receipt without changing the owned pack or its index.
+  Future<bool> savePublicationReceipt(
+    StickerPack pack,
+    StickerPackOrigin published, {
+    required bool Function() isCurrent,
+  }) async {
+    final client = _client;
+    final user = client?.userID;
+    final token = client?.accessToken;
+    final scope = accountScope;
+    bool current() =>
+        isCurrent() &&
+        accountScope == scope &&
+        identical(_client, client) &&
+        client?.accessToken == token;
+    if (client == null ||
+        user == null ||
+        token == null ||
+        token.isEmpty ||
+        !current()) {
+      return false;
+    }
+    try {
+      await client.setAccountData(user, 'n42.sticker.publication.${pack.id}', {
+        'content_hash': stickerPackFingerprint(pack),
+        'origin': published.toJson(),
+      });
+      return current();
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// A receipt for different content must never be presented as the current pack.
+  Future<String?> getPublicationReceipt(StickerPack pack) async {
+    final client = _client;
+    final user = client?.userID;
+    final token = client?.accessToken;
+    final scope = accountScope;
+    if (client == null || user == null || token == null || token.isEmpty) {
+      return null;
+    }
+    try {
+      final data = await client.getAccountData(
+        user,
+        'n42.sticker.publication.${pack.id}',
+      );
+      if (accountScope != scope ||
+          !identical(_client, client) ||
+          client.accessToken != token ||
+          data['content_hash'] != stickerPackFingerprint(pack)) {
+        return null;
+      }
+      final published = StickerPackOrigin.tryFromJson(data['origin']);
+      return published != null &&
+              parseMatrixStickerPackLink(published.shareUrl) != null
+          ? published.shareUrl
+          : null;
+    } catch (_) {
+      return null;
+    }
   }
 
   /// 安装贴纸包

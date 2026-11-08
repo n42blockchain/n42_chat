@@ -6361,4 +6361,8 @@ class STa extends S {
   @override
   String get stickerPublishFailed =>
       'வெளியீடு உறுதிப்படுத்தப்படவில்லை. மீண்டும் முயலும் முன் குழுவைச் சரிபார்க்கவும்.';
+
+  @override
+  String get stickerPublishReceiptMissing =>
+      'வெளியிடப்பட்டது, ஆனால் இணைப்பு சேமிக்கப்படவில்லை. இந்தப் பக்கத்தை விட்டு வெளியேறும் முன் அதைப் பகிரவும் அல்லது நகலெடுக்கவும்.';
 }

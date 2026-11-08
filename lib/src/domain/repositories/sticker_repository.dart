@@ -76,8 +76,9 @@ abstract class IStickerRepository {
   /// Does not join rooms or install; installPack confirms the preview separately.
   Future<StickerPack?> importPack(String shareUrl);
 
-  /// Read the original shared snapshot link; does not publish private packs.
-  Future<String?> getPackShareUrl(String packId);
+  /// Read a shared snapshot link or the latest saved owned-pack publication.
+  /// Optional reviewed content must match. This never publishes private packs.
+  Future<String?> getPackShareUrl(String packId, {StickerPack? reviewedPack});
 
   /// Publish an owned pack to a joined room after explicit user confirmation.
   /// Room state and its media are not end-to-end encrypted.

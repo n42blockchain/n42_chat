@@ -2909,5 +2909,6 @@
   "stickerPackSourceRoom": "Czat źródłowy",
   "stickerPackImages": "Obrazy",
   "stickerPublishNotice": "Opublikuj ten pakiet w wybranej grupie. Obrazy i metadane nie są szyfrowane metodą end-to-end. Osoby mogące odczytać stan grupy mogą mieć do nich dostęp.",
-  "stickerPublishFailed": "Nie potwierdzono publikacji. Sprawdź grupę przed ponowną próbą."
+  "stickerPublishFailed": "Nie potwierdzono publikacji. Sprawdź grupę przed ponowną próbą.",
+  "stickerPublishReceiptMissing": "Opublikowano, ale link nie został zapisany. Udostępnij lub skopiuj go przed opuszczeniem strony."
 }

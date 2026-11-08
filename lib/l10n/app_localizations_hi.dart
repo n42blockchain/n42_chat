@@ -6293,4 +6293,8 @@ class SHi extends S {
   @override
   String get stickerPublishFailed =>
       'प्रकाशन की पुष्टि नहीं हुई। दोबारा कोशिश करने से पहले समूह देखें।';
+
+  @override
+  String get stickerPublishReceiptMissing =>
+      'प्रकाशित हो गया, लेकिन लिंक सहेजा नहीं गया। इस पेज से जाने से पहले इसे साझा या कॉपी करें।';
 }

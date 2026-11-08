@@ -2941,5 +2941,6 @@
     "description": "Explains the unencrypted Matrix image-pack boundary before confirmed private-copy installation."
   },
   "stickerPublishNotice": "Publish this pack to the selected group. Its images and metadata are not end-to-end encrypted. People who can read the group state may access them.",
-  "stickerPublishFailed": "Publication was not confirmed. Check the group before trying again."
+  "stickerPublishFailed": "Publication was not confirmed. Check the group before trying again.",
+  "stickerPublishReceiptMissing": "Published, but the link was not saved. Share or copy it before leaving this page."
 }

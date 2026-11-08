@@ -6295,4 +6295,8 @@ class STr extends S {
   @override
   String get stickerPublishFailed =>
       'Yayımlama onaylanmadı. Yeniden denemeden önce grubu kontrol edin.';
+
+  @override
+  String get stickerPublishReceiptMissing =>
+      'Yayımlandı ancak bağlantı kaydedilmedi. Bu sayfadan ayrılmadan önce paylaşın veya kopyalayın.';
 }

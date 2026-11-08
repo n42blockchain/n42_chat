@@ -6265,4 +6265,8 @@ class SAr extends S {
   @override
   String get stickerPublishFailed =>
       'لم يتم تأكيد النشر. تحقق من المجموعة قبل المحاولة مجددًا.';
+
+  @override
+  String get stickerPublishReceiptMissing =>
+      'تم النشر، لكن لم يتم حفظ الرابط. شاركه أو انسخه قبل مغادرة هذه الصفحة.';
 }

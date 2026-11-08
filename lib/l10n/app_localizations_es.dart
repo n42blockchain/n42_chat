@@ -6338,4 +6338,8 @@ class SEs extends S {
   @override
   String get stickerPublishFailed =>
       'No se confirmó la publicación. Revisa el grupo antes de volver a intentarlo.';
+
+  @override
+  String get stickerPublishReceiptMissing =>
+      'Se publicó, pero el enlace no se guardó. Compártelo o cópialo antes de salir de esta página.';
 }

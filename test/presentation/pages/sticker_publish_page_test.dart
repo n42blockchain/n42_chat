@@ -6,6 +6,7 @@ import 'package:get_it/get_it.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:n42_chat/l10n/app_localizations.dart';
 import 'package:n42_chat/src/domain/entities/sticker_pack_entity.dart';
+import 'package:n42_chat/src/domain/entities/sticker_publication_receipt_failure.dart';
 import 'package:n42_chat/src/domain/entities/conversation_entity.dart';
 import 'package:n42_chat/src/domain/repositories/auth_repository.dart';
 import 'package:n42_chat/src/domain/repositories/sticker_repository.dart';
@@ -57,6 +58,10 @@ void main() {
     when(() => auth.currentAccountGeneration).thenReturn(generation);
     when(() => auth.accountInvalidationStream).thenAnswer((_) => events.stream);
     when(() => repo.getPackById(any())).thenAnswer((_) async => pack);
+    when(
+      () =>
+          repo.getPackShareUrl(any(), reviewedPack: any(named: 'reviewedPack')),
+    ).thenAnswer((_) async => null);
     when(
       () => repo.publishPack(
         any(),
@@ -268,6 +273,103 @@ void main() {
         ),
         findsOneWidget,
       );
+      verify(
+        () => repo.publishPack(
+          any(),
+          any(),
+          reviewedPack: any(named: 'reviewedPack'),
+        ),
+      ).called(1);
+    },
+  );
+
+  testWidgets('reopening shows saved link without publishing again', (
+    tester,
+  ) async {
+    when(
+      () =>
+          repo.getPackShareUrl(any(), reviewedPack: any(named: 'reviewedPack')),
+    ).thenAnswer((_) async => 'https://matrix.to/saved-link');
+    await open(tester);
+    expect(find.byKey(const ValueKey('sticker_publish_link')), findsOneWidget);
+    expect(find.text('https://matrix.to/saved-link'), findsOneWidget);
+    verifyNever(
+      () => repo.publishPack(
+        any(),
+        any(),
+        reviewedPack: any(named: 'reviewedPack'),
+      ),
+    );
+  });
+  testWidgets(
+    'receipt save failure keeps confirmed link and warns without retry',
+    (tester) async {
+      when(
+        () => repo.publishPack(
+          any(),
+          any(),
+          reviewedPack: any(named: 'reviewedPack'),
+        ),
+      ).thenThrow(
+        const StickerPublicationReceiptFailure(
+          'https://matrix.to/confirmed-link',
+        ),
+      );
+      await open(tester);
+      await review(tester);
+      await tester.tap(find.byKey(const ValueKey('sticker_publish_confirm')));
+      await tester.pumpAndSettle();
+      expect(find.text('https://matrix.to/confirmed-link'), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('sticker_publish_receipt_missing')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const ValueKey('sticker_publish_review')),
+        findsNothing,
+      );
+      verify(
+        () => repo.publishPack(
+          any(),
+          any(),
+          reviewedPack: any(named: 'reviewedPack'),
+        ),
+      ).called(1);
+    },
+  );
+
+  testWidgets(
+    'saved link does not prevent an explicitly confirmed new publication',
+    (tester) async {
+      when(
+        () => repo.getPackShareUrl(
+          any(),
+          reviewedPack: any(named: 'reviewedPack'),
+        ),
+      ).thenAnswer((_) async => 'https://matrix.to/saved-link');
+      await open(tester);
+      final another = find.byKey(const ValueKey('sticker_publish_another'));
+      await tester.scrollUntilVisible(
+        another,
+        150,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await Scrollable.ensureVisible(tester.element(another), alignment: 0.5);
+      await tester.pumpAndSettle();
+      expect(another.hitTestable(), findsOneWidget);
+      await tester.tap(another);
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('sticker_publish_link')), findsNothing);
+      await review(tester);
+      verifyNever(
+        () => repo.publishPack(
+          any(),
+          any(),
+          reviewedPack: any(named: 'reviewedPack'),
+        ),
+      );
+      await tester.tap(find.byKey(const ValueKey('sticker_publish_confirm')));
+      await tester.pumpAndSettle();
       verify(
         () => repo.publishPack(
           any(),

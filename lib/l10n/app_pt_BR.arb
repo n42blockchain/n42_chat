@@ -2909,5 +2909,6 @@
   "stickerPackSourceRoom": "Conversa de origem",
   "stickerPackImages": "Imagens",
   "stickerPublishNotice": "Publique este pacote no grupo selecionado. As imagens e os metadados não têm criptografia de ponta a ponta. Quem puder ler o estado do grupo poderá acessá-los.",
-  "stickerPublishFailed": "A publicação não foi confirmada. Verifique o grupo antes de tentar novamente."
+  "stickerPublishFailed": "A publicação não foi confirmada. Verifique o grupo antes de tentar novamente.",
+  "stickerPublishReceiptMissing": "Publicado, mas o link não foi salvo. Compartilhe ou copie o link antes de sair desta página."
 }

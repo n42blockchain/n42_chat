@@ -7,6 +7,7 @@ import 'package:n42_chat/src/data/repositories/sticker_repository_impl.dart';
 import 'package:n42_chat/src/data/services/matrix_sticker_publication.dart';
 import 'package:n42_chat/src/domain/entities/sticker_pack_entity.dart';
 import 'package:n42_chat/src/domain/entities/sticker_pack_origin.dart';
+import 'package:n42_chat/src/domain/entities/sticker_publication_receipt_failure.dart';
 import 'package:n42_chat/src/domain/repositories/auth_repository.dart';
 
 class _Source extends Mock implements MatrixStickerDataSource {}
@@ -33,6 +34,8 @@ void main() {
   );
   setUp(() {
     registerFallbackValue(pack);
+    registerFallbackValue(origin);
+    registerFallbackValue(() => true);
     source = _Source();
     publisher = _Publisher();
     lifecycle = _Lifecycle();
@@ -48,6 +51,15 @@ void main() {
     when(() => source.accountScope).thenReturn('original');
     when(() => source.getInstalledPacks()).thenAnswer((_) async => [pack]);
     when(() => publisher.publish(any(), any())).thenAnswer((_) async => origin);
+    when(
+      () => source.savePublicationReceipt(
+        any(),
+        any(),
+        isCurrent: any(named: 'isCurrent'),
+      ),
+    ).thenAnswer((_) async => true);
+    when(() => source.getPublicationReceipt(any()))
+        .thenAnswer((_) async => null);
     repository = StickerRepositoryImpl(source, publication: publisher);
   });
   tearDown(() => repository.dispose());
@@ -109,5 +121,103 @@ void main() {
       isNull,
     );
     verifyNever(() => publisher.publish(any(), any()));
+  });
+  test(
+    'confirmed room link is retained when private receipt save fails',
+    () async {
+      when(
+        () => source.savePublicationReceipt(
+          any(),
+          any(),
+          isCurrent: any(named: 'isCurrent'),
+        ),
+      ).thenAnswer((_) async => false);
+      await expectLater(
+        repository.publishPack(pack.id, '!room:test', reviewedPack: pack),
+        throwsA(
+          isA<StickerPublicationReceiptFailure>().having(
+            (e) => e.shareUrl,
+            'confirmed link',
+            origin.shareUrl,
+          ),
+        ),
+      );
+      verify(() => publisher.publish(pack, '!room:test')).called(1);
+    },
+  );
+  test(
+    'account invalidation during private save cannot expose old receipt',
+    () async {
+      final gate = Completer<bool>();
+      when(
+        () => source.savePublicationReceipt(
+          any(),
+          any(),
+          isCurrent: any(named: 'isCurrent'),
+        ),
+      ).thenAnswer((_) => gate.future);
+      final pending = repository.publishPack(
+        pack.id,
+        '!room:test',
+        reviewedPack: pack,
+      );
+      await Future<void>.delayed(Duration.zero);
+      active = false;
+      gate.complete(true);
+      expect(await pending, isNull);
+    },
+  );
+  test('saved receipt is read on reopening without a room write', () async {
+    when(() => source.getPublicationReceipt(pack))
+        .thenAnswer((_) async => origin.shareUrl);
+    final reopened = StickerRepositoryImpl(source, publication: publisher);
+    addTearDown(reopened.dispose);
+    expect(await reopened.getPackShareUrl(pack.id), origin.shareUrl);
+    verifyNever(() => publisher.publish(any(), any()));
+  });
+  test(
+    'mutable local list cannot change the published snapshot receipt',
+    () async {
+      final mutable = pack.copyWith(stickers: [...pack.stickers]);
+      final reviewed = mutable.copyWith(
+        stickers: List.unmodifiable(mutable.stickers),
+      );
+      when(() => source.getInstalledPacks()).thenAnswer((_) async => [mutable]);
+      final gate = Completer<StickerPackOrigin>();
+      when(() => publisher.publish(any(), any()))
+          .thenAnswer((_) => gate.future);
+      final pending = repository.publishPack(
+        pack.id,
+        '!room:test',
+        reviewedPack: reviewed,
+      );
+      await Future<void>.delayed(Duration.zero);
+      mutable.stickers[0] = mutable.stickers.single.copyWith(
+        url: 'mxc://test/changed',
+      );
+      gate.complete(origin);
+      expect(await pending, origin.shareUrl);
+      final saved =
+          verify(
+                () => source.savePublicationReceipt(
+                  captureAny(),
+                  any(),
+                  isCurrent: any(named: 'isCurrent'),
+                ),
+              ).captured.single
+              as StickerPack;
+      expect(saved.stickers.single.url, 'mxc://test/image');
+      expect(() => saved.stickers.clear(), throwsUnsupportedError);
+    },
+  );
+  test('receipt is not exposed for a different reviewed preview', () async {
+    expect(
+      await repository.getPackShareUrl(
+        pack.id,
+        reviewedPack: pack.copyWith(name: 'Other art'),
+      ),
+      isNull,
+    );
+    verifyNever(() => source.getPublicationReceipt(any()));
   });
 }

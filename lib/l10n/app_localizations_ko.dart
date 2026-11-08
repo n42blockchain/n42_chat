@@ -6158,4 +6158,8 @@ class SKo extends S {
 
   @override
   String get stickerPublishFailed => '게시가 확인되지 않았습니다. 다시 시도하기 전에 그룹을 확인하세요.';
+
+  @override
+  String get stickerPublishReceiptMissing =>
+      '게시되었지만 링크가 저장되지 않았습니다. 이 페이지를 나가기 전에 링크를 공유하거나 복사하세요.';
 }

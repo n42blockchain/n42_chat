@@ -2909,5 +2909,6 @@
   "stickerPackSourceRoom": "Zdrojový chat",
   "stickerPackImages": "Obrázky",
   "stickerPublishNotice": "Zveřejněte tento balíček ve vybrané skupině. Obrázky a metadata nejsou koncově šifrované. Mohou k nim přistupovat lidé, kteří mohou číst stav skupiny.",
-  "stickerPublishFailed": "Zveřejnění nebylo potvrzeno. Před dalším pokusem zkontrolujte skupinu."
+  "stickerPublishFailed": "Zveřejnění nebylo potvrzeno. Před dalším pokusem zkontrolujte skupinu.",
+  "stickerPublishReceiptMissing": "Zveřejněno, ale odkaz se neuložil. Před opuštěním stránky jej sdílejte nebo zkopírujte."
 }

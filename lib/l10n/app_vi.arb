@@ -2909,5 +2909,6 @@
   "stickerPackSourceRoom": "Cuộc trò chuyện nguồn",
   "stickerPackImages": "Hình ảnh",
   "stickerPublishNotice": "Đăng gói này vào nhóm đã chọn. Hình ảnh và siêu dữ liệu không được mã hóa đầu cuối. Người có thể đọc trạng thái nhóm có thể truy cập chúng.",
-  "stickerPublishFailed": "Chưa xác nhận được việc đăng. Hãy kiểm tra nhóm trước khi thử lại."
+  "stickerPublishFailed": "Chưa xác nhận được việc đăng. Hãy kiểm tra nhóm trước khi thử lại.",
+  "stickerPublishReceiptMissing": "Đã đăng nhưng chưa lưu được liên kết. Hãy chia sẻ hoặc sao chép liên kết trước khi rời trang này."
 }

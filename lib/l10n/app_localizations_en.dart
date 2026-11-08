@@ -6264,4 +6264,8 @@ class SEn extends S {
   @override
   String get stickerPublishFailed =>
       'Publication was not confirmed. Check the group before trying again.';
+
+  @override
+  String get stickerPublishReceiptMissing =>
+      'Published, but the link was not saved. Share or copy it before leaving this page.';
 }

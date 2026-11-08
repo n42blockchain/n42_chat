@@ -7,6 +7,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../domain/entities/conversation_entity.dart';
 import '../../../domain/entities/sticker_pack_entity.dart';
+import '../../../domain/entities/sticker_publication_receipt_failure.dart';
 import '../../../domain/repositories/auth_repository.dart';
 import '../../../domain/repositories/conversation_repository.dart';
 import '../../../domain/repositories/sticker_repository.dart';
@@ -33,6 +34,7 @@ class _StickerPublishPageState extends State<StickerPublishPage> {
   List<ConversationEntity> _rooms = [];
   ConversationEntity? _selected;
   String? _link;
+  bool _receiptMissing = false;
   bool _loading = true, _busy = false, _confirming = false, _failed = false;
 
   bool get _current =>
@@ -79,6 +81,7 @@ class _StickerPublishPageState extends State<StickerPublishPage> {
       _rooms = [];
       _selected = null;
       _link = null;
+      _receiptMissing = false;
       _loading = false;
       _busy = false;
       _confirming = false;
@@ -91,7 +94,18 @@ class _StickerPublishPageState extends State<StickerPublishPage> {
       return;
     }
     try {
-      final pack = await _repo.getPackById(widget.packId);
+      final loaded = await _repo.getPackById(widget.packId);
+      final pack = loaded?.copyWith(
+        stickers: List.unmodifiable(loaded.stickers),
+      );
+      if (!mounted) return;
+      if (!_current) {
+        _invalidate();
+        return;
+      }
+      final link = pack?.source == StickerPackSource.custom
+          ? await _repo.getPackShareUrl(widget.packId, reviewedPack: pack)
+          : null;
       if (!mounted) return;
       if (!_current) {
         _invalidate();
@@ -109,6 +123,7 @@ class _StickerPublishPageState extends State<StickerPublishPage> {
             .where((r) => r.isGroup && !r.isInvite && !r.isHidden)
             .toList();
         _failed = _pack == null;
+        _link = link;
         _loading = false;
       });
     } catch (_) {
@@ -197,6 +212,18 @@ class _StickerPublishPageState extends State<StickerPublishPage> {
         _busy = false;
         _failed = link == null;
       });
+    } on StickerPublicationReceiptFailure catch (error) {
+      if (!mounted) return;
+      if (!_current) {
+        _invalidate();
+        return;
+      }
+      setState(() {
+        _link = error.shareUrl;
+        _receiptMissing = true;
+        _busy = false;
+        _failed = false;
+      });
     } catch (_) {
       if (!mounted) return;
       if (!_current) {
@@ -244,7 +271,11 @@ class _StickerPublishPageState extends State<StickerPublishPage> {
                     if (_failed)
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 12),
-                        child: Text(l10n.stickerPublishFailed),
+                        child: Text(
+                          _pack == null
+                              ? l10n.commonLoadFailed
+                              : l10n.stickerPublishFailed,
+                        ),
                       ),
                     if (pack != null) ...[
                       const SizedBox(height: 16),
@@ -305,10 +336,34 @@ class _StickerPublishPageState extends State<StickerPublishPage> {
                               : Text(l10n.groupPublish),
                         )
                       else ...[
+                        if (_receiptMissing)
+                          Text(
+                            l10n.stickerPublishReceiptMissing,
+                            key: const ValueKey(
+                              'sticker_publish_receipt_missing',
+                            ),
+                          ),
                         SelectableText(
                           _link!,
                           key: const ValueKey('sticker_publish_link'),
                           textDirection: TextDirection.ltr,
+                        ),
+                        TextButton.icon(
+                          key: const ValueKey('sticker_publish_another'),
+                          onPressed: () {
+                            if (!_current) {
+                              _invalidate();
+                              return;
+                            }
+                            setState(() {
+                              _link = null;
+                              _selected = null;
+                              _receiptMissing = false;
+                              _failed = false;
+                            });
+                          },
+                          icon: const Icon(Icons.add),
+                          label: Text(l10n.groupPublish),
                         ),
                         Builder(
                           builder: (context) => FilledButton.icon(

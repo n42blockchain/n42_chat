@@ -10,6 +10,7 @@ import 'package:n42_chat/src/data/datasources/matrix/matrix_client_manager.dart'
 import 'package:n42_chat/src/data/datasources/matrix/matrix_sticker_datasource.dart';
 import 'package:n42_chat/src/data/repositories/sticker_repository_impl.dart';
 import 'package:n42_chat/src/domain/entities/sticker_pack_origin.dart';
+import 'package:n42_chat/src/core/utils/matrix_sticker_pack_link.dart';
 import 'package:n42_chat/src/domain/entities/sticker_pack_entity.dart';
 import 'package:n42_chat/src/domain/repositories/auth_repository.dart';
 import 'package:n42_chat/src/data/services/matrix_sticker_publication.dart';
@@ -132,25 +133,61 @@ void main() {
                 call.positionalArguments[3] as Map<String, dynamic>,
               ),
             );
-        final published =
-            await MatrixStickerPublication(ownerManager, lifecycle).publish(
-              StickerPack(
-                id: 'custom_live',
-                name: 'Owned shared art',
-                author: 'Synthetic QA',
-                source: StickerPackSource.custom,
-                stickers: [
-                  Sticker(
-                    id: 'smile',
-                    url: '$mxc',
-                    name: 'Synthetic pixel',
-                    mimeType: 'image/png',
-                  ),
-                ],
-              ),
-              roomId,
-            );
-        final eventId = published.eventId;
+        when(() => ownerClient.getAccountData(any(), any())).thenAnswer(
+          (call) => apis.first.getAccountData(
+            call.positionalArguments[0] as String,
+            call.positionalArguments[1] as String,
+          ),
+        );
+        when(() => ownerClient.setAccountData(any(), any(), any())).thenAnswer(
+          (call) => apis.first.setAccountData(
+            call.positionalArguments[0] as String,
+            call.positionalArguments[1] as String,
+            call.positionalArguments[2] as Map<String, dynamic>,
+          ),
+        );
+        final owned = StickerPack(
+          id: 'custom_live',
+          name: 'Owned shared art',
+          author: 'Synthetic QA',
+          source: StickerPackSource.custom,
+          stickers: [
+            Sticker(
+              id: 'smile',
+              url: '$mxc',
+              name: 'Synthetic pixel',
+              mimeType: 'image/png',
+            ),
+          ],
+        );
+        final ownerSource = MatrixStickerDataSource(ownerManager);
+        expect(await ownerSource.installPack(owned.id, owned), isTrue);
+        final ownerRepository = StickerRepositoryImpl(
+          ownerSource,
+          publication: MatrixStickerPublication(ownerManager, lifecycle),
+        );
+        addTearDown(ownerRepository.dispose);
+        final reviewed = await ownerRepository.getPackById(owned.id);
+        final shareUrl = await ownerRepository.publishPack(
+          owned.id,
+          roomId,
+          reviewedPack: reviewed!,
+        );
+        expect(shareUrl, isNotNull);
+        final eventId = parseMatrixStickerPackLink(shareUrl!)!.eventId;
+        final reopenedOwner = StickerRepositoryImpl(
+          MatrixStickerDataSource(ownerManager),
+        );
+        addTearDown(reopenedOwner.dispose);
+        expect(await reopenedOwner.getPackShareUrl(owned.id), shareUrl);
+        verify(
+          () => ownerClient.setRoomStateWithKey(
+            any(),
+            'm.room.image_pack',
+            any(),
+            any(),
+          ),
+        ).called(1);
         final reference = StickerPackOrigin(
           roomId: roomId,
           eventId: eventId,
@@ -194,7 +231,7 @@ void main() {
         await apis.last.joinRoom(roomId);
         final preview = await repository.importPack(reference.shareUrl);
         expect(preview, isNotNull);
-        expect(preview!.origin!.stateKey, published.stateKey);
+        expect(preview!.origin!.stateKey, startsWith('n42_'));
         verifyNever(() => client.setAccountData(any(), any(), any()));
         final media = await apis.last.httpClient.get(
           Uri.parse(preview.stickers.single.httpUrl!),

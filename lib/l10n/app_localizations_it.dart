@@ -6324,4 +6324,8 @@ class SIt extends S {
   @override
   String get stickerPublishFailed =>
       'La pubblicazione non è stata confermata. Controlla il gruppo prima di riprovare.';
+
+  @override
+  String get stickerPublishReceiptMissing =>
+      'Pubblicato, ma il link non è stato salvato. Condividilo o copialo prima di lasciare questa pagina.';
 }

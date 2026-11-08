@@ -6341,4 +6341,8 @@ class STe extends S {
   @override
   String get stickerPublishFailed =>
       'ప్రచురణ నిర్ధారించబడలేదు. మళ్లీ ప్రయత్నించే ముందు గ్రూపును తనిఖీ చేయండి.';
+
+  @override
+  String get stickerPublishReceiptMissing =>
+      'ప్రచురించబడింది, కానీ లింక్ సేవ్ కాలేదు. ఈ పేజీ నుండి వెళ్లే ముందు దాన్ని షేర్ చేయండి లేదా కాపీ చేయండి.';
 }

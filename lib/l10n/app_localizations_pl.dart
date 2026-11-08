@@ -6333,4 +6333,8 @@ class SPl extends S {
   @override
   String get stickerPublishFailed =>
       'Nie potwierdzono publikacji. Sprawdź grupę przed ponowną próbą.';
+
+  @override
+  String get stickerPublishReceiptMissing =>
+      'Opublikowano, ale link nie został zapisany. Udostępnij lub skopiuj go przed opuszczeniem strony.';
 }

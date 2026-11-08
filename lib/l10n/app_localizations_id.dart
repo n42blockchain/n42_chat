@@ -6306,4 +6306,8 @@ class SId extends S {
   @override
   String get stickerPublishFailed =>
       'Publikasi belum dikonfirmasi. Periksa grup sebelum mencoba lagi.';
+
+  @override
+  String get stickerPublishReceiptMissing =>
+      'Sudah dipublikasikan, tetapi tautan tidak tersimpan. Bagikan atau salin tautan sebelum meninggalkan halaman ini.';
 }

@@ -6281,4 +6281,8 @@ class SVi extends S {
   @override
   String get stickerPublishFailed =>
       'Chưa xác nhận được việc đăng. Hãy kiểm tra nhóm trước khi thử lại.';
+
+  @override
+  String get stickerPublishReceiptMissing =>
+      'Đã đăng nhưng chưa lưu được liên kết. Hãy chia sẻ hoặc sao chép liên kết trước khi rời trang này.';
 }
