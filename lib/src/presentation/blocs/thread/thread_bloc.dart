@@ -19,6 +19,7 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
   int _generation = 0;
   int _streamRevision = 0;
   int _historyRevision = 0;
+  bool _hasLoadedOlderPages = false;
   StreamSubscription<void>? _historyChangesSubscription;
   bool Function()? _threadSessionGuard;
 
@@ -115,6 +116,7 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
       return;
     }
     _generation++;
+    _hasLoadedOlderPages = false;
     _detachSubscription();
     final repository = _messageRepository;
     _threadSessionGuard = repository is IThreadHistoryVisibilityRepository
@@ -273,28 +275,78 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
     final roomId = state.roomId!;
     final rootId = state.threadRootEventId!;
 
+    final before = {
+      if (state.rootMessage != null) state.rootMessage!.id: state.rootMessage!,
+      for (final message in state.replies) message.id: message,
+    };
+    final retainCursor = _hasLoadedOlderPages;
+    var checkingVisibility = false;
     emit(state.copyWith(isLoading: true));
     try {
       final page = await _loadPage(roomId, rootId);
-
-      if (!isCurrent()) return;
-      final messages = page.messages;
-      final replies = messages
-          .where((m) => m.id != state.threadRootEventId)
-          .toList();
-
-      emit(
-        state.copyWith(
-          replies: replies,
-          isLoading: false,
-          hasMore: page.hasMore,
-          nextBatch: page.nextBatch,
-          clearNextBatch: page.nextBatch == null,
-        ),
-      );
+      final repository = _messageRepository;
+      while (isCurrent()) {
+        final snapshot = state;
+        final current = [
+          if (snapshot.rootMessage != null) snapshot.rootMessage!,
+          ...snapshot.replies,
+        ];
+        final merged = <String, MessageEntity>{
+          for (final message in current) message.id: message,
+          for (final message in page.messages) message.id: message,
+          // Live edits and arrivals after refresh began beat its response.
+          for (final message in current)
+            if (!identical(before[message.id], message)) message.id: message,
+        }.values.toList();
+        checkingVisibility = true;
+        final visible = repository is IThreadHistoryVisibilityRepository
+            ? await (repository as IThreadHistoryVisibilityRepository)
+                  .filterThreadHistory(roomId, merged)
+            : merged;
+        checkingVisibility = false;
+        if (!isCurrent()) return;
+        // A stream update or clear can complete during the visibility read.
+        if (!identical(snapshot, state)) continue;
+        final root = visible.where((m) => m.id == rootId).firstOrNull;
+        final replies = visible.where((m) => m.id != rootId).toList();
+        final order = {
+          for (var i = 0; i < replies.length; i++) replies[i].id: i,
+        };
+        replies.sort((a, b) {
+          final time = a.timestamp.compareTo(b.timestamp);
+          return time != 0 ? time : order[a.id]!.compareTo(order[b.id]!);
+        });
+        emit(
+          state.copyWith(
+            rootMessage: root,
+            clearRootMessage: root == null,
+            replies: replies,
+            participantCount: {
+              if (root != null) root.senderId,
+              for (final message in replies) message.senderId,
+            }.length,
+            isLoading: false,
+            clearError: true,
+            hasMore: retainCursor ? snapshot.hasMore : page.hasMore,
+            nextBatch: retainCursor ? snapshot.nextBatch : page.nextBatch,
+            clearNextBatch:
+                (retainCursor ? snapshot.nextBatch : page.nextBatch) == null,
+          ),
+        );
+        return;
+      }
     } catch (e) {
       if (!isCurrent()) return;
-      emit(state.copyWith(isLoading: false, error: e.toString()));
+      emit(
+        state.copyWith(
+          isLoading: false,
+          error: e.toString(),
+          clearRootMessage: checkingVisibility,
+          replies: checkingVisibility ? const [] : null,
+          participantCount: checkingVisibility ? 0 : null,
+          clearReplyTarget: checkingVisibility,
+        ),
+      );
     }
   }
 
@@ -331,6 +383,7 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
           .where((m) => m.id != state.threadRootEventId)
           .toList();
 
+      _hasLoadedOlderPages = true;
       emit(
         state.copyWith(
           // Current entries win over overlapping older-page data, preserving

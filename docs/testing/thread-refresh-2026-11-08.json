@@ -1,0 +1,17 @@
+{
+  "date": "2026-11-08",
+  "scope": "Standalone Chat thread refresh repair; not included in wallet 73525",
+  "pre_fix_failures": 3,
+  "new_cases": 6,
+  "focused_passed": 58,
+  "focused_log": "/tmp/n42-chat-thread-refresh-cluster.log",
+  "analysis_log": "/tmp/n42-chat-thread-refresh-analysis.log",
+  "analysis_errors": 0,
+  "analysis_warnings": 0,
+  "remaining": [
+    "Full Chat regression",
+    "Wallet immutable pin integration",
+    "Native and real-homeserver acceptance",
+    "Older remote redactions and initial fallback completeness"
+  ]
+}
