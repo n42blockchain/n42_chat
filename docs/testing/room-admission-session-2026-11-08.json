@@ -7,12 +7,24 @@
   "analysis": "No issues found",
   "boundaries": [
     "Local known-gate check is not authoritative homeserver admission",
-    "Full regression and host pin integration pending",
-    "No live room join or production configuration changed"
+    "No live room join or production configuration changed",
+    "Host pin integration pending"
   ],
   "logs": {
     "/tmp/n42-room-admission-before.log": "dd7966bb2e4e36b099b654d1492165962a6c71b8eea9d74e42afd3d7c690bfe1",
     "/tmp/n42-room-admission-after.log": "f5498941d61ef51c31eb3ed7db421abd61e6cdcdbd31a40dad97aa25e93975e4",
     "/tmp/n42-room-admission-analysis.log": "22114e94cf6893057cad76b3d3564189355888ad1837754366adb5d932c38023"
+  },
+  "full_regression": {
+    "source": "26c84ac0a61b68de46132041ab6921f605173bfe",
+    "passed": 9074,
+    "failed": 0,
+    "environment_skips": 7,
+    "exit_code": 0,
+    "covered_lines": 107626,
+    "lines": 148085,
+    "coverage_percent": 72.67852922308134,
+    "json_sha256": "ff599711cb4d7d365e600b6b3c142b42cbd47d783385cac33907ca32c6b74805",
+    "lcov_sha256": "617ffb40043e15e662b56f2622c1e6d3f9d744d97486a21860e43336f817adcf"
   }
 }
