@@ -1073,7 +1073,7 @@ class SZh extends S {
   String get chatPrivateChat => '私聊';
 
   @override
-  String get chatNoMessages => '暫無消息';
+  String get chatNoMessages => '暂无消息';
 
   @override
   String get chatSendFirstMessage => '發送第一條消息開始聊天';

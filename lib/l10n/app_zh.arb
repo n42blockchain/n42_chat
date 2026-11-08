@@ -340,7 +340,7 @@
   "chatSelectAll": "全選",
   "chatGroupChatCount": "羣聊({count})",
   "chatPrivateChat": "私聊",
-  "chatNoMessages": "暫無消息",
+  "chatNoMessages": "暂无消息",
   "chatSendFirstMessage": "發送第一條消息開始聊天",
   "chatEncryptionNotice": "此聊天已啓用端到端加密。只有您和對方可以閱讀消息。",
   "chatMultiForward": "轉發",

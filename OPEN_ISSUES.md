@@ -839,6 +839,8 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ### QA-006 Direct UI literals still need module-by-module translation review
 
+- 2026-11-08 catalog correction: Simplified Chinese `chatNoMessages` now uses `暂无消息`; Traditional Chinese remains `暫無消息`. Generated localization was regenerated and the generated-locale copy suite passes. Attachment-panel direct literals, recent-photo heading semantics, broader linguistic review and device acceptance remain open. This follow-up is separate from the frozen wallet 73510 release source.
+
 - 2026-11-08 phone-render follow-up: real-font English/Chinese/Arabic probes at 360x640 verify attachment/keyboard transition, scrollable empty content and hit-testable photo/camera/file/poll actions. Six reviewed captures also confirm existing untranslated `Event` and `Could not load recent media` labels in `chat_more_panel.dart`, reuse of the played-media label for recent photos, and Traditional Chinese wording in the Simplified Chinese `chatNoMessages` catalog entry. These remain QA-006 work; key parity and layout success do not close linguistic review. Rendering uses synthetic media adapters and is not native acceptance.
 
 - 2026-11-06 regression follow-up: the full suite finished with 7,914 passed, four external-fixture skips and one stale poll scheduling-label failure. Both scheduling-enabled and scheduling-disabled assertions now resolve the localized title rather than the old English literal; all 11 poll composer tests pass. Full-suite rerun passed: 7,915 tests, four external-fixture skips, zero failures (`/tmp/n42-chat-full-fixtures-fixed-20261106.log`). No fresh coverage was measured; this does not close the module-wide localization or device review.
