@@ -6253,4 +6253,35 @@ class SMr extends S {
   @override
   String get backupOlderFilesWarning =>
       'या फायली दुसऱ्या खात्याच्या असू शकतात. पुनर्संचयित करण्यापूर्वी मजकूर आणि मालक तपासण्यासाठी फाइल निवडा.';
+
+  @override
+  String get stickerImportTitle => 'स्टिकर संच आयात करा';
+
+  @override
+  String get stickerImportLinkHint => 'Matrix स्टिकर संचाची लिंक';
+
+  @override
+  String get stickerImportPreview => 'पूर्वावलोकन';
+
+  @override
+  String get stickerImportUnavailable =>
+      'हा संच उपलब्ध नाही किंवा तुम्हाला प्रवेश नाही.';
+
+  @override
+  String get stickerImportCopyNotice =>
+      'या संचाची खाजगी प्रत जोडा. यातील प्रतिमा आणि मेटाडेटा यांना एंड-टू-एंड एन्क्रिप्शनचे संरक्षण नाही.';
+
+  @override
+  String get stickerImportFailed =>
+      'हा संच जोडता आला नाही. पुन्हा प्रयत्न करा.';
+
+  @override
+  String get stickerImportAccountChanged =>
+      'खाते बदलले आहे किंवा सत्राची मुदत संपली आहे. स्टिकर आयात पुन्हा उघडा.';
+
+  @override
+  String get stickerPackSourceRoom => 'स्रोत चॅट';
+
+  @override
+  String get stickerPackImages => 'प्रतिमा';
 }

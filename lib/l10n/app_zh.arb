@@ -2286,5 +2286,14 @@
   "backupRecoverLegacyArchive": "恢复旧的本地历史",
   "backupLegacyArchiveWarning": "这些历史记录的账号归属未经验证。请仅将属于你的房间复制到下方账号，原始记录会保留。",
   "backupOlderFiles": "旧备份文件",
-  "backupOlderFilesWarning": "这些文件可能属于其他账号。请选择文件，核对内容和账号归属后再恢复。"
+  "backupOlderFilesWarning": "这些文件可能属于其他账号。请选择文件，核对内容和账号归属后再恢复。",
+  "stickerImportTitle": "导入贴纸包",
+  "stickerImportLinkHint": "Matrix 贴纸包链接",
+  "stickerImportPreview": "预览",
+  "stickerImportUnavailable": "此贴纸包不可用，或你没有访问权限。",
+  "stickerImportCopyNotice": "添加此贴纸包的私人副本。图片和元数据不受端到端加密保护。",
+  "stickerImportFailed": "无法添加此贴纸包，请重试。",
+  "stickerImportAccountChanged": "账号已变更或登录已失效，请重新打开贴纸导入。",
+  "stickerPackSourceRoom": "来源会话",
+  "stickerPackImages": "图片"
 }

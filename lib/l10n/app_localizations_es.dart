@@ -6299,4 +6299,35 @@ class SEs extends S {
   @override
   String get backupOlderFilesWarning =>
       'Estos archivos pueden pertenecer a otra cuenta. Selecciona uno para comprobar su contenido y propietario antes de restaurarlo.';
+
+  @override
+  String get stickerImportTitle => 'Importar paquete de stickers';
+
+  @override
+  String get stickerImportLinkHint => 'Enlace al paquete de stickers de Matrix';
+
+  @override
+  String get stickerImportPreview => 'Vista previa';
+
+  @override
+  String get stickerImportUnavailable =>
+      'Este paquete no está disponible o no tienes acceso.';
+
+  @override
+  String get stickerImportCopyNotice =>
+      'Añade una copia privada de este paquete. Sus imágenes y metadatos no están cifrados de extremo a extremo.';
+
+  @override
+  String get stickerImportFailed =>
+      'No se pudo añadir este paquete. Inténtalo de nuevo.';
+
+  @override
+  String get stickerImportAccountChanged =>
+      'La cuenta cambió o la sesión caducó. Vuelve a abrir la importación de stickers.';
+
+  @override
+  String get stickerPackSourceRoom => 'Chat de origen';
+
+  @override
+  String get stickerPackImages => 'Imágenes';
 }

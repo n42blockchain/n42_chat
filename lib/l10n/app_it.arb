@@ -2898,5 +2898,14 @@
   "backupRecoverLegacyArchive": "Recupera la cronologia locale precedente",
   "backupLegacyArchiveWarning": "Il proprietario di questa cronologia non è verificato. Copia solo le tue stanze nell’account qui sotto. L’originale viene conservato.",
   "backupOlderFiles": "File di backup precedenti",
-  "backupOlderFilesWarning": "Questi file potrebbero appartenere a un altro account. Seleziona un file per verificarne contenuto e proprietario prima del ripristino."
+  "backupOlderFilesWarning": "Questi file potrebbero appartenere a un altro account. Seleziona un file per verificarne contenuto e proprietario prima del ripristino.",
+  "stickerImportTitle": "Importa pacchetto di adesivi",
+  "stickerImportLinkHint": "Link al pacchetto di adesivi Matrix",
+  "stickerImportPreview": "Anteprima",
+  "stickerImportUnavailable": "Questo pacchetto non è disponibile o non hai accesso.",
+  "stickerImportCopyNotice": "Aggiungi una copia privata di questo pacchetto. Le immagini e i metadati non sono crittografati end-to-end.",
+  "stickerImportFailed": "Impossibile aggiungere questo pacchetto. Riprova.",
+  "stickerImportAccountChanged": "L’account è cambiato o la sessione è scaduta. Riapri l’importazione degli adesivi.",
+  "stickerPackSourceRoom": "Chat di origine",
+  "stickerPackImages": "Immagini"
 }

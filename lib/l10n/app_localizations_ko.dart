@@ -6122,4 +6122,33 @@ class SKo extends S {
   @override
   String get backupOlderFilesWarning =>
       '다른 계정의 파일일 수 있습니다. 파일을 선택하고 내용과 소유자를 확인한 후 복원하세요.';
+
+  @override
+  String get stickerImportTitle => '스티커 팩 가져오기';
+
+  @override
+  String get stickerImportLinkHint => 'Matrix 스티커 팩 링크';
+
+  @override
+  String get stickerImportPreview => '미리 보기';
+
+  @override
+  String get stickerImportUnavailable => '이 팩을 사용할 수 없거나 접근 권한이 없습니다.';
+
+  @override
+  String get stickerImportCopyNotice =>
+      '이 팩의 비공개 사본을 추가합니다. 이미지와 메타데이터는 종단간 암호화되지 않습니다.';
+
+  @override
+  String get stickerImportFailed => '이 팩을 추가할 수 없습니다. 다시 시도하세요.';
+
+  @override
+  String get stickerImportAccountChanged =>
+      '계정이 변경되었거나 세션이 만료되었습니다. 스티커 가져오기를 다시 여세요.';
+
+  @override
+  String get stickerPackSourceRoom => '출처 채팅';
+
+  @override
+  String get stickerPackImages => '이미지';
 }

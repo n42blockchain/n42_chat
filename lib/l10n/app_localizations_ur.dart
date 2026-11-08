@@ -6269,4 +6269,35 @@ class SUr extends S {
   @override
   String get backupOlderFilesWarning =>
       'یہ فائلیں کسی دوسرے اکاؤنٹ کی ہو سکتی ہیں۔ بحالی سے پہلے مواد اور مالک کی جانچ کے لیے فائل منتخب کریں۔';
+
+  @override
+  String get stickerImportTitle => 'اسٹیکر پیک درآمد کریں';
+
+  @override
+  String get stickerImportLinkHint => 'Matrix اسٹیکر پیک کا لنک';
+
+  @override
+  String get stickerImportPreview => 'پیش نظارہ';
+
+  @override
+  String get stickerImportUnavailable =>
+      'یہ پیک دستیاب نہیں یا آپ کو اس تک رسائی کی اجازت نہیں۔';
+
+  @override
+  String get stickerImportCopyNotice =>
+      'اس پیک کی ایک نجی نقل شامل کریں۔ اس کی تصاویر اور میٹا ڈیٹا اینڈ ٹو اینڈ انکرپشن سے محفوظ نہیں ہیں۔';
+
+  @override
+  String get stickerImportFailed =>
+      'یہ پیک شامل نہیں ہو سکا۔ دوبارہ کوشش کریں۔';
+
+  @override
+  String get stickerImportAccountChanged =>
+      'اکاؤنٹ بدل گیا ہے یا سیشن ختم ہو گیا ہے۔ اسٹیکر درآمد دوبارہ کھولیں۔';
+
+  @override
+  String get stickerPackSourceRoom => 'ماخذ چیٹ';
+
+  @override
+  String get stickerPackImages => 'تصاویر';
 }

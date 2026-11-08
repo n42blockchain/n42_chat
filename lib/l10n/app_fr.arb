@@ -2898,5 +2898,14 @@
   "backupRecoverLegacyArchive": "Restaurer un ancien historique local",
   "backupLegacyArchiveWarning": "Le propriétaire de cet historique n’est pas vérifié. Copiez uniquement vos salons vers le compte ci-dessous. L’original est conservé.",
   "backupOlderFiles": "Anciens fichiers de sauvegarde",
-  "backupOlderFilesWarning": "Ces fichiers peuvent appartenir à un autre compte. Sélectionnez un fichier pour vérifier son contenu et son propriétaire avant de le restaurer."
+  "backupOlderFilesWarning": "Ces fichiers peuvent appartenir à un autre compte. Sélectionnez un fichier pour vérifier son contenu et son propriétaire avant de le restaurer.",
+  "stickerImportTitle": "Importer un pack de stickers",
+  "stickerImportLinkHint": "Lien du pack de stickers Matrix",
+  "stickerImportPreview": "Aperçu",
+  "stickerImportUnavailable": "Ce pack est indisponible ou vous n’y avez pas accès.",
+  "stickerImportCopyNotice": "Ajoutez une copie privée de ce pack. Ses images et métadonnées ne sont pas chiffrées de bout en bout.",
+  "stickerImportFailed": "Impossible d’ajouter ce pack. Réessayez.",
+  "stickerImportAccountChanged": "Le compte a changé ou la session a expiré. Rouvrez l’importation de stickers.",
+  "stickerPackSourceRoom": "Discussion d’origine",
+  "stickerPackImages": "Images"
 }

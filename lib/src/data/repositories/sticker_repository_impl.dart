@@ -70,7 +70,6 @@ class StickerRepositoryImpl implements IStickerRepository {
         author: 'N42 Studio',
         source: StickerPackSource.store,
         isOfficial: true,
-        downloadCount: 12500,
         stickers: [
           Sticker(id: 'cat1', url: 'emoji:🐱', emoji: '🐱'),
           Sticker(id: 'dog1', url: 'emoji:🐶', emoji: '🐶'),
@@ -85,7 +84,6 @@ class StickerRepositoryImpl implements IStickerRepository {
         author: 'N42 Studio',
         source: StickerPackSource.store,
         isOfficial: true,
-        downloadCount: 8900,
         stickers: [
           Sticker(id: 'happy1', url: 'emoji:😊', emoji: '😊'),
           Sticker(id: 'sad1', url: 'emoji:😢', emoji: '😢'),
@@ -99,7 +97,6 @@ class StickerRepositoryImpl implements IStickerRepository {
         description: 'Delicious food stickers',
         author: 'Community',
         source: StickerPackSource.store,
-        downloadCount: 5600,
         stickers: [
           Sticker(id: 'pizza1', url: 'emoji:🍕', emoji: '🍕'),
           Sticker(id: 'burger1', url: 'emoji:🍔', emoji: '🍔'),
@@ -113,7 +110,6 @@ class StickerRepositoryImpl implements IStickerRepository {
         description: 'Party and celebration stickers',
         author: 'Community',
         source: StickerPackSource.store,
-        downloadCount: 4200,
         stickers: [
           Sticker(id: 'party1', url: 'emoji:🎉', emoji: '🎉'),
           Sticker(id: 'gift1', url: 'emoji:🎁', emoji: '🎁'),
@@ -449,8 +445,12 @@ class StickerRepositoryImpl implements IStickerRepository {
         ? packs.toList()
         : packs.where((pack) => _matchesStoreCategory(pack, category)).toList();
 
-    if (category == 'popular') {
-      filtered.sort((a, b) => b.downloadCount.compareTo(a.downloadCount));
+    if (category == 'popular' &&
+        filtered.any((pack) => pack.downloadCount > 0)) {
+      filtered.sort((a, b) {
+        final count = b.downloadCount.compareTo(a.downloadCount);
+        return count != 0 ? count : a.id.compareTo(b.id);
+      });
     } else if (category == 'new') {
       filtered.sort((a, b) => b.id.compareTo(a.id));
     }

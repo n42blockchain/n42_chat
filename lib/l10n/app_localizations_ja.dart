@@ -6119,4 +6119,33 @@ class SJa extends S {
   @override
   String get backupOlderFilesWarning =>
       'これらのファイルは別のアカウントのものかもしれません。ファイルを選び、内容と所有者を確認してから復元してください。';
+
+  @override
+  String get stickerImportTitle => 'ステッカーパックをインポート';
+
+  @override
+  String get stickerImportLinkHint => 'Matrix のステッカーパックリンク';
+
+  @override
+  String get stickerImportPreview => 'プレビュー';
+
+  @override
+  String get stickerImportUnavailable => 'このパックは利用できないか、アクセス権がありません。';
+
+  @override
+  String get stickerImportCopyNotice =>
+      'このパックの非公開コピーを追加します。画像とメタデータはエンドツーエンド暗号化されていません。';
+
+  @override
+  String get stickerImportFailed => 'このパックを追加できませんでした。もう一度お試しください。';
+
+  @override
+  String get stickerImportAccountChanged =>
+      'アカウントが変わったか、セッションが切れました。インポート画面を開き直してください。';
+
+  @override
+  String get stickerPackSourceRoom => '共有元のチャット';
+
+  @override
+  String get stickerPackImages => '画像';
 }

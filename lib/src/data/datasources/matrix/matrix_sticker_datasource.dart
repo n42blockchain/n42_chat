@@ -220,6 +220,10 @@ class MatrixStickerDataSource {
           roomId: reference.roomId,
           eventId: reference.eventId,
           stateKey: event.stateKey!,
+          roomName:
+              room != null && room.name.isNotEmpty && room.name.length <= 512
+              ? room.name
+              : null,
           viaServers: reference.viaServers,
         ),
       );

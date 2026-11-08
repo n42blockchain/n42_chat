@@ -2898,5 +2898,14 @@
   "backupRecoverLegacyArchive": "Obnovit starší místní historii",
   "backupLegacyArchiveWarning": "Vlastník této historie nebyl ověřen. Zkopírujte pouze své místnosti do níže uvedeného účtu. Originál zůstane zachován.",
   "backupOlderFiles": "Starší soubory záloh",
-  "backupOlderFilesWarning": "Tyto soubory mohou patřit jinému účtu. Vyberte soubor a před obnovením ověřte jeho obsah a vlastníka."
+  "backupOlderFilesWarning": "Tyto soubory mohou patřit jinému účtu. Vyberte soubor a před obnovením ověřte jeho obsah a vlastníka.",
+  "stickerImportTitle": "Importovat balíček nálepek",
+  "stickerImportLinkHint": "Odkaz na balíček nálepek Matrix",
+  "stickerImportPreview": "Náhled",
+  "stickerImportUnavailable": "Tento balíček není dostupný nebo k němu nemáte přístup.",
+  "stickerImportCopyNotice": "Přidejte soukromou kopii tohoto balíčku. Jeho obrázky a metadata nejsou koncově šifrovány.",
+  "stickerImportFailed": "Balíček se nepodařilo přidat. Zkuste to znovu.",
+  "stickerImportAccountChanged": "Účet se změnil nebo relace vypršela. Znovu otevřete import nálepek.",
+  "stickerPackSourceRoom": "Zdrojový chat",
+  "stickerPackImages": "Obrázky"
 }

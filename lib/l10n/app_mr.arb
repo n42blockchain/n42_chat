@@ -2898,5 +2898,14 @@
   "backupRecoverLegacyArchive": "जुना स्थानिक इतिहास पुनर्संचयित करा",
   "backupLegacyArchiveWarning": "या इतिहासाच्या मालकाची पडताळणी झालेली नाही. फक्त तुमच्या खोल्या खालील खात्यात कॉपी करा. मूळ इतिहास जतन केला जाईल.",
   "backupOlderFiles": "जुन्या बॅकअप फायली",
-  "backupOlderFilesWarning": "या फायली दुसऱ्या खात्याच्या असू शकतात. पुनर्संचयित करण्यापूर्वी मजकूर आणि मालक तपासण्यासाठी फाइल निवडा."
+  "backupOlderFilesWarning": "या फायली दुसऱ्या खात्याच्या असू शकतात. पुनर्संचयित करण्यापूर्वी मजकूर आणि मालक तपासण्यासाठी फाइल निवडा.",
+  "stickerImportTitle": "स्टिकर संच आयात करा",
+  "stickerImportLinkHint": "Matrix स्टिकर संचाची लिंक",
+  "stickerImportPreview": "पूर्वावलोकन",
+  "stickerImportUnavailable": "हा संच उपलब्ध नाही किंवा तुम्हाला प्रवेश नाही.",
+  "stickerImportCopyNotice": "या संचाची खाजगी प्रत जोडा. यातील प्रतिमा आणि मेटाडेटा यांना एंड-टू-एंड एन्क्रिप्शनचे संरक्षण नाही.",
+  "stickerImportFailed": "हा संच जोडता आला नाही. पुन्हा प्रयत्न करा.",
+  "stickerImportAccountChanged": "खाते बदलले आहे किंवा सत्राची मुदत संपली आहे. स्टिकर आयात पुन्हा उघडा.",
+  "stickerPackSourceRoom": "स्रोत चॅट",
+  "stickerPackImages": "प्रतिमा"
 }

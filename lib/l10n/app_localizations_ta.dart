@@ -6322,4 +6322,35 @@ class STa extends S {
   @override
   String get backupOlderFilesWarning =>
       'இந்தக் கோப்புகள் வேறொரு கணக்கிற்குச் சொந்தமாக இருக்கலாம். மீட்டெடுப்பதற்கு முன் உள்ளடக்கத்தையும் உரிமையாளரையும் சரிபார்க்க ஒரு கோப்பைத் தேர்ந்தெடுக்கவும்.';
+
+  @override
+  String get stickerImportTitle => 'ஸ்டிக்கர் தொகுப்பை இறக்குமதி செய்';
+
+  @override
+  String get stickerImportLinkHint => 'Matrix ஸ்டிக்கர் தொகுப்பு இணைப்பு';
+
+  @override
+  String get stickerImportPreview => 'முன்னோட்டம்';
+
+  @override
+  String get stickerImportUnavailable =>
+      'இந்தத் தொகுப்பு கிடைக்கவில்லை அல்லது உங்களுக்கு அணுகல் இல்லை.';
+
+  @override
+  String get stickerImportCopyNotice =>
+      'இந்தத் தொகுப்பின் தனிப்பட்ட நகலைச் சேர்க்கவும். இதன் படங்களும் மெட்டாடேட்டாவும் முனையிலிருந்து முனைக்கு மறையாக்கப்படவில்லை.';
+
+  @override
+  String get stickerImportFailed =>
+      'இந்தத் தொகுப்பைச் சேர்க்க முடியவில்லை. மீண்டும் முயலவும்.';
+
+  @override
+  String get stickerImportAccountChanged =>
+      'கணக்கு மாறிவிட்டது அல்லது அமர்வு காலாவதியானது. ஸ்டிக்கர் இறக்குமதியை மீண்டும் திறக்கவும்.';
+
+  @override
+  String get stickerPackSourceRoom => 'மூல அரட்டை';
+
+  @override
+  String get stickerPackImages => 'படங்கள்';
 }

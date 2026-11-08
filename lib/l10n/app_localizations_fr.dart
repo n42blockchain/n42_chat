@@ -6324,4 +6324,34 @@ class SFr extends S {
   @override
   String get backupOlderFilesWarning =>
       'Ces fichiers peuvent appartenir à un autre compte. Sélectionnez un fichier pour vérifier son contenu et son propriétaire avant de le restaurer.';
+
+  @override
+  String get stickerImportTitle => 'Importer un pack de stickers';
+
+  @override
+  String get stickerImportLinkHint => 'Lien du pack de stickers Matrix';
+
+  @override
+  String get stickerImportPreview => 'Aperçu';
+
+  @override
+  String get stickerImportUnavailable =>
+      'Ce pack est indisponible ou vous n’y avez pas accès.';
+
+  @override
+  String get stickerImportCopyNotice =>
+      'Ajoutez une copie privée de ce pack. Ses images et métadonnées ne sont pas chiffrées de bout en bout.';
+
+  @override
+  String get stickerImportFailed => 'Impossible d’ajouter ce pack. Réessayez.';
+
+  @override
+  String get stickerImportAccountChanged =>
+      'Le compte a changé ou la session a expiré. Rouvrez l’importation de stickers.';
+
+  @override
+  String get stickerPackSourceRoom => 'Discussion d’origine';
+
+  @override
+  String get stickerPackImages => 'Images';
 }

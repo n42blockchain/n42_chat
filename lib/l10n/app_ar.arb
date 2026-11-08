@@ -2898,5 +2898,14 @@
   "backupRecoverLegacyArchive": "استعادة السجل المحلي القديم",
   "backupLegacyArchiveWarning": "لم يتم التحقق من مالك هذا السجل. انسخ غرفك فقط إلى الحساب أدناه. سيُحتفظ بالأصل.",
   "backupOlderFiles": "ملفات النسخ الاحتياطي القديمة",
-  "backupOlderFilesWarning": "قد تنتمي هذه الملفات إلى حساب آخر. اختر ملفًا للتحقق من محتواه ومالكه قبل الاستعادة."
+  "backupOlderFilesWarning": "قد تنتمي هذه الملفات إلى حساب آخر. اختر ملفًا للتحقق من محتواه ومالكه قبل الاستعادة.",
+  "stickerImportTitle": "استيراد حزمة ملصقات",
+  "stickerImportLinkHint": "رابط حزمة ملصقات Matrix",
+  "stickerImportPreview": "معاينة",
+  "stickerImportUnavailable": "هذه الحزمة غير متاحة أو ليس لديك إذن للوصول إليها.",
+  "stickerImportCopyNotice": "أضف نسخة خاصة من هذه الحزمة. الصور والبيانات الوصفية فيها غير مشفرة من طرف إلى طرف.",
+  "stickerImportFailed": "تعذرت إضافة هذه الحزمة. حاول مرة أخرى.",
+  "stickerImportAccountChanged": "تم تغيير الحساب أو انتهت الجلسة. أعد فتح استيراد الملصقات.",
+  "stickerPackSourceRoom": "المحادثة المصدر",
+  "stickerPackImages": "الصور"
 }

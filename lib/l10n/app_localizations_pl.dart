@@ -6294,4 +6294,35 @@ class SPl extends S {
   @override
   String get backupOlderFilesWarning =>
       'Te pliki mogą należeć do innego konta. Wybierz plik i sprawdź jego zawartość oraz właściciela przed przywróceniem.';
+
+  @override
+  String get stickerImportTitle => 'Importuj pakiet naklejek';
+
+  @override
+  String get stickerImportLinkHint => 'Link do pakietu naklejek Matrix';
+
+  @override
+  String get stickerImportPreview => 'Podgląd';
+
+  @override
+  String get stickerImportUnavailable =>
+      'Ten pakiet jest niedostępny lub nie masz do niego dostępu.';
+
+  @override
+  String get stickerImportCopyNotice =>
+      'Dodaj prywatną kopię tego pakietu. Jego obrazy i metadane nie są szyfrowane end-to-end.';
+
+  @override
+  String get stickerImportFailed =>
+      'Nie udało się dodać tego pakietu. Spróbuj ponownie.';
+
+  @override
+  String get stickerImportAccountChanged =>
+      'Konto zostało zmienione lub sesja wygasła. Otwórz ponownie import naklejek.';
+
+  @override
+  String get stickerPackSourceRoom => 'Czat źródłowy';
+
+  @override
+  String get stickerPackImages => 'Obrazy';
 }

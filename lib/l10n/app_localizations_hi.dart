@@ -6254,4 +6254,35 @@ class SHi extends S {
   @override
   String get backupOlderFilesWarning =>
       'ये फ़ाइलें किसी दूसरे खाते की हो सकती हैं। पुनर्स्थापित करने से पहले सामग्री और मालिक की जाँच के लिए फ़ाइल चुनें।';
+
+  @override
+  String get stickerImportTitle => 'स्टिकर पैक आयात करें';
+
+  @override
+  String get stickerImportLinkHint => 'Matrix स्टिकर पैक का लिंक';
+
+  @override
+  String get stickerImportPreview => 'पूर्वावलोकन';
+
+  @override
+  String get stickerImportUnavailable =>
+      'यह पैक उपलब्ध नहीं है या आपको इसे देखने की अनुमति नहीं है।';
+
+  @override
+  String get stickerImportCopyNotice =>
+      'इस पैक की एक निजी प्रति जोड़ें। इसके चित्र और मेटाडेटा एंड-टू-एंड एन्क्रिप्टेड नहीं हैं।';
+
+  @override
+  String get stickerImportFailed =>
+      'यह पैक जोड़ा नहीं जा सका। फिर से कोशिश करें।';
+
+  @override
+  String get stickerImportAccountChanged =>
+      'खाता बदल गया है या सत्र समाप्त हो गया है। स्टिकर आयात फिर से खोलें।';
+
+  @override
+  String get stickerPackSourceRoom => 'स्रोत चैट';
+
+  @override
+  String get stickerPackImages => 'चित्र';
 }

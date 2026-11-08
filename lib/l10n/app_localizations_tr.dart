@@ -6257,4 +6257,34 @@ class STr extends S {
   @override
   String get backupOlderFilesWarning =>
       'Bu dosyalar başka bir hesaba ait olabilir. Geri yüklemeden önce içeriğini ve sahibini kontrol etmek için bir dosya seçin.';
+
+  @override
+  String get stickerImportTitle => 'Çıkartma paketini içe aktar';
+
+  @override
+  String get stickerImportLinkHint => 'Matrix çıkartma paketi bağlantısı';
+
+  @override
+  String get stickerImportPreview => 'Önizleme';
+
+  @override
+  String get stickerImportUnavailable =>
+      'Bu paket kullanılamıyor veya erişim izniniz yok.';
+
+  @override
+  String get stickerImportCopyNotice =>
+      'Bu paketin özel bir kopyasını ekleyin. Görselleri ve meta verileri uçtan uca şifrelenmez.';
+
+  @override
+  String get stickerImportFailed => 'Bu paket eklenemedi. Yeniden deneyin.';
+
+  @override
+  String get stickerImportAccountChanged =>
+      'Hesap değişti veya oturumun süresi doldu. Çıkartma içe aktarma ekranını yeniden açın.';
+
+  @override
+  String get stickerPackSourceRoom => 'Kaynak sohbet';
+
+  @override
+  String get stickerPackImages => 'Görseller';
 }

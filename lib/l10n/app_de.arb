@@ -2898,5 +2898,14 @@
   "backupRecoverLegacyArchive": "Älteren lokalen Verlauf wiederherstellen",
   "backupLegacyArchiveWarning": "Der Besitzer dieses Verlaufs ist nicht bestätigt. Kopiere nur deine Räume in das unten angegebene Konto. Das Original bleibt erhalten.",
   "backupOlderFiles": "Ältere Sicherungsdateien",
-  "backupOlderFilesWarning": "Diese Dateien gehören möglicherweise zu einem anderen Konto. Wähle eine Datei, um Inhalt und Kontozugehörigkeit vor der Wiederherstellung zu prüfen."
+  "backupOlderFilesWarning": "Diese Dateien gehören möglicherweise zu einem anderen Konto. Wähle eine Datei, um Inhalt und Kontozugehörigkeit vor der Wiederherstellung zu prüfen.",
+  "stickerImportTitle": "Stickerpaket importieren",
+  "stickerImportLinkHint": "Link zu einem Matrix-Stickerpaket",
+  "stickerImportPreview": "Vorschau",
+  "stickerImportUnavailable": "Dieses Paket ist nicht verfügbar oder du hast keinen Zugriff.",
+  "stickerImportCopyNotice": "Füge eine private Kopie dieses Pakets hinzu. Seine Bilder und Metadaten sind nicht Ende-zu-Ende-verschlüsselt.",
+  "stickerImportFailed": "Dieses Paket konnte nicht hinzugefügt werden. Versuche es erneut.",
+  "stickerImportAccountChanged": "Das Konto wurde gewechselt oder die Sitzung ist abgelaufen. Öffne den Stickerimport erneut.",
+  "stickerPackSourceRoom": "Ursprünglicher Chat",
+  "stickerPackImages": "Bilder"
 }

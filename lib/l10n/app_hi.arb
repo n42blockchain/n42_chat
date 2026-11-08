@@ -2898,5 +2898,14 @@
   "backupRecoverLegacyArchive": "पुराना स्थानीय इतिहास पुनर्स्थापित करें",
   "backupLegacyArchiveWarning": "इस इतिहास के मालिक की पुष्टि नहीं हुई है। केवल अपने कमरे नीचे दिए खाते में कॉपी करें। मूल इतिहास सुरक्षित रहेगा।",
   "backupOlderFiles": "पुरानी बैकअप फ़ाइलें",
-  "backupOlderFilesWarning": "ये फ़ाइलें किसी दूसरे खाते की हो सकती हैं। पुनर्स्थापित करने से पहले सामग्री और मालिक की जाँच के लिए फ़ाइल चुनें।"
+  "backupOlderFilesWarning": "ये फ़ाइलें किसी दूसरे खाते की हो सकती हैं। पुनर्स्थापित करने से पहले सामग्री और मालिक की जाँच के लिए फ़ाइल चुनें।",
+  "stickerImportTitle": "स्टिकर पैक आयात करें",
+  "stickerImportLinkHint": "Matrix स्टिकर पैक का लिंक",
+  "stickerImportPreview": "पूर्वावलोकन",
+  "stickerImportUnavailable": "यह पैक उपलब्ध नहीं है या आपको इसे देखने की अनुमति नहीं है।",
+  "stickerImportCopyNotice": "इस पैक की एक निजी प्रति जोड़ें। इसके चित्र और मेटाडेटा एंड-टू-एंड एन्क्रिप्टेड नहीं हैं।",
+  "stickerImportFailed": "यह पैक जोड़ा नहीं जा सका। फिर से कोशिश करें।",
+  "stickerImportAccountChanged": "खाता बदल गया है या सत्र समाप्त हो गया है। स्टिकर आयात फिर से खोलें।",
+  "stickerPackSourceRoom": "स्रोत चैट",
+  "stickerPackImages": "चित्र"
 }

@@ -6267,4 +6267,35 @@ class SCs extends S {
   @override
   String get backupOlderFilesWarning =>
       'Tyto soubory mohou patřit jinému účtu. Vyberte soubor a před obnovením ověřte jeho obsah a vlastníka.';
+
+  @override
+  String get stickerImportTitle => 'Importovat balíček nálepek';
+
+  @override
+  String get stickerImportLinkHint => 'Odkaz na balíček nálepek Matrix';
+
+  @override
+  String get stickerImportPreview => 'Náhled';
+
+  @override
+  String get stickerImportUnavailable =>
+      'Tento balíček není dostupný nebo k němu nemáte přístup.';
+
+  @override
+  String get stickerImportCopyNotice =>
+      'Přidejte soukromou kopii tohoto balíčku. Jeho obrázky a metadata nejsou koncově šifrovány.';
+
+  @override
+  String get stickerImportFailed =>
+      'Balíček se nepodařilo přidat. Zkuste to znovu.';
+
+  @override
+  String get stickerImportAccountChanged =>
+      'Účet se změnil nebo relace vypršela. Znovu otevřete import nálepek.';
+
+  @override
+  String get stickerPackSourceRoom => 'Zdrojový chat';
+
+  @override
+  String get stickerPackImages => 'Obrázky';
 }

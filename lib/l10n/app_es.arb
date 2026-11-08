@@ -2898,5 +2898,14 @@
   "backupRecoverLegacyArchive": "Recuperar el historial local anterior",
   "backupLegacyArchiveWarning": "No se ha verificado a quién pertenece este historial. Copia solo tus salas a la cuenta indicada abajo. Se conserva el original.",
   "backupOlderFiles": "Archivos de copia anteriores",
-  "backupOlderFilesWarning": "Estos archivos pueden pertenecer a otra cuenta. Selecciona uno para comprobar su contenido y propietario antes de restaurarlo."
+  "backupOlderFilesWarning": "Estos archivos pueden pertenecer a otra cuenta. Selecciona uno para comprobar su contenido y propietario antes de restaurarlo.",
+  "stickerImportTitle": "Importar paquete de stickers",
+  "stickerImportLinkHint": "Enlace al paquete de stickers de Matrix",
+  "stickerImportPreview": "Vista previa",
+  "stickerImportUnavailable": "Este paquete no está disponible o no tienes acceso.",
+  "stickerImportCopyNotice": "Añade una copia privada de este paquete. Sus imágenes y metadatos no están cifrados de extremo a extremo.",
+  "stickerImportFailed": "No se pudo añadir este paquete. Inténtalo de nuevo.",
+  "stickerImportAccountChanged": "La cuenta cambió o la sesión caducó. Vuelve a abrir la importación de stickers.",
+  "stickerPackSourceRoom": "Chat de origen",
+  "stickerPackImages": "Imágenes"
 }

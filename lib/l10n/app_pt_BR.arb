@@ -2898,5 +2898,14 @@
   "backupRecoverLegacyArchive": "Recuperar histórico local anterior",
   "backupLegacyArchiveWarning": "O proprietário deste histórico não foi verificado. Copie apenas suas salas para a conta abaixo. O original será mantido.",
   "backupOlderFiles": "Arquivos de backup anteriores",
-  "backupOlderFilesWarning": "Estes arquivos podem pertencer a outra conta. Selecione um arquivo para verificar o conteúdo e o proprietário antes de restaurar."
+  "backupOlderFilesWarning": "Estes arquivos podem pertencer a outra conta. Selecione um arquivo para verificar o conteúdo e o proprietário antes de restaurar.",
+  "stickerImportTitle": "Importar pacote de figurinhas",
+  "stickerImportLinkHint": "Link do pacote de figurinhas Matrix",
+  "stickerImportPreview": "Prévia",
+  "stickerImportUnavailable": "Este pacote não está disponível ou você não tem acesso.",
+  "stickerImportCopyNotice": "Adicione uma cópia privada deste pacote. As imagens e os metadados não têm criptografia de ponta a ponta.",
+  "stickerImportFailed": "Não foi possível adicionar este pacote. Tente novamente.",
+  "stickerImportAccountChanged": "A conta mudou ou a sessão expirou. Abra a importação de figurinhas novamente.",
+  "stickerPackSourceRoom": "Conversa de origem",
+  "stickerPackImages": "Imagens"
 }

@@ -6267,4 +6267,35 @@ class SId extends S {
   @override
   String get backupOlderFilesWarning =>
       'File ini mungkin milik akun lain. Pilih file untuk memeriksa isi dan pemiliknya sebelum memulihkan.';
+
+  @override
+  String get stickerImportTitle => 'Impor paket stiker';
+
+  @override
+  String get stickerImportLinkHint => 'Tautan paket stiker Matrix';
+
+  @override
+  String get stickerImportPreview => 'Pratinjau';
+
+  @override
+  String get stickerImportUnavailable =>
+      'Paket ini tidak tersedia atau Anda tidak memiliki akses.';
+
+  @override
+  String get stickerImportCopyNotice =>
+      'Tambahkan salinan pribadi paket ini. Gambar dan metadatanya tidak dienkripsi end-to-end.';
+
+  @override
+  String get stickerImportFailed =>
+      'Paket ini tidak dapat ditambahkan. Coba lagi.';
+
+  @override
+  String get stickerImportAccountChanged =>
+      'Akun berubah atau sesi berakhir. Buka kembali impor stiker.';
+
+  @override
+  String get stickerPackSourceRoom => 'Chat sumber';
+
+  @override
+  String get stickerPackImages => 'Gambar';
 }

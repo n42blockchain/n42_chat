@@ -6226,4 +6226,34 @@ class SEn extends S {
   @override
   String get backupOlderFilesWarning =>
       'These files may belong to another account. Select a file to check its contents and ownership before restoring.';
+
+  @override
+  String get stickerImportTitle => 'Import sticker pack';
+
+  @override
+  String get stickerImportLinkHint => 'Matrix sticker pack link';
+
+  @override
+  String get stickerImportPreview => 'Preview';
+
+  @override
+  String get stickerImportUnavailable =>
+      'This pack is unavailable or you do not have access.';
+
+  @override
+  String get stickerImportCopyNotice =>
+      'Add a private copy of this pack. Its images and metadata are not end-to-end encrypted.';
+
+  @override
+  String get stickerImportFailed => 'Could not add this pack. Try again.';
+
+  @override
+  String get stickerImportAccountChanged =>
+      'Account changed or session expired. Reopen sticker import.';
+
+  @override
+  String get stickerPackSourceRoom => 'Source chat';
+
+  @override
+  String get stickerPackImages => 'Images';
 }

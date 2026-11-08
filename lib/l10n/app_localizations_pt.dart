@@ -6289,6 +6289,38 @@ class SPt extends S {
   @override
   String get backupOlderFilesWarning =>
       'Estes ficheiros podem pertencer a outra conta. Selecione um ficheiro para verificar o conteúdo e o proprietário antes de restaurar.';
+
+  @override
+  String get stickerImportTitle => 'Importar pacote de autocolantes';
+
+  @override
+  String get stickerImportLinkHint =>
+      'Ligação do pacote de autocolantes Matrix';
+
+  @override
+  String get stickerImportPreview => 'Pré-visualização';
+
+  @override
+  String get stickerImportUnavailable =>
+      'Este pacote não está disponível ou não tem acesso.';
+
+  @override
+  String get stickerImportCopyNotice =>
+      'Adicione uma cópia privada deste pacote. As imagens e os metadados não são encriptados ponto a ponto.';
+
+  @override
+  String get stickerImportFailed =>
+      'Não foi possível adicionar este pacote. Tente novamente.';
+
+  @override
+  String get stickerImportAccountChanged =>
+      'A conta mudou ou a sessão expirou. Volte a abrir a importação de autocolantes.';
+
+  @override
+  String get stickerPackSourceRoom => 'Conversa de origem';
+
+  @override
+  String get stickerPackImages => 'Imagens';
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).
@@ -12577,4 +12609,35 @@ class SPtBr extends SPt {
   @override
   String get backupOlderFilesWarning =>
       'Estes arquivos podem pertencer a outra conta. Selecione um arquivo para verificar o conteúdo e o proprietário antes de restaurar.';
+
+  @override
+  String get stickerImportTitle => 'Importar pacote de figurinhas';
+
+  @override
+  String get stickerImportLinkHint => 'Link do pacote de figurinhas Matrix';
+
+  @override
+  String get stickerImportPreview => 'Prévia';
+
+  @override
+  String get stickerImportUnavailable =>
+      'Este pacote não está disponível ou você não tem acesso.';
+
+  @override
+  String get stickerImportCopyNotice =>
+      'Adicione uma cópia privada deste pacote. As imagens e os metadados não têm criptografia de ponta a ponta.';
+
+  @override
+  String get stickerImportFailed =>
+      'Não foi possível adicionar este pacote. Tente novamente.';
+
+  @override
+  String get stickerImportAccountChanged =>
+      'A conta mudou ou a sessão expirou. Abra a importação de figurinhas novamente.';
+
+  @override
+  String get stickerPackSourceRoom => 'Conversa de origem';
+
+  @override
+  String get stickerPackImages => 'Imagens';
 }

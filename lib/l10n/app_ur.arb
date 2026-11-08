@@ -2898,5 +2898,14 @@
   "backupRecoverLegacyArchive": "پرانی مقامی تاریخ بحال کریں",
   "backupLegacyArchiveWarning": "اس تاریخ کے مالک کی تصدیق نہیں ہوئی۔ صرف اپنے کمرے نیچے دیے گئے اکاؤنٹ میں نقل کریں۔ اصل محفوظ رہے گا۔",
   "backupOlderFiles": "پرانی بیک اپ فائلیں",
-  "backupOlderFilesWarning": "یہ فائلیں کسی دوسرے اکاؤنٹ کی ہو سکتی ہیں۔ بحالی سے پہلے مواد اور مالک کی جانچ کے لیے فائل منتخب کریں۔"
+  "backupOlderFilesWarning": "یہ فائلیں کسی دوسرے اکاؤنٹ کی ہو سکتی ہیں۔ بحالی سے پہلے مواد اور مالک کی جانچ کے لیے فائل منتخب کریں۔",
+  "stickerImportTitle": "اسٹیکر پیک درآمد کریں",
+  "stickerImportLinkHint": "Matrix اسٹیکر پیک کا لنک",
+  "stickerImportPreview": "پیش نظارہ",
+  "stickerImportUnavailable": "یہ پیک دستیاب نہیں یا آپ کو اس تک رسائی کی اجازت نہیں۔",
+  "stickerImportCopyNotice": "اس پیک کی ایک نجی نقل شامل کریں۔ اس کی تصاویر اور میٹا ڈیٹا اینڈ ٹو اینڈ انکرپشن سے محفوظ نہیں ہیں۔",
+  "stickerImportFailed": "یہ پیک شامل نہیں ہو سکا۔ دوبارہ کوشش کریں۔",
+  "stickerImportAccountChanged": "اکاؤنٹ بدل گیا ہے یا سیشن ختم ہو گیا ہے۔ اسٹیکر درآمد دوبارہ کھولیں۔",
+  "stickerPackSourceRoom": "ماخذ چیٹ",
+  "stickerPackImages": "تصاویر"
 }

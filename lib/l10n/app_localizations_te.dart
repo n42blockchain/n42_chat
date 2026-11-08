@@ -6302,4 +6302,35 @@ class STe extends S {
   @override
   String get backupOlderFilesWarning =>
       'ఈ ఫైళ్లు మరొక ఖాతాకు చెందినవి కావచ్చు. పునరుద్ధరించే ముందు విషయాన్ని, యజమానిని తనిఖీ చేయడానికి ఫైల్‌ను ఎంచుకోండి.';
+
+  @override
+  String get stickerImportTitle => 'స్టికర్ ప్యాక్‌ను దిగుమతి చేయండి';
+
+  @override
+  String get stickerImportLinkHint => 'Matrix స్టికర్ ప్యాక్ లింక్';
+
+  @override
+  String get stickerImportPreview => 'ముందస్తు వీక్షణ';
+
+  @override
+  String get stickerImportUnavailable =>
+      'ఈ ప్యాక్ అందుబాటులో లేదు లేదా మీకు ప్రాప్యత లేదు.';
+
+  @override
+  String get stickerImportCopyNotice =>
+      'ఈ ప్యాక్‌కు వ్యక్తిగత కాపీని జోడించండి. దీని చిత్రాలు మరియు మెటాడేటా ఎండ్-టు-ఎండ్ ఎన్‌క్రిప్ట్ చేయబడవు.';
+
+  @override
+  String get stickerImportFailed =>
+      'ఈ ప్యాక్‌ను జోడించలేకపోయాము. మళ్లీ ప్రయత్నించండి.';
+
+  @override
+  String get stickerImportAccountChanged =>
+      'ఖాతా మారింది లేదా సెషన్ గడువు ముగిసింది. స్టికర్ దిగుమతిని మళ్లీ తెరవండి.';
+
+  @override
+  String get stickerPackSourceRoom => 'మూల చాట్';
+
+  @override
+  String get stickerPackImages => 'చిత్రాలు';
 }

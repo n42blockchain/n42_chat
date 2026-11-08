@@ -2898,5 +2898,14 @@
   "backupRecoverLegacyArchive": "以前のローカル履歴を復元",
   "backupLegacyArchiveWarning": "この履歴の所有者は確認されていません。自分のルームだけを下のアカウントにコピーしてください。元の履歴は保持されます。",
   "backupOlderFiles": "以前のバックアップファイル",
-  "backupOlderFilesWarning": "これらのファイルは別のアカウントのものかもしれません。ファイルを選び、内容と所有者を確認してから復元してください。"
+  "backupOlderFilesWarning": "これらのファイルは別のアカウントのものかもしれません。ファイルを選び、内容と所有者を確認してから復元してください。",
+  "stickerImportTitle": "ステッカーパックをインポート",
+  "stickerImportLinkHint": "Matrix のステッカーパックリンク",
+  "stickerImportPreview": "プレビュー",
+  "stickerImportUnavailable": "このパックは利用できないか、アクセス権がありません。",
+  "stickerImportCopyNotice": "このパックの非公開コピーを追加します。画像とメタデータはエンドツーエンド暗号化されていません。",
+  "stickerImportFailed": "このパックを追加できませんでした。もう一度お試しください。",
+  "stickerImportAccountChanged": "アカウントが変わったか、セッションが切れました。インポート画面を開き直してください。",
+  "stickerPackSourceRoom": "共有元のチャット",
+  "stickerPackImages": "画像"
 }

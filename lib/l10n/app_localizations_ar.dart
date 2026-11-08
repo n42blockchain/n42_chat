@@ -6227,4 +6227,34 @@ class SAr extends S {
   @override
   String get backupOlderFilesWarning =>
       'قد تنتمي هذه الملفات إلى حساب آخر. اختر ملفًا للتحقق من محتواه ومالكه قبل الاستعادة.';
+
+  @override
+  String get stickerImportTitle => 'استيراد حزمة ملصقات';
+
+  @override
+  String get stickerImportLinkHint => 'رابط حزمة ملصقات Matrix';
+
+  @override
+  String get stickerImportPreview => 'معاينة';
+
+  @override
+  String get stickerImportUnavailable =>
+      'هذه الحزمة غير متاحة أو ليس لديك إذن للوصول إليها.';
+
+  @override
+  String get stickerImportCopyNotice =>
+      'أضف نسخة خاصة من هذه الحزمة. الصور والبيانات الوصفية فيها غير مشفرة من طرف إلى طرف.';
+
+  @override
+  String get stickerImportFailed => 'تعذرت إضافة هذه الحزمة. حاول مرة أخرى.';
+
+  @override
+  String get stickerImportAccountChanged =>
+      'تم تغيير الحساب أو انتهت الجلسة. أعد فتح استيراد الملصقات.';
+
+  @override
+  String get stickerPackSourceRoom => 'المحادثة المصدر';
+
+  @override
+  String get stickerPackImages => 'الصور';
 }

@@ -6256,4 +6256,35 @@ class SBn extends S {
   @override
   String get backupOlderFilesWarning =>
       'এই ফাইলগুলো অন্য অ্যাকাউন্টের হতে পারে। পুনরুদ্ধারের আগে বিষয়বস্তু ও মালিক যাচাই করতে একটি ফাইল বেছে নিন।';
+
+  @override
+  String get stickerImportTitle => 'স্টিকার প্যাক আমদানি করুন';
+
+  @override
+  String get stickerImportLinkHint => 'Matrix স্টিকার প্যাকের লিংক';
+
+  @override
+  String get stickerImportPreview => 'প্রাকদর্শন';
+
+  @override
+  String get stickerImportUnavailable =>
+      'এই প্যাকটি উপলব্ধ নয় অথবা এটি দেখার অনুমতি আপনার নেই।';
+
+  @override
+  String get stickerImportCopyNotice =>
+      'এই প্যাকের একটি ব্যক্তিগত অনুলিপি যোগ করুন। এর ছবি ও মেটাডেটা এন্ড-টু-এন্ড এনক্রিপশন দিয়ে সুরক্ষিত নয়।';
+
+  @override
+  String get stickerImportFailed =>
+      'এই প্যাকটি যোগ করা যায়নি। আবার চেষ্টা করুন।';
+
+  @override
+  String get stickerImportAccountChanged =>
+      'অ্যাকাউন্ট বদলেছে অথবা সেশনের মেয়াদ শেষ হয়েছে। স্টিকার আমদানি আবার খুলুন।';
+
+  @override
+  String get stickerPackSourceRoom => 'উৎস চ্যাট';
+
+  @override
+  String get stickerPackImages => 'ছবি';
 }

@@ -2898,5 +2898,14 @@
   "backupRecoverLegacyArchive": "Khôi phục lịch sử cục bộ cũ",
   "backupLegacyArchiveWarning": "Chưa xác minh chủ sở hữu lịch sử này. Chỉ sao chép phòng của bạn vào tài khoản bên dưới. Bản gốc được giữ lại.",
   "backupOlderFiles": "Tệp sao lưu cũ",
-  "backupOlderFilesWarning": "Các tệp này có thể thuộc tài khoản khác. Chọn tệp để kiểm tra nội dung và chủ sở hữu trước khi khôi phục."
+  "backupOlderFilesWarning": "Các tệp này có thể thuộc tài khoản khác. Chọn tệp để kiểm tra nội dung và chủ sở hữu trước khi khôi phục.",
+  "stickerImportTitle": "Nhập gói nhãn dán",
+  "stickerImportLinkHint": "Liên kết gói nhãn dán Matrix",
+  "stickerImportPreview": "Xem trước",
+  "stickerImportUnavailable": "Gói này không khả dụng hoặc bạn không có quyền truy cập.",
+  "stickerImportCopyNotice": "Thêm bản sao riêng tư của gói này. Hình ảnh và siêu dữ liệu của gói không được mã hóa đầu cuối.",
+  "stickerImportFailed": "Không thể thêm gói này. Hãy thử lại.",
+  "stickerImportAccountChanged": "Tài khoản đã thay đổi hoặc phiên đã hết hạn. Mở lại trang nhập nhãn dán.",
+  "stickerPackSourceRoom": "Cuộc trò chuyện nguồn",
+  "stickerPackImages": "Hình ảnh"
 }

@@ -6243,4 +6243,34 @@ class SVi extends S {
   @override
   String get backupOlderFilesWarning =>
       'Các tệp này có thể thuộc tài khoản khác. Chọn tệp để kiểm tra nội dung và chủ sở hữu trước khi khôi phục.';
+
+  @override
+  String get stickerImportTitle => 'Nhập gói nhãn dán';
+
+  @override
+  String get stickerImportLinkHint => 'Liên kết gói nhãn dán Matrix';
+
+  @override
+  String get stickerImportPreview => 'Xem trước';
+
+  @override
+  String get stickerImportUnavailable =>
+      'Gói này không khả dụng hoặc bạn không có quyền truy cập.';
+
+  @override
+  String get stickerImportCopyNotice =>
+      'Thêm bản sao riêng tư của gói này. Hình ảnh và siêu dữ liệu của gói không được mã hóa đầu cuối.';
+
+  @override
+  String get stickerImportFailed => 'Không thể thêm gói này. Hãy thử lại.';
+
+  @override
+  String get stickerImportAccountChanged =>
+      'Tài khoản đã thay đổi hoặc phiên đã hết hạn. Mở lại trang nhập nhãn dán.';
+
+  @override
+  String get stickerPackSourceRoom => 'Cuộc trò chuyện nguồn';
+
+  @override
+  String get stickerPackImages => 'Hình ảnh';
 }

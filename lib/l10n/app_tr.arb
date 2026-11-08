@@ -2898,5 +2898,14 @@
   "backupRecoverLegacyArchive": "Eski yerel geçmişi kurtar",
   "backupLegacyArchiveWarning": "Bu geçmişin sahibi doğrulanmamıştır. Yalnızca kendi odalarınızı aşağıdaki hesaba kopyalayın. Orijinal korunur.",
   "backupOlderFiles": "Eski yedek dosyaları",
-  "backupOlderFilesWarning": "Bu dosyalar başka bir hesaba ait olabilir. Geri yüklemeden önce içeriğini ve sahibini kontrol etmek için bir dosya seçin."
+  "backupOlderFilesWarning": "Bu dosyalar başka bir hesaba ait olabilir. Geri yüklemeden önce içeriğini ve sahibini kontrol etmek için bir dosya seçin.",
+  "stickerImportTitle": "Çıkartma paketini içe aktar",
+  "stickerImportLinkHint": "Matrix çıkartma paketi bağlantısı",
+  "stickerImportPreview": "Önizleme",
+  "stickerImportUnavailable": "Bu paket kullanılamıyor veya erişim izniniz yok.",
+  "stickerImportCopyNotice": "Bu paketin özel bir kopyasını ekleyin. Görselleri ve meta verileri uçtan uca şifrelenmez.",
+  "stickerImportFailed": "Bu paket eklenemedi. Yeniden deneyin.",
+  "stickerImportAccountChanged": "Hesap değişti veya oturumun süresi doldu. Çıkartma içe aktarma ekranını yeniden açın.",
+  "stickerPackSourceRoom": "Kaynak sohbet",
+  "stickerPackImages": "Görseller"
 }

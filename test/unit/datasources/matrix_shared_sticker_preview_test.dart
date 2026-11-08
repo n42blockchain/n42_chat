@@ -145,6 +145,14 @@ void main() {
     final pack = await repository.importPack(link);
     expect(pack!.name, 'Group art');
     expect(pack.avatarUrl, 'mxc://test/avatar');
+    expect(pack.origin!.roomName, 'Group art');
+    expect(await repository.installPack(pack.id), isTrue);
+    final reopened = StickerRepositoryImpl(MatrixStickerDataSource(manager));
+    addTearDown(reopened.dispose);
+    expect(
+      (await reopened.getPackById(pack.id))!.origin!.roomName,
+      'Group art',
+    );
   });
 
   test(

@@ -5,12 +5,14 @@ class StickerPackOrigin extends Equatable {
   final String roomId;
   final String eventId;
   final String stateKey;
+  final String? roomName;
   final List<String> viaServers;
 
   StickerPackOrigin({
     required this.roomId,
     required this.eventId,
     this.stateKey = '',
+    this.roomName,
     List<String> viaServers = const [],
   }) : viaServers = List<String>.unmodifiable(viaServers);
 
@@ -27,6 +29,7 @@ class StickerPackOrigin extends Equatable {
     'room_id': roomId,
     'event_id': eventId,
     'state_key': stateKey,
+    if (roomName != null) 'room_name': roomName,
     if (viaServers.isNotEmpty) 'via': viaServers,
   };
 
@@ -62,10 +65,15 @@ class StickerPackOrigin extends Equatable {
       roomId: value['room_id'] as String,
       eventId: value['event_id'] as String,
       stateKey: key,
+      roomName:
+          value['room_name'] is String &&
+              (value['room_name'] as String).length <= 512
+          ? value['room_name'] as String
+          : null,
       viaServers: List<String>.unmodifiable(via.cast<String>()),
     );
   }
 
   @override
-  List<Object?> get props => [roomId, eventId, stateKey, viaServers];
+  List<Object?> get props => [roomId, eventId, stateKey, roomName, viaServers];
 }

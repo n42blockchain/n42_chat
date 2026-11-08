@@ -2927,5 +2927,17 @@
   "backupRecoverLegacyArchive": "Recover older local history",
   "backupLegacyArchiveWarning": "This history has no verified owner. Copy only your rooms to the account below. The original is kept.",
   "backupOlderFiles": "Older backup files",
-  "backupOlderFilesWarning": "These files may belong to another account. Select a file to check its contents and ownership before restoring."
+  "backupOlderFilesWarning": "These files may belong to another account. Select a file to check its contents and ownership before restoring.",
+  "stickerImportTitle": "Import sticker pack",
+  "stickerImportLinkHint": "Matrix sticker pack link",
+  "stickerImportPreview": "Preview",
+  "stickerImportUnavailable": "This pack is unavailable or you do not have access.",
+  "stickerImportCopyNotice": "Add a private copy of this pack. Its images and metadata are not end-to-end encrypted.",
+  "stickerImportFailed": "Could not add this pack. Try again.",
+  "stickerImportAccountChanged": "Account changed or session expired. Reopen sticker import.",
+  "stickerPackSourceRoom": "Source chat",
+  "stickerPackImages": "Images",
+  "@stickerImportCopyNotice": {
+    "description": "Explains the unencrypted Matrix image-pack boundary before confirmed private-copy installation."
+  }
 }

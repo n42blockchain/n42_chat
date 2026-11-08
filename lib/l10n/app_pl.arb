@@ -2898,5 +2898,14 @@
   "backupRecoverLegacyArchive": "Przywróć starszą historię lokalną",
   "backupLegacyArchiveWarning": "Właściciel tej historii nie został zweryfikowany. Skopiuj tylko swoje pokoje do konta poniżej. Oryginał zostanie zachowany.",
   "backupOlderFiles": "Starsze pliki kopii zapasowych",
-  "backupOlderFilesWarning": "Te pliki mogą należeć do innego konta. Wybierz plik i sprawdź jego zawartość oraz właściciela przed przywróceniem."
+  "backupOlderFilesWarning": "Te pliki mogą należeć do innego konta. Wybierz plik i sprawdź jego zawartość oraz właściciela przed przywróceniem.",
+  "stickerImportTitle": "Importuj pakiet naklejek",
+  "stickerImportLinkHint": "Link do pakietu naklejek Matrix",
+  "stickerImportPreview": "Podgląd",
+  "stickerImportUnavailable": "Ten pakiet jest niedostępny lub nie masz do niego dostępu.",
+  "stickerImportCopyNotice": "Dodaj prywatną kopię tego pakietu. Jego obrazy i metadane nie są szyfrowane end-to-end.",
+  "stickerImportFailed": "Nie udało się dodać tego pakietu. Spróbuj ponownie.",
+  "stickerImportAccountChanged": "Konto zostało zmienione lub sesja wygasła. Otwórz ponownie import naklejek.",
+  "stickerPackSourceRoom": "Czat źródłowy",
+  "stickerPackImages": "Obrazy"
 }

@@ -6287,4 +6287,35 @@ class SUk extends S {
   @override
   String get backupOlderFilesWarning =>
       'Ці файли можуть належати іншому обліковому запису. Виберіть файл і перевірте його вміст та власника перед відновленням.';
+
+  @override
+  String get stickerImportTitle => 'Імпортувати набір наліпок';
+
+  @override
+  String get stickerImportLinkHint => 'Посилання на набір наліпок Matrix';
+
+  @override
+  String get stickerImportPreview => 'Попередній перегляд';
+
+  @override
+  String get stickerImportUnavailable =>
+      'Цей набір недоступний або ви не маєте доступу.';
+
+  @override
+  String get stickerImportCopyNotice =>
+      'Додайте приватну копію цього набору. Його зображення та метадані не захищені наскрізним шифруванням.';
+
+  @override
+  String get stickerImportFailed =>
+      'Не вдалося додати цей набір. Спробуйте ще раз.';
+
+  @override
+  String get stickerImportAccountChanged =>
+      'Обліковий запис змінено або сеанс завершився. Знову відкрийте імпорт наліпок.';
+
+  @override
+  String get stickerPackSourceRoom => 'Вихідний чат';
+
+  @override
+  String get stickerPackImages => 'Зображення';
 }

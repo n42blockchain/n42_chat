@@ -2286,5 +2286,14 @@
   "backupRecoverLegacyArchive": "復原舊的本機歷史",
   "backupLegacyArchiveWarning": "這些歷史記錄的帳號歸屬未經驗證。請僅將屬於你的聊天室複製到下方帳號，原始記錄會保留。",
   "backupOlderFiles": "舊備份檔案",
-  "backupOlderFilesWarning": "這些檔案可能屬於其他帳號。請選擇檔案，核對內容和帳號歸屬後再復原。"
+  "backupOlderFilesWarning": "這些檔案可能屬於其他帳號。請選擇檔案，核對內容和帳號歸屬後再復原。",
+  "stickerImportTitle": "匯入貼圖包",
+  "stickerImportLinkHint": "Matrix 貼圖包連結",
+  "stickerImportPreview": "預覽",
+  "stickerImportUnavailable": "此貼圖包無法使用，或你沒有存取權限。",
+  "stickerImportCopyNotice": "新增此貼圖包的私人副本。圖片和中繼資料不受端對端加密保護。",
+  "stickerImportFailed": "無法新增此貼圖包，請重試。",
+  "stickerImportAccountChanged": "帳號已變更或登入已失效，請重新開啟貼圖匯入。",
+  "stickerPackSourceRoom": "來源對話",
+  "stickerPackImages": "圖片"
 }

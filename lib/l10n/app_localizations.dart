@@ -11512,6 +11512,60 @@ abstract class S {
   /// In en, this message translates to:
   /// **'These files may belong to another account. Select a file to check its contents and ownership before restoring.'**
   String get backupOlderFilesWarning;
+
+  /// No description provided for @stickerImportTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Import sticker pack'**
+  String get stickerImportTitle;
+
+  /// No description provided for @stickerImportLinkHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Matrix sticker pack link'**
+  String get stickerImportLinkHint;
+
+  /// No description provided for @stickerImportPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview'**
+  String get stickerImportPreview;
+
+  /// No description provided for @stickerImportUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'This pack is unavailable or you do not have access.'**
+  String get stickerImportUnavailable;
+
+  /// Explains the unencrypted Matrix image-pack boundary before confirmed private-copy installation.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a private copy of this pack. Its images and metadata are not end-to-end encrypted.'**
+  String get stickerImportCopyNotice;
+
+  /// No description provided for @stickerImportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not add this pack. Try again.'**
+  String get stickerImportFailed;
+
+  /// No description provided for @stickerImportAccountChanged.
+  ///
+  /// In en, this message translates to:
+  /// **'Account changed or session expired. Reopen sticker import.'**
+  String get stickerImportAccountChanged;
+
+  /// No description provided for @stickerPackSourceRoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Source chat'**
+  String get stickerPackSourceRoom;
+
+  /// No description provided for @stickerPackImages.
+  ///
+  /// In en, this message translates to:
+  /// **'Images'**
+  String get stickerPackImages;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

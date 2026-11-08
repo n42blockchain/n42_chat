@@ -2898,5 +2898,14 @@
   "backupRecoverLegacyArchive": "Recuperar histórico local anterior",
   "backupLegacyArchiveWarning": "O proprietário deste histórico não foi verificado. Copie apenas as suas salas para a conta abaixo. O original é mantido.",
   "backupOlderFiles": "Ficheiros de cópia anteriores",
-  "backupOlderFilesWarning": "Estes ficheiros podem pertencer a outra conta. Selecione um ficheiro para verificar o conteúdo e o proprietário antes de restaurar."
+  "backupOlderFilesWarning": "Estes ficheiros podem pertencer a outra conta. Selecione um ficheiro para verificar o conteúdo e o proprietário antes de restaurar.",
+  "stickerImportTitle": "Importar pacote de autocolantes",
+  "stickerImportLinkHint": "Ligação do pacote de autocolantes Matrix",
+  "stickerImportPreview": "Pré-visualização",
+  "stickerImportUnavailable": "Este pacote não está disponível ou não tem acesso.",
+  "stickerImportCopyNotice": "Adicione uma cópia privada deste pacote. As imagens e os metadados não são encriptados ponto a ponto.",
+  "stickerImportFailed": "Não foi possível adicionar este pacote. Tente novamente.",
+  "stickerImportAccountChanged": "A conta mudou ou a sessão expirou. Volte a abrir a importação de autocolantes.",
+  "stickerPackSourceRoom": "Conversa de origem",
+  "stickerPackImages": "Imagens"
 }

@@ -2898,5 +2898,14 @@
   "backupRecoverLegacyArchive": "Rejesha historia ya zamani ya kifaa",
   "backupLegacyArchiveWarning": "Mmiliki wa historia hii hajathibitishwa. Nakili vyumba vyako tu kwenye akaunti iliyo hapa chini. Historia asili itahifadhiwa.",
   "backupOlderFiles": "Faili za zamani za nakala rudufu",
-  "backupOlderFilesWarning": "Faili hizi huenda ni za akaunti nyingine. Chagua faili ili ukague maudhui na mmiliki kabla ya kurejesha."
+  "backupOlderFilesWarning": "Faili hizi huenda ni za akaunti nyingine. Chagua faili ili ukague maudhui na mmiliki kabla ya kurejesha.",
+  "stickerImportTitle": "Leta kifurushi cha vibandiko",
+  "stickerImportLinkHint": "Kiungo cha kifurushi cha vibandiko cha Matrix",
+  "stickerImportPreview": "Hakiki",
+  "stickerImportUnavailable": "Kifurushi hiki hakipatikani au huna ruhusa ya kukifikia.",
+  "stickerImportCopyNotice": "Ongeza nakala ya faragha ya kifurushi hiki. Picha na metadata zake hazijasimbwa kwa njia fiche kutoka mwanzo hadi mwisho.",
+  "stickerImportFailed": "Haikuwezekana kuongeza kifurushi hiki. Jaribu tena.",
+  "stickerImportAccountChanged": "Akaunti imebadilika au kipindi kimeisha. Fungua tena uletaji wa vibandiko.",
+  "stickerPackSourceRoom": "Gumzo la chanzo",
+  "stickerPackImages": "Picha"
 }

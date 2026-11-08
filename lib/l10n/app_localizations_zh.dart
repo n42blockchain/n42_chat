@@ -6080,6 +6080,33 @@ class SZh extends S {
 
   @override
   String get backupOlderFilesWarning => '这些文件可能属于其他账号。请选择文件，核对内容和账号归属后再恢复。';
+
+  @override
+  String get stickerImportTitle => '导入贴纸包';
+
+  @override
+  String get stickerImportLinkHint => 'Matrix 贴纸包链接';
+
+  @override
+  String get stickerImportPreview => '预览';
+
+  @override
+  String get stickerImportUnavailable => '此贴纸包不可用，或你没有访问权限。';
+
+  @override
+  String get stickerImportCopyNotice => '添加此贴纸包的私人副本。图片和元数据不受端到端加密保护。';
+
+  @override
+  String get stickerImportFailed => '无法添加此贴纸包，请重试。';
+
+  @override
+  String get stickerImportAccountChanged => '账号已变更或登录已失效，请重新打开贴纸导入。';
+
+  @override
+  String get stickerPackSourceRoom => '来源会话';
+
+  @override
+  String get stickerPackImages => '图片';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -12158,4 +12185,31 @@ class SZhTw extends SZh {
 
   @override
   String get backupOlderFilesWarning => '這些檔案可能屬於其他帳號。請選擇檔案，核對內容和帳號歸屬後再復原。';
+
+  @override
+  String get stickerImportTitle => '匯入貼圖包';
+
+  @override
+  String get stickerImportLinkHint => 'Matrix 貼圖包連結';
+
+  @override
+  String get stickerImportPreview => '預覽';
+
+  @override
+  String get stickerImportUnavailable => '此貼圖包無法使用，或你沒有存取權限。';
+
+  @override
+  String get stickerImportCopyNotice => '新增此貼圖包的私人副本。圖片和中繼資料不受端對端加密保護。';
+
+  @override
+  String get stickerImportFailed => '無法新增此貼圖包，請重試。';
+
+  @override
+  String get stickerImportAccountChanged => '帳號已變更或登入已失效，請重新開啟貼圖匯入。';
+
+  @override
+  String get stickerPackSourceRoom => '來源對話';
+
+  @override
+  String get stickerPackImages => '圖片';
 }

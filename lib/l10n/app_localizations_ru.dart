@@ -6287,4 +6287,35 @@ class SRu extends S {
   @override
   String get backupOlderFilesWarning =>
       'Эти файлы могут принадлежать другой учётной записи. Выберите файл и проверьте его содержимое и владельца перед восстановлением.';
+
+  @override
+  String get stickerImportTitle => 'Импортировать набор стикеров';
+
+  @override
+  String get stickerImportLinkHint => 'Ссылка на набор стикеров Matrix';
+
+  @override
+  String get stickerImportPreview => 'Предпросмотр';
+
+  @override
+  String get stickerImportUnavailable =>
+      'Этот набор недоступен или у вас нет доступа.';
+
+  @override
+  String get stickerImportCopyNotice =>
+      'Добавьте личную копию этого набора. Его изображения и метаданные не защищены сквозным шифрованием.';
+
+  @override
+  String get stickerImportFailed =>
+      'Не удалось добавить этот набор. Повторите попытку.';
+
+  @override
+  String get stickerImportAccountChanged =>
+      'Аккаунт изменён или сеанс истёк. Откройте импорт стикеров заново.';
+
+  @override
+  String get stickerPackSourceRoom => 'Исходный чат';
+
+  @override
+  String get stickerPackImages => 'Изображения';
 }

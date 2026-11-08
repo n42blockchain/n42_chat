@@ -105,7 +105,14 @@ void main() {
     'store pagination respects category ordering and exhausted offsets',
     () async {
       final all = await repository.getStorePacks(category: 'popular');
-      expect(all.first.downloadCount, greaterThan(all.last.downloadCount));
+      expect(all, isNotEmpty);
+      expect(
+        all.every((pack) => pack.downloadCount == 0),
+        isTrue,
+        reason:
+            'Bundled sample collections have no measured download statistics',
+      );
+      expect(all, await repository.getStorePacks());
       expect(
         await repository.getStorePacks(
           category: 'popular',

@@ -6288,4 +6288,36 @@ class SSw extends S {
   @override
   String get backupOlderFilesWarning =>
       'Faili hizi huenda ni za akaunti nyingine. Chagua faili ili ukague maudhui na mmiliki kabla ya kurejesha.';
+
+  @override
+  String get stickerImportTitle => 'Leta kifurushi cha vibandiko';
+
+  @override
+  String get stickerImportLinkHint =>
+      'Kiungo cha kifurushi cha vibandiko cha Matrix';
+
+  @override
+  String get stickerImportPreview => 'Hakiki';
+
+  @override
+  String get stickerImportUnavailable =>
+      'Kifurushi hiki hakipatikani au huna ruhusa ya kukifikia.';
+
+  @override
+  String get stickerImportCopyNotice =>
+      'Ongeza nakala ya faragha ya kifurushi hiki. Picha na metadata zake hazijasimbwa kwa njia fiche kutoka mwanzo hadi mwisho.';
+
+  @override
+  String get stickerImportFailed =>
+      'Haikuwezekana kuongeza kifurushi hiki. Jaribu tena.';
+
+  @override
+  String get stickerImportAccountChanged =>
+      'Akaunti imebadilika au kipindi kimeisha. Fungua tena uletaji wa vibandiko.';
+
+  @override
+  String get stickerPackSourceRoom => 'Gumzo la chanzo';
+
+  @override
+  String get stickerPackImages => 'Picha';
 }

@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
+import '../../widgets/chat/sticker_thumb.dart';
+import 'sticker_import_page.dart';
+
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/ai_sticker_service.dart';
@@ -64,6 +68,13 @@ class _StickerStorePageState extends State<StickerStorePage>
     }
   }
 
+  Future<void> _openImport() async {
+    await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(builder: (_) => const StickerImportPage()),
+    );
+    if (mounted) await _loadData();
+  }
+
   Future<void> _openAiGenerate() async {
     final added = await Navigator.of(context).push<bool>(
       MaterialPageRoute<bool>(builder: (_) => const AiStickerGeneratePage()),
@@ -101,9 +112,8 @@ class _StickerStorePageState extends State<StickerStorePage>
     final pack = await _repository.createCustomPack(name: name);
     if (!mounted) return;
     if (pack == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Failed to create pack')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Failed to create pack')));
       return;
     }
     await _openCustomPack(pack.id);
@@ -127,9 +137,8 @@ class _StickerStorePageState extends State<StickerStorePage>
         _installedPacks.add(pack.copyWith(isInstalled: true));
       });
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Installed "${pack.name}"')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Installed "${pack.name}"')));
       }
     }
   }
@@ -165,9 +174,8 @@ class _StickerStorePageState extends State<StickerStorePage>
         _installedPacks.removeWhere((p) => p.id == pack.id);
       });
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Removed "${pack.name}"')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Removed "${pack.name}"')));
       }
     }
   }
@@ -179,9 +187,19 @@ class _StickerStorePageState extends State<StickerStorePage>
     return Scaffold(
       backgroundColor: context.pageBackground,
       appBar: AppBar(
-        title: const Text('Sticker Store'),
+        title: Text(
+          S.of(context)?.profileStickers ?? 'Stickers',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
         backgroundColor: context.surfaceColor,
         actions: [
+          IconButton(
+            key: const ValueKey('sticker_store_import'),
+            tooltip: S.of(context)?.stickerImportTitle ?? 'Import sticker pack',
+            icon: const Icon(Icons.file_download_outlined),
+            onPressed: _openImport,
+          ),
           IconButton(
             tooltip: 'New pack',
             icon: const Icon(Icons.create_new_folder_outlined),
@@ -487,12 +505,7 @@ class _StickerStorePageState extends State<StickerStorePage>
                         AppDimensions.radiusM,
                       ),
                     ),
-                    child: Center(
-                      child: Text(
-                        sticker.emoji ?? '?',
-                        style: const TextStyle(fontSize: 28),
-                      ),
-                    ),
+                    child: StickerThumb(sticker: sticker),
                   );
                 },
               ),
@@ -501,19 +514,21 @@ class _StickerStorePageState extends State<StickerStorePage>
             // 统计信息
             Row(
               children: [
-                Icon(Icons.download, size: 14, color: context.textSecondary),
-                const SizedBox(width: AppDimensions.spacingXS),
-                Text(
-                  '${pack.downloadCount}',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 12,
-                    height: 1.3,
-                    color: context.textSecondary,
+                if (pack.downloadCount > 0) ...[
+                  Icon(Icons.download, size: 14, color: context.textSecondary),
+                  const SizedBox(width: AppDimensions.spacingXS),
+                  Text(
+                    '${pack.downloadCount}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 12,
+                      height: 1.3,
+                      color: context.textSecondary,
+                    ),
                   ),
-                ),
-                const SizedBox(width: AppDimensions.spacing),
+                  const SizedBox(width: AppDimensions.spacing),
+                ],
                 Icon(
                   Icons.emoji_emotions_outlined,
                   size: 14,

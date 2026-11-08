@@ -6285,4 +6285,35 @@ class SIt extends S {
   @override
   String get backupOlderFilesWarning =>
       'Questi file potrebbero appartenere a un altro account. Seleziona un file per verificarne contenuto e proprietario prima del ripristino.';
+
+  @override
+  String get stickerImportTitle => 'Importa pacchetto di adesivi';
+
+  @override
+  String get stickerImportLinkHint => 'Link al pacchetto di adesivi Matrix';
+
+  @override
+  String get stickerImportPreview => 'Anteprima';
+
+  @override
+  String get stickerImportUnavailable =>
+      'Questo pacchetto non è disponibile o non hai accesso.';
+
+  @override
+  String get stickerImportCopyNotice =>
+      'Aggiungi una copia privata di questo pacchetto. Le immagini e i metadati non sono crittografati end-to-end.';
+
+  @override
+  String get stickerImportFailed =>
+      'Impossibile aggiungere questo pacchetto. Riprova.';
+
+  @override
+  String get stickerImportAccountChanged =>
+      'L’account è cambiato o la sessione è scaduta. Riapri l’importazione degli adesivi.';
+
+  @override
+  String get stickerPackSourceRoom => 'Chat di origine';
+
+  @override
+  String get stickerPackImages => 'Immagini';
 }

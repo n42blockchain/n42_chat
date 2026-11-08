@@ -6306,4 +6306,35 @@ class SDe extends S {
   @override
   String get backupOlderFilesWarning =>
       'Diese Dateien gehören möglicherweise zu einem anderen Konto. Wähle eine Datei, um Inhalt und Kontozugehörigkeit vor der Wiederherstellung zu prüfen.';
+
+  @override
+  String get stickerImportTitle => 'Stickerpaket importieren';
+
+  @override
+  String get stickerImportLinkHint => 'Link zu einem Matrix-Stickerpaket';
+
+  @override
+  String get stickerImportPreview => 'Vorschau';
+
+  @override
+  String get stickerImportUnavailable =>
+      'Dieses Paket ist nicht verfügbar oder du hast keinen Zugriff.';
+
+  @override
+  String get stickerImportCopyNotice =>
+      'Füge eine private Kopie dieses Pakets hinzu. Seine Bilder und Metadaten sind nicht Ende-zu-Ende-verschlüsselt.';
+
+  @override
+  String get stickerImportFailed =>
+      'Dieses Paket konnte nicht hinzugefügt werden. Versuche es erneut.';
+
+  @override
+  String get stickerImportAccountChanged =>
+      'Das Konto wurde gewechselt oder die Sitzung ist abgelaufen. Öffne den Stickerimport erneut.';
+
+  @override
+  String get stickerPackSourceRoom => 'Ursprünglicher Chat';
+
+  @override
+  String get stickerPackImages => 'Bilder';
 }
