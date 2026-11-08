@@ -164,6 +164,152 @@ class _Fixture {
 }
 
 void main() {
+  for (final link in [false, true]) {
+    Future<void> openDraft(WidgetTester tester) async {
+      await tester.tap(find.byIcon(Icons.add));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(link ? 'Favorite Link' : 'New Note'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField).first, 'Private draft');
+      if (link) {
+        await tester.enterText(
+          find.byType(TextField).last,
+          'https://example.test',
+        );
+      }
+    }
+
+    testWidgets(
+      '${link ? 'link' : 'note'} save failure keeps the draft and retries once',
+      (tester) async {
+        final f = _Fixture();
+        await f.initialize(tester);
+        await f.open(tester);
+        await openDraft(tester);
+        f.store.reject = true;
+        await tester.tap(find.text('Confirm'));
+        await tester.pumpAndSettle();
+        expect(find.text('Save failed'), findsOneWidget);
+        expect(find.byType(AlertDialog), findsOneWidget);
+        expect(
+          tester
+              .widget<TextField>(find.byType(TextField).first)
+              .controller!
+              .text,
+          'Private draft',
+        );
+        expect(
+          (await f.repository.getSavedMessages()).where(
+            (entry) => entry.content.contains('Private draft'),
+          ),
+          isEmpty,
+        );
+        await tester.tap(find.text('Confirm'));
+        await tester.pumpAndSettle();
+        expect(find.byType(AlertDialog), findsNothing);
+        expect(
+          (await f.repository.getSavedMessages()).where(
+            (entry) => entry.content.contains('Private draft'),
+          ),
+          hasLength(1),
+        );
+      },
+    );
+
+    testWidgets(
+      '${link ? 'link' : 'note'} pending save prevents dismissal and replacement-account success',
+      (tester) async {
+        final f = _Fixture();
+        await f.initialize(tester);
+        await f.open(tester);
+        await openDraft(tester);
+        final pending = Completer<void>();
+        f.store.hold = pending;
+        f.store.started = Completer<void>();
+        await tester.tap(find.text('Confirm'));
+        await tester.pump();
+        await f.store.started!.future;
+        expect(
+          tester
+              .widget<TextButton>(find.widgetWithText(TextButton, 'Confirm'))
+              .onPressed,
+          isNull,
+        );
+        expect(
+          tester
+              .widget<TextButton>(find.widgetWithText(TextButton, 'Cancel'))
+              .onPressed,
+          isNull,
+        );
+        await tester.binding.handlePopRoute();
+        await tester.pump();
+        expect(find.byType(AlertDialog), findsOneWidget);
+        f.switchToB();
+        pending.complete();
+        await tester.pumpAndSettle();
+        expect(find.text('Save failed'), findsOneWidget);
+        expect(await f.repository.getSavedMessages(), isEmpty);
+        expect(find.text(link ? 'Link added' : 'Note added'), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'old add menu cannot rebind a ${link ? 'link' : 'note'} editor',
+      (tester) async {
+        final f = _Fixture();
+        await f.initialize(tester);
+        await f.open(tester);
+        await tester.tap(find.byIcon(Icons.add));
+        await tester.pumpAndSettle();
+        f.switchToB();
+        await tester.tap(find.text(link ? 'Favorite Link' : 'New Note'));
+        await tester.pumpAndSettle();
+        await tester.enterText(find.byType(TextField).first, 'Old menu draft');
+        if (link) {
+          await tester.enterText(
+            find.byType(TextField).last,
+            'https://example.test',
+          );
+        }
+        await tester.tap(find.text('Confirm'));
+        await tester.pumpAndSettle();
+        expect(await f.repository.getSavedMessages(), isEmpty);
+        expect(find.text('Save failed'), findsOneWidget);
+      },
+    );
+  }
+
+  for (final link in [false, true]) {
+    testWidgets(
+      'stale ${link ? 'link' : 'note'} draft cannot save into a replacement account',
+      (tester) async {
+        final f = _Fixture();
+        await f.initialize(tester);
+        await f.open(tester);
+        await tester.tap(find.byIcon(Icons.add));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text(link ? 'Favorite Link' : 'New Note'));
+        await tester.pumpAndSettle();
+        await tester.enterText(
+          find.byType(TextField).first,
+          'Alice private draft',
+        );
+        if (link) {
+          await tester.enterText(
+            find.byType(TextField).last,
+            'https://example.test',
+          );
+        }
+        f.switchToB();
+        await tester.tap(find.text('Confirm'));
+        await tester.pumpAndSettle();
+        expect(await f.repository.getSavedMessages(), isEmpty);
+        expect(find.byType(AlertDialog), findsOneWidget);
+        expect(find.text('Save failed'), findsOneWidget);
+      },
+    );
+  }
+
   testWidgets(
     'old favorite action sheet cannot delete replacement-account data',
     (tester) async {
