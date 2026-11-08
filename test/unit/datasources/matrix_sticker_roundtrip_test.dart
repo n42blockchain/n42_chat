@@ -41,6 +41,43 @@ void main() {
         });
   });
 
+  test('custom pack management source survives reopening', () async {
+    const pack = StickerPack(
+      id: 'custom_owned',
+      name: 'Owned',
+      source: StickerPackSource.custom,
+    );
+    expect(await source.installPack(pack.id, pack), isTrue);
+    final reopened = (await MatrixStickerDataSource(
+      manager,
+    ).getInstalledPacks()).singleWhere((pack) => pack.id == 'custom_owned');
+    expect(reopened.source, StickerPackSource.custom);
+  });
+
+  test('stored ownership does not depend on identifier spelling', () async {
+    const pack = StickerPack(
+      id: 'owned_identifier',
+      name: 'Owned',
+      source: StickerPackSource.custom,
+    );
+    expect(await source.installPack(pack.id, pack), isTrue);
+    final reopened = (await source.getInstalledPacks()).singleWhere(
+      (p) => p.id == pack.id,
+    );
+    expect(reopened.source, StickerPackSource.custom);
+  });
+
+  test('legacy custom packs recover management without new metadata', () async {
+    const pack = StickerPack(id: 'custom_legacy', name: 'Legacy');
+    expect(await source.installPack(pack.id, pack), isTrue);
+    accountData['${MatrixStickerDataSource.stickerPackType}.${pack.id}']!
+        .remove('n42.source');
+    final reopened = (await source.getInstalledPacks()).singleWhere(
+      (p) => p.id == pack.id,
+    );
+    expect(reopened.source, StickerPackSource.custom);
+  });
+
   test(
     'same emoji preserves both images and stable identifiers after reopen',
     () async {

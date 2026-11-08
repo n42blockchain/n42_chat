@@ -72,10 +72,11 @@ abstract class IStickerRepository {
   /// 重命名贴纸包
   Future<bool> renamePack(String packId, String newName);
 
-  /// 导入贴纸包（从其他用户分享）
+  /// Load a readable Matrix image-pack snapshot for preview.
+  /// Does not join rooms or install; installPack confirms the preview separately.
   Future<StickerPack?> importPack(String shareUrl);
 
-  /// 获取贴纸包分享链接
+  /// Read the original shared snapshot link; does not publish private packs.
   Future<String?> getPackShareUrl(String packId);
 
   /// 监听已安装贴纸包变化

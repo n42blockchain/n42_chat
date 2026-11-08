@@ -1,4 +1,5 @@
 import 'package:matrix/matrix.dart' as matrix;
+
 import 'debug_log.dart';
 
 /// Matrix 工具类
@@ -41,8 +42,22 @@ class MatrixUtils {
     try {
       // 解析 mxc://server/mediaId
       final uri = Uri.parse(mxcUrl);
-      final serverName = uri.host;
-      final mediaId = uri.pathSegments.isNotEmpty ? uri.pathSegments.first : '';
+      if (uri.userInfo.isNotEmpty ||
+          uri.hasQuery ||
+          uri.hasFragment ||
+          uri.pathSegments.length != 1) {
+        return null;
+      }
+      final mediaId = uri.pathSegments.single;
+      if (mediaId == '.' ||
+          mediaId == '..' ||
+          RegExp(r'[\x00-\x20/\\]').hasMatch(mediaId)) {
+        return null;
+      }
+      // Preserve a Matrix server's port and keep both identifiers in their own
+      // URL path segment. Never interpret an MXC authority as a client origin.
+      final serverName = Uri.encodeComponent(uri.authority);
+      final encodedMediaId = Uri.encodeComponent(mediaId);
 
       if (serverName.isEmpty || mediaId.isEmpty) {
         debugLog('MatrixUtils: Invalid mxc URL format: $mxcUrl');
@@ -65,11 +80,11 @@ class MatrixUtils {
             : 'scale';
         final animatedStr = animated ? '&animated=true' : '';
         url =
-            '$homeserver/_matrix/client/v1/media/thumbnail/$serverName/$mediaId?width=$width&height=$height&method=$methodStr$animatedStr';
+            '$homeserver/_matrix/client/v1/media/thumbnail/$serverName/$encodedMediaId?width=$width&height=$height&method=$methodStr$animatedStr';
       } else {
         // 完整下载 URL
         url =
-            '$homeserver/_matrix/client/v1/media/download/$serverName/$mediaId';
+            '$homeserver/_matrix/client/v1/media/download/$serverName/$encodedMediaId';
       }
 
       return url;

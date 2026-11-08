@@ -1,10 +1,15 @@
 import 'dart:typed_data';
+import 'dart:convert';
+
+import 'package:crypto/crypto.dart';
 
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:matrix/matrix.dart' as matrix;
 
 import '../../../core/utils/matrix_utils.dart';
 import '../../../domain/entities/sticker_pack_entity.dart';
+import '../../../domain/entities/sticker_pack_origin.dart';
+import '../../../core/utils/matrix_sticker_pack_link.dart';
 import '../bundled_sticker_packs.dart';
 import 'matrix_client_manager.dart';
 import '../../../core/utils/debug_log.dart';
@@ -35,10 +40,10 @@ class MatrixStickerDataSource {
   /// Identity of the account whose private sticker data is being read.
   Object? get accountScope {
     final client = _client;
-    return client == null ? null :
-        (client, client.userID, client.deviceID, client.homeserver);
+    return client == null
+        ? null
+        : (client, client.userID, client.deviceID, client.homeserver);
   }
-
 
   /// 获取已安装的贴纸包列表
   Future<List<StickerPack>> getInstalledPacks() async {
@@ -115,7 +120,8 @@ class MatrixStickerDataSource {
                 url: url,
                 httpUrl: _getHttpUrl(url),
                 name: (value['body'] ?? value['name']) as String?,
-                emoji: value.containsKey('n42.emoji') &&
+                emoji:
+                    value.containsKey('n42.emoji') &&
                         (value['n42.emoji'] == null ||
                             value['n42.emoji'] is String)
                     ? value['n42.emoji'] as String?
@@ -137,11 +143,87 @@ class MatrixStickerDataSource {
         avatarUrl: pack['avatar_url'] as String?,
         avatarHttpUrl: _getHttpUrl(pack['avatar_url'] as String?),
         author: (pack['author'] ?? pack['attribution']) as String?,
-        source: StickerPackSource.matrix,
+        source:
+            StickerPackSource.values
+                .where((source) => source.name == data['n42.source'])
+                .firstOrNull ??
+            (packId.startsWith('custom_')
+                ? StickerPackSource.custom
+                : StickerPackSource.matrix),
+        origin: StickerPackOrigin.tryFromJson(data['n42.origin']),
         stickers: stickers,
       );
     } catch (e) {
       debugLog('MatrixStickerDataSource: Failed to parse pack: $e');
+      return null;
+    }
+  }
+
+  /// Read only through the authenticated homeserver. No joins or account writes.
+  Future<StickerPack?> previewSharedPack(StickerPackOrigin reference) async {
+    final client = _client;
+    if (client == null || client.userID == null) return null;
+    final origin = accountScope;
+    try {
+      final event = await client.getOneRoomEvent(
+        reference.roomId,
+        reference.eventId,
+      );
+      if (accountScope != origin ||
+          event.eventId != reference.eventId ||
+          (event.roomId != null && event.roomId != reference.roomId) ||
+          event.type != 'm.room.image_pack' ||
+          event.stateKey == null ||
+          event.stateKey!.length > 4096 ||
+          event.unsigned?['redacted_because'] != null ||
+          utf8.encode(jsonEncode(event.content)).length > 65536) {
+        return null;
+      }
+      final usage = (event.content['pack'] is Map)
+          ? (event.content['pack'] as Map)['usage']
+          : null;
+      if (usage is List && usage.isNotEmpty && !usage.contains('sticker')) {
+        return null;
+      }
+      final id =
+          'shared_${sha256.convert(utf8.encode('${reference.roomId}|${reference.eventId}'))}';
+      final data = Map<String, dynamic>.from(event.content);
+      final metadata = data['pack'] is Map
+          ? Map<String, dynamic>.from(data['pack'] as Map)
+          : <String, dynamic>{};
+      final room = client.getRoomById(reference.roomId);
+      metadata['display_name'] ??= room?.name.isNotEmpty == true
+          ? room!.name
+          : reference.roomId;
+      if (metadata['avatar_url'] == null && room?.avatar != null) {
+        metadata['avatar_url'] = room!.avatar.toString();
+      }
+      data['pack'] = metadata;
+      final pack = _parseStickerPack(id, data);
+      if (pack == null ||
+          pack.isEmpty ||
+          pack.stickers.length > 500 ||
+          pack.stickers.any(
+            (sticker) =>
+                !isMatrixStickerMediaUrl(sticker.url) ||
+                (sticker.mimeType != null &&
+                    !sticker.mimeType!.startsWith('image/')),
+          ) ||
+          (pack.avatarUrl != null &&
+              !isMatrixStickerMediaUrl(pack.avatarUrl!))) {
+        return null;
+      }
+      return pack.copyWith(
+        source: StickerPackSource.matrix,
+        isInstalled: false,
+        origin: StickerPackOrigin(
+          roomId: reference.roomId,
+          eventId: reference.eventId,
+          stateKey: event.stateKey!,
+          viaServers: reference.viaServers,
+        ),
+      );
+    } catch (_) {
       return null;
     }
   }
@@ -265,6 +347,8 @@ class MatrixStickerDataSource {
     }
 
     return {
+      'n42.source': pack.source.name,
+      if (pack.origin != null) 'n42.origin': pack.origin!.toJson(),
       'pack': {
         'display_name': pack.name,
         'description': pack.description,
@@ -339,10 +423,7 @@ class MatrixStickerDataSource {
       List<Map<String, dynamic>> recentList = [];
 
       try {
-        final data = await client.getAccountData(
-          userId,
-          recentStickersType,
-        );
+        final data = await client.getAccountData(userId, recentStickersType);
         recentList =
             (data['recent'] as List?)?.cast<Map<String, dynamic>>() ?? [];
       } catch (e) {
@@ -451,7 +532,6 @@ class MatrixStickerDataSource {
         final eventId = await room.sendTextEvent(text);
         return accountScope == origin ? eventId : null;
       }
-
 
       // 如果是 emoji 贴纸，发送为文本消息
       if (sticker.url.startsWith('emoji:')) {

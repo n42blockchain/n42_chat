@@ -1,13 +1,13 @@
 import 'dart:typed_data';
 import 'dart:async';
 
-
 import '../../domain/entities/sticker_pack_entity.dart';
 import '../../domain/repositories/sticker_repository.dart';
 import '../datasources/matrix/matrix_sticker_datasource.dart';
 import '../datasources/bundled_sticker_packs.dart';
 import '../../core/utils/debug_log.dart';
 import '../../core/utils/sticker_suggestion_utils.dart';
+import '../../core/utils/matrix_sticker_pack_link.dart';
 
 /// 贴纸仓库实现
 class StickerRepositoryImpl implements IStickerRepository {
@@ -16,9 +16,12 @@ class StickerRepositoryImpl implements IStickerRepository {
   /// 已安装贴纸包缓存
   List<StickerPack>? _installedPacksCache;
   Object? _installedPacksScope;
+  Object? _importScope;
+  final _importPreviews = <String, StickerPack>{};
 
   /// 已安装贴纸包变化流控制器
-  final _installedPacksController = StreamController<List<StickerPack>>.broadcast();
+  final _installedPacksController =
+      StreamController<List<StickerPack>>.broadcast();
 
   StickerRepositoryImpl(this._dataSource);
 
@@ -54,10 +57,7 @@ class StickerRepositoryImpl implements IStickerRepository {
     // Built-in sample stickers — replace with Matrix sticker pack API (m.sticker_pack)
     // TODO: 从贴纸商店 API 获取
     // 目前返回一些示例贴纸包
-    final packs = _filterStorePacks(
-      _getSampleStorePacks(),
-      category: category,
-    );
+    final packs = _filterStorePacks(_getSampleStorePacks(), category: category);
     return packs.skip(offset).take(limit).toList();
   }
 
@@ -131,6 +131,10 @@ class StickerRepositoryImpl implements IStickerRepository {
     final installedPack = installed.where((p) => p.id == packId).firstOrNull;
     if (installedPack != null) return installedPack;
 
+    if (_importScope != _dataSource.accountScope) _importPreviews.clear();
+    final preview = _importPreviews[packId];
+    if (preview != null) return preview;
+
     // 从商店查找
     final storePacks = _getSampleStorePacks();
     return storePacks.where((p) => p.id == packId).firstOrNull;
@@ -186,24 +190,33 @@ class StickerRepositoryImpl implements IStickerRepository {
 
     // 搜索已安装的贴纸包
     final installed = await getInstalledPacks();
-    final installedMatches = installed.where((pack) =>
-        pack.name.toLowerCase().contains(queryLower) ||
-        (pack.description?.toLowerCase().contains(queryLower) ?? false) ||
-        pack.stickers.any((s) =>
-            (s.name?.toLowerCase().contains(queryLower) ?? false) ||
-            (s.emoji?.contains(queryLower) ?? false)));
+    final installedMatches = installed.where(
+      (pack) =>
+          pack.name.toLowerCase().contains(queryLower) ||
+          (pack.description?.toLowerCase().contains(queryLower) ?? false) ||
+          pack.stickers.any(
+            (s) =>
+                (s.name?.toLowerCase().contains(queryLower) ?? false) ||
+                (s.emoji?.contains(queryLower) ?? false),
+          ),
+    );
 
     // 搜索商店贴纸包
     final storePacks = _getSampleStorePacks();
-    final storeMatches = storePacks.where((pack) =>
-        pack.name.toLowerCase().contains(queryLower) ||
-        (pack.description?.toLowerCase().contains(queryLower) ?? false));
+    final storeMatches = storePacks.where(
+      (pack) =>
+          pack.name.toLowerCase().contains(queryLower) ||
+          (pack.description?.toLowerCase().contains(queryLower) ?? false),
+    );
 
     return _dedupePacksById([...installedMatches, ...storeMatches]);
   }
 
   @override
-  Future<List<StickerHit>> searchStickers(String query, {int limit = 24}) async {
+  Future<List<StickerHit>> searchStickers(
+    String query, {
+    int limit = 24,
+  }) async {
     if (query.trim().isEmpty) return const [];
     final installed = await getInstalledPacks();
     return StickerSuggestionUtils.rank(installed, query, limit: limit);
@@ -212,12 +225,27 @@ class StickerRepositoryImpl implements IStickerRepository {
   @override
   Future<List<StickerCategory>> getCategories() async {
     return const [
-      StickerCategory(id: 'popular', name: 'Popular', icon: '🔥', packCount: 10),
+      StickerCategory(
+        id: 'popular',
+        name: 'Popular',
+        icon: '🔥',
+        packCount: 10,
+      ),
       StickerCategory(id: 'new', name: 'New', icon: '✨', packCount: 5),
       StickerCategory(id: 'animals', name: 'Animals', icon: '🐾', packCount: 8),
-      StickerCategory(id: 'emotions', name: 'Emotions', icon: '😊', packCount: 12),
+      StickerCategory(
+        id: 'emotions',
+        name: 'Emotions',
+        icon: '😊',
+        packCount: 12,
+      ),
       StickerCategory(id: 'food', name: 'Food', icon: '🍔', packCount: 6),
-      StickerCategory(id: 'celebration', name: 'Celebration', icon: '🎉', packCount: 4),
+      StickerCategory(
+        id: 'celebration',
+        name: 'Celebration',
+        icon: '🎉',
+        packCount: 4,
+      ),
     ];
   }
 
@@ -326,7 +354,9 @@ class StickerRepositoryImpl implements IStickerRepository {
       final pack = await getPackById(packId);
       if (pack == null || _dataSource.accountScope != origin) return false;
 
-      final updatedStickers = pack.stickers.where((s) => s.id != stickerId).toList();
+      final updatedStickers = pack.stickers
+          .where((s) => s.id != stickerId)
+          .toList();
       final updatedPack = pack.copyWith(
         stickers: updatedStickers,
         updatedAt: DateTime.now(),
@@ -377,15 +407,27 @@ class StickerRepositoryImpl implements IStickerRepository {
 
   @override
   Future<StickerPack?> importPack(String shareUrl) async {
-    // TODO: 实现从分享链接导入贴纸包
-    debugLog('StickerRepositoryImpl: Import pack from $shareUrl');
-    return null;
+    final reference = parseMatrixStickerPackLink(shareUrl);
+    final scope = _dataSource.accountScope;
+    if (reference == null || scope == null) return null;
+    if (_importScope != scope) {
+      _importPreviews.clear();
+      _importScope = scope;
+    }
+    final pack = await _dataSource.previewSharedPack(reference);
+    if (pack == null || _dataSource.accountScope != scope) return null;
+    if (_importPreviews.length >= 32) {
+      _importPreviews.remove(_importPreviews.keys.first);
+    }
+    _importPreviews[pack.id] = pack;
+    return pack;
   }
 
   @override
   Future<String?> getPackShareUrl(String packId) async {
-    // TODO: 实现获取贴纸包分享链接
-    return null;
+    final scope = _dataSource.accountScope;
+    final pack = await getPackById(packId);
+    return _dataSource.accountScope == scope ? pack?.origin?.shareUrl : null;
   }
 
   @override
