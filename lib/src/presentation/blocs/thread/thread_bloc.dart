@@ -337,6 +337,10 @@ class ThreadBloc extends Bloc<ThreadEvent, ThreadState> {
       }
     } catch (e) {
       if (!isCurrent()) return;
+      // Hidden pages must be fetched again after a failed visibility check.
+      if (checkingVisibility) {
+        _hasLoadedOlderPages = false;
+      }
       emit(
         state.copyWith(
           isLoading: false,

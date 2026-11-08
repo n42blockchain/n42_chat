@@ -13,5 +13,24 @@
     "Wallet immutable pin integration",
     "Native and real-homeserver acceptance",
     "Older remote redactions and initial fallback completeness"
-  ]
+  ],
+  "prior_full_regression": {
+    "source": "4b0b832f158698c7ecc5f102a2cee0cb82b686e5",
+    "passed": 9072,
+    "failed": 0,
+    "environment_skips": 7,
+    "coverage_hit": 107621,
+    "coverage_total": 148079,
+    "coverage_percent": 72.67809750200907,
+    "log": "/tmp/n42-chat-thread-refresh-full.jsonl",
+    "log_sha256": "d10ca090b5f37c7113dbe8578667c1b06c2e42f7e3eb8fd8049054ed261146a3",
+    "scope": "Before cursor-reset recovery repair; not final-source acceptance"
+  },
+  "cursor_recovery_follow_up": {
+    "pre_fix_failures": 1,
+    "focused_passed": 58,
+    "log": "/tmp/n42-chat-thread-refresh-retry-cluster.log",
+    "behavior": "Visibility failure discards retained-page position so explicit retry can fetch hidden pages again",
+    "final_source_full_regression": "pending"
+  }
 }

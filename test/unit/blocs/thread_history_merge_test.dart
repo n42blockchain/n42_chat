@@ -237,6 +237,19 @@ void main() {
     verify(
       () => paged.getThreadMessagePage('!room', 'root', fromToken: 'oldest'),
     ).called(1);
+    when(() => paged.filterThreadHistory(any(), any()))
+        .thenThrow(StateError('visibility unavailable'));
+    b.add(const LoadThreadMessages());
+    await pumpEventQueue();
+    expect(b.state.replies, isEmpty);
+    when(() => paged.filterThreadHistory(any(), any())).thenAnswer(
+      (call) async => call.positionalArguments[1] as List<MessageEntity>,
+    );
+    b.add(const LoadThreadMessages());
+    await pumpEventQueue();
+    expect(b.state.replies.map((m) => m.id), ['recent']);
+    expect(b.state.hasMore, isTrue);
+    expect(b.state.nextBatch, 'first');
   });
 
   test('refresh repeats visibility after a concurrent live update', () async {
