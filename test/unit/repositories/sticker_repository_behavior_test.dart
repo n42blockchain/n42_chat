@@ -343,6 +343,32 @@ void main() {
     },
   );
 
+  test('account switch during avatar upload cannot create a pack', () async {
+    Object scope = Object();
+    when(() => source.accountScope).thenAnswer((_) => scope);
+    final upload = Completer<String?>();
+    when(() => source.uploadStickerImage(any(), any(), any()))
+        .thenAnswer((_) => upload.future);
+    final pending = repository.createCustomPack(name: 'Private', avatarBytes: bytes);
+    await pumpEventQueue();
+    scope = Object();
+    upload.complete('mxc://fixture/avatar');
+    expect(await pending, isNull);
+    verifyNever(() => source.installPack(any(), any()));
+  });
+
+  test('account switch during lookup cannot install a store pack', () async {
+    Object scope = Object();
+    when(() => source.accountScope).thenAnswer((_) => scope);
+    final lookup = Completer<List<StickerPack>>();
+    when(() => source.getInstalledPacks()).thenAnswer((_) => lookup.future);
+    final pending = repository.installPack('store_food');
+    scope = Object();
+    lookup.complete([]);
+    expect(await pending, isFalse);
+    verifyNever(() => source.installPack(any(), any()));
+  });
+
   test('rename preserves stickers and refreshes cached name', () async {
     expect(await repository.renamePack(custom.id, 'Trips'), isTrue);
     final updated = await repository.getPackById(custom.id);

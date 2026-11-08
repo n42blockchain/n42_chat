@@ -138,10 +138,12 @@ class StickerRepositoryImpl implements IStickerRepository {
 
   @override
   Future<bool> installPack(String packId) async {
+    final origin = _dataSource.accountScope;
     final pack = await getPackById(packId);
-    if (pack == null) return false;
+    if (pack == null || _dataSource.accountScope != origin) return false;
 
     final success = await _dataSource.installPack(packId, pack);
+    if (_dataSource.accountScope != origin) return false;
     if (success) {
       _invalidateCache();
       _notifyInstalledPacksChanged();
@@ -223,6 +225,7 @@ class StickerRepositoryImpl implements IStickerRepository {
     String? description,
     Uint8List? avatarBytes,
   }) async {
+    final origin = _dataSource.accountScope;
     try {
       String? avatarUrl;
       if (avatarBytes != null) {
@@ -232,6 +235,8 @@ class StickerRepositoryImpl implements IStickerRepository {
           'image/png',
         );
       }
+
+      if (_dataSource.accountScope != origin) return null;
 
       final packId = 'custom_${DateTime.now().millisecondsSinceEpoch}';
       final pack = StickerPack(
@@ -245,6 +250,7 @@ class StickerRepositoryImpl implements IStickerRepository {
       );
 
       final success = await _dataSource.installPack(packId, pack);
+      if (_dataSource.accountScope != origin) return null;
       if (success) {
         _invalidateCache();
         _notifyInstalledPacksChanged();
@@ -313,9 +319,10 @@ class StickerRepositoryImpl implements IStickerRepository {
     required String packId,
     required String stickerId,
   }) async {
+    final origin = _dataSource.accountScope;
     try {
       final pack = await getPackById(packId);
-      if (pack == null) return false;
+      if (pack == null || _dataSource.accountScope != origin) return false;
 
       final updatedStickers = pack.stickers.where((s) => s.id != stickerId).toList();
       final updatedPack = pack.copyWith(
@@ -324,6 +331,7 @@ class StickerRepositoryImpl implements IStickerRepository {
       );
 
       final success = await _dataSource.installPack(packId, updatedPack);
+      if (_dataSource.accountScope != origin) return false;
       if (success) {
         _invalidateCache();
         _notifyInstalledPacksChanged();
@@ -342,9 +350,10 @@ class StickerRepositoryImpl implements IStickerRepository {
 
   @override
   Future<bool> renamePack(String packId, String newName) async {
+    final origin = _dataSource.accountScope;
     try {
       final pack = await getPackById(packId);
-      if (pack == null) return false;
+      if (pack == null || _dataSource.accountScope != origin) return false;
 
       final updatedPack = pack.copyWith(
         name: newName,
@@ -352,6 +361,7 @@ class StickerRepositoryImpl implements IStickerRepository {
       );
 
       final success = await _dataSource.installPack(packId, updatedPack);
+      if (_dataSource.accountScope != origin) return false;
       if (success) {
         _invalidateCache();
         _notifyInstalledPacksChanged();

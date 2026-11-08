@@ -804,7 +804,7 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Release boundary: wallet candidate 73481 contains the older serializer and is held. Complete full Chat regression and wallet integration, then build and verify a fresh artifact before delivery.
 - Next step: finish persistence acceptance, then define persistent pack distribution, bounded resource validation and receiver preview/install, and wire/test both sender and receiver before claiming a sharing ecosystem.
 
-- Follow-up 2026-11-07: reproduced account switching during sticker upload copying the old pack into the replacement account. The repository now checks the captured scope after pack lookup/upload and persistence. The new regression fails before the fix and the 39-case repository suite passes after it. Host integration/full regression and a replacement release remain pending; candidate 73484 must be held.
+- Follow-up 2026-11-07: reproduced account switching during sticker upload copying the old pack into the replacement account. The repository now checks the captured scope after pack lookup/upload and persistence. The new regression fails before the fix and the 39-case repository suite passes after it. Further regressions also reproduce avatar-upload creation and store-pack lookup crossing account changes. Create/install/rename/remove now retain origin scope across awaits. The expanded repository/persistence cluster passes 52 tests. Host integration/full regression and a replacement release remain pending; candidate 73484 must be held.
 
 ### INTEGRATION-002 Standalone Settings composition — Resolved
 
