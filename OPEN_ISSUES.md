@@ -1014,6 +1014,8 @@ Host master commit `aecb6f77` was published to n42appv2. It pins `cbc7bd1a128d84
 
 ### AUTH-SOCIAL-001 N42 native social-login provider acceptance
 
+- Live capability recheck (2026-11-07): GET https://n42.world/v1/auth/n42/capabilities returns HTTP 200, google_native_code=false, native_oidc_providers=[apple, facebook], web_providers=[google, apple, facebook], legacy_account_migration=false. This is capability advertisement only; Google native activation and actual provider-to-Matrix acceptance remain unverified. The historical n42-wallet-auth container was not present on the inspected Matrix gateway host; the current auth origin/configuration was not established and no remote setting changed.
+
 - Severity: H
 - Added: 2026-11-05
 - Current state (2026-11-06): dedicated N42 clients are registered. ID Hub now implements independent native OIDC proof verification, browser OAuth callbacks and a guarded Matrix bridge. The Chat plugin has opt-in `n42NativeAuthUrl` integration for iOS Apple and Facebook Limited Login, plus Google authorization codes on iOS/Android: server nonce, proof verification, same-DID Matrix credentials and temporary Hub-session revocation. Configured flows never fall back to legacy identity lookup. Host enablement and deployed provider acceptance remain pending.
