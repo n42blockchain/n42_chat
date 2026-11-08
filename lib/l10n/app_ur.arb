@@ -2915,5 +2915,12 @@
   "stickerSubscribeNotice": "اس پیک کے منتظمین کی آئندہ تبدیلیاں حاصل کریں۔ تصاویر اور میٹا ڈیٹا اینڈ ٹو اینڈ مرموز نہیں ہیں۔ بعد میں رکنیت ختم کر سکتے ہیں؛ اس سے اصل چیٹ میں شمولیت نہیں ہوگی۔",
   "stickerSubscriptions": "اسٹیکر کی رکنیتیں",
   "stickerUnsubscribe": "رکنیت ختم کریں",
-  "stickerSubscriptionsEmpty": "اسٹیکر کی کوئی رکنیت نہیں"
+  "stickerSubscriptionsEmpty": "اسٹیکر کی کوئی رکنیت نہیں",
+  "chatAttachmentEvent": "ایونٹ",
+  "chatRecentMedia": "حالیہ تصاویر اور ویڈیوز",
+  "chatRecentMediaLoadFailed": "حالیہ میڈیا لوڈ نہیں ہو سکا",
+  "chatRecentMediaPermission": "حالیہ میڈیا دکھانے کے لیے تصاویر تک رسائی درکار ہے",
+  "chatRecentMediaEmpty": "کوئی حالیہ تصویر یا ویڈیو نہیں ہے",
+  "chatRecentPhoto": "حالیہ تصویر",
+  "chatRecentVideo": "حالیہ ویڈیو"
 }

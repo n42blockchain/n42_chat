@@ -2915,5 +2915,12 @@
   "stickerSubscribeNotice": "Recibe los cambios futuros de los administradores del paquete. Las imágenes y los metadatos no tienen cifrado de extremo a extremo. Puedes cancelar la suscripción después; esto no te une al chat de origen.",
   "stickerSubscriptions": "Suscripciones de stickers",
   "stickerUnsubscribe": "Cancelar suscripción",
-  "stickerSubscriptionsEmpty": "No hay suscripciones de stickers"
+  "stickerSubscriptionsEmpty": "No hay suscripciones de stickers",
+  "chatAttachmentEvent": "Evento",
+  "chatRecentMedia": "Fotos y vídeos recientes",
+  "chatRecentMediaLoadFailed": "No se pudieron cargar los archivos recientes",
+  "chatRecentMediaPermission": "Se necesita acceso a las fotos para mostrar los archivos recientes",
+  "chatRecentMediaEmpty": "No hay fotos ni vídeos recientes",
+  "chatRecentPhoto": "Foto reciente",
+  "chatRecentVideo": "Vídeo reciente"
 }

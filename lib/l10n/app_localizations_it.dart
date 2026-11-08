@@ -6344,4 +6344,27 @@ class SIt extends S {
 
   @override
   String get stickerSubscriptionsEmpty => 'Nessuna iscrizione agli adesivi';
+
+  @override
+  String get chatAttachmentEvent => 'Evento';
+
+  @override
+  String get chatRecentMedia => 'Foto e video recenti';
+
+  @override
+  String get chatRecentMediaLoadFailed =>
+      'Impossibile caricare i contenuti recenti';
+
+  @override
+  String get chatRecentMediaPermission =>
+      'È necessario l’accesso alle foto per mostrare i contenuti recenti';
+
+  @override
+  String get chatRecentMediaEmpty => 'Nessuna foto o video recente';
+
+  @override
+  String get chatRecentPhoto => 'Foto recente';
+
+  @override
+  String get chatRecentVideo => 'Video recente';
 }

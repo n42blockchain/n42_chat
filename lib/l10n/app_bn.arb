@@ -2915,5 +2915,12 @@
   "stickerSubscribeNotice": "এই প্যাকের প্রশাসকদের ভবিষ্যৎ পরিবর্তন অনুসরণ করুন। ছবি ও মেটাডেটা এন্ড-টু-এন্ড এনক্রিপ্ট করা নয়। পরে সাবস্ক্রিপশন বাতিল করতে পারবেন; এতে উৎস চ্যাটে যোগ দেওয়া হবে না।",
   "stickerSubscriptions": "স্টিকার সাবস্ক্রিপশন",
   "stickerUnsubscribe": "সাবস্ক্রিপশন বাতিল করুন",
-  "stickerSubscriptionsEmpty": "কোনো স্টিকার সাবস্ক্রিপশন নেই"
+  "stickerSubscriptionsEmpty": "কোনো স্টিকার সাবস্ক্রিপশন নেই",
+  "chatAttachmentEvent": "ইভেন্ট",
+  "chatRecentMedia": "সাম্প্রতিক ছবি ও ভিডিও",
+  "chatRecentMediaLoadFailed": "সাম্প্রতিক মিডিয়া লোড করা যায়নি",
+  "chatRecentMediaPermission": "সাম্প্রতিক মিডিয়া দেখাতে ছবিতে প্রবেশের অনুমতি প্রয়োজন",
+  "chatRecentMediaEmpty": "সাম্প্রতিক কোনো ছবি বা ভিডিও নেই",
+  "chatRecentPhoto": "সাম্প্রতিক ছবি",
+  "chatRecentVideo": "সাম্প্রতিক ভিডিও"
 }

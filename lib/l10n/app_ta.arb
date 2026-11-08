@@ -2915,5 +2915,12 @@
   "stickerSubscribeNotice": "இந்தத் தொகுப்பின் நிர்வாகிகள் செய்யும் எதிர்கால மாற்றங்களைப் பெறுங்கள். படங்களும் மெட்டாடேட்டாவும் முனையிலிருந்து முனை வரை மறையாக்கப்படவில்லை. பின்னர் சந்தாவை ரத்துசெய்யலாம்; இதனால் மூல அரட்டையில் சேர மாட்டீர்கள்.",
   "stickerSubscriptions": "ஸ்டிக்கர் சந்தாக்கள்",
   "stickerUnsubscribe": "சந்தாவை ரத்துசெய்",
-  "stickerSubscriptionsEmpty": "ஸ்டிக்கர் சந்தாக்கள் இல்லை"
+  "stickerSubscriptionsEmpty": "ஸ்டிக்கர் சந்தாக்கள் இல்லை",
+  "chatAttachmentEvent": "நிகழ்வு",
+  "chatRecentMedia": "சமீபத்திய படங்களும் காணொளிகளும்",
+  "chatRecentMediaLoadFailed": "சமீபத்திய ஊடகத்தை ஏற்ற முடியவில்லை",
+  "chatRecentMediaPermission": "சமீபத்திய ஊடகத்தைக் காட்ட படங்களை அணுகும் அனுமதி தேவை",
+  "chatRecentMediaEmpty": "சமீபத்திய படங்களோ காணொளிகளோ இல்லை",
+  "chatRecentPhoto": "சமீபத்திய படம்",
+  "chatRecentVideo": "சமீபத்திய காணொளி"
 }

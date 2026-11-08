@@ -6349,6 +6349,29 @@ class SPt extends S {
 
   @override
   String get stickerSubscriptionsEmpty => 'Sem subscrições de autocolantes';
+
+  @override
+  String get chatAttachmentEvent => 'Evento';
+
+  @override
+  String get chatRecentMedia => 'Fotografias e vídeos recentes';
+
+  @override
+  String get chatRecentMediaLoadFailed =>
+      'Não foi possível carregar os conteúdos recentes';
+
+  @override
+  String get chatRecentMediaPermission =>
+      'É necessário acesso às fotografias para mostrar os conteúdos recentes';
+
+  @override
+  String get chatRecentMediaEmpty => 'Sem fotografias ou vídeos recentes';
+
+  @override
+  String get chatRecentPhoto => 'Fotografia recente';
+
+  @override
+  String get chatRecentVideo => 'Vídeo recente';
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).
@@ -12696,4 +12719,27 @@ class SPtBr extends SPt {
 
   @override
   String get stickerSubscriptionsEmpty => 'Nenhuma assinatura de figurinhas';
+
+  @override
+  String get chatAttachmentEvent => 'Evento';
+
+  @override
+  String get chatRecentMedia => 'Fotos e vídeos recentes';
+
+  @override
+  String get chatRecentMediaLoadFailed =>
+      'Não foi possível carregar as mídias recentes';
+
+  @override
+  String get chatRecentMediaPermission =>
+      'É necessário acesso às fotos para mostrar as mídias recentes';
+
+  @override
+  String get chatRecentMediaEmpty => 'Nenhuma foto ou vídeo recente';
+
+  @override
+  String get chatRecentPhoto => 'Foto recente';
+
+  @override
+  String get chatRecentVideo => 'Vídeo recente';
 }

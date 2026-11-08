@@ -11614,6 +11614,48 @@ abstract class S {
   /// In en, this message translates to:
   /// **'No sticker subscriptions'**
   String get stickerSubscriptionsEmpty;
+
+  /// No description provided for @chatAttachmentEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'Event'**
+  String get chatAttachmentEvent;
+
+  /// No description provided for @chatRecentMedia.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent photos and videos'**
+  String get chatRecentMedia;
+
+  /// No description provided for @chatRecentMediaLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load recent media'**
+  String get chatRecentMediaLoadFailed;
+
+  /// No description provided for @chatRecentMediaPermission.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo access is needed to show recent media'**
+  String get chatRecentMediaPermission;
+
+  /// No description provided for @chatRecentMediaEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No recent photos or videos'**
+  String get chatRecentMediaEmpty;
+
+  /// No description provided for @chatRecentPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent photo'**
+  String get chatRecentPhoto;
+
+  /// No description provided for @chatRecentVideo.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent video'**
+  String get chatRecentVideo;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

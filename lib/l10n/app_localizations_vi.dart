@@ -6301,4 +6301,27 @@ class SVi extends S {
 
   @override
   String get stickerSubscriptionsEmpty => 'Không có đăng ký nhãn dán';
+
+  @override
+  String get chatAttachmentEvent => 'Sự kiện';
+
+  @override
+  String get chatRecentMedia => 'Ảnh và video gần đây';
+
+  @override
+  String get chatRecentMediaLoadFailed =>
+      'Không thể tải nội dung đa phương tiện gần đây';
+
+  @override
+  String get chatRecentMediaPermission =>
+      'Cần quyền truy cập ảnh để hiển thị nội dung gần đây';
+
+  @override
+  String get chatRecentMediaEmpty => 'Không có ảnh hoặc video gần đây';
+
+  @override
+  String get chatRecentPhoto => 'Ảnh gần đây';
+
+  @override
+  String get chatRecentVideo => 'Video gần đây';
 }

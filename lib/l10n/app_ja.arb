@@ -2915,5 +2915,12 @@
   "stickerSubscribeNotice": "パックの管理者による今後の変更を受け取ります。画像とメタデータはエンドツーエンド暗号化されません。購読は後から解除できます。この操作で元のチャットに参加することはありません。",
   "stickerSubscriptions": "ステッカーの購読",
   "stickerUnsubscribe": "購読を解除",
-  "stickerSubscriptionsEmpty": "購読中のステッカーはありません"
+  "stickerSubscriptionsEmpty": "購読中のステッカーはありません",
+  "chatAttachmentEvent": "イベント",
+  "chatRecentMedia": "最近の写真と動画",
+  "chatRecentMediaLoadFailed": "最近のメディアを読み込めませんでした",
+  "chatRecentMediaPermission": "最近のメディアを表示するには写真へのアクセスが必要です",
+  "chatRecentMediaEmpty": "最近の写真や動画はありません",
+  "chatRecentPhoto": "最近の写真",
+  "chatRecentVideo": "最近の動画"
 }

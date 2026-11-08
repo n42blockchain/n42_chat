@@ -6358,4 +6358,27 @@ class SEs extends S {
 
   @override
   String get stickerSubscriptionsEmpty => 'No hay suscripciones de stickers';
+
+  @override
+  String get chatAttachmentEvent => 'Evento';
+
+  @override
+  String get chatRecentMedia => 'Fotos y vídeos recientes';
+
+  @override
+  String get chatRecentMediaLoadFailed =>
+      'No se pudieron cargar los archivos recientes';
+
+  @override
+  String get chatRecentMediaPermission =>
+      'Se necesita acceso a las fotos para mostrar los archivos recientes';
+
+  @override
+  String get chatRecentMediaEmpty => 'No hay fotos ni vídeos recientes';
+
+  @override
+  String get chatRecentPhoto => 'Foto reciente';
+
+  @override
+  String get chatRecentVideo => 'Vídeo reciente';
 }

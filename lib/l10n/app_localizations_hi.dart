@@ -6313,4 +6313,26 @@ class SHi extends S {
 
   @override
   String get stickerSubscriptionsEmpty => 'कोई स्टिकर सदस्यता नहीं';
+
+  @override
+  String get chatAttachmentEvent => 'इवेंट';
+
+  @override
+  String get chatRecentMedia => 'हाल की फ़ोटो और वीडियो';
+
+  @override
+  String get chatRecentMediaLoadFailed => 'हाल का मीडिया लोड नहीं हो सका';
+
+  @override
+  String get chatRecentMediaPermission =>
+      'हाल का मीडिया दिखाने के लिए फ़ोटो ऐक्सेस की अनुमति चाहिए';
+
+  @override
+  String get chatRecentMediaEmpty => 'हाल की कोई फ़ोटो या वीडियो नहीं है';
+
+  @override
+  String get chatRecentPhoto => 'हाल की फ़ोटो';
+
+  @override
+  String get chatRecentVideo => 'हाल का वीडियो';
 }

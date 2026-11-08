@@ -6361,4 +6361,26 @@ class STe extends S {
 
   @override
   String get stickerSubscriptionsEmpty => 'స్టికర్ సభ్యత్వాలు లేవు';
+
+  @override
+  String get chatAttachmentEvent => 'ఈవెంట్';
+
+  @override
+  String get chatRecentMedia => 'ఇటీవలి ఫోటోలు మరియు వీడియోలు';
+
+  @override
+  String get chatRecentMediaLoadFailed => 'ఇటీవలి మీడియాను లోడ్ చేయలేకపోయాము';
+
+  @override
+  String get chatRecentMediaPermission =>
+      'ఇటీవలి మీడియాను చూపడానికి ఫోటోలను యాక్సెస్ చేసే అనుమతి అవసరం';
+
+  @override
+  String get chatRecentMediaEmpty => 'ఇటీవలి ఫోటోలు లేదా వీడియోలు లేవు';
+
+  @override
+  String get chatRecentPhoto => 'ఇటీవలి ఫోటో';
+
+  @override
+  String get chatRecentVideo => 'ఇటీవలి వీడియో';
 }

@@ -2947,5 +2947,12 @@
   "stickerSubscribeNotice": "Follow future changes made by this pack’s administrators. Images and metadata are not end-to-end encrypted. You can unsubscribe later; this does not join the source chat.",
   "stickerSubscriptions": "Sticker subscriptions",
   "stickerUnsubscribe": "Unsubscribe",
-  "stickerSubscriptionsEmpty": "No sticker subscriptions"
+  "stickerSubscriptionsEmpty": "No sticker subscriptions",
+  "chatAttachmentEvent": "Event",
+  "chatRecentMedia": "Recent photos and videos",
+  "chatRecentMediaLoadFailed": "Could not load recent media",
+  "chatRecentMediaPermission": "Photo access is needed to show recent media",
+  "chatRecentMediaEmpty": "No recent photos or videos",
+  "chatRecentPhoto": "Recent photo",
+  "chatRecentVideo": "Recent video"
 }

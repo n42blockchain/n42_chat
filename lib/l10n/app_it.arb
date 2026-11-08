@@ -2915,5 +2915,12 @@
   "stickerSubscribeNotice": "Segui le modifiche future degli amministratori del pacchetto. Immagini e metadati non sono crittografati end-to-end. Puoi annullare l’iscrizione in seguito; questa azione non ti unisce alla chat di origine.",
   "stickerSubscriptions": "Iscrizioni agli adesivi",
   "stickerUnsubscribe": "Annulla iscrizione",
-  "stickerSubscriptionsEmpty": "Nessuna iscrizione agli adesivi"
+  "stickerSubscriptionsEmpty": "Nessuna iscrizione agli adesivi",
+  "chatAttachmentEvent": "Evento",
+  "chatRecentMedia": "Foto e video recenti",
+  "chatRecentMediaLoadFailed": "Impossibile caricare i contenuti recenti",
+  "chatRecentMediaPermission": "È necessario l’accesso alle foto per mostrare i contenuti recenti",
+  "chatRecentMediaEmpty": "Nessuna foto o video recente",
+  "chatRecentPhoto": "Foto recente",
+  "chatRecentVideo": "Video recente"
 }

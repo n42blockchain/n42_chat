@@ -2303,5 +2303,12 @@
   "stickerSubscribeNotice": "持續接收貼圖包管理員後續的修改。圖片和中繼資料不受端對端加密保護。你可以稍後取消訂閱；此操作不會加入來源群組。",
   "stickerSubscriptions": "貼圖訂閱",
   "stickerUnsubscribe": "取消訂閱",
-  "stickerSubscriptionsEmpty": "尚無貼圖訂閱"
+  "stickerSubscriptionsEmpty": "尚無貼圖訂閱",
+  "chatAttachmentEvent": "活動",
+  "chatRecentMedia": "最近的照片和影片",
+  "chatRecentMediaLoadFailed": "無法載入最近的照片和影片",
+  "chatRecentMediaPermission": "需要照片存取權限才能顯示最近的照片和影片",
+  "chatRecentMediaEmpty": "沒有最近的照片或影片",
+  "chatRecentPhoto": "最近的照片",
+  "chatRecentVideo": "最近的影片"
 }

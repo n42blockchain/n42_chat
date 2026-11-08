@@ -6315,4 +6315,26 @@ class STr extends S {
 
   @override
   String get stickerSubscriptionsEmpty => 'Çıkartma aboneliği yok';
+
+  @override
+  String get chatAttachmentEvent => 'Etkinlik';
+
+  @override
+  String get chatRecentMedia => 'Son fotoğraflar ve videolar';
+
+  @override
+  String get chatRecentMediaLoadFailed => 'Son medya yüklenemedi';
+
+  @override
+  String get chatRecentMediaPermission =>
+      'Son medyayı göstermek için fotoğraf erişimi gerekiyor';
+
+  @override
+  String get chatRecentMediaEmpty => 'Son fotoğraf veya video yok';
+
+  @override
+  String get chatRecentPhoto => 'Son fotoğraf';
+
+  @override
+  String get chatRecentVideo => 'Son video';
 }

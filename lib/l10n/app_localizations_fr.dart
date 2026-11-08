@@ -6382,4 +6382,27 @@ class SFr extends S {
 
   @override
   String get stickerSubscriptionsEmpty => 'Aucun abonnement aux stickers';
+
+  @override
+  String get chatAttachmentEvent => 'Événement';
+
+  @override
+  String get chatRecentMedia => 'Photos et vidéos récentes';
+
+  @override
+  String get chatRecentMediaLoadFailed =>
+      'Impossible de charger les médias récents';
+
+  @override
+  String get chatRecentMediaPermission =>
+      'L’accès aux photos est nécessaire pour afficher les médias récents';
+
+  @override
+  String get chatRecentMediaEmpty => 'Aucune photo ou vidéo récente';
+
+  @override
+  String get chatRecentPhoto => 'Photo récente';
+
+  @override
+  String get chatRecentVideo => 'Vidéo récente';
 }

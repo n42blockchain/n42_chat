@@ -6328,4 +6328,26 @@ class SUr extends S {
 
   @override
   String get stickerSubscriptionsEmpty => 'اسٹیکر کی کوئی رکنیت نہیں';
+
+  @override
+  String get chatAttachmentEvent => 'ایونٹ';
+
+  @override
+  String get chatRecentMedia => 'حالیہ تصاویر اور ویڈیوز';
+
+  @override
+  String get chatRecentMediaLoadFailed => 'حالیہ میڈیا لوڈ نہیں ہو سکا';
+
+  @override
+  String get chatRecentMediaPermission =>
+      'حالیہ میڈیا دکھانے کے لیے تصاویر تک رسائی درکار ہے';
+
+  @override
+  String get chatRecentMediaEmpty => 'کوئی حالیہ تصویر یا ویڈیو نہیں ہے';
+
+  @override
+  String get chatRecentPhoto => 'حالیہ تصویر';
+
+  @override
+  String get chatRecentVideo => 'حالیہ ویڈیو';
 }

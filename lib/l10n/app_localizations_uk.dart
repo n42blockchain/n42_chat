@@ -6346,4 +6346,27 @@ class SUk extends S {
 
   @override
   String get stickerSubscriptionsEmpty => 'Немає підписок на наліпки';
+
+  @override
+  String get chatAttachmentEvent => 'Подія';
+
+  @override
+  String get chatRecentMedia => 'Нещодавні фото й відео';
+
+  @override
+  String get chatRecentMediaLoadFailed =>
+      'Не вдалося завантажити нещодавні медіафайли';
+
+  @override
+  String get chatRecentMediaPermission =>
+      'Для показу нещодавніх медіафайлів потрібен доступ до фото';
+
+  @override
+  String get chatRecentMediaEmpty => 'Немає нещодавніх фото чи відео';
+
+  @override
+  String get chatRecentPhoto => 'Нещодавнє фото';
+
+  @override
+  String get chatRecentVideo => 'Нещодавнє відео';
 }

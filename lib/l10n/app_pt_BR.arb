@@ -2915,5 +2915,12 @@
   "stickerSubscribeNotice": "Receba futuras alterações dos administradores do pacote. Imagens e metadados não têm criptografia de ponta a ponta. Você pode cancelar a assinatura depois; isso não faz você entrar na conversa de origem.",
   "stickerSubscriptions": "Assinaturas de figurinhas",
   "stickerUnsubscribe": "Cancelar assinatura",
-  "stickerSubscriptionsEmpty": "Nenhuma assinatura de figurinhas"
+  "stickerSubscriptionsEmpty": "Nenhuma assinatura de figurinhas",
+  "chatAttachmentEvent": "Evento",
+  "chatRecentMedia": "Fotos e vídeos recentes",
+  "chatRecentMediaLoadFailed": "Não foi possível carregar as mídias recentes",
+  "chatRecentMediaPermission": "É necessário acesso às fotos para mostrar as mídias recentes",
+  "chatRecentMediaEmpty": "Nenhuma foto ou vídeo recente",
+  "chatRecentPhoto": "Foto recente",
+  "chatRecentVideo": "Vídeo recente"
 }

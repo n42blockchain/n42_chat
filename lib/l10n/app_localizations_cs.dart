@@ -6326,4 +6326,26 @@ class SCs extends S {
 
   @override
   String get stickerSubscriptionsEmpty => 'Žádné odběry samolepek';
+
+  @override
+  String get chatAttachmentEvent => 'Událost';
+
+  @override
+  String get chatRecentMedia => 'Nedávné fotky a videa';
+
+  @override
+  String get chatRecentMediaLoadFailed => 'Nedávná média se nepodařilo načíst';
+
+  @override
+  String get chatRecentMediaPermission =>
+      'Pro zobrazení nedávných médií je nutný přístup k fotkám';
+
+  @override
+  String get chatRecentMediaEmpty => 'Žádné nedávné fotky ani videa';
+
+  @override
+  String get chatRecentPhoto => 'Nedávná fotka';
+
+  @override
+  String get chatRecentVideo => 'Nedávné video';
 }

@@ -6175,4 +6175,25 @@ class SJa extends S {
 
   @override
   String get stickerSubscriptionsEmpty => '購読中のステッカーはありません';
+
+  @override
+  String get chatAttachmentEvent => 'イベント';
+
+  @override
+  String get chatRecentMedia => '最近の写真と動画';
+
+  @override
+  String get chatRecentMediaLoadFailed => '最近のメディアを読み込めませんでした';
+
+  @override
+  String get chatRecentMediaPermission => '最近のメディアを表示するには写真へのアクセスが必要です';
+
+  @override
+  String get chatRecentMediaEmpty => '最近の写真や動画はありません';
+
+  @override
+  String get chatRecentPhoto => '最近の写真';
+
+  @override
+  String get chatRecentVideo => '最近の動画';
 }

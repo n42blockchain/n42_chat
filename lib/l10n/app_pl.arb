@@ -2915,5 +2915,12 @@
   "stickerSubscribeNotice": "Otrzymuj przyszłe zmiany administratorów pakietu. Obrazy i metadane nie są szyfrowane end-to-end. Subskrypcję można później anulować; nie powoduje to dołączenia do czatu źródłowego.",
   "stickerSubscriptions": "Subskrypcje naklejek",
   "stickerUnsubscribe": "Anuluj subskrypcję",
-  "stickerSubscriptionsEmpty": "Brak subskrypcji naklejek"
+  "stickerSubscriptionsEmpty": "Brak subskrypcji naklejek",
+  "chatAttachmentEvent": "Wydarzenie",
+  "chatRecentMedia": "Ostatnie zdjęcia i filmy",
+  "chatRecentMediaLoadFailed": "Nie udało się wczytać ostatnich multimediów",
+  "chatRecentMediaPermission": "Do wyświetlania ostatnich multimediów potrzebny jest dostęp do zdjęć",
+  "chatRecentMediaEmpty": "Brak ostatnich zdjęć lub filmów",
+  "chatRecentPhoto": "Ostatnie zdjęcie",
+  "chatRecentVideo": "Ostatni film"
 }

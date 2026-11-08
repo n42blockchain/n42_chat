@@ -5,6 +5,13 @@ import 'package:n42_chat/l10n/app_localizations.dart';
 // Update these accessors after regenerating the localization classes.
 // This test loads every supported locale and reads each non-parameter label.
 final _labels = <(String, String Function(S))>[
+  ('chatAttachmentEvent', (s) => s.chatAttachmentEvent),
+  ('chatRecentMedia', (s) => s.chatRecentMedia),
+  ('chatRecentMediaLoadFailed', (s) => s.chatRecentMediaLoadFailed),
+  ('chatRecentMediaPermission', (s) => s.chatRecentMediaPermission),
+  ('chatRecentMediaEmpty', (s) => s.chatRecentMediaEmpty),
+  ('chatRecentPhoto', (s) => s.chatRecentPhoto),
+  ('chatRecentVideo', (s) => s.chatRecentVideo),
   ('stickerImportTitle', (s) => s.stickerImportTitle),
   ('stickerImportLinkHint', (s) => s.stickerImportLinkHint),
   ('stickerImportPreview', (s) => s.stickerImportPreview),
@@ -2444,7 +2451,7 @@ void main() {
     expect((await S.delegate.load(const Locale('zh', 'TW'))).groupPublish, '發佈');
   });
   test('all supported locales provide readable labels', () async {
-    expect(_labels, hasLength(1706));
+    expect(_labels, hasLength(1713));
     expect(_formattedLabels, hasLength(182));
     expect(_labels.map((entry) => entry.$1).toSet(), hasLength(_labels.length));
     final emptyLabels = <String>[];

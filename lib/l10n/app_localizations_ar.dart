@@ -6285,4 +6285,26 @@ class SAr extends S {
 
   @override
   String get stickerSubscriptionsEmpty => 'لا توجد اشتراكات ملصقات';
+
+  @override
+  String get chatAttachmentEvent => 'حدث';
+
+  @override
+  String get chatRecentMedia => 'الصور ومقاطع الفيديو الحديثة';
+
+  @override
+  String get chatRecentMediaLoadFailed => 'تعذر تحميل الوسائط الحديثة';
+
+  @override
+  String get chatRecentMediaPermission =>
+      'يلزم السماح بالوصول إلى الصور لعرض الوسائط الحديثة';
+
+  @override
+  String get chatRecentMediaEmpty => 'لا توجد صور أو مقاطع فيديو حديثة';
+
+  @override
+  String get chatRecentPhoto => 'صورة حديثة';
+
+  @override
+  String get chatRecentVideo => 'فيديو حديث';
 }

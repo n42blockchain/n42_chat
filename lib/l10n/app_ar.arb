@@ -2915,5 +2915,12 @@
   "stickerSubscribeNotice": "متابعة التغييرات المستقبلية التي يجريها مسؤولو هذه الحزمة. الصور والبيانات الوصفية ليست مشفرة من طرف إلى طرف. يمكنك إلغاء الاشتراك لاحقًا؛ لن تنضم إلى المحادثة المصدر.",
   "stickerSubscriptions": "اشتراكات الملصقات",
   "stickerUnsubscribe": "إلغاء الاشتراك",
-  "stickerSubscriptionsEmpty": "لا توجد اشتراكات ملصقات"
+  "stickerSubscriptionsEmpty": "لا توجد اشتراكات ملصقات",
+  "chatAttachmentEvent": "حدث",
+  "chatRecentMedia": "الصور ومقاطع الفيديو الحديثة",
+  "chatRecentMediaLoadFailed": "تعذر تحميل الوسائط الحديثة",
+  "chatRecentMediaPermission": "يلزم السماح بالوصول إلى الصور لعرض الوسائط الحديثة",
+  "chatRecentMediaEmpty": "لا توجد صور أو مقاطع فيديو حديثة",
+  "chatRecentPhoto": "صورة حديثة",
+  "chatRecentVideo": "فيديو حديث"
 }

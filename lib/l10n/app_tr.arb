@@ -2915,5 +2915,12 @@
   "stickerSubscribeNotice": "Paket yöneticilerinin gelecekteki değişikliklerini takip edin. Görseller ve meta veriler uçtan uca şifrelenmez. Aboneliği daha sonra iptal edebilirsiniz; bu işlem kaynak sohbete katılmanızı sağlamaz.",
   "stickerSubscriptions": "Çıkartma abonelikleri",
   "stickerUnsubscribe": "Abonelikten çık",
-  "stickerSubscriptionsEmpty": "Çıkartma aboneliği yok"
+  "stickerSubscriptionsEmpty": "Çıkartma aboneliği yok",
+  "chatAttachmentEvent": "Etkinlik",
+  "chatRecentMedia": "Son fotoğraflar ve videolar",
+  "chatRecentMediaLoadFailed": "Son medya yüklenemedi",
+  "chatRecentMediaPermission": "Son medyayı göstermek için fotoğraf erişimi gerekiyor",
+  "chatRecentMediaEmpty": "Son fotoğraf veya video yok",
+  "chatRecentPhoto": "Son fotoğraf",
+  "chatRecentVideo": "Son video"
 }

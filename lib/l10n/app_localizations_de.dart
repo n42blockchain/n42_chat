@@ -6365,4 +6365,27 @@ class SDe extends S {
 
   @override
   String get stickerSubscriptionsEmpty => 'Keine Sticker-Abos';
+
+  @override
+  String get chatAttachmentEvent => 'Termin';
+
+  @override
+  String get chatRecentMedia => 'Neueste Fotos und Videos';
+
+  @override
+  String get chatRecentMediaLoadFailed =>
+      'Neueste Medien konnten nicht geladen werden';
+
+  @override
+  String get chatRecentMediaPermission =>
+      'Zum Anzeigen neuester Medien ist Zugriff auf Fotos erforderlich';
+
+  @override
+  String get chatRecentMediaEmpty => 'Keine neuen Fotos oder Videos';
+
+  @override
+  String get chatRecentPhoto => 'Neuestes Foto';
+
+  @override
+  String get chatRecentVideo => 'Neuestes Video';
 }

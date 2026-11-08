@@ -2915,5 +2915,12 @@
   "stickerSubscribeNotice": "ఈ ప్యాక్ నిర్వాహకులు చేసే తదుపరి మార్పులను పొందండి. చిత్రాలు, మెటాడేటాకు ఎండ్-టు-ఎండ్ ఎన్‌క్రిప్షన్ లేదు. తర్వాత సభ్యత్వాన్ని రద్దు చేయవచ్చు; దీనివల్ల మూల చాట్‌లో చేరరు.",
   "stickerSubscriptions": "స్టికర్ సభ్యత్వాలు",
   "stickerUnsubscribe": "సభ్యత్వాన్ని రద్దు చేయండి",
-  "stickerSubscriptionsEmpty": "స్టికర్ సభ్యత్వాలు లేవు"
+  "stickerSubscriptionsEmpty": "స్టికర్ సభ్యత్వాలు లేవు",
+  "chatAttachmentEvent": "ఈవెంట్",
+  "chatRecentMedia": "ఇటీవలి ఫోటోలు మరియు వీడియోలు",
+  "chatRecentMediaLoadFailed": "ఇటీవలి మీడియాను లోడ్ చేయలేకపోయాము",
+  "chatRecentMediaPermission": "ఇటీవలి మీడియాను చూపడానికి ఫోటోలను యాక్సెస్ చేసే అనుమతి అవసరం",
+  "chatRecentMediaEmpty": "ఇటీవలి ఫోటోలు లేదా వీడియోలు లేవు",
+  "chatRecentPhoto": "ఇటీవలి ఫోటో",
+  "chatRecentVideo": "ఇటీవలి వీడియో"
 }

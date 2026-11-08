@@ -6315,4 +6315,26 @@ class SBn extends S {
 
   @override
   String get stickerSubscriptionsEmpty => 'কোনো স্টিকার সাবস্ক্রিপশন নেই';
+
+  @override
+  String get chatAttachmentEvent => 'ইভেন্ট';
+
+  @override
+  String get chatRecentMedia => 'সাম্প্রতিক ছবি ও ভিডিও';
+
+  @override
+  String get chatRecentMediaLoadFailed => 'সাম্প্রতিক মিডিয়া লোড করা যায়নি';
+
+  @override
+  String get chatRecentMediaPermission =>
+      'সাম্প্রতিক মিডিয়া দেখাতে ছবিতে প্রবেশের অনুমতি প্রয়োজন';
+
+  @override
+  String get chatRecentMediaEmpty => 'সাম্প্রতিক কোনো ছবি বা ভিডিও নেই';
+
+  @override
+  String get chatRecentPhoto => 'সাম্প্রতিক ছবি';
+
+  @override
+  String get chatRecentVideo => 'সাম্প্রতিক ভিডিও';
 }

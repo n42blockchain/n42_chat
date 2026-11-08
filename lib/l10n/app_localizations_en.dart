@@ -6284,4 +6284,26 @@ class SEn extends S {
 
   @override
   String get stickerSubscriptionsEmpty => 'No sticker subscriptions';
+
+  @override
+  String get chatAttachmentEvent => 'Event';
+
+  @override
+  String get chatRecentMedia => 'Recent photos and videos';
+
+  @override
+  String get chatRecentMediaLoadFailed => 'Could not load recent media';
+
+  @override
+  String get chatRecentMediaPermission =>
+      'Photo access is needed to show recent media';
+
+  @override
+  String get chatRecentMediaEmpty => 'No recent photos or videos';
+
+  @override
+  String get chatRecentPhoto => 'Recent photo';
+
+  @override
+  String get chatRecentVideo => 'Recent video';
 }

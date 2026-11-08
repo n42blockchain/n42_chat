@@ -2915,5 +2915,12 @@
   "stickerSubscribeNotice": "Pokea mabadiliko yajayo kutoka kwa wasimamizi wa kifurushi hiki. Picha na metadata hazijasimbwa kutoka mwisho hadi mwisho. Unaweza kujiondoa baadaye; hatua hii haikuungi kwenye gumzo la chanzo.",
   "stickerSubscriptions": "Usajili wa vibandiko",
   "stickerUnsubscribe": "Jiondoe",
-  "stickerSubscriptionsEmpty": "Hakuna usajili wa vibandiko"
+  "stickerSubscriptionsEmpty": "Hakuna usajili wa vibandiko",
+  "chatAttachmentEvent": "Tukio",
+  "chatRecentMedia": "Picha na video za hivi karibuni",
+  "chatRecentMediaLoadFailed": "Imeshindikana kupakia midia ya hivi karibuni",
+  "chatRecentMediaPermission": "Ruhusa ya kufikia picha inahitajika ili kuonyesha midia ya hivi karibuni",
+  "chatRecentMediaEmpty": "Hakuna picha au video za hivi karibuni",
+  "chatRecentPhoto": "Picha ya hivi karibuni",
+  "chatRecentVideo": "Video ya hivi karibuni"
 }

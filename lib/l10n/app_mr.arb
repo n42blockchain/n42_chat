@@ -2915,5 +2915,12 @@
   "stickerSubscribeNotice": "या पॅकच्या प्रशासकांचे पुढील बदल मिळवा. प्रतिमा आणि मेटाडेटा एंड-टू-एंड एन्क्रिप्ट केलेले नाहीत. नंतर सदस्यता रद्द करू शकता; यामुळे मूळ चॅटमध्ये सामील होणार नाही.",
   "stickerSubscriptions": "स्टिकर सदस्यता",
   "stickerUnsubscribe": "सदस्यता रद्द करा",
-  "stickerSubscriptionsEmpty": "कोणतीही स्टिकर सदस्यता नाही"
+  "stickerSubscriptionsEmpty": "कोणतीही स्टिकर सदस्यता नाही",
+  "chatAttachmentEvent": "कार्यक्रम",
+  "chatRecentMedia": "अलीकडील फोटो आणि व्हिडिओ",
+  "chatRecentMediaLoadFailed": "अलीकडील मीडिया लोड करता आला नाही",
+  "chatRecentMediaPermission": "अलीकडील मीडिया दाखवण्यासाठी फोटोचा अॅक्सेस आवश्यक आहे",
+  "chatRecentMediaEmpty": "अलीकडील फोटो किंवा व्हिडिओ नाहीत",
+  "chatRecentPhoto": "अलीकडील फोटो",
+  "chatRecentVideo": "अलीकडील व्हिडिओ"
 }

@@ -6312,4 +6312,26 @@ class SMr extends S {
 
   @override
   String get stickerSubscriptionsEmpty => 'कोणतीही स्टिकर सदस्यता नाही';
+
+  @override
+  String get chatAttachmentEvent => 'कार्यक्रम';
+
+  @override
+  String get chatRecentMedia => 'अलीकडील फोटो आणि व्हिडिओ';
+
+  @override
+  String get chatRecentMediaLoadFailed => 'अलीकडील मीडिया लोड करता आला नाही';
+
+  @override
+  String get chatRecentMediaPermission =>
+      'अलीकडील मीडिया दाखवण्यासाठी फोटोचा अॅक्सेस आवश्यक आहे';
+
+  @override
+  String get chatRecentMediaEmpty => 'अलीकडील फोटो किंवा व्हिडिओ नाहीत';
+
+  @override
+  String get chatRecentPhoto => 'अलीकडील फोटो';
+
+  @override
+  String get chatRecentVideo => 'अलीकडील व्हिडिओ';
 }

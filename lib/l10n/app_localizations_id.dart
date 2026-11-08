@@ -6326,4 +6326,26 @@ class SId extends S {
 
   @override
   String get stickerSubscriptionsEmpty => 'Tidak ada langganan stiker';
+
+  @override
+  String get chatAttachmentEvent => 'Acara';
+
+  @override
+  String get chatRecentMedia => 'Foto dan video terbaru';
+
+  @override
+  String get chatRecentMediaLoadFailed => 'Tidak dapat memuat media terbaru';
+
+  @override
+  String get chatRecentMediaPermission =>
+      'Akses foto diperlukan untuk menampilkan media terbaru';
+
+  @override
+  String get chatRecentMediaEmpty => 'Tidak ada foto atau video terbaru';
+
+  @override
+  String get chatRecentPhoto => 'Foto terbaru';
+
+  @override
+  String get chatRecentVideo => 'Video terbaru';
 }

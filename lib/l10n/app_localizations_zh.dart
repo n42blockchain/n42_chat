@@ -6133,6 +6133,27 @@ class SZh extends S {
 
   @override
   String get stickerSubscriptionsEmpty => '暂无贴纸订阅';
+
+  @override
+  String get chatAttachmentEvent => '活动';
+
+  @override
+  String get chatRecentMedia => '最近的照片和视频';
+
+  @override
+  String get chatRecentMediaLoadFailed => '无法加载最近的照片和视频';
+
+  @override
+  String get chatRecentMediaPermission => '需要照片访问权限才能显示最近的照片和视频';
+
+  @override
+  String get chatRecentMediaEmpty => '暂无最近的照片或视频';
+
+  @override
+  String get chatRecentPhoto => '最近的照片';
+
+  @override
+  String get chatRecentVideo => '最近的视频';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -12264,4 +12285,25 @@ class SZhTw extends SZh {
 
   @override
   String get stickerSubscriptionsEmpty => '尚無貼圖訂閱';
+
+  @override
+  String get chatAttachmentEvent => '活動';
+
+  @override
+  String get chatRecentMedia => '最近的照片和影片';
+
+  @override
+  String get chatRecentMediaLoadFailed => '無法載入最近的照片和影片';
+
+  @override
+  String get chatRecentMediaPermission => '需要照片存取權限才能顯示最近的照片和影片';
+
+  @override
+  String get chatRecentMediaEmpty => '沒有最近的照片或影片';
+
+  @override
+  String get chatRecentPhoto => '最近的照片';
+
+  @override
+  String get chatRecentVideo => '最近的影片';
 }

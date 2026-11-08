@@ -6381,4 +6381,26 @@ class STa extends S {
 
   @override
   String get stickerSubscriptionsEmpty => 'ஸ்டிக்கர் சந்தாக்கள் இல்லை';
+
+  @override
+  String get chatAttachmentEvent => 'நிகழ்வு';
+
+  @override
+  String get chatRecentMedia => 'சமீபத்திய படங்களும் காணொளிகளும்';
+
+  @override
+  String get chatRecentMediaLoadFailed => 'சமீபத்திய ஊடகத்தை ஏற்ற முடியவில்லை';
+
+  @override
+  String get chatRecentMediaPermission =>
+      'சமீபத்திய ஊடகத்தைக் காட்ட படங்களை அணுகும் அனுமதி தேவை';
+
+  @override
+  String get chatRecentMediaEmpty => 'சமீபத்திய படங்களோ காணொளிகளோ இல்லை';
+
+  @override
+  String get chatRecentPhoto => 'சமீபத்திய படம்';
+
+  @override
+  String get chatRecentVideo => 'சமீபத்திய காணொளி';
 }

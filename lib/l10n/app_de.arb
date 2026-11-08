@@ -2915,5 +2915,12 @@
   "stickerSubscribeNotice": "Künftige Änderungen durch die Paketadministratoren übernehmen. Bilder und Metadaten sind nicht Ende-zu-Ende-verschlüsselt. Das Abo kann später beendet werden; dem Quellchat trittst du dadurch nicht bei.",
   "stickerSubscriptions": "Sticker-Abos",
   "stickerUnsubscribe": "Abo beenden",
-  "stickerSubscriptionsEmpty": "Keine Sticker-Abos"
+  "stickerSubscriptionsEmpty": "Keine Sticker-Abos",
+  "chatAttachmentEvent": "Termin",
+  "chatRecentMedia": "Neueste Fotos und Videos",
+  "chatRecentMediaLoadFailed": "Neueste Medien konnten nicht geladen werden",
+  "chatRecentMediaPermission": "Zum Anzeigen neuester Medien ist Zugriff auf Fotos erforderlich",
+  "chatRecentMediaEmpty": "Keine neuen Fotos oder Videos",
+  "chatRecentPhoto": "Neuestes Foto",
+  "chatRecentVideo": "Neuestes Video"
 }

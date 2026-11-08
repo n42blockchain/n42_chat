@@ -2915,5 +2915,12 @@
   "stickerSubscribeNotice": "Sledujte budoucí změny správců tohoto balíčku. Obrázky a metadata nejsou koncově šifrovány. Odběr můžete později zrušit; do zdrojového chatu tím nevstoupíte.",
   "stickerSubscriptions": "Odběry samolepek",
   "stickerUnsubscribe": "Zrušit odběr",
-  "stickerSubscriptionsEmpty": "Žádné odběry samolepek"
+  "stickerSubscriptionsEmpty": "Žádné odběry samolepek",
+  "chatAttachmentEvent": "Událost",
+  "chatRecentMedia": "Nedávné fotky a videa",
+  "chatRecentMediaLoadFailed": "Nedávná média se nepodařilo načíst",
+  "chatRecentMediaPermission": "Pro zobrazení nedávných médií je nutný přístup k fotkám",
+  "chatRecentMediaEmpty": "Žádné nedávné fotky ani videa",
+  "chatRecentPhoto": "Nedávná fotka",
+  "chatRecentVideo": "Nedávné video"
 }

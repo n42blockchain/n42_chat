@@ -172,7 +172,7 @@ void main() {
 
     await tester.pumpWidget(wrap(panel));
     await tester.pumpAndSettle();
-    final tiles = find.bySemanticsLabel(RegExp('Recent (photo|video)'));
+    final tiles = find.bySemanticsLabel(RegExp(r'^Recent (photo|video)(?:$|\n)'));
     expect(tiles, findsNWidgets(2));
 
     await tester.tap(tiles.at(1));

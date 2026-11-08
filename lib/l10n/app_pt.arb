@@ -2915,5 +2915,12 @@
   "stickerSubscribeNotice": "Receba futuras alterações dos administradores do pacote. As imagens e os metadados não têm encriptação ponto a ponto. Pode cancelar a subscrição mais tarde; isto não o faz aderir à conversa de origem.",
   "stickerSubscriptions": "Subscrições de autocolantes",
   "stickerUnsubscribe": "Cancelar subscrição",
-  "stickerSubscriptionsEmpty": "Sem subscrições de autocolantes"
+  "stickerSubscriptionsEmpty": "Sem subscrições de autocolantes",
+  "chatAttachmentEvent": "Evento",
+  "chatRecentMedia": "Fotografias e vídeos recentes",
+  "chatRecentMediaLoadFailed": "Não foi possível carregar os conteúdos recentes",
+  "chatRecentMediaPermission": "É necessário acesso às fotografias para mostrar os conteúdos recentes",
+  "chatRecentMediaEmpty": "Sem fotografias ou vídeos recentes",
+  "chatRecentPhoto": "Fotografia recente",
+  "chatRecentVideo": "Vídeo recente"
 }

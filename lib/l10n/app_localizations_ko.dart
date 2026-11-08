@@ -6178,4 +6178,25 @@ class SKo extends S {
 
   @override
   String get stickerSubscriptionsEmpty => '구독 중인 스티커가 없습니다';
+
+  @override
+  String get chatAttachmentEvent => '일정';
+
+  @override
+  String get chatRecentMedia => '최근 사진 및 동영상';
+
+  @override
+  String get chatRecentMediaLoadFailed => '최근 미디어를 불러올 수 없습니다';
+
+  @override
+  String get chatRecentMediaPermission => '최근 미디어를 표시하려면 사진 접근 권한이 필요합니다';
+
+  @override
+  String get chatRecentMediaEmpty => '최근 사진이나 동영상이 없습니다';
+
+  @override
+  String get chatRecentPhoto => '최근 사진';
+
+  @override
+  String get chatRecentVideo => '최근 동영상';
 }

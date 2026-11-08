@@ -2915,5 +2915,12 @@
   "stickerSubscribeNotice": "Suivez les futures modifications des administrateurs du pack. Les images et métadonnées ne sont pas chiffrées de bout en bout. Vous pourrez vous désabonner ; cela ne vous fait pas rejoindre la discussion source.",
   "stickerSubscriptions": "Abonnements aux stickers",
   "stickerUnsubscribe": "Se désabonner",
-  "stickerSubscriptionsEmpty": "Aucun abonnement aux stickers"
+  "stickerSubscriptionsEmpty": "Aucun abonnement aux stickers",
+  "chatAttachmentEvent": "Événement",
+  "chatRecentMedia": "Photos et vidéos récentes",
+  "chatRecentMediaLoadFailed": "Impossible de charger les médias récents",
+  "chatRecentMediaPermission": "L’accès aux photos est nécessaire pour afficher les médias récents",
+  "chatRecentMediaEmpty": "Aucune photo ou vidéo récente",
+  "chatRecentPhoto": "Photo récente",
+  "chatRecentVideo": "Vidéo récente"
 }

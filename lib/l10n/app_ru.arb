@@ -2915,5 +2915,12 @@
   "stickerSubscribeNotice": "Получайте будущие изменения администраторов набора. Изображения и метаданные не защищены сквозным шифрованием. Подписку можно отменить позже; вы не вступите в исходный чат.",
   "stickerSubscriptions": "Подписки на стикеры",
   "stickerUnsubscribe": "Отписаться",
-  "stickerSubscriptionsEmpty": "Нет подписок на стикеры"
+  "stickerSubscriptionsEmpty": "Нет подписок на стикеры",
+  "chatAttachmentEvent": "Событие",
+  "chatRecentMedia": "Недавние фото и видео",
+  "chatRecentMediaLoadFailed": "Не удалось загрузить недавние медиафайлы",
+  "chatRecentMediaPermission": "Для показа недавних медиафайлов нужен доступ к фото",
+  "chatRecentMediaEmpty": "Нет недавних фото или видео",
+  "chatRecentPhoto": "Недавнее фото",
+  "chatRecentVideo": "Недавнее видео"
 }

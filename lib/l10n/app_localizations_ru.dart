@@ -6346,4 +6346,27 @@ class SRu extends S {
 
   @override
   String get stickerSubscriptionsEmpty => 'Нет подписок на стикеры';
+
+  @override
+  String get chatAttachmentEvent => 'Событие';
+
+  @override
+  String get chatRecentMedia => 'Недавние фото и видео';
+
+  @override
+  String get chatRecentMediaLoadFailed =>
+      'Не удалось загрузить недавние медиафайлы';
+
+  @override
+  String get chatRecentMediaPermission =>
+      'Для показа недавних медиафайлов нужен доступ к фото';
+
+  @override
+  String get chatRecentMediaEmpty => 'Нет недавних фото или видео';
+
+  @override
+  String get chatRecentPhoto => 'Недавнее фото';
+
+  @override
+  String get chatRecentVideo => 'Недавнее видео';
 }

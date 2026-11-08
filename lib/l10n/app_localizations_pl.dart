@@ -6353,4 +6353,27 @@ class SPl extends S {
 
   @override
   String get stickerSubscriptionsEmpty => 'Brak subskrypcji naklejek';
+
+  @override
+  String get chatAttachmentEvent => 'Wydarzenie';
+
+  @override
+  String get chatRecentMedia => 'Ostatnie zdjęcia i filmy';
+
+  @override
+  String get chatRecentMediaLoadFailed =>
+      'Nie udało się wczytać ostatnich multimediów';
+
+  @override
+  String get chatRecentMediaPermission =>
+      'Do wyświetlania ostatnich multimediów potrzebny jest dostęp do zdjęć';
+
+  @override
+  String get chatRecentMediaEmpty => 'Brak ostatnich zdjęć lub filmów';
+
+  @override
+  String get chatRecentPhoto => 'Ostatnie zdjęcie';
+
+  @override
+  String get chatRecentVideo => 'Ostatni film';
 }

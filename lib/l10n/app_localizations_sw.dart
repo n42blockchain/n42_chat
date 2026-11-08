@@ -6348,4 +6348,27 @@ class SSw extends S {
 
   @override
   String get stickerSubscriptionsEmpty => 'Hakuna usajili wa vibandiko';
+
+  @override
+  String get chatAttachmentEvent => 'Tukio';
+
+  @override
+  String get chatRecentMedia => 'Picha na video za hivi karibuni';
+
+  @override
+  String get chatRecentMediaLoadFailed =>
+      'Imeshindikana kupakia midia ya hivi karibuni';
+
+  @override
+  String get chatRecentMediaPermission =>
+      'Ruhusa ya kufikia picha inahitajika ili kuonyesha midia ya hivi karibuni';
+
+  @override
+  String get chatRecentMediaEmpty => 'Hakuna picha au video za hivi karibuni';
+
+  @override
+  String get chatRecentPhoto => 'Picha ya hivi karibuni';
+
+  @override
+  String get chatRecentVideo => 'Video ya hivi karibuni';
 }
