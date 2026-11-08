@@ -1033,7 +1033,7 @@ Host master commit `aecb6f77` was published to n42appv2. It pins `cbc7bd1a128d84
 
 ### AUTH-SOCIAL-001 N42 native social-login provider acceptance
 
-- Live capability recheck (2026-11-07): GET https://n42.world/v1/auth/n42/capabilities returns HTTP 200, google_native_code=false, native_oidc_providers=[apple, facebook], web_providers=[google, apple, facebook], legacy_account_migration=false. This is capability advertisement only; Google native activation and actual provider-to-Matrix acceptance remain unverified. The historical n42-wallet-auth container was not present on the inspected Matrix gateway host; the current auth origin/configuration was not established and no remote setting changed.
+- Live capability recheck (2026-11-07): GET https://n42.world/v1/auth/n42/capabilities returns HTTP 200, google_native_code=false, native_oidc_providers=[apple, facebook], web_providers=[google, apple, facebook], legacy_account_migration=false. This is capability advertisement only; Google native activation and actual provider-to-Matrix acceptance remain unverified. The initial Matrix gateway host was not the auth origin. A later read-only check located n42-wallet-auth on the n42.world host (image n42-id-hub:n42-auth-cdfba5e); localhost capabilities matched the public response. Controlled runtime credentials remain outside Git and no remote setting changed. Public m.si46.world checks report Tuwunel 1.9.4 and an HTTP 200 shared-secret registration nonce endpoint, so the route is not absent merely because the implementation is Tuwunel. These GET checks do not prove account registration, same-DID reuse or E2EE initialization.
 
 - Severity: H
 - Added: 2026-11-05
