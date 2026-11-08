@@ -380,6 +380,59 @@ void main() {
     await tester.pump(const Duration(milliseconds: 350));
   }
 
+  testWidgets(
+    'attachments wait for keyboard dismissal without dropping panel intent',
+    (tester) async {
+      await pumpChat(
+        tester,
+        messages: [
+          MessageEntity(
+            id: 'seed',
+            roomId: _roomId,
+            senderId: '@friend:hs.test',
+            senderName: 'Friend',
+            content: 'Hello',
+            type: MessageType.text,
+            timestamp: DateTime(2026, 1, 1),
+          ),
+        ],
+      );
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.view.resetViewInsets);
+      await tester.binding.setSurfaceSize(const Size(360, 640));
+      tester.view.viewInsets = const FakeViewPadding(bottom: 300);
+      await tester.pump();
+      await tester.tap(
+        find.byKey(const ValueKey('chat_input_attachment_toggle')),
+      );
+      await tester.pump();
+      expect(tester.takeException(), isNull);
+      expect(find.byKey(const ValueKey('chat_more_panel')), findsNothing);
+      tester.view.viewInsets = FakeViewPadding.zero;
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+      expect(find.byKey(const ValueKey('chat_more_panel')), findsOneWidget);
+      expect(find.text('Photos'), findsOneWidget);
+      expect(find.text('Take Photo'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('empty chat remains readable in the reduced keyboard viewport', (
+    tester,
+  ) async {
+    await pumpChat(tester);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetViewInsets);
+    await tester.binding.setSurfaceSize(const Size(360, 640));
+    tester.view.viewInsets = const FakeViewPadding(bottom: 300);
+    await tester.pump();
+    expect(tester.takeException(), isNull);
+    expect(find.text('No messages'), findsOneWidget);
+  });
+
   for (final outcome in ['saved', 'failed', 'edited', 'relogin']) {
     testWidgets('scheduled composer retains text until acknowledgement: $outcome', (tester) async {
       late _Auth auth;

@@ -1019,6 +1019,14 @@ Host master commit `aecb6f77` was published to n42appv2. It pins `cbc7bd1a128d84
 - Verification: 240 malformed URL cases, 220 legitimate synthetic navigation cases, policy tampering/replay/expiry tests, native-channel stale-document/race/revocation checks and blocked-launch UI tests. These are local regression evidence only.
 - Next step: deploy the issuer and policy endpoint with strong publish authentication/audit, ship pinned public keys/environment audience/upgrade URL, independently enforce nonce and business authorization on the backend, then execute iOS/Android/external-browser acceptance. Measure <=30-minute revocation and <0.5% legitimate rejection with actual deployment/traffic. Local preference persistence is not cross-device replay prevention. Protocol: `docs/security/mini-app-policy-v1.md`.
 
+### UI-003 Native attachment and empty-chat layout acceptance remain open
+
+- Severity: M
+- Added: 2026-11-08
+- Observed: Android run 42467703995 passes DEVICE-01 login/navigation but reports a 140px bottom overflow after opening attachments. The run then exceeds its one-hour job limit, so remaining cases are not accepted. Candidate wallet 73507 is held and must not be uploaded as a fix for this issue.
+- Local repair: two pre-fix phone-viewport probes independently reproduce the attachment/keyboard transition overflow and the empty-message column overflow. Attachment intent is retained while the system keyboard exits; the empty conversation notice and existing empty-state content now scroll when height is constrained. No attachment actions are removed. The 64-case media-action/pagination cluster passes with zero failures/skips; scoped analysis has no errors/warnings and two existing test infos.
+- Next step: complete current-source full regression, integrate into the wallet, rerun native acceptance with sufficient job time, and build a fresh candidate after the native result. Widget probes do not establish the exact native root cause or successful native acceptance.
+
 ### MEDIA-006 Device media performance and complete stage observability remain unverified
 
 - Severity: M

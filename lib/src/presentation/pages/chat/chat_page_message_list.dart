@@ -59,18 +59,29 @@ extension _ChatPageMessageListMethods on _ChatPageState {
         }
 
         if (state.isEmpty) {
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _buildEncryptionNotice(),
-              const SizedBox(height: AppDimensions.spacing),
-              N42EmptyState.noData(
-                title: S.of(context)?.chatNoMessages ?? 'No messages',
-                description:
-                    S.of(context)?.chatSendFirstMessage ??
-                    'Send first message to start chatting',
+          return LayoutBuilder(
+            builder: (context, constraints) => SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: constraints.hasBoundedHeight
+                      ? constraints.maxHeight
+                      : 0,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildEncryptionNotice(),
+                    const SizedBox(height: AppDimensions.spacing),
+                    N42EmptyState.noData(
+                      title: S.of(context)?.chatNoMessages ?? 'No messages',
+                      description:
+                          S.of(context)?.chatSendFirstMessage ??
+                          'Send first message to start chatting',
+                    ),
+                  ],
+                ),
               ),
-            ],
+            ),
           );
         }
 

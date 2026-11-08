@@ -1498,7 +1498,10 @@ class _ChatPageState extends State<_ChatPageContent> with WidgetsBindingObserver
                 _buildStickerPicker(),
 
               // 更多功能面板（仅在非多选模式下）
-              if (_showMorePanel && !_isMultiSelectMode) _buildMorePanel(),
+              if (_showMorePanel &&
+                  !_isMultiSelectMode &&
+                  MediaQuery.viewInsetsOf(context).bottom == 0)
+                _buildMorePanel(),
             ],
           ),
         ),
