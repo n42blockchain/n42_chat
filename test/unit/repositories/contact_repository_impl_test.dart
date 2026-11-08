@@ -33,6 +33,7 @@ void main() {
   setUp(() {
     FlutterSecureStorage.setMockInitialValues({});
     mockContactDS = MockMatrixContactDataSource();
+    when(() => mockContactDS.captureSession()).thenReturn(() => true);
     when(
       () => mockContactDS.refreshDirectChatMembers(),
     ).thenAnswer((_) async {});

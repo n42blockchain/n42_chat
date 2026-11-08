@@ -1,0 +1,27 @@
+{
+  "scope": "Friend request acceptance, direct-chat preparation and automatic Moments/Status sharing stay bound to their initiating login",
+  "preFix": {
+    "confirmedFailingCases": 7,
+    "logs": [
+      "/tmp/n42-chat-friend-session-red.log",
+      "/tmp/n42-chat-friend-repository-red.log",
+      "/tmp/n42-chat-friend-nested-red.log"
+    ]
+  },
+  "verification": {
+    "focusedPassed": 114,
+    "focusedFailed": 0,
+    "focusedLog": "/tmp/n42-chat-friend-session-final-cluster.log",
+    "fullRegression": "pending"
+  },
+  "preserved": [
+    "normal friend acceptance and both social-room invitations",
+    "hidden-reader policy and existing friendship membership checks",
+    "optional sharing failure does not undo a confirmed same-account friend acceptance"
+  ],
+  "boundaries": [
+    "No rollback of already dispatched server requests",
+    "Native, live two-account and wallet pin integration remain separate",
+    "Does not complete all account-switch acceptance"
+  ]
+}

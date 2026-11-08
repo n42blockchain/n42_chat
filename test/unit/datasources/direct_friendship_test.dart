@@ -432,6 +432,31 @@ void main() {
     },
   );
 
+  for (final field in ['token', 'device', 'homeserver']) {
+    test(
+      'accepting an invite stops before direct mapping after $field replacement',
+      () async {
+        var token = 'original-token';
+        var device = 'original-device';
+        var homeserver = Uri.parse('https://original.invalid');
+        when(() => client.accessToken).thenAnswer((_) => token);
+        when(() => client.deviceID).thenAnswer((_) => device);
+        when(() => client.homeserver).thenAnswer((_) => homeserver);
+        when(() => room.join()).thenAnswer((_) async {
+          if (field == 'token') token = 'replacement-token';
+          if (field == 'device') device = 'replacement-device';
+          if (field == 'homeserver') {
+            homeserver = Uri.parse('https://replacement.invalid');
+          }
+        });
+        when(() => room.addToDirectChat(any())).thenAnswer((_) async {});
+        await expectLater(contacts.acceptInvite('!dm:test'), throwsStateError);
+        verifyNever(() => room.addToDirectChat(any()));
+        verifyNever(() => client.setAccountData(any(), 'm.direct', any()));
+      },
+    );
+  }
+
   test('accepting a missing invitation cannot report success', () async {
     when(() => client.getRoomById('!gone:test')).thenReturn(null);
     await expectLater(contacts.acceptInvite('!gone:test'), throwsStateError);

@@ -151,12 +151,15 @@ class ContactRepositoryImpl implements IContactRepository {
 
   @override
   Future<String> startDirectChat(String userId) async {
+    final current = _contactDataSource.captureSession();
     final encrypted = await _storageDataSource.shouldDefaultEncryptNewChats();
+    if (!current()) throw StateError('Account changed');
     final roomId = await _contactDataSource.startDirectChat(
       userId,
       encrypted: encrypted,
     );
 
+    if (!current()) throw StateError('Account changed');
     // Share Moments only after both users have joined the direct room.
     if (_contactDataSource.getDirectChatRoomIdMap().containsKey(userId)) {
       try {
@@ -167,6 +170,7 @@ class ContactRepositoryImpl implements IContactRepository {
         );
       }
     }
+    if (!current()) throw StateError('Account changed');
     return roomId;
   }
 
@@ -257,8 +261,10 @@ class ContactRepositoryImpl implements IContactRepository {
 
   @override
   Future<void> acceptFriendRequest(String requestId) async {
+    final current = _contactDataSource.captureSession();
     // 1. 接受好友请求（加入聊天房间）
     await _contactDataSource.acceptInvite(requestId);
+    if (!current()) throw StateError('Account changed');
 
     // 2. 获取好友的 userId
     final room = _contactDataSource.getRoomById(requestId);
@@ -276,6 +282,7 @@ class ContactRepositoryImpl implements IContactRepository {
         // 不影响好友请求的接受
       }
     }
+    if (!current()) throw StateError('Account changed');
   }
 
   @override

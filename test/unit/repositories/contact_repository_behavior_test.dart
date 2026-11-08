@@ -59,8 +59,53 @@ void main() {
     return room;
   }
 
+  test(
+    'accepting a friend stops before social sharing after session replacement',
+    () async {
+      var current = true;
+      when(() => contacts.captureSession()).thenReturn(() => current);
+      when(() => contacts.acceptInvite('!invite:test')).thenAnswer((_) async {
+        current = false;
+      });
+      when(() => contacts.getRoomById('!invite:test')).thenAnswer(
+        (_) => invite(
+          '!invite:test',
+          inviter: alice,
+          sender: user(alice, 'Alice'),
+        ),
+      );
+      when(() => moments.inviteFriendToMomentRoom(alice))
+          .thenAnswer((_) async {});
+      await expectLater(
+        repository.acceptFriendRequest('!invite:test'),
+        throwsStateError,
+      );
+      verifyNever(() => moments.inviteFriendToMomentRoom(any()));
+    },
+  );
+
+  test('starting a direct chat cannot continue after encryption preferences change session', () async {
+    var current = true;
+    when(() => contacts.captureSession()).thenReturn(() => current);
+    when(() => preferences.shouldDefaultEncryptNewChats())
+        .thenAnswer((_) async {
+          current = false;
+          return true;
+        });
+    when(() => contacts.startDirectChat(alice, encrypted: true))
+        .thenAnswer((_) async => '!direct:test');
+    when(() => moments.inviteFriendToMomentRoom(alice))
+        .thenAnswer((_) async {});
+    await expectLater(repository.startDirectChat(alice), throwsStateError);
+    verifyNever(
+      () => contacts.startDirectChat(any(), encrypted: any(named: 'encrypted')),
+    );
+    verifyNever(() => moments.inviteFriendToMomentRoom(any()));
+  });
+
   setUp(() {
     contacts = _Contacts();
+    when(() => contacts.captureSession()).thenReturn(() => true);
     when(() => contacts.refreshDirectChatMembers()).thenAnswer((_) async {});
     when(() => contacts.getOutgoingInvites()).thenReturn([]);
     preferences = _Preferences();

@@ -981,23 +981,43 @@ class MatrixMomentDataSource {
   ///
   /// 在好友关系建立时调用，使好友可以看到我的朋友圈
   Future<void> inviteFriendToMomentRoom(String userId) async {
-    if (_client == null) return;
-    await _privacy.load(userId);
+    final client = _client;
+    if (client == null) return;
+    final account = client.userID;
+    final device = client.deviceID;
+    final token = client.accessToken;
+    final homeserver = client.homeserver;
+    void ensureCurrent() {
+      if (!identical(client, _client) ||
+          account != client.userID ||
+          device != client.deviceID ||
+          token != client.accessToken ||
+          homeserver != client.homeserver) {
+        throw StateError('Account changed');
+      }
+    }
+
+    final privacy = _privacy;
+    await privacy.load(userId);
+    ensureCurrent();
     for (final story in [false, true]) {
-      if (_privacy.hides(userId, story: story)) continue;
-      final room = await _privacy.ownRoom(story: story);
+      if (privacy.hides(userId, story: story)) continue;
+      final room = await privacy.ownRoom(story: story);
+      ensureCurrent();
       if (room == null) continue;
-      await _privacy.apply(room, story: story);
+      await privacy.apply(room, story: story);
+      ensureCurrent();
       final membership = room
           .getState(matrix.EventTypes.RoomMember, userId)
           ?.content['membership'];
       if (membership == 'join' || membership == 'invite' || membership == 'ban')
         continue;
-      await _client!.inviteUser(
+      await client.inviteUser(
         room.id,
         userId,
         reason: story ? ContactPrivacyService.storyReason : momentInviteReason,
       );
+      ensureCurrent();
     }
   }
 
