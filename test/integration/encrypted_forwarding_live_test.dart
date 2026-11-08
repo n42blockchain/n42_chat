@@ -9,10 +9,18 @@ import 'package:flutter_vodozemac/flutter_vodozemac.dart' as flutter_vod;
 import 'package:matrix/matrix.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:n42_chat/src/data/datasources/matrix/matrix_client_manager.dart';
+import 'package:n42_chat/src/data/datasources/local/secure_storage_datasource.dart';
+import 'package:n42_chat/src/data/services/matrix_history_sharing.dart';
+import 'package:n42_chat/src/domain/repositories/auth_repository.dart';
+import 'package:n42_chat/src/domain/repositories/chat_catch_up_repository.dart';
 import 'package:n42_chat/src/data/datasources/matrix/matrix_reaction_datasource.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 class _Manager extends Mock implements MatrixClientManager {}
+
+class _Lifecycle extends Mock implements IAccountBoundDeletionLifecycle {}
+
+class _Storage extends Mock implements SecureStorageDataSource {}
 
 class _TokenAuth extends AuthenticationData {
   _TokenAuth(this.token, {super.session})
@@ -182,6 +190,13 @@ void main() {
         final downloaded = await receivedAttachment!
             .downloadAndDecryptAttachment();
         expect(downloaded.bytes, orderedEquals(bytes));
+        await _verifyHistorySharing(
+          clients,
+          manager,
+          roomIds,
+          originalId,
+          body,
+        );
       } finally {
         try {
           for (var i = 0; i < clients.length; i++) {
@@ -230,4 +245,102 @@ Future<void> _syncUntil(
     await Future<void>.delayed(const Duration(milliseconds: 250));
   }
   throw TimeoutException('Owned encrypted forwarding condition not reached');
+}
+
+Future<void> _verifyHistorySharing(
+  List<Client> clients,
+  _Manager manager,
+  List<String> rooms,
+  String originalId,
+  String body,
+) async {
+  final sender = clients.first, recipient = clients.last;
+  await sender.setAccountData(sender.userID!, 'm.direct', {
+    recipient.userID!: [rooms.last],
+  });
+  await _syncUntil(clients, () => sender.getRoomById(rooms.last)!.isDirectChat);
+  final lifecycle = _Lifecycle();
+  final storage = _Storage();
+  final journal = <String, String>{};
+  final generation = AuthSessionInvalidation(
+    userId: sender.userID!,
+    homeserver: sender.homeserver!,
+    deviceId: sender.deviceID,
+    isCurrent: () => sender.isLogged(),
+    matchesClient: (client) => identical(client, sender),
+  );
+  when(() => lifecycle.currentAccountGeneration).thenReturn(generation);
+  when(() => storage.readStrict(any()))
+      .thenAnswer((call) async => journal[call.positionalArguments.first]);
+  when(() => storage.write(any(), any())).thenAnswer((call) async {
+    journal[call.positionalArguments[0] as String] =
+        call.positionalArguments[1] as String;
+  });
+  final sharing = MatrixHistorySharing(manager, lifecycle, storage);
+  try {
+    final sourceRoom = sender.getRoomById(rooms.first)!;
+    expect(
+      sourceRoom.roomVersion,
+      '12',
+      reason: 'Fixture uses creator-privilege room version',
+    );
+    expect(sourceRoom.creatorUserIds, contains(sender.userID));
+    await sharing.setHistorySharing(rooms.first, enabled: true);
+    final draft = await sharing.previewHistory(
+      roomId: rooms.first,
+      targetRoomId: rooms.last,
+      recipient: recipient.userID!,
+      eventIds: [originalId],
+    );
+    expect(draft.messages.single.content, body);
+    expect(await sharing.shareHistory(draft), HistoryShareStatus.completed);
+    Future<List<Event>> history(String roomId) async {
+      final timeline = await recipient.getRoomById(roomId)!.getTimeline();
+      try {
+        return List<Event>.of(timeline.events);
+      } finally {
+        timeline.cancelSubscriptions();
+      }
+    }
+
+    await _syncUntil(
+      clients,
+      () async => (await history(rooms.last)).any(
+        (e) =>
+            e.content['n42.history_share'] is Map &&
+            (e.content['n42.history_share'] as Map)['batch'] == draft.id &&
+            (e.content['body'] as String? ?? '').contains(body),
+      ),
+    );
+    final shared = (await history(rooms.last)).singleWhere(
+      (e) =>
+          e.content['n42.history_share'] is Map &&
+          (e.content['n42.history_share'] as Map)['batch'] == draft.id,
+    );
+    expect(
+      (await sender.getOneRoomEvent(rooms.last, shared.eventId)).type,
+      EventTypes.Encrypted,
+    );
+    await _syncUntil(clients, () async {
+      final audits = (await history(rooms.first)).where(
+        (e) =>
+            e.content['n42.history_share'] is Map &&
+            (e.content['n42.history_share'] as Map)['batch'] == draft.id,
+      );
+      return audits
+          .map((e) => (e.content['n42.history_share'] as Map)['phase'])
+          .toSet()
+          .containsAll(['requested', 'completed']);
+    });
+    final cancelled = await sharing.previewHistory(
+      roomId: rooms.first,
+      targetRoomId: rooms.last,
+      recipient: recipient.userID!,
+      eventIds: [originalId],
+    );
+    await sharing.setHistorySharing(rooms.first, enabled: false);
+    await expectLater(sharing.shareHistory(cancelled), throwsStateError);
+  } finally {
+    await sharing.dispose();
+  }
 }

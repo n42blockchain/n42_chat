@@ -102,7 +102,18 @@ class MatrixHistorySharing implements IChatCatchUpRepository {
     final level = own is int
         ? own
         : (power['users_default'] is int ? power['users_default'] as int : 0);
-    if (members == null || !members.containsKey(client.userID) || level < 100) {
+    // Version 12 creators have implicit owner power and must not appear in
+    // m.room.power_levels. Creation state is immutable; membership and mutable
+    // administrator power above are still read from the server for each check.
+    final room = client.getRoomById(roomId);
+    final version = int.tryParse(room?.roomVersion ?? '');
+    final creator =
+        version != null &&
+        version >= 12 &&
+        room!.creatorUserIds.contains(client.userID);
+    if (members == null ||
+        !members.containsKey(client.userID) ||
+        (!creator && level < 100)) {
       throw StateError('Administrator required');
     }
     return Map<String, dynamic>.from(

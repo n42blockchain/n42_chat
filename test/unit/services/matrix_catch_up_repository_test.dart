@@ -158,6 +158,36 @@ void main() {
     eventIds: ['selected'],
   );
 
+  for (final scenario in [
+    ('12', true, true),
+    ('12', false, false),
+    ('11', true, false),
+  ]) {
+    test(
+      'creator permission version=${scenario.$1} creator=${scenario.$2}',
+      () async {
+        admin = 0;
+        when(() => source.roomVersion).thenReturn(scenario.$1);
+        when(() => source.creatorUserIds)
+            .thenReturn(scenario.$2 ? {user} : {peer});
+        if (scenario.$3) {
+          expect(await preview(), isA<HistoryShareDraft>());
+        } else {
+          await expectLater(preview(), throwsStateError);
+        }
+      },
+    );
+  }
+
+  test('version 12 creator must still be joined to share history', () async {
+    admin = 0;
+    when(() => source.roomVersion).thenReturn('12');
+    when(() => source.creatorUserIds).thenReturn({user});
+    when(() => client.getJoinedMembersByRoom(group))
+        .thenAnswer((_) async => {peer: m.RoomMember()});
+    await expectLater(preview(), throwsStateError);
+  });
+
   test('preview does not send; confirmation sends ciphertext and two content-free audits', () async {
     final draft = await preview();
     verifyNever(() => client.sendMessage(any(), any(), any(), any()));
