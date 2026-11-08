@@ -79,6 +79,18 @@ void main() {
     await momentStateController.close();
   });
 
+  testWidgets('detail report action opens the reporting dialog', (tester) async {
+    await tester.pumpWidget(
+      _buildTestWidget(momentBloc: mockMomentBloc, moment: moment),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.flag_outlined));
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsOneWidget);
+    expect(find.text('Spam'), findsOneWidget);
+    expect(find.text('Report submitted'), findsNothing);
+  });
+
   testWidgets('author avatar opens the correct contact profile', (
     tester,
   ) async {

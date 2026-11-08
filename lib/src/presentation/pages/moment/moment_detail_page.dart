@@ -1,4 +1,5 @@
 import 'moment_author_navigation.dart';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,6 +15,7 @@ import '../../blocs/moment/moment_event.dart';
 import '../../blocs/moment/moment_state.dart';
 import '../../widgets/common/n42_avatar.dart';
 import 'moment_forward_sheet.dart';
+import '../../widgets/common/user_report_dialog.dart';
 import '../../../core/utils/debug_log.dart';
 
 /// 动态详情页面
@@ -132,6 +134,12 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
             title: Text(s?.momentMoment ?? 'Moment'),
             backgroundColor: context.surfaceColor,
             actions: [
+              IconButton(
+                tooltip: s?.reportTitle ?? 'Report',
+                icon: const Icon(Icons.flag_outlined),
+                onPressed: () =>
+                    showMomentReportDialog(context, moment: moment),
+              ),
               IconButton(
                 icon: const Icon(Icons.share_outlined),
                 onPressed: () => MomentForwardSheet.show(context, moment),
