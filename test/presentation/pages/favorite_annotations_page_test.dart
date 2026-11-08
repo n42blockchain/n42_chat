@@ -165,6 +165,46 @@ class _Fixture {
 
 void main() {
   for (final link in [false, true]) {
+    testWidgets(
+      'compact ${link ? 'link' : 'note'} error dialog remains usable with keyboard',
+      (tester) async {
+        tester.view.physicalSize = const Size(360, 640);
+        tester.view.devicePixelRatio = 1;
+        tester.platformDispatcher.textScaleFactorTestValue = 1.5;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        addTearDown(tester.view.resetViewInsets);
+        addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+        final f = _Fixture();
+        await f.initialize(tester);
+        await f.open(tester);
+        await tester.tap(find.byIcon(Icons.add));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text(link ? 'Favorite Link' : 'New Note'));
+        await tester.pumpAndSettle();
+        await tester.enterText(find.byType(TextField).first, 'Draft');
+        if (link) {
+          await tester.enterText(
+            find.byType(TextField).last,
+            'https://example.test',
+          );
+        }
+        tester.view.viewInsets = const FakeViewPadding(bottom: 300);
+        await tester.pumpAndSettle();
+        f.store.reject = true;
+        await tester.tap(find.text('Confirm'));
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+        expect(find.text('Save failed'), findsOneWidget);
+        expect(find.byType(AlertDialog), findsOneWidget);
+        await tester.tap(find.text('Confirm'));
+        await tester.pumpAndSettle();
+        expect(find.byType(AlertDialog), findsNothing);
+      },
+    );
+  }
+
+  for (final link in [false, true]) {
     Future<void> openDraft(WidgetTester tester) async {
       await tester.tap(find.byIcon(Icons.add));
       await tester.pumpAndSettle();
