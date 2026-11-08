@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_vodozemac/flutter_vodozemac.dart' as flutter_vod;
@@ -145,6 +146,42 @@ void main() {
         });
         final original = await sourceRoom.getEventById(originalId);
         expect(original?.content['body'], body);
+        final bytes = Uint8List.fromList(
+          utf8.encode('Private attachment $stamp 中文'),
+        );
+        final attachmentId = await sourceRoom.sendFileEvent(
+          MatrixFile(
+            bytes: bytes,
+            name: 'forwarding.txt',
+            mimeType: 'text/plain',
+          ),
+        );
+        expect(attachmentId, isNotEmpty);
+        final forwardedAttachmentId = await MatrixReactionDataSource(manager)
+            .forwardMessage(roomIds.first, attachmentId!, roomIds.last);
+        expect(forwardedAttachmentId, isNotEmpty);
+        final attachmentWire = await clients.first.getOneRoomEvent(
+          roomIds.last,
+          forwardedAttachmentId!,
+        );
+        expect(attachmentWire.type, EventTypes.Encrypted);
+        expect(
+          jsonEncode(attachmentWire.content).contains('forwarding.txt'),
+          isFalse,
+        );
+        Event? receivedAttachment;
+        await _syncUntil(clients, () async {
+          receivedAttachment = await clients.last
+              .getRoomById(roomIds.last)!
+              .getEventById(forwardedAttachmentId);
+          return receivedAttachment?.content['file'] is Map;
+        });
+        expect(receivedAttachment!.content['msgtype'], 'm.file');
+        expect(receivedAttachment!.content['body'], 'forwarding.txt');
+        expect(receivedAttachment!.content.containsKey('url'), isFalse);
+        final downloaded = await receivedAttachment!
+            .downloadAndDecryptAttachment();
+        expect(downloaded.bytes, orderedEquals(bytes));
       } finally {
         try {
           for (var i = 0; i < clients.length; i++) {
