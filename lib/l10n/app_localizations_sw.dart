@@ -6371,4 +6371,28 @@ class SSw extends S {
 
   @override
   String get chatRecentVideo => 'Video ya hivi karibuni';
+
+  @override
+  String get chatAttachmentTip => 'Bakshishi';
+
+  @override
+  String get chatAttachmentWhiteboard => 'Ubao mweupe';
+
+  @override
+  String get chatAttachmentVideoNote => 'Ujumbe wa video';
+
+  @override
+  String get chatAttachmentCode => 'Msimbo';
+
+  @override
+  String get chatAttachmentShop => 'Duka';
+
+  @override
+  String chatSelectionLimit(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Kikomo cha uteuzi: $countString';
+  }
 }

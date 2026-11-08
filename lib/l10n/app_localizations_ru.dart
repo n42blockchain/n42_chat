@@ -6369,4 +6369,28 @@ class SRu extends S {
 
   @override
   String get chatRecentVideo => 'Недавнее видео';
+
+  @override
+  String get chatAttachmentTip => 'Чаевые';
+
+  @override
+  String get chatAttachmentWhiteboard => 'Доска';
+
+  @override
+  String get chatAttachmentVideoNote => 'Видеосообщение';
+
+  @override
+  String get chatAttachmentCode => 'Код';
+
+  @override
+  String get chatAttachmentShop => 'Магазин';
+
+  @override
+  String chatSelectionLimit(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Лимит выбора: $countString';
+  }
 }

@@ -6196,4 +6196,28 @@ class SJa extends S {
 
   @override
   String get chatRecentVideo => '最近の動画';
+
+  @override
+  String get chatAttachmentTip => 'チップ';
+
+  @override
+  String get chatAttachmentWhiteboard => 'ホワイトボード';
+
+  @override
+  String get chatAttachmentVideoNote => 'ビデオメッセージ';
+
+  @override
+  String get chatAttachmentCode => 'コード';
+
+  @override
+  String get chatAttachmentShop => 'ショップ';
+
+  @override
+  String chatSelectionLimit(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '選択上限：$countString 件';
+  }
 }

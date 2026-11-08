@@ -6369,4 +6369,28 @@ class SUk extends S {
 
   @override
   String get chatRecentVideo => 'Нещодавнє відео';
+
+  @override
+  String get chatAttachmentTip => 'Чайові';
+
+  @override
+  String get chatAttachmentWhiteboard => 'Дошка';
+
+  @override
+  String get chatAttachmentVideoNote => 'Відеоповідомлення';
+
+  @override
+  String get chatAttachmentCode => 'Код';
+
+  @override
+  String get chatAttachmentShop => 'Магазин';
+
+  @override
+  String chatSelectionLimit(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Ліміт вибору: $countString';
+  }
 }

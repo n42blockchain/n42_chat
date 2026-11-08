@@ -6350,4 +6350,28 @@ class SUr extends S {
 
   @override
   String get chatRecentVideo => 'حالیہ ویڈیو';
+
+  @override
+  String get chatAttachmentTip => 'بخشش';
+
+  @override
+  String get chatAttachmentWhiteboard => 'وائٹ بورڈ';
+
+  @override
+  String get chatAttachmentVideoNote => 'ویڈیو پیغام';
+
+  @override
+  String get chatAttachmentCode => 'کوڈ';
+
+  @override
+  String get chatAttachmentShop => 'دکان';
+
+  @override
+  String chatSelectionLimit(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'انتخاب کی حد: $countString';
+  }
 }

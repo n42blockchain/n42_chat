@@ -6335,4 +6335,28 @@ class SHi extends S {
 
   @override
   String get chatRecentVideo => 'हाल का वीडियो';
+
+  @override
+  String get chatAttachmentTip => 'टिप';
+
+  @override
+  String get chatAttachmentWhiteboard => 'व्हाइटबोर्ड';
+
+  @override
+  String get chatAttachmentVideoNote => 'वीडियो संदेश';
+
+  @override
+  String get chatAttachmentCode => 'कोड';
+
+  @override
+  String get chatAttachmentShop => 'दुकान';
+
+  @override
+  String chatSelectionLimit(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'चयन सीमा: $countString';
+  }
 }

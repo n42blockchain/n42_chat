@@ -2922,5 +2922,11 @@
   "chatRecentMediaPermission": "Cần quyền truy cập ảnh để hiển thị nội dung gần đây",
   "chatRecentMediaEmpty": "Không có ảnh hoặc video gần đây",
   "chatRecentPhoto": "Ảnh gần đây",
-  "chatRecentVideo": "Video gần đây"
+  "chatRecentVideo": "Video gần đây",
+  "chatAttachmentTip": "Tiền boa",
+  "chatAttachmentWhiteboard": "Bảng trắng",
+  "chatAttachmentVideoNote": "Tin nhắn video",
+  "chatAttachmentCode": "Mã",
+  "chatAttachmentShop": "Cửa hàng",
+  "chatSelectionLimit": "Giới hạn lựa chọn: {count}"
 }

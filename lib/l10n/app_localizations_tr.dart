@@ -6337,4 +6337,28 @@ class STr extends S {
 
   @override
   String get chatRecentVideo => 'Son video';
+
+  @override
+  String get chatAttachmentTip => 'Bahşiş';
+
+  @override
+  String get chatAttachmentWhiteboard => 'Beyaz tahta';
+
+  @override
+  String get chatAttachmentVideoNote => 'Video mesajı';
+
+  @override
+  String get chatAttachmentCode => 'Kod';
+
+  @override
+  String get chatAttachmentShop => 'Mağaza';
+
+  @override
+  String chatSelectionLimit(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Seçim sınırı: $countString';
+  }
 }

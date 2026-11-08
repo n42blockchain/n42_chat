@@ -2310,5 +2310,11 @@
   "chatRecentMediaPermission": "需要照片存取權限才能顯示最近的照片和影片",
   "chatRecentMediaEmpty": "沒有最近的照片或影片",
   "chatRecentPhoto": "最近的照片",
-  "chatRecentVideo": "最近的影片"
+  "chatRecentVideo": "最近的影片",
+  "chatAttachmentTip": "打賞",
+  "chatAttachmentWhiteboard": "白板",
+  "chatAttachmentVideoNote": "影片留言",
+  "chatAttachmentCode": "程式碼",
+  "chatAttachmentShop": "商店",
+  "chatSelectionLimit": "最多選擇 {count} 項"
 }

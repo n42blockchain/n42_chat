@@ -6405,4 +6405,28 @@ class SFr extends S {
 
   @override
   String get chatRecentVideo => 'Vidéo récente';
+
+  @override
+  String get chatAttachmentTip => 'Pourboire';
+
+  @override
+  String get chatAttachmentWhiteboard => 'Tableau blanc';
+
+  @override
+  String get chatAttachmentVideoNote => 'Message vidéo';
+
+  @override
+  String get chatAttachmentCode => 'Code';
+
+  @override
+  String get chatAttachmentShop => 'Boutique';
+
+  @override
+  String chatSelectionLimit(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Limite de sélection : $countString';
+  }
 }

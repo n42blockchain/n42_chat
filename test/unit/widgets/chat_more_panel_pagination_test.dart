@@ -208,7 +208,7 @@ void main() {
     await tester.pump();
 
     expect(find.textContaining('(1)'), findsOneWidget);
-    expect(find.text('Select up to 1 items'), findsOneWidget);
+    expect(find.text('Selection limit: 1'), findsOneWidget);
   });
 
   testWidgets('窄屏有限授权且已选择媒体时顶栏不溢出', (tester) async {

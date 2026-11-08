@@ -6383,4 +6383,28 @@ class STe extends S {
 
   @override
   String get chatRecentVideo => 'ఇటీవలి వీడియో';
+
+  @override
+  String get chatAttachmentTip => 'టిప్';
+
+  @override
+  String get chatAttachmentWhiteboard => 'వైట్‌బోర్డ్';
+
+  @override
+  String get chatAttachmentVideoNote => 'వీడియో సందేశం';
+
+  @override
+  String get chatAttachmentCode => 'కోడ్';
+
+  @override
+  String get chatAttachmentShop => 'దుకాణం';
+
+  @override
+  String chatSelectionLimit(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'ఎంపిక పరిమితి: $countString';
+  }
 }

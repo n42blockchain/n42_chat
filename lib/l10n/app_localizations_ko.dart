@@ -6199,4 +6199,28 @@ class SKo extends S {
 
   @override
   String get chatRecentVideo => '최근 동영상';
+
+  @override
+  String get chatAttachmentTip => '후원';
+
+  @override
+  String get chatAttachmentWhiteboard => '화이트보드';
+
+  @override
+  String get chatAttachmentVideoNote => '동영상 메시지';
+
+  @override
+  String get chatAttachmentCode => '코드';
+
+  @override
+  String get chatAttachmentShop => '상점';
+
+  @override
+  String chatSelectionLimit(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '선택 한도: $countString';
+  }
 }

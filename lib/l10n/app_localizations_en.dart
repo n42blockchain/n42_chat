@@ -6306,4 +6306,28 @@ class SEn extends S {
 
   @override
   String get chatRecentVideo => 'Recent video';
+
+  @override
+  String get chatAttachmentTip => 'Tip';
+
+  @override
+  String get chatAttachmentWhiteboard => 'Whiteboard';
+
+  @override
+  String get chatAttachmentVideoNote => 'Video note';
+
+  @override
+  String get chatAttachmentCode => 'Code';
+
+  @override
+  String get chatAttachmentShop => 'Shop';
+
+  @override
+  String chatSelectionLimit(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Selection limit: $countString';
+  }
 }

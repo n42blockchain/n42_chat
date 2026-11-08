@@ -2922,5 +2922,11 @@
   "chatRecentMediaPermission": "हाल का मीडिया दिखाने के लिए फ़ोटो ऐक्सेस की अनुमति चाहिए",
   "chatRecentMediaEmpty": "हाल की कोई फ़ोटो या वीडियो नहीं है",
   "chatRecentPhoto": "हाल की फ़ोटो",
-  "chatRecentVideo": "हाल का वीडियो"
+  "chatRecentVideo": "हाल का वीडियो",
+  "chatAttachmentTip": "टिप",
+  "chatAttachmentWhiteboard": "व्हाइटबोर्ड",
+  "chatAttachmentVideoNote": "वीडियो संदेश",
+  "chatAttachmentCode": "कोड",
+  "chatAttachmentShop": "दुकान",
+  "chatSelectionLimit": "चयन सीमा: {count}"
 }

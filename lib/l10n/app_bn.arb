@@ -2922,5 +2922,11 @@
   "chatRecentMediaPermission": "সাম্প্রতিক মিডিয়া দেখাতে ছবিতে প্রবেশের অনুমতি প্রয়োজন",
   "chatRecentMediaEmpty": "সাম্প্রতিক কোনো ছবি বা ভিডিও নেই",
   "chatRecentPhoto": "সাম্প্রতিক ছবি",
-  "chatRecentVideo": "সাম্প্রতিক ভিডিও"
+  "chatRecentVideo": "সাম্প্রতিক ভিডিও",
+  "chatAttachmentTip": "বকশিশ",
+  "chatAttachmentWhiteboard": "হোয়াইটবোর্ড",
+  "chatAttachmentVideoNote": "ভিডিও বার্তা",
+  "chatAttachmentCode": "কোড",
+  "chatAttachmentShop": "দোকান",
+  "chatSelectionLimit": "সর্বোচ্চ নির্বাচন: {count}"
 }

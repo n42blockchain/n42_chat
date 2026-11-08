@@ -2922,5 +2922,11 @@
   "chatRecentMediaPermission": "சமீபத்திய ஊடகத்தைக் காட்ட படங்களை அணுகும் அனுமதி தேவை",
   "chatRecentMediaEmpty": "சமீபத்திய படங்களோ காணொளிகளோ இல்லை",
   "chatRecentPhoto": "சமீபத்திய படம்",
-  "chatRecentVideo": "சமீபத்திய காணொளி"
+  "chatRecentVideo": "சமீபத்திய காணொளி",
+  "chatAttachmentTip": "அன்பளிப்பு",
+  "chatAttachmentWhiteboard": "வெண்பலகை",
+  "chatAttachmentVideoNote": "காணொளிச் செய்தி",
+  "chatAttachmentCode": "நிரல் குறியீடு",
+  "chatAttachmentShop": "கடை",
+  "chatSelectionLimit": "தேர்வு வரம்பு: {count}"
 }

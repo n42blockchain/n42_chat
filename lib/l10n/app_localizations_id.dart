@@ -6348,4 +6348,28 @@ class SId extends S {
 
   @override
   String get chatRecentVideo => 'Video terbaru';
+
+  @override
+  String get chatAttachmentTip => 'Tip';
+
+  @override
+  String get chatAttachmentWhiteboard => 'Papan tulis';
+
+  @override
+  String get chatAttachmentVideoNote => 'Pesan video';
+
+  @override
+  String get chatAttachmentCode => 'Kode';
+
+  @override
+  String get chatAttachmentShop => 'Toko';
+
+  @override
+  String chatSelectionLimit(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Batas pilihan: $countString';
+  }
 }

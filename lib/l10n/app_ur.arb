@@ -2922,5 +2922,11 @@
   "chatRecentMediaPermission": "حالیہ میڈیا دکھانے کے لیے تصاویر تک رسائی درکار ہے",
   "chatRecentMediaEmpty": "کوئی حالیہ تصویر یا ویڈیو نہیں ہے",
   "chatRecentPhoto": "حالیہ تصویر",
-  "chatRecentVideo": "حالیہ ویڈیو"
+  "chatRecentVideo": "حالیہ ویڈیو",
+  "chatAttachmentTip": "بخشش",
+  "chatAttachmentWhiteboard": "وائٹ بورڈ",
+  "chatAttachmentVideoNote": "ویڈیو پیغام",
+  "chatAttachmentCode": "کوڈ",
+  "chatAttachmentShop": "دکان",
+  "chatSelectionLimit": "انتخاب کی حد: {count}"
 }

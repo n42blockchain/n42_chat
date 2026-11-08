@@ -2922,5 +2922,11 @@
   "chatRecentMediaPermission": "ఇటీవలి మీడియాను చూపడానికి ఫోటోలను యాక్సెస్ చేసే అనుమతి అవసరం",
   "chatRecentMediaEmpty": "ఇటీవలి ఫోటోలు లేదా వీడియోలు లేవు",
   "chatRecentPhoto": "ఇటీవలి ఫోటో",
-  "chatRecentVideo": "ఇటీవలి వీడియో"
+  "chatRecentVideo": "ఇటీవలి వీడియో",
+  "chatAttachmentTip": "టిప్",
+  "chatAttachmentWhiteboard": "వైట్‌బోర్డ్",
+  "chatAttachmentVideoNote": "వీడియో సందేశం",
+  "chatAttachmentCode": "కోడ్",
+  "chatAttachmentShop": "దుకాణం",
+  "chatSelectionLimit": "ఎంపిక పరిమితి: {count}"
 }

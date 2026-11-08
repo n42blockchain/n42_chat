@@ -2922,5 +2922,11 @@
   "chatRecentMediaPermission": "अलीकडील मीडिया दाखवण्यासाठी फोटोचा अॅक्सेस आवश्यक आहे",
   "chatRecentMediaEmpty": "अलीकडील फोटो किंवा व्हिडिओ नाहीत",
   "chatRecentPhoto": "अलीकडील फोटो",
-  "chatRecentVideo": "अलीकडील व्हिडिओ"
+  "chatRecentVideo": "अलीकडील व्हिडिओ",
+  "chatAttachmentTip": "बक्षीस",
+  "chatAttachmentWhiteboard": "व्हाइटबोर्ड",
+  "chatAttachmentVideoNote": "व्हिडिओ संदेश",
+  "chatAttachmentCode": "कोड",
+  "chatAttachmentShop": "दुकान",
+  "chatSelectionLimit": "निवड मर्यादा: {count}"
 }

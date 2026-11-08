@@ -6388,4 +6388,28 @@ class SDe extends S {
 
   @override
   String get chatRecentVideo => 'Neuestes Video';
+
+  @override
+  String get chatAttachmentTip => 'Trinkgeld';
+
+  @override
+  String get chatAttachmentWhiteboard => 'Whiteboard';
+
+  @override
+  String get chatAttachmentVideoNote => 'Videonachricht';
+
+  @override
+  String get chatAttachmentCode => 'Code';
+
+  @override
+  String get chatAttachmentShop => 'Geschäft';
+
+  @override
+  String chatSelectionLimit(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Auswahllimit: $countString';
+  }
 }

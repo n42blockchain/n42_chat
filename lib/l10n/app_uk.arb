@@ -2922,5 +2922,11 @@
   "chatRecentMediaPermission": "Для показу нещодавніх медіафайлів потрібен доступ до фото",
   "chatRecentMediaEmpty": "Немає нещодавніх фото чи відео",
   "chatRecentPhoto": "Нещодавнє фото",
-  "chatRecentVideo": "Нещодавнє відео"
+  "chatRecentVideo": "Нещодавнє відео",
+  "chatAttachmentTip": "Чайові",
+  "chatAttachmentWhiteboard": "Дошка",
+  "chatAttachmentVideoNote": "Відеоповідомлення",
+  "chatAttachmentCode": "Код",
+  "chatAttachmentShop": "Магазин",
+  "chatSelectionLimit": "Ліміт вибору: {count}"
 }

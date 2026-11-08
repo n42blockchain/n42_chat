@@ -6348,4 +6348,28 @@ class SCs extends S {
 
   @override
   String get chatRecentVideo => 'Nedávné video';
+
+  @override
+  String get chatAttachmentTip => 'Spropitné';
+
+  @override
+  String get chatAttachmentWhiteboard => 'Tabule';
+
+  @override
+  String get chatAttachmentVideoNote => 'Videozpráva';
+
+  @override
+  String get chatAttachmentCode => 'Kód';
+
+  @override
+  String get chatAttachmentShop => 'Obchod';
+
+  @override
+  String chatSelectionLimit(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Limit výběru: $countString';
+  }
 }

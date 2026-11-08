@@ -6403,4 +6403,28 @@ class STa extends S {
 
   @override
   String get chatRecentVideo => 'சமீபத்திய காணொளி';
+
+  @override
+  String get chatAttachmentTip => 'அன்பளிப்பு';
+
+  @override
+  String get chatAttachmentWhiteboard => 'வெண்பலகை';
+
+  @override
+  String get chatAttachmentVideoNote => 'காணொளிச் செய்தி';
+
+  @override
+  String get chatAttachmentCode => 'நிரல் குறியீடு';
+
+  @override
+  String get chatAttachmentShop => 'கடை';
+
+  @override
+  String chatSelectionLimit(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'தேர்வு வரம்பு: $countString';
+  }
 }

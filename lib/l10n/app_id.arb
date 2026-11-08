@@ -2922,5 +2922,11 @@
   "chatRecentMediaPermission": "Akses foto diperlukan untuk menampilkan media terbaru",
   "chatRecentMediaEmpty": "Tidak ada foto atau video terbaru",
   "chatRecentPhoto": "Foto terbaru",
-  "chatRecentVideo": "Video terbaru"
+  "chatRecentVideo": "Video terbaru",
+  "chatAttachmentTip": "Tip",
+  "chatAttachmentWhiteboard": "Papan tulis",
+  "chatAttachmentVideoNote": "Pesan video",
+  "chatAttachmentCode": "Kode",
+  "chatAttachmentShop": "Toko",
+  "chatSelectionLimit": "Batas pilihan: {count}"
 }

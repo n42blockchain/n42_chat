@@ -6334,4 +6334,28 @@ class SMr extends S {
 
   @override
   String get chatRecentVideo => 'अलीकडील व्हिडिओ';
+
+  @override
+  String get chatAttachmentTip => 'बक्षीस';
+
+  @override
+  String get chatAttachmentWhiteboard => 'व्हाइटबोर्ड';
+
+  @override
+  String get chatAttachmentVideoNote => 'व्हिडिओ संदेश';
+
+  @override
+  String get chatAttachmentCode => 'कोड';
+
+  @override
+  String get chatAttachmentShop => 'दुकान';
+
+  @override
+  String chatSelectionLimit(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'निवड मर्यादा: $countString';
+  }
 }

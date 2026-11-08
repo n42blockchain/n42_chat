@@ -6372,6 +6372,30 @@ class SPt extends S {
 
   @override
   String get chatRecentVideo => 'Vídeo recente';
+
+  @override
+  String get chatAttachmentTip => 'Gorjeta';
+
+  @override
+  String get chatAttachmentWhiteboard => 'Quadro branco';
+
+  @override
+  String get chatAttachmentVideoNote => 'Mensagem de vídeo';
+
+  @override
+  String get chatAttachmentCode => 'Código';
+
+  @override
+  String get chatAttachmentShop => 'Loja';
+
+  @override
+  String chatSelectionLimit(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Limite de seleção: $countString';
+  }
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).
@@ -12742,4 +12766,28 @@ class SPtBr extends SPt {
 
   @override
   String get chatRecentVideo => 'Vídeo recente';
+
+  @override
+  String get chatAttachmentTip => 'Gorjeta';
+
+  @override
+  String get chatAttachmentWhiteboard => 'Quadro branco';
+
+  @override
+  String get chatAttachmentVideoNote => 'Mensagem de vídeo';
+
+  @override
+  String get chatAttachmentCode => 'Código';
+
+  @override
+  String get chatAttachmentShop => 'Loja';
+
+  @override
+  String chatSelectionLimit(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Limite de seleção: $countString';
+  }
 }

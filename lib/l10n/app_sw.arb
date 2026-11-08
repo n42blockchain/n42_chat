@@ -2922,5 +2922,11 @@
   "chatRecentMediaPermission": "Ruhusa ya kufikia picha inahitajika ili kuonyesha midia ya hivi karibuni",
   "chatRecentMediaEmpty": "Hakuna picha au video za hivi karibuni",
   "chatRecentPhoto": "Picha ya hivi karibuni",
-  "chatRecentVideo": "Video ya hivi karibuni"
+  "chatRecentVideo": "Video ya hivi karibuni",
+  "chatAttachmentTip": "Bakshishi",
+  "chatAttachmentWhiteboard": "Ubao mweupe",
+  "chatAttachmentVideoNote": "Ujumbe wa video",
+  "chatAttachmentCode": "Msimbo",
+  "chatAttachmentShop": "Duka",
+  "chatSelectionLimit": "Kikomo cha uteuzi: {count}"
 }

@@ -6307,4 +6307,28 @@ class SAr extends S {
 
   @override
   String get chatRecentVideo => 'فيديو حديث';
+
+  @override
+  String get chatAttachmentTip => 'إكرامية';
+
+  @override
+  String get chatAttachmentWhiteboard => 'لوحة بيضاء';
+
+  @override
+  String get chatAttachmentVideoNote => 'رسالة فيديو';
+
+  @override
+  String get chatAttachmentCode => 'شفرة برمجية';
+
+  @override
+  String get chatAttachmentShop => 'متجر';
+
+  @override
+  String chatSelectionLimit(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'الحد الأقصى للاختيار: $countString';
+  }
 }

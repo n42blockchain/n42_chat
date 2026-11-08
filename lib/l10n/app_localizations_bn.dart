@@ -6337,4 +6337,28 @@ class SBn extends S {
 
   @override
   String get chatRecentVideo => 'সাম্প্রতিক ভিডিও';
+
+  @override
+  String get chatAttachmentTip => 'বকশিশ';
+
+  @override
+  String get chatAttachmentWhiteboard => 'হোয়াইটবোর্ড';
+
+  @override
+  String get chatAttachmentVideoNote => 'ভিডিও বার্তা';
+
+  @override
+  String get chatAttachmentCode => 'কোড';
+
+  @override
+  String get chatAttachmentShop => 'দোকান';
+
+  @override
+  String chatSelectionLimit(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'সর্বোচ্চ নির্বাচন: $countString';
+  }
 }

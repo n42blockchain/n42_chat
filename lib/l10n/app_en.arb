@@ -2954,5 +2954,12 @@
   "chatRecentMediaPermission": "Photo access is needed to show recent media",
   "chatRecentMediaEmpty": "No recent photos or videos",
   "chatRecentPhoto": "Recent photo",
-  "chatRecentVideo": "Recent video"
+  "chatRecentVideo": "Recent video",
+  "chatAttachmentTip": "Tip",
+  "chatAttachmentWhiteboard": "Whiteboard",
+  "chatAttachmentVideoNote": "Video note",
+  "chatAttachmentCode": "Code",
+  "chatAttachmentShop": "Shop",
+  "chatSelectionLimit": "Selection limit: {count}",
+  "@chatSelectionLimit": {"description": "Maximum number of recent media items that may be selected.", "placeholders": {"count": {"type": "int", "format": "decimalPattern"}}}
 }

@@ -275,7 +275,12 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
       final maxSelection = widget.maxRecentMediaSelection.clamp(1, 30);
       if (_selectedRecentMediaIds.length >= maxSelection) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Select up to $maxSelection items')),
+          SnackBar(
+            content: Text(
+              S.of(context)?.chatSelectionLimit(maxSelection) ??
+                  'Selection limit: $maxSelection',
+            ),
+          ),
         );
         return;
       }
@@ -482,7 +487,7 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
       ),
       _MoreItem(
         icon: Icons.volunteer_activism_outlined,
-        label: 'Tip',
+        label: S.of(context)?.chatAttachmentTip ?? 'Tip',
         onTap: widget.onTipPressed,
         iconColor: const Color(0xFFFF6B9D),
       ),
@@ -504,7 +509,7 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
       ),
       _MoreItem(
         icon: Icons.storefront_outlined,
-        label: widget.shopLabel ?? 'Shop',
+        label: widget.shopLabel ?? S.of(context)?.chatAttachmentShop ?? 'Shop',
         onTap: widget.onShopPressed,
         iconColor: AppColors.warning,
       ),
@@ -528,17 +533,21 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
       ),
       _MoreItem(
         icon: Icons.draw_outlined,
-        label: 'Whiteboard',
+        label: S.of(context)?.chatAttachmentWhiteboard ?? 'Whiteboard',
         onTap: widget.onWhiteboardPressed,
         iconColor: Colors.brown,
       ),
       _MoreItem(
         icon: Icons.video_camera_front_outlined,
-        label: 'Video note',
+        label: S.of(context)?.chatAttachmentVideoNote ?? 'Video note',
         onTap: widget.onVideoNotePressed,
         iconColor: Colors.pinkAccent,
       ),
-      _MoreItem(icon: Icons.code, label: 'Code', onTap: widget.onCodePressed),
+      _MoreItem(
+        icon: Icons.code,
+        label: S.of(context)?.chatAttachmentCode ?? 'Code',
+        onTap: widget.onCodePressed,
+      ),
       if (widget.onAiAssistantPressed != null)
         _MoreItem(
           icon: Icons.auto_awesome,
@@ -965,9 +974,8 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
               const SizedBox(height: 8),
               Text(
                 item.label,
-                style: Theme.of(
-                  context,
-                ).textTheme.bodySmall?.copyWith(color: context.textSecondary),
+                style: Theme.of(context).textTheme.bodySmall
+                    ?.copyWith(color: context.textSecondary),
                 textAlign: TextAlign.center,
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,

@@ -2922,5 +2922,11 @@
   "chatRecentMediaPermission": "Pro zobrazení nedávných médií je nutný přístup k fotkám",
   "chatRecentMediaEmpty": "Žádné nedávné fotky ani videa",
   "chatRecentPhoto": "Nedávná fotka",
-  "chatRecentVideo": "Nedávné video"
+  "chatRecentVideo": "Nedávné video",
+  "chatAttachmentTip": "Spropitné",
+  "chatAttachmentWhiteboard": "Tabule",
+  "chatAttachmentVideoNote": "Videozpráva",
+  "chatAttachmentCode": "Kód",
+  "chatAttachmentShop": "Obchod",
+  "chatSelectionLimit": "Limit výběru: {count}"
 }

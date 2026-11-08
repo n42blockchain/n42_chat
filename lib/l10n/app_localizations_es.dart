@@ -6381,4 +6381,28 @@ class SEs extends S {
 
   @override
   String get chatRecentVideo => 'Vídeo reciente';
+
+  @override
+  String get chatAttachmentTip => 'Propina';
+
+  @override
+  String get chatAttachmentWhiteboard => 'Pizarra';
+
+  @override
+  String get chatAttachmentVideoNote => 'Mensaje de vídeo';
+
+  @override
+  String get chatAttachmentCode => 'Código';
+
+  @override
+  String get chatAttachmentShop => 'Tienda';
+
+  @override
+  String chatSelectionLimit(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Límite de selección: $countString';
+  }
 }

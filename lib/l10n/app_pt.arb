@@ -2922,5 +2922,11 @@
   "chatRecentMediaPermission": "É necessário acesso às fotografias para mostrar os conteúdos recentes",
   "chatRecentMediaEmpty": "Sem fotografias ou vídeos recentes",
   "chatRecentPhoto": "Fotografia recente",
-  "chatRecentVideo": "Vídeo recente"
+  "chatRecentVideo": "Vídeo recente",
+  "chatAttachmentTip": "Gorjeta",
+  "chatAttachmentWhiteboard": "Quadro branco",
+  "chatAttachmentVideoNote": "Mensagem de vídeo",
+  "chatAttachmentCode": "Código",
+  "chatAttachmentShop": "Loja",
+  "chatSelectionLimit": "Limite de seleção: {count}"
 }

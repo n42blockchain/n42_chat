@@ -2922,5 +2922,11 @@
   "chatRecentMediaPermission": "最近のメディアを表示するには写真へのアクセスが必要です",
   "chatRecentMediaEmpty": "最近の写真や動画はありません",
   "chatRecentPhoto": "最近の写真",
-  "chatRecentVideo": "最近の動画"
+  "chatRecentVideo": "最近の動画",
+  "chatAttachmentTip": "チップ",
+  "chatAttachmentWhiteboard": "ホワイトボード",
+  "chatAttachmentVideoNote": "ビデオメッセージ",
+  "chatAttachmentCode": "コード",
+  "chatAttachmentShop": "ショップ",
+  "chatSelectionLimit": "選択上限：{count} 件"
 }

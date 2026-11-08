@@ -6154,6 +6154,30 @@ class SZh extends S {
 
   @override
   String get chatRecentVideo => '最近的视频';
+
+  @override
+  String get chatAttachmentTip => '打赏';
+
+  @override
+  String get chatAttachmentWhiteboard => '白板';
+
+  @override
+  String get chatAttachmentVideoNote => '视频留言';
+
+  @override
+  String get chatAttachmentCode => '代码';
+
+  @override
+  String get chatAttachmentShop => '商店';
+
+  @override
+  String chatSelectionLimit(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '最多选择 $countString 项';
+  }
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -12306,4 +12330,28 @@ class SZhTw extends SZh {
 
   @override
   String get chatRecentVideo => '最近的影片';
+
+  @override
+  String get chatAttachmentTip => '打賞';
+
+  @override
+  String get chatAttachmentWhiteboard => '白板';
+
+  @override
+  String get chatAttachmentVideoNote => '影片留言';
+
+  @override
+  String get chatAttachmentCode => '程式碼';
+
+  @override
+  String get chatAttachmentShop => '商店';
+
+  @override
+  String chatSelectionLimit(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '最多選擇 $countString 項';
+  }
 }

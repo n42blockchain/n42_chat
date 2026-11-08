@@ -6324,4 +6324,28 @@ class SVi extends S {
 
   @override
   String get chatRecentVideo => 'Video gần đây';
+
+  @override
+  String get chatAttachmentTip => 'Tiền boa';
+
+  @override
+  String get chatAttachmentWhiteboard => 'Bảng trắng';
+
+  @override
+  String get chatAttachmentVideoNote => 'Tin nhắn video';
+
+  @override
+  String get chatAttachmentCode => 'Mã';
+
+  @override
+  String get chatAttachmentShop => 'Cửa hàng';
+
+  @override
+  String chatSelectionLimit(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Giới hạn lựa chọn: $countString';
+  }
 }

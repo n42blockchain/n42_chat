@@ -2922,5 +2922,11 @@
   "chatRecentMediaPermission": "Son medyayı göstermek için fotoğraf erişimi gerekiyor",
   "chatRecentMediaEmpty": "Son fotoğraf veya video yok",
   "chatRecentPhoto": "Son fotoğraf",
-  "chatRecentVideo": "Son video"
+  "chatRecentVideo": "Son video",
+  "chatAttachmentTip": "Bahşiş",
+  "chatAttachmentWhiteboard": "Beyaz tahta",
+  "chatAttachmentVideoNote": "Video mesajı",
+  "chatAttachmentCode": "Kod",
+  "chatAttachmentShop": "Mağaza",
+  "chatSelectionLimit": "Seçim sınırı: {count}"
 }

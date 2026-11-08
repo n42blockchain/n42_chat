@@ -11656,6 +11656,42 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Recent video'**
   String get chatRecentVideo;
+
+  /// No description provided for @chatAttachmentTip.
+  ///
+  /// In en, this message translates to:
+  /// **'Tip'**
+  String get chatAttachmentTip;
+
+  /// No description provided for @chatAttachmentWhiteboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Whiteboard'**
+  String get chatAttachmentWhiteboard;
+
+  /// No description provided for @chatAttachmentVideoNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Video note'**
+  String get chatAttachmentVideoNote;
+
+  /// No description provided for @chatAttachmentCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Code'**
+  String get chatAttachmentCode;
+
+  /// No description provided for @chatAttachmentShop.
+  ///
+  /// In en, this message translates to:
+  /// **'Shop'**
+  String get chatAttachmentShop;
+
+  /// Maximum number of recent media items that may be selected.
+  ///
+  /// In en, this message translates to:
+  /// **'Selection limit: {count}'**
+  String chatSelectionLimit(int count);
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

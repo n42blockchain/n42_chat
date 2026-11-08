@@ -5,6 +5,11 @@ import 'package:n42_chat/l10n/app_localizations.dart';
 // Update these accessors after regenerating the localization classes.
 // This test loads every supported locale and reads each non-parameter label.
 final _labels = <(String, String Function(S))>[
+  ('chatAttachmentTip', (s) => s.chatAttachmentTip),
+  ('chatAttachmentWhiteboard', (s) => s.chatAttachmentWhiteboard),
+  ('chatAttachmentVideoNote', (s) => s.chatAttachmentVideoNote),
+  ('chatAttachmentCode', (s) => s.chatAttachmentCode),
+  ('chatAttachmentShop', (s) => s.chatAttachmentShop),
   ('chatAttachmentEvent', (s) => s.chatAttachmentEvent),
   ('chatRecentMedia', (s) => s.chatRecentMedia),
   ('chatRecentMediaLoadFailed', (s) => s.chatRecentMediaLoadFailed),
@@ -1836,6 +1841,7 @@ final _labels = <(String, String Function(S))>[
 ];
 
 final _formattedLabels = <(String, List<String> Function(S))>[
+  ('chatSelectionLimit', (s) => [s.chatSelectionLimit(1), s.chatSelectionLimit(12)]),
   ('scheduledMessageCreatedAt', (s) => [s.scheduledMessageCreatedAt('2030-01-01 12:00')]),
   ('authLoginFailed', (s) => [s.authLoginFailed('fixture')]),
   (
@@ -2451,8 +2457,8 @@ void main() {
     expect((await S.delegate.load(const Locale('zh', 'TW'))).groupPublish, '發佈');
   });
   test('all supported locales provide readable labels', () async {
-    expect(_labels, hasLength(1713));
-    expect(_formattedLabels, hasLength(182));
+    expect(_labels, hasLength(1718));
+    expect(_formattedLabels, hasLength(183));
     expect(_labels.map((entry) => entry.$1).toSet(), hasLength(_labels.length));
     final emptyLabels = <String>[];
 

@@ -6376,4 +6376,28 @@ class SPl extends S {
 
   @override
   String get chatRecentVideo => 'Ostatni film';
+
+  @override
+  String get chatAttachmentTip => 'Napiwek';
+
+  @override
+  String get chatAttachmentWhiteboard => 'Tablica';
+
+  @override
+  String get chatAttachmentVideoNote => 'Wiadomość wideo';
+
+  @override
+  String get chatAttachmentCode => 'Kod';
+
+  @override
+  String get chatAttachmentShop => 'Sklep';
+
+  @override
+  String chatSelectionLimit(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Limit wyboru: $countString';
+  }
 }

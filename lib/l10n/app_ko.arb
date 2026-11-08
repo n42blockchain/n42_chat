@@ -2922,5 +2922,11 @@
   "chatRecentMediaPermission": "최근 미디어를 표시하려면 사진 접근 권한이 필요합니다",
   "chatRecentMediaEmpty": "최근 사진이나 동영상이 없습니다",
   "chatRecentPhoto": "최근 사진",
-  "chatRecentVideo": "최근 동영상"
+  "chatRecentVideo": "최근 동영상",
+  "chatAttachmentTip": "후원",
+  "chatAttachmentWhiteboard": "화이트보드",
+  "chatAttachmentVideoNote": "동영상 메시지",
+  "chatAttachmentCode": "코드",
+  "chatAttachmentShop": "상점",
+  "chatSelectionLimit": "선택 한도: {count}"
 }

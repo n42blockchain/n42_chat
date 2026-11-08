@@ -6367,4 +6367,28 @@ class SIt extends S {
 
   @override
   String get chatRecentVideo => 'Video recente';
+
+  @override
+  String get chatAttachmentTip => 'Mancia';
+
+  @override
+  String get chatAttachmentWhiteboard => 'Lavagna';
+
+  @override
+  String get chatAttachmentVideoNote => 'Videomessaggio';
+
+  @override
+  String get chatAttachmentCode => 'Codice';
+
+  @override
+  String get chatAttachmentShop => 'Negozio';
+
+  @override
+  String chatSelectionLimit(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Limite di selezione: $countString';
+  }
 }

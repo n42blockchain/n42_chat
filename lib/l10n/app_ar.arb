@@ -2922,5 +2922,11 @@
   "chatRecentMediaPermission": "يلزم السماح بالوصول إلى الصور لعرض الوسائط الحديثة",
   "chatRecentMediaEmpty": "لا توجد صور أو مقاطع فيديو حديثة",
   "chatRecentPhoto": "صورة حديثة",
-  "chatRecentVideo": "فيديو حديث"
+  "chatRecentVideo": "فيديو حديث",
+  "chatAttachmentTip": "إكرامية",
+  "chatAttachmentWhiteboard": "لوحة بيضاء",
+  "chatAttachmentVideoNote": "رسالة فيديو",
+  "chatAttachmentCode": "شفرة برمجية",
+  "chatAttachmentShop": "متجر",
+  "chatSelectionLimit": "الحد الأقصى للاختيار: {count}"
 }
