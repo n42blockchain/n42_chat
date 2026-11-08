@@ -31,6 +31,7 @@ void main() {
     when(
       () => repository.getRecentStickers(limit: any(named: 'limit')),
     ).thenAnswer((_) async => []);
+    when(() => repository.watchInstalledPacks()).thenAnswer((_) => const Stream.empty());
     when(() => repository.getInstalledPacks()).thenAnswer(
       (_) async => const [
         StickerPack(

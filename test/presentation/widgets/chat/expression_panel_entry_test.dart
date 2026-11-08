@@ -45,6 +45,8 @@ class _Stickers implements IStickerRepository {
   }
 
   @override
+  Stream<List<StickerPack>> watchInstalledPacks() => const Stream.empty();
+  @override
   Future<List<RecentSticker>> getRecentStickers({int limit = 20}) async => [];
   @override
   Future<void> recordStickerUsage(String packId, String stickerId) async =>

@@ -969,6 +969,7 @@ void main() {
       });
       final stickers = _Stickers();
       when(() => stickers.getRecentStickers(limit: any(named: 'limit'))).thenAnswer((_) async => []);
+      when(() => stickers.watchInstalledPacks()).thenAnswer((_) => const Stream.empty());
       when(() => stickers.getInstalledPacks()).thenAnswer((_) async => const [StickerPack(id: 'pack', name: 'Test', stickers: [])]);
       getIt.registerSingleton<IStickerRepository>(stickers);
       await openAttachmentPanel(tester);
