@@ -7,6 +7,7 @@ import 'package:matrix/matrix.dart' as matrix;
 import '../../domain/entities/sticker_pack_subscription.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/matrix/matrix_client_manager.dart';
+import '../datasources/matrix/matrix_sticker_datasource.dart';
 
 /// Explicit standard live references. Never joins rooms or copies private packs.
 /// https://spec.matrix.org/v1.19/client-server-api/#user-image-packs
@@ -51,6 +52,98 @@ class MatrixStickerSubscriptions {
     return (client, check, generation);
   }
 
+  /// Includes login generation and token identity, unlike room/account cache IDs.
+  Object? get accountScope {
+    try {
+      final (client, _, generation) = _session();
+      return (client, generation, client.accessToken);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Stream<void> watchChanges() async* {
+    final events = StreamController<void>();
+    StreamSubscription<matrix.SyncUpdate>? sync;
+    StreamSubscription<AuthSessionInvalidation>? auth;
+    StreamSubscription<void>? sessions;
+    var closed = false;
+    void bind() {
+      unawaited(sync?.cancel());
+      sync = null;
+      try {
+        final (client, check, _) = _session();
+        sync = client.onSync.stream.listen((update) {
+          if (closed) return;
+          try {
+            check();
+          } catch (_) {
+            return;
+          }
+          final accountChanged =
+              update.accountData?.any(
+                (event) =>
+                    event.type == accountDataType ||
+                    event.type == MatrixStickerDataSource.installedPacksType ||
+                    event.type.startsWith(
+                      '${MatrixStickerDataSource.stickerPackType}.',
+                    ),
+              ) ==
+              true;
+          final packChanged =
+              update.rooms?.join?.values.any(
+                (room) =>
+                    room.state?.any(
+                          (event) => event.type == 'm.room.image_pack',
+                        ) ==
+                        true ||
+                    room.timeline?.events?.any(
+                          (event) => event.type == 'm.room.image_pack',
+                        ) ==
+                        true,
+              ) ==
+              true;
+          if (accountChanged ||
+              packChanged ||
+              update.rooms?.leave?.isNotEmpty == true) {
+            events.add(null);
+          }
+        });
+      } catch (_) {
+        /* No active account to bind. */
+      }
+    }
+
+    if (lifecycle is IAccountBoundAuthInvalidation) {
+      auth = (lifecycle as IAccountBoundAuthInvalidation)
+          .accountInvalidationStream
+          .listen((_) {
+            if (closed) return;
+            bind();
+            events.add(null);
+          });
+    }
+    if (lifecycle is IAccountBoundSessionChanges) {
+      sessions = (lifecycle as IAccountBoundSessionChanges)
+          .accountSessionChanges
+          .listen((_) {
+            if (closed) return;
+            bind();
+            events.add(null);
+          });
+    }
+    bind();
+    try {
+      yield* events.stream;
+    } finally {
+      closed = true;
+      await sync?.cancel();
+      await auth?.cancel();
+      await sessions?.cancel();
+      await events.close();
+    }
+  }
+
   Future<Map<String, dynamic>> _read(matrix.Client client) async {
     try {
       final data = await client.getAccountData(client.userID!, accountDataType);
@@ -62,6 +155,13 @@ class MatrixStickerSubscriptions {
       if (error.errcode == 'M_NOT_FOUND') return {};
       rethrow;
     }
+  }
+
+  Future<Set<String>> getJoinedRoomIds() async {
+    final (client, check, _) = _session();
+    final rooms = await client.getJoinedRooms();
+    check();
+    return Set.unmodifiable(rooms);
   }
 
   Future<List<StickerPackSubscription>> getEnabled() async {

@@ -24,6 +24,7 @@ class AuthRepositoryImpl
     implements
         IAuthRepository,
         IAccountBoundAuthInvalidation,
+        IAccountBoundSessionChanges,
         IAccountBoundDeletionLifecycle,
         IConfirmedAccountDeletionGeneration {
   final MatrixAuthDataSource _authDataSource;
@@ -45,6 +46,7 @@ class AuthRepositoryImpl
   final _loginStateController = StreamController<bool>.broadcast();
   final _accountInvalidationController =
       StreamController<AuthSessionInvalidation>.broadcast();
+  final _accountSessionController = StreamController<void>.broadcast();
   int _matrixMonitorEpoch = 0;
   AuthSessionInvalidation? _currentMonitorOrigin;
   AuthSessionInvalidation? _deletionRequestOrigin;
@@ -106,6 +108,9 @@ class AuthRepositoryImpl
   @override
   Stream<AuthSessionInvalidation> get accountInvalidationStream =>
       _accountInvalidationController.stream;
+
+  @override
+  Stream<void> get accountSessionChanges => _accountSessionController.stream;
 
   @override
   AuthSessionInvalidation? get currentAccountGeneration {
@@ -1558,6 +1563,7 @@ class AuthRepositoryImpl
     _matrixLoginStateSubscription?.cancel();
     _loginStateController.close();
     _accountInvalidationController.close();
+    unawaited(_accountSessionController.close());
   }
 
   Future<void> _handleSdkLogout(
@@ -1642,6 +1648,7 @@ class AuthRepositoryImpl
         observedClient == null ||
         observedUserId == null ||
         observedHomeserver == null) {
+      if (!_isDisposed) _accountSessionController.add(null);
       return;
     }
     bool sameOrigin() {
@@ -1674,6 +1681,7 @@ class AuthRepositoryImpl
           !identical(_confirmedDeletionOrigin, origin),
     );
     _currentMonitorOrigin = origin;
+    if (!_isDisposed) _accountSessionController.add(null);
     _matrixLoginStateSubscription = stream.listen((loginState) async {
       if (!sameOrigin()) {
         authLog('Ignoring login state from a replaced Matrix client');

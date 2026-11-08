@@ -1,12 +1,15 @@
 import 'dart:typed_data';
 import 'dart:async';
+import 'dart:collection';
 
 import '../../domain/entities/sticker_pack_entity.dart';
+import '../../domain/entities/sticker_pack_subscription.dart';
 import '../../domain/entities/sticker_publication_receipt_failure.dart';
 import '../../domain/repositories/sticker_repository.dart';
 import '../datasources/matrix/matrix_sticker_datasource.dart';
 import '../datasources/bundled_sticker_packs.dart';
 import '../services/matrix_sticker_publication.dart';
+import '../services/matrix_sticker_subscriptions.dart';
 import '../../core/utils/debug_log.dart';
 import '../../core/utils/sticker_suggestion_utils.dart';
 import '../../core/utils/matrix_sticker_pack_link.dart';
@@ -24,33 +27,175 @@ class StickerRepositoryImpl implements IStickerRepository {
 
   /// 已安装贴纸包变化流控制器
   final _installedPacksController =
-      StreamController<List<StickerPack>>.broadcast();
+      StreamController<(Object?, int, List<StickerPack>)>.broadcast();
 
   final MatrixStickerPublication? publication;
+  final MatrixStickerSubscriptions? subscriptions;
+  StreamSubscription<void>? _subscriptionChanges;
+  Object? _observedInstalledScope;
+  Object? _loadScope;
+  Future<List<StickerPack>>? _installedLoad;
+  int _installedRevision = 0;
+  bool _disposed = false;
+  static const _liveReadConcurrency = 4;
+  final _readBudgets = <Object?, _StickerReadBudget>{};
 
-  StickerRepositoryImpl(this._dataSource, {this.publication});
+  StickerRepositoryImpl(
+    this._dataSource, {
+    this.publication,
+    this.subscriptions,
+  }) {
+    _subscriptionChanges = subscriptions?.watchChanges().listen((_) {
+      if (_disposed) return;
+      _invalidateCache();
+      _notifyInstalledPacksChanged();
+    });
+  }
+
+  Object? get _installedScope => subscriptions == null
+      ? _dataSource.accountScope
+      : (_dataSource.accountScope, subscriptions!.accountScope);
 
   @override
-  Future<List<StickerPack>> getInstalledPacks() async {
-    final origin = _dataSource.accountScope;
-    if (_installedPacksScope != origin) _installedPacksCache = null;
-    if (_installedPacksCache != null) {
-      return _installedPacksCache!;
+  Future<List<StickerPack>> getInstalledPacks() {
+    final scope = _installedScope;
+    if (_observedInstalledScope != scope) {
+      _observedInstalledScope = scope;
+      _invalidateCache();
     }
+    if (_disposed ||
+        (subscriptions != null && subscriptions!.accountScope == null)) {
+      return Future.value(List<StickerPack>.of(BundledStickerPacks.all));
+    }
+    if (_installedPacksScope == scope && _installedPacksCache != null) {
+      return Future.value(_installedPacksCache!);
+    }
+    if (_loadScope == scope && _installedLoad != null) return _installedLoad!;
+    _loadScope = scope;
+    final revision = _installedRevision;
+    return _installedLoad = Future<List<StickerPack>>.microtask(
+      () => _loadInstalledPacks(scope, revision),
+    );
+  }
 
-    final remotePacks = await _dataSource.getInstalledPacks();
-    if (_dataSource.accountScope != origin) {
-      return List<StickerPack>.of(BundledStickerPacks.all);
+  Future<List<StickerPack>> _loadInstalledPacks(
+    Object? scope,
+    int revision,
+  ) async {
+    try {
+      if (_disposed || _installedScope != scope) {
+        return List.of(BundledStickerPacks.all);
+      }
+      if (revision != _installedRevision) return await getInstalledPacks();
+      final private = await _dataSource.getInstalledPacks();
+      if (_disposed || _installedScope != scope) {
+        return List.of(BundledStickerPacks.all);
+      }
+      if (revision != _installedRevision) return await getInstalledPacks();
+      final live = <StickerPack>[];
+      var incomplete = false;
+      if (subscriptions != null) {
+        try {
+          final references = await subscriptions!.getEnabled();
+          if (_disposed || _installedScope != scope) {
+            return List.of(BundledStickerPacks.all);
+          }
+          if (revision != _installedRevision) return await getInstalledPacks();
+          final joined = references.isEmpty
+              ? const <String>{}
+              : await subscriptions!.getJoinedRoomIds();
+          if (_disposed || _installedScope != scope) {
+            return List.of(BundledStickerPacks.all);
+          }
+          if (revision != _installedRevision) return await getInstalledPacks();
+          final readable = references
+              .where((ref) => joined.contains(ref.roomId))
+              .toList();
+          for (
+            var start = 0;
+            start < readable.length;
+            start += _liveReadConcurrency
+          ) {
+            final batch = await Future.wait(
+              readable
+                  .skip(start)
+                  .take(_liveReadConcurrency)
+                  .map((ref) => _resolveLivePack(ref, scope, revision)),
+            );
+            if (_disposed || _installedScope != scope) {
+              return List.of(BundledStickerPacks.all);
+            }
+            if (revision != _installedRevision) {
+              return await getInstalledPacks();
+            }
+            for (final pack in batch) {
+              if (pack != null) {
+                live.add(pack);
+              } else {
+                incomplete = true;
+              }
+            }
+          }
+        } catch (_) {
+          incomplete = true;
+        }
+      }
+      if (_disposed || _installedScope != scope) {
+        return List.of(BundledStickerPacks.all);
+      }
+      if (revision != _installedRevision) return await getInstalledPacks();
+      final packs = _dedupePacksById([
+        ...BundledStickerPacks.all,
+        ...live,
+        ...private,
+      ]);
+      if (!incomplete) {
+        _installedPacksScope = scope;
+        _installedPacksCache = packs;
+      }
+      return packs;
+    } finally {
+      if (_loadScope == scope && revision == _installedRevision) {
+        _installedLoad = null;
+        _loadScope = null;
+      }
     }
-    // 内置贴纸包始终置顶且默认"已安装"，保证面板不空；按 id 去重避免与远端重复。
-    final bundledIds = BundledStickerPacks.all.map((p) => p.id).toSet();
-    final packs = <StickerPack>[
-      ...BundledStickerPacks.all,
-      ...remotePacks.where((p) => !bundledIds.contains(p.id)),
-    ];
-    _installedPacksScope = origin;
-    _installedPacksCache = packs;
-    return packs;
+  }
+
+  Future<StickerPack?> _resolveLivePack(
+    StickerPackSubscription reference,
+    Object? scope,
+    int revision,
+  ) async {
+    final budget = _readBudgets.putIfAbsent(scope, _StickerReadBudget.new);
+    if (budget.active < _liveReadConcurrency) {
+      budget.active++;
+    } else {
+      final permit = Completer<void>();
+      budget.waiting.add(permit);
+      await permit.future;
+    }
+    try {
+      if (_disposed ||
+          _installedScope != scope ||
+          revision != _installedRevision) {
+        return null;
+      }
+      return await _dataSource.getSubscribedPack(reference);
+    } catch (_) {
+      return null;
+    } finally {
+      if (budget.waiting.isNotEmpty) {
+        budget.waiting.removeFirst().complete();
+      } else {
+        budget.active--;
+      }
+      if (budget.active == 0 &&
+          budget.waiting.isEmpty &&
+          identical(_readBudgets[scope], budget)) {
+        _readBudgets.remove(scope);
+      }
+    }
   }
 
   @override
@@ -147,6 +292,7 @@ class StickerRepositoryImpl implements IStickerRepository {
     final pack = await getPackById(packId);
     if (pack == null || _dataSource.accountScope != origin) return false;
 
+    if (pack.subscription != null) return true;
     final success = await _dataSource.installPack(packId, pack);
     if (_dataSource.accountScope != origin) return false;
     if (success) {
@@ -158,6 +304,14 @@ class StickerRepositoryImpl implements IStickerRepository {
 
   @override
   Future<bool> uninstallPack(String packId) async {
+    if (packId.startsWith('subscribed_') && subscriptions != null) {
+      final scope = _installedScope;
+      final reference = (await getPackSubscriptions())
+          .where((ref) => ref.packId == packId)
+          .firstOrNull;
+      if (_installedScope != scope || reference == null) return false;
+      return setPackSubscribed(reference, enabled: false);
+    }
     final origin = _dataSource.accountScope;
     final success = await _dataSource.uninstallPack(packId);
     if (_dataSource.accountScope != origin) return false;
@@ -170,7 +324,18 @@ class StickerRepositoryImpl implements IStickerRepository {
 
   @override
   Future<List<RecentSticker>> getRecentStickers({int limit = 20}) async {
-    return await _dataSource.getRecentStickers(limit: limit);
+    if (subscriptions == null) {
+      return _dataSource.getRecentStickers(limit: limit);
+    }
+    final scope = _installedScope;
+    if (_disposed || subscriptions!.accountScope == null) return [];
+    final packs = await getInstalledPacks();
+    if (_disposed || _installedScope != scope) return [];
+    final recent = await _dataSource.getRecentStickers(
+      limit: limit,
+      resolvedPacks: packs,
+    );
+    return !_disposed && _installedScope == scope ? recent : [];
   }
 
   @override
@@ -493,14 +658,54 @@ class StickerRepositoryImpl implements IStickerRepository {
   }
 
   @override
+  Future<List<StickerPackSubscription>> getPackSubscriptions() async {
+    final service = subscriptions;
+    final scope = _installedScope;
+    if (_disposed || service == null || service.accountScope == null) return [];
+    final references = await service.getEnabled();
+    return !_disposed && _installedScope == scope ? references : [];
+  }
+
+  @override
+  Future<bool> setPackSubscribed(
+    StickerPackSubscription reference, {
+    required bool enabled,
+  }) async {
+    final service = subscriptions;
+    final scope = _installedScope;
+    if (_disposed || service == null || service.accountScope == null) {
+      return false;
+    }
+    try {
+      await service.setEnabled(reference, enabled: enabled);
+      if (_disposed || _installedScope != scope) return false;
+      _invalidateCache();
+      _notifyInstalledPacksChanged();
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  @override
   Stream<List<StickerPack>> watchInstalledPacks() {
     // 立即发送当前数据
     _notifyInstalledPacksChanged();
-    return _installedPacksController.stream;
+    return _installedPacksController.stream
+        .where(
+          (event) =>
+              !_disposed &&
+              event.$1 == _installedScope &&
+              event.$2 == _installedRevision,
+        )
+        .map((event) => event.$3);
   }
 
   void _invalidateCache() {
     _installedPacksCache = null;
+    _installedRevision++;
+    _installedLoad = null;
+    _loadScope = null;
   }
 
   List<StickerPack> _filterStorePacks(
@@ -551,13 +756,25 @@ class StickerRepositoryImpl implements IStickerRepository {
   }
 
   void _notifyInstalledPacksChanged() {
-    final origin = _dataSource.accountScope;
-    getInstalledPacks().then((packs) {
-      if (_dataSource.accountScope == origin &&
-          !_installedPacksController.isClosed) {
-        _installedPacksController.add(packs);
-      }
-    });
+    if (_disposed) return;
+    final origin = _installedScope;
+    final load = getInstalledPacks();
+    final revision = _installedRevision;
+    unawaited(
+      load.then(
+        (packs) {
+          if (!_disposed &&
+              _installedScope == origin &&
+              revision == _installedRevision &&
+              !_installedPacksController.isClosed) {
+            _installedPacksController.add((origin, revision, packs));
+          }
+        },
+        onError: (Object error, StackTrace stack) {
+          debugLog('StickerRepositoryImpl: Installed-pack refresh failed');
+        },
+      ),
+    );
   }
 
   String? _getMimeType(String filename) {
@@ -578,6 +795,13 @@ class StickerRepositoryImpl implements IStickerRepository {
   }
 
   void dispose() {
-    _installedPacksController.close();
+    _disposed = true;
+    unawaited(_subscriptionChanges?.cancel());
+    unawaited(_installedPacksController.close());
   }
+}
+
+class _StickerReadBudget {
+  int active = 0;
+  final waiting = Queue<Completer<void>>();
 }

@@ -69,6 +69,27 @@ void main() {
     userId: session['userId']!,
     deviceId: session['deviceId']!,
   );
+  test('successful login announces its final usable session without security invalidation', () async {
+    final client = MockClient();
+    when(() => client.userID).thenReturn(session['userId']);
+    when(() => client.deviceID).thenReturn(session['deviceId']);
+    when(() => client.homeserver).thenReturn(Uri.parse(session['homeserver']!));
+    when(() => client.accessToken).thenReturn(session['accessToken']);
+    when(() => manager.client).thenReturn(client);
+    final observed = <AuthSessionInvalidation?>[];
+    final invalidated = <AuthSessionInvalidation>[];
+    final sessions = repository.accountSessionChanges.listen((_) => observed.add(repository.currentAccountGeneration));
+    final security = repository.accountInvalidationStream.listen(invalidated.add);
+    addTearDown(sessions.cancel); addTearDown(security.cancel);
+    expect((await login()).success, isTrue);
+    await Future<void>.delayed(Duration.zero);
+    final current = repository.currentAccountGeneration;
+    expect(current, isNotNull);
+    expect(current!.isCurrent, isTrue);
+    expect(observed.any((value) => identical(value, current)), isTrue);
+    expect(invalidated, isEmpty);
+  });
+
   test(
     'registration excludes concurrent password login and releases its lock',
     () async {

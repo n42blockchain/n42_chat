@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
@@ -5,6 +6,7 @@ import 'dart:math';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:matrix/matrix.dart';
+import 'package:matrix/src/utils/cached_stream_controller.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:n42_chat/src/data/datasources/matrix/matrix_client_manager.dart';
 import 'package:n42_chat/src/data/datasources/matrix/matrix_sticker_datasource.dart';
@@ -220,8 +222,35 @@ void main() {
             call.positionalArguments[2] as Map<String, dynamic>,
           ),
         );
+        final readerUpdates = CachedStreamController<SyncUpdate>();
+        addTearDown(readerUpdates.close);
+        when(() => client.onSync).thenReturn(readerUpdates);
+        when(() => client.getJoinedRooms())
+            .thenAnswer((_) => apis.last.getJoinedRooms());
+        final readerLifecycle = _Lifecycle();
+        final readerGeneration = AuthSessionInvalidation(
+          userId: accounts.last.userId,
+          homeserver: uri,
+          deviceId: accounts.last.deviceId,
+          isCurrent: () => true,
+          matchesClient: (c) => identical(c, client),
+        );
+        when(() => readerLifecycle.currentAccountGeneration)
+            .thenReturn(readerGeneration);
+        when(() => client.getRoomStateWithKey(any(), any(), any())).thenAnswer(
+          (call) => apis.last.getRoomStateWithKey(
+            call.positionalArguments[0] as String,
+            call.positionalArguments[1] as String,
+            call.positionalArguments[2] as String,
+          ),
+        );
+        final subscriptions = MatrixStickerSubscriptions(
+          manager,
+          readerLifecycle,
+        );
         final repository = StickerRepositoryImpl(
           MatrixStickerDataSource(manager),
+          subscriptions: subscriptions,
         );
         addTearDown(repository.dispose);
         expect(await repository.importPack(reference.shareUrl), isNull);
@@ -257,33 +286,45 @@ void main() {
           (await fresh.getInstalledPacks()).where((p) => p.id == preview.id),
           isEmpty,
         );
-        final readerLifecycle = _Lifecycle();
-        final readerGeneration = AuthSessionInvalidation(
-          userId: accounts.last.userId,
-          homeserver: uri,
-          deviceId: accounts.last.deviceId,
-          isCurrent: () => true,
-          matchesClient: (c) => identical(c, client),
-        );
-        when(() => readerLifecycle.currentAccountGeneration)
-            .thenReturn(readerGeneration);
-        when(() => client.getRoomStateWithKey(any(), any(), any())).thenAnswer(
-          (call) => apis.last.getRoomStateWithKey(
-            call.positionalArguments[0] as String,
-            call.positionalArguments[1] as String,
-            call.positionalArguments[2] as String,
-          ),
-        );
-        final subscriptions = MatrixStickerSubscriptions(
-          manager,
-          readerLifecycle,
-        );
         final liveReference = StickerPackSubscription(
           roomId: roomId,
           stateKey: preview.origin!.stateKey,
         );
         expect(await subscriptions.getEnabled(), isEmpty);
-        await subscriptions.setEnabled(liveReference, enabled: true);
+        expect(
+          await repository.setPackSubscribed(liveReference, enabled: true),
+          isTrue,
+        );
+        expect(
+          (await repository.getInstalledPacks()).where(
+            (pack) => pack.subscription == liveReference,
+          ),
+          hasLength(1),
+        );
+        await repository.recordStickerUsage(liveReference.packId, 'smile');
+        expect(
+          (await repository.getRecentStickers()).single.packId,
+          liveReference.packId,
+        );
+        final updatedVisible = Completer<void>(),
+            leftVisible = Completer<void>();
+        var left = false;
+        final visible = repository.watchInstalledPacks().listen((packs) {
+          if (packs.any(
+                (pack) =>
+                    pack.subscription == liveReference &&
+                    pack.name == 'Updated live art',
+              ) &&
+              !updatedVisible.isCompleted) {
+            updatedVisible.complete();
+          }
+          if (left &&
+              !packs.any((pack) => pack.subscription == liveReference) &&
+              !leftVisible.isCompleted) {
+            leftVisible.complete();
+          }
+        });
+        addTearDown(visible.cancel);
         final enabledData = await apis.last.getAccountData(
           accounts.last.userId,
           'm.image_pack.rooms',
@@ -296,8 +337,8 @@ void main() {
           readerLifecycle,
         );
         expect(await reopenedSubscriptions.getEnabled(), [liveReference]);
-        // The reference follows a state key; private imported copies above remain
-        // bound to their original event. Resolver/picker wiring is a separate gate.
+        // Feed the real server sync response into the SDK stream adapter. The
+        // installed-pack stream consumed by the picker must resolve fresh state.
         await apis.first.setRoomStateWithKey(
           roomId,
           'm.room.image_pack',
@@ -313,6 +354,14 @@ void main() {
           },
         );
         expect(await reopenedSubscriptions.getEnabled(), [liveReference]);
+        final refreshedSync = await apis.last.sync(timeout: 0);
+        readerUpdates.add(refreshedSync);
+        await updatedVisible.future.timeout(const Duration(seconds: 10));
+        expect(preview.name, 'Owned shared art');
+        expect(
+          (await repository.getRecentStickers()).single.sticker.name,
+          'Updated description',
+        );
         final currentPack = await apis.last.getRoomStateWithKey(
           roomId,
           'm.room.image_pack',
@@ -323,8 +372,19 @@ void main() {
           'Updated live art',
         );
         // Losing room access must not lock the user's own subscription list.
+        left = true;
         await apis.last.leaveRoom(roomId);
-        await reopenedSubscriptions.setEnabled(liveReference, enabled: false);
+        expect(await apis.last.getJoinedRooms(), isNot(contains(roomId)));
+        readerUpdates.add(
+          await apis.last.sync(since: refreshedSync.nextBatch, timeout: 0),
+        );
+        await leftVisible.future.timeout(const Duration(seconds: 10));
+        expect(await repository.getRecentStickers(), isEmpty);
+        expect(await repository.getPackSubscriptions(), [liveReference]);
+        expect(
+          await repository.setPackSubscribed(liveReference, enabled: false),
+          isTrue,
+        );
         expect(await reopenedSubscriptions.getEnabled(), isEmpty);
         verifyNever(() => client.joinRoom(any()));
       } finally {

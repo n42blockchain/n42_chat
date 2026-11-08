@@ -9,6 +9,7 @@ import 'package:matrix/matrix.dart' as matrix;
 import '../../../core/utils/matrix_utils.dart';
 import '../../../domain/entities/sticker_pack_entity.dart';
 import '../../../domain/entities/sticker_pack_origin.dart';
+import '../../../domain/entities/sticker_pack_subscription.dart';
 import '../../../core/utils/matrix_sticker_pack_link.dart';
 import '../../../core/utils/sticker_pack_fingerprint.dart';
 import '../bundled_sticker_packs.dart';
@@ -156,6 +157,72 @@ class MatrixStickerDataSource {
       );
     } catch (e) {
       debugLog('MatrixStickerDataSource: Failed to parse pack: $e');
+      return null;
+    }
+  }
+
+  /// Resolve current room state for a live reference, without joining or copying.
+  Future<StickerPack?> getSubscribedPack(
+    StickerPackSubscription reference,
+  ) async {
+    final client = _client;
+    final scope = accountScope;
+    final token = client?.accessToken;
+    if (client == null ||
+        token == null ||
+        token.isEmpty ||
+        !reference.isValid) {
+      return null;
+    }
+    try {
+      final content = await client.getRoomStateWithKey(
+        reference.roomId,
+        'm.room.image_pack',
+        reference.stateKey,
+      );
+      if (accountScope != scope ||
+          !identical(_client, client) ||
+          client.accessToken != token ||
+          utf8.encode(jsonEncode(content)).length > 65536) {
+        return null;
+      }
+      final images = content['images'];
+      if (images is! Map || images.isEmpty || images.length > 500) return null;
+      final metadata = content['pack'] is Map
+          ? Map<String, dynamic>.from(content['pack'] as Map)
+          : <String, dynamic>{};
+      final usage = metadata['usage'];
+      if (usage is List && usage.isNotEmpty && !usage.contains('sticker')) {
+        return null;
+      }
+      final room = client.getRoomById(reference.roomId);
+      metadata['display_name'] ??= room?.name.isNotEmpty == true
+          ? room!.name
+          : reference.roomId;
+      metadata['avatar_url'] ??= room?.avatar?.toString();
+      // Deliberately discard all remote ownership and immutable-origin hints.
+      final parsed = _parseStickerPack(reference.packId, {
+        'pack': metadata,
+        'images': images,
+      });
+      if (parsed == null ||
+          parsed.isEmpty ||
+          parsed.stickers.any(
+            (sticker) =>
+                !isMatrixStickerMediaUrl(sticker.url) ||
+                (sticker.mimeType != null &&
+                    !sticker.mimeType!.startsWith('image/')),
+          ) ||
+          (parsed.avatarUrl != null &&
+              !isMatrixStickerMediaUrl(parsed.avatarUrl!))) {
+        return null;
+      }
+      return parsed.copyWith(
+        source: StickerPackSource.matrix,
+        isInstalled: true,
+        subscription: reference,
+      );
+    } catch (_) {
       return null;
     }
   }
@@ -428,7 +495,10 @@ class MatrixStickerDataSource {
   }
 
   /// 获取常用贴纸
-  Future<List<RecentSticker>> getRecentStickers({int limit = 20}) async {
+  Future<List<RecentSticker>> getRecentStickers({
+    int limit = 20,
+    Iterable<StickerPack> resolvedPacks = const [],
+  }) async {
     if (_client == null) return [];
     final origin = accountScope;
 
@@ -441,6 +511,7 @@ class MatrixStickerDataSource {
       if (accountScope != origin) return [];
       final recentList = data['recent'] as List? ?? [];
       final result = <RecentSticker>[];
+      final known = {for (final pack in resolvedPacks) pack.id: pack};
 
       for (final item in recentList.take(limit)) {
         if (item is Map<String, dynamic>) {
@@ -451,7 +522,11 @@ class MatrixStickerDataSource {
 
           if (packId != null && stickerId != null) {
             if (accountScope != origin) return [];
-            final pack = await _getPackFromAccountData(packId);
+            if (packId.startsWith('subscribed_') &&
+                !known.containsKey(packId)) {
+              continue;
+            }
+            final pack = known[packId] ?? await _getPackFromAccountData(packId);
             if (accountScope != origin) return [];
             final sticker = pack?.stickers
                 .where((s) => s.id == stickerId)

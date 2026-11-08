@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 import 'sticker_pack_origin.dart';
+import 'sticker_pack_subscription.dart';
 
 /// 单个贴纸
 class Sticker extends Equatable {
@@ -130,6 +131,9 @@ class StickerPack extends Equatable {
   /// Immutable shared-event provenance; absent for legacy/private packs.
   final StickerPackOrigin? origin;
 
+  /// Live reference; never grant custom-pack ownership from remote metadata.
+  final StickerPackSubscription? subscription;
+
   /// 是否已安装/添加
   final bool isInstalled;
 
@@ -156,6 +160,7 @@ class StickerPack extends Equatable {
     this.stickers = const [],
     this.isInstalled = false,
     this.origin,
+    this.subscription,
     this.isOfficial = false,
     this.downloadCount = 0,
     this.createdAt,
@@ -185,6 +190,7 @@ class StickerPack extends Equatable {
     List<Sticker>? stickers,
     bool? isInstalled,
     StickerPackOrigin? origin,
+    StickerPackSubscription? subscription,
     bool? isOfficial,
     int? downloadCount,
     DateTime? createdAt,
@@ -201,6 +207,7 @@ class StickerPack extends Equatable {
       stickers: stickers ?? this.stickers,
       isInstalled: isInstalled ?? this.isInstalled,
       origin: origin ?? this.origin,
+      subscription: subscription ?? this.subscription,
       isOfficial: isOfficial ?? this.isOfficial,
       downloadCount: downloadCount ?? this.downloadCount,
       createdAt: createdAt ?? this.createdAt,
@@ -220,6 +227,7 @@ class StickerPack extends Equatable {
     stickers,
     isInstalled,
     origin,
+    subscription,
     isOfficial,
     downloadCount,
     createdAt,

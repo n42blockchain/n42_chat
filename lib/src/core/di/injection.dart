@@ -1,3 +1,4 @@
+import '../../data/services/matrix_sticker_subscriptions.dart';
 import '../../data/services/matrix_sticker_publication.dart';
 import 'archive_registration.dart';
 import '../../data/datasources/local/chat_history_clear_store.dart';
@@ -978,6 +979,10 @@ void _registerRepositories() {
   getIt.registerLazySingleton<IStickerRepository>(
     () => StickerRepositoryImpl(
       getIt<MatrixStickerDataSource>(),
+      subscriptions: MatrixStickerSubscriptions(
+        getIt<MatrixClientManager>(),
+        getIt<IAuthRepository>() as IAccountBoundDeletionLifecycle,
+      ),
       publication: MatrixStickerPublication(
         getIt<MatrixClientManager>(),
         getIt<IAuthRepository>() as IAccountBoundDeletionLifecycle,

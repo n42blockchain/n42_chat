@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:matrix/matrix.dart' as m;
+import 'package:matrix/src/utils/cached_stream_controller.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:n42_chat/src/data/datasources/matrix/matrix_client_manager.dart';
 import 'package:n42_chat/src/data/services/matrix_sticker_subscriptions.dart';
@@ -14,6 +15,12 @@ class _Client extends Mock implements m.Client {}
 class _Manager extends Mock implements MatrixClientManager {}
 
 class _Lifecycle extends Mock implements IAccountBoundDeletionLifecycle {}
+
+class _WatchLifecycle extends Mock
+    implements
+        IAccountBoundDeletionLifecycle,
+        IAccountBoundAuthInvalidation,
+        IAccountBoundSessionChanges {}
 
 void main() {
   late _Client client;
@@ -429,6 +436,93 @@ void main() {
       verifyNever(
         () => client.setAccountData('@owner:test', 'm.image_pack.rooms', any()),
       );
+    },
+  );
+  test('watch ignores ordinary messages and emits only relevant account, pack and leave updates', () async {
+    final updates = CachedStreamController<m.SyncUpdate>();
+    when(() => client.onSync).thenReturn(updates);
+    var changes = 0;
+    final listener = service.watchChanges().listen((_) => changes++);
+    await Future<void>.delayed(Duration.zero);
+    m.SyncUpdate update(String text) =>
+        m.SyncUpdate.fromJson(jsonDecode(text) as Map<String, Object?>);
+    updates.add(
+      update(
+        '{"next_batch":"1","rooms":{"join":{"!room:test":{"timeline":{"events":[{"type":"m.room.message","event_id":"\$message","sender":"@owner:test","origin_server_ts":1,"content":{}}]}}}}}',
+      ),
+    );
+    updates.add(
+      update(
+        '{"next_batch":"2","account_data":{"events":[{"type":"n42.other","content":{}}]}}',
+      ),
+    );
+    await Future<void>.delayed(Duration.zero);
+    expect(changes, 0);
+    updates.add(
+      update(
+        '{"next_batch":"3","account_data":{"events":[{"type":"m.image_pack.rooms","content":{}}]}}',
+      ),
+    );
+    updates.add(
+      update(
+        '{"next_batch":"4","rooms":{"join":{"!room:test":{"state":{"events":[{"type":"m.room.image_pack","event_id":"\$pack","sender":"@owner:test","origin_server_ts":1,"state_key":"art","content":{}}]}}}}}',
+      ),
+    );
+    updates.add(
+      update('{"next_batch":"5","rooms":{"leave":{"!room:test":{}}}}'),
+    );
+    await Future<void>.delayed(Duration.zero);
+    expect(changes, 3);
+    await listener.cancel();
+    await updates.close();
+  });
+  test(
+    'watch rebinds on login generation change and drops old SDK notifications',
+    () async {
+      final watching = _WatchLifecycle();
+      final invalidations = StreamController<AuthSessionInvalidation>.broadcast(
+        sync: true,
+      );
+      final sessionChanges = StreamController<void>.broadcast(sync: true);
+      when(() => watching.accountSessionChanges)
+          .thenAnswer((_) => sessionChanges.stream);
+      final oldUpdates = CachedStreamController<m.SyncUpdate>(),
+          nextUpdates = CachedStreamController<m.SyncUpdate>();
+      when(() => watching.currentAccountGeneration)
+          .thenReturn(lifecycle.currentAccountGeneration);
+      when(() => watching.accountInvalidationStream)
+          .thenAnswer((_) => invalidations.stream);
+      when(() => client.onSync).thenReturn(oldUpdates);
+      final bound = MatrixStickerSubscriptions(manager, watching);
+      var changes = 0;
+      final listener = bound.watchChanges().listen((_) => changes++);
+      await Future<void>.delayed(Duration.zero);
+      active = false;
+      when(() => client.accessToken).thenReturn('next-token');
+      final next = AuthSessionInvalidation(
+        userId: '@owner:test',
+        homeserver: Uri.parse('https://test'),
+        deviceId: 'D',
+        isCurrent: () => true,
+        matchesClient: (c) => identical(c, client),
+      );
+      when(() => watching.currentAccountGeneration).thenReturn(next);
+      when(() => client.onSync).thenReturn(nextUpdates);
+      sessionChanges.add(null);
+      final change = m.SyncUpdate.fromJson(
+        jsonDecode(
+          '{"next_batch":"changed","account_data":{"events":[{"type":"m.image_pack.rooms","content":{}}]}}',
+        ) as Map<String, Object?>,
+      );
+      oldUpdates.add(change);
+      nextUpdates.add(change);
+      await Future<void>.delayed(Duration.zero);
+      expect(changes, 2);
+      await listener.cancel();
+      await invalidations.close();
+      await sessionChanges.close();
+      await oldUpdates.close();
+      await nextUpdates.close();
     },
   );
 }

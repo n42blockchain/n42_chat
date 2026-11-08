@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import '../entities/sticker_pack_entity.dart';
+import '../entities/sticker_pack_subscription.dart';
 
 /// 贴纸仓库接口
 abstract class IStickerRepository {
@@ -86,6 +87,15 @@ abstract class IStickerRepository {
     String packId,
     String roomId, {
     required StickerPack reviewedPack,
+  });
+
+  /// Standard live references, including rooms that are no longer readable.
+  Future<List<StickerPackSubscription>> getPackSubscriptions();
+
+  /// Requires separate user consent to future administrator-controlled changes.
+  Future<bool> setPackSubscribed(
+    StickerPackSubscription reference, {
+    required bool enabled,
   });
 
   /// 监听已安装贴纸包变化
