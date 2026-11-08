@@ -2161,6 +2161,7 @@ void main() {
       pending.complete();
       await Future<void>.delayed(const Duration(milliseconds: 10));
       expect(results, contains('success:report'));
+      expect(bloc.state.error, isNull);
       await subscription.cancel();
       await bloc.close();
     });

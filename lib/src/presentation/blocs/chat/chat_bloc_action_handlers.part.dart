@@ -547,6 +547,8 @@ extension ChatBlocActionHandlers on ChatBloc {
       if (!sameOrigin() || (origin != null && !origin.isCurrent)) return;
       // 通过 error 字段发送成功信号（使用特殊前缀区分）
       emit(state.copyWith(error: 'success:report'));
+      // Keep the acknowledgement transient across later timeline updates.
+      emit(state.copyWith(clearError: true));
     } catch (e) {
       if (!sameOrigin() || (origin != null && !origin.isCurrent)) return;
       debugLog('ChatBloc: Failed to report message: $e');
