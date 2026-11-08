@@ -1,0 +1,18 @@
+{
+  "date": "2026-11-08",
+  "base_source": "3aeb5e63118a6003b782429b625ee561796d74e1",
+  "focused_tests": 50,
+  "failures": 0,
+  "pre_fix_failures": 2,
+  "analysis": "No issues found",
+  "boundaries": [
+    "Local known-gate check is not authoritative homeserver admission",
+    "Full regression and host pin integration pending",
+    "No live room join or production configuration changed"
+  ],
+  "logs": {
+    "/tmp/n42-room-admission-before.log": "dd7966bb2e4e36b099b654d1492165962a6c71b8eea9d74e42afd3d7c690bfe1",
+    "/tmp/n42-room-admission-after.log": "f5498941d61ef51c31eb3ed7db421abd61e6cdcdbd31a40dad97aa25e93975e4",
+    "/tmp/n42-room-admission-analysis.log": "22114e94cf6893057cad76b3d3564189355888ad1837754366adb5d932c38023"
+  }
+}

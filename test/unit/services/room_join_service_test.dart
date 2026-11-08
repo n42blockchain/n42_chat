@@ -47,18 +47,16 @@ void main() {
     when(() => client.userID).thenReturn('@user:test');
     when(() => client.getRoomById(id)).thenReturn(room);
     when(() => room.membership).thenReturn(matrix.Membership.invite);
-    when(
-      () => room.getState('n42.token_gate'),
-    ).thenAnswer((_) => gate == null ? null : event);
+    when(() => room.getState('n42.token_gate'))
+        .thenAnswer((_) => gate == null ? null : event);
     when(() => event.content).thenAnswer((_) => gate!);
     when(() => room.join()).thenAnswer((_) async {});
     when(() => client.getRoomIdByAlias(alias)).thenAnswer(
       (_) async =>
           matrix.GetRoomIdByAliasResponse(roomId: id, servers: ['test']),
     );
-    when(
-      () => client.joinRoom(id, via: any(named: 'via')),
-    ).thenAnswer((_) async => id);
+    when(() => client.joinRoom(id, via: any(named: 'via')))
+        .thenAnswer((_) async => id);
     service = RoomJoinService(
       manager,
       verifyGate: (roomId) {
@@ -148,9 +146,8 @@ void main() {
     verifyNever(() => room.join());
   });
   test('state read error cannot become an ungated join', () async {
-    when(
-      () => room.getState('n42.token_gate'),
-    ).thenThrow(StateError('state unavailable'));
+    when(() => room.getState('n42.token_gate'))
+        .thenThrow(StateError('state unavailable'));
     await expectLater(service.join(id), throwsStateError);
     verifyNever(() => room.join());
   });
@@ -223,6 +220,26 @@ void main() {
       },
     );
   }
+  for (final field in ['token', 'device']) {
+    test(
+      'credential replacement during gate verification rejects $field',
+      () async {
+        when(() => client.accessToken).thenReturn('synthetic-token-A');
+        when(() => client.deviceID).thenReturn('device-A');
+        gate = {'enabled': true};
+        verifier = (_) async {
+          if (field == 'token') {
+            when(() => client.accessToken).thenReturn('synthetic-token-B');
+          } else {
+            when(() => client.deviceID).thenReturn('device-B');
+          }
+          return passed;
+        };
+        await expectLater(service.join(id), throwsStateError);
+        verifyNever(() => room.join());
+      },
+    );
+  }
   test('alias resolves once and checks the immutable room ID', () async {
     gate = {'enabled': true};
     expect(await service.join(' $alias '), id);
@@ -245,9 +262,8 @@ void main() {
     });
   }
   test('alias resolution failure is surfaced', () async {
-    when(
-      () => client.getRoomIdByAlias(alias),
-    ).thenThrow(StateError('alias unavailable'));
+    when(() => client.getRoomIdByAlias(alias))
+        .thenThrow(StateError('alias unavailable'));
     await expectLater(service.join(alias), throwsStateError);
     verifyNever(() => room.join());
   });
@@ -270,9 +286,8 @@ void main() {
   );
   test('unexpected returned room ID is rejected', () async {
     when(() => client.getRoomById(id)).thenReturn(null);
-    when(
-      () => client.joinRoom(id, via: null),
-    ).thenAnswer((_) async => '!different:test');
+    when(() => client.joinRoom(id, via: null))
+        .thenAnswer((_) async => '!different:test');
     await expectLater(service.join(id), throwsStateError);
   });
   for (final knownRoom in [true, false]) {
