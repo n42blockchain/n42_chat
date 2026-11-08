@@ -1,0 +1,42 @@
+{
+  "verifiedAt": "2026-11-08T14:36:37.943626+00:00",
+  "currentChatCommit": "856850ef04695135c696ba4347df2b622b821ba5",
+  "matrixVersion": "16.0.1",
+  "componentHashMatches": {
+    "tool/local_e2ee_smoke.dart": true,
+    "lib/src/core/encryption/e2ee_manager.dart": true,
+    "pubspec.lock": true,
+    "tool/local_group_load.dart": true
+  },
+  "privateLogHashMatches": {
+    "matrix16-e2ee-30-final.log": true,
+    "matrix16-group-load-final.log": true,
+    "matrix16-server-load.log": true
+  },
+  "recovery": {
+    "receipt": "matrix16-local-e2ee-30-2026-11-07.json",
+    "originalSource": "f6da200ff9f3c5726995c8367bf7a2862b8b0276",
+    "exitCode": 0,
+    "correctRecoveries": 30,
+    "validWrongKeysRejected": 30,
+    "historicalMessageDecrypted": true,
+    "revokedDeviceCannotDecryptNewSession": true
+  },
+  "groupLoad": {
+    "receipt": "matrix16-group-load-2026-11-07.json",
+    "exitCode": 0,
+    "members": 20,
+    "messages": 10000,
+    "deliveries": 200000,
+    "fileEvents": 100,
+    "capturedServerLogPlaintextCanaryOccurrences": 0
+  },
+  "scope": "Reconciled existing isolated real Tuwunel / Matrix SDK evidence against unchanged current components; no new live run or production probe.",
+  "remaining": [
+    "Native keychain, UI and physical-device acceptance",
+    "Production and push log confidentiality",
+    "Attachment payload downloads",
+    "Interrupted or corrupted backup recovery",
+    "Room permission and UIAA acceptance"
+  ]
+}
