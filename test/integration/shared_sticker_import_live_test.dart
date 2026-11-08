@@ -11,6 +11,8 @@ import 'package:n42_chat/src/data/datasources/matrix/matrix_sticker_datasource.d
 import 'package:n42_chat/src/data/repositories/sticker_repository_impl.dart';
 import 'package:n42_chat/src/domain/entities/sticker_pack_origin.dart';
 import 'package:n42_chat/src/core/utils/matrix_sticker_pack_link.dart';
+import 'package:n42_chat/src/domain/entities/sticker_pack_subscription.dart';
+import 'package:n42_chat/src/data/services/matrix_sticker_subscriptions.dart';
 import 'package:n42_chat/src/domain/entities/sticker_pack_entity.dart';
 import 'package:n42_chat/src/domain/repositories/auth_repository.dart';
 import 'package:n42_chat/src/data/services/matrix_sticker_publication.dart';
@@ -255,6 +257,76 @@ void main() {
           (await fresh.getInstalledPacks()).where((p) => p.id == preview.id),
           isEmpty,
         );
+        final readerLifecycle = _Lifecycle();
+        final readerGeneration = AuthSessionInvalidation(
+          userId: accounts.last.userId,
+          homeserver: uri,
+          deviceId: accounts.last.deviceId,
+          isCurrent: () => true,
+          matchesClient: (c) => identical(c, client),
+        );
+        when(() => readerLifecycle.currentAccountGeneration)
+            .thenReturn(readerGeneration);
+        when(() => client.getRoomStateWithKey(any(), any(), any())).thenAnswer(
+          (call) => apis.last.getRoomStateWithKey(
+            call.positionalArguments[0] as String,
+            call.positionalArguments[1] as String,
+            call.positionalArguments[2] as String,
+          ),
+        );
+        final subscriptions = MatrixStickerSubscriptions(
+          manager,
+          readerLifecycle,
+        );
+        final liveReference = StickerPackSubscription(
+          roomId: roomId,
+          stateKey: preview.origin!.stateKey,
+        );
+        expect(await subscriptions.getEnabled(), isEmpty);
+        await subscriptions.setEnabled(liveReference, enabled: true);
+        final enabledData = await apis.last.getAccountData(
+          accounts.last.userId,
+          'm.image_pack.rooms',
+        );
+        expect(enabledData['rooms'], {
+          roomId: {liveReference.stateKey: <String, dynamic>{}},
+        });
+        final reopenedSubscriptions = MatrixStickerSubscriptions(
+          manager,
+          readerLifecycle,
+        );
+        expect(await reopenedSubscriptions.getEnabled(), [liveReference]);
+        // The reference follows a state key; private imported copies above remain
+        // bound to their original event. Resolver/picker wiring is a separate gate.
+        await apis.first.setRoomStateWithKey(
+          roomId,
+          'm.room.image_pack',
+          liveReference.stateKey,
+          {
+            'pack': {
+              'display_name': 'Updated live art',
+              'usage': ['sticker'],
+            },
+            'images': {
+              'smile': {'url': '$mxc', 'body': 'Updated description'},
+            },
+          },
+        );
+        expect(await reopenedSubscriptions.getEnabled(), [liveReference]);
+        final currentPack = await apis.last.getRoomStateWithKey(
+          roomId,
+          'm.room.image_pack',
+          liveReference.stateKey,
+        );
+        expect(
+          (currentPack['pack'] as Map)['display_name'],
+          'Updated live art',
+        );
+        // Losing room access must not lock the user's own subscription list.
+        await apis.last.leaveRoom(roomId);
+        await reopenedSubscriptions.setEnabled(liveReference, enabled: false);
+        expect(await reopenedSubscriptions.getEnabled(), isEmpty);
+        verifyNever(() => client.joinRoom(any()));
       } finally {
         final failures = <Object>[];
         for (var i = 0; i < accounts.length; i++) {
