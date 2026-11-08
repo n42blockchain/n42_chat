@@ -404,6 +404,27 @@ void main() {
     );
   }
 
+  for (final switchAccount in [false, true]) {
+    test('cached pack stream retains account: switch=$switchAccount', () async {
+      Object scope = Object();
+      when(() => source.accountScope).thenAnswer((_) => scope);
+      await repository.getInstalledPacks();
+      final emissions = <List<StickerPack>>[];
+      final subscription = repository.watchInstalledPacks().listen(
+        emissions.add,
+      );
+      if (switchAccount) scope = Object();
+      await Future<void>.delayed(Duration.zero);
+      await subscription.cancel();
+      expect(
+        emissions
+            .expand((packs) => packs)
+            .where((pack) => pack.id == custom.id),
+        switchAccount ? isEmpty : hasLength(1),
+      );
+    });
+  }
+
   test('uninstall receipt from the previous account is rejected', () async {
     Object scope = Object();
     when(() => source.accountScope).thenAnswer((_) => scope);

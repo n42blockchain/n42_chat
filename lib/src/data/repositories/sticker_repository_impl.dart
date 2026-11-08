@@ -391,12 +391,7 @@ class StickerRepositoryImpl implements IStickerRepository {
   @override
   Stream<List<StickerPack>> watchInstalledPacks() {
     // 立即发送当前数据
-    getInstalledPacks().then((packs) {
-      if (!_installedPacksController.isClosed) {
-        _installedPacksController.add(packs);
-      }
-    });
-
+    _notifyInstalledPacksChanged();
     return _installedPacksController.stream;
   }
 
@@ -448,8 +443,10 @@ class StickerRepositoryImpl implements IStickerRepository {
   }
 
   void _notifyInstalledPacksChanged() {
+    final origin = _dataSource.accountScope;
     getInstalledPacks().then((packs) {
-      if (!_installedPacksController.isClosed) {
+      if (_dataSource.accountScope == origin &&
+          !_installedPacksController.isClosed) {
         _installedPacksController.add(packs);
       }
     });
