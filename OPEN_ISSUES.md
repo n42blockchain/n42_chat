@@ -855,13 +855,22 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Verification: 18 new regression cases cover the former partial deletion, corrupt legacy metadata, rejected/thrown writes before and after migration, simulated preference-cache restart, invalid/unknown record versions, non-resurrection of legacy data, the actual Bloc failure/retry path, and concurrent initial loading. Two cases reproduce failures against the original repository implementation. These tests use a fake platform store; physical process termination/power-loss durability and cross-isolate locking are not established. SharedPreferences is still the underlying storage.
 - Integration: wallet commit `8ecdb286` pins Chat `ebaa003b3dd882be9f951cb73c88633fa618f76c` and synchronizes the lib/assets mirror. The normal wallet Chat/quality suite passes 457 checks, including 104 newly wired favorites/email regressions. This resolves the two-key deletion defect in the wallet dependency. Retained legacy keys remain migration input, not a downgrade synchronization mechanism; UI-001 remains separate.
 
-### UI-001 Legacy favorite tag and remark methods have no visible read/edit path
+### UI-001 Favorite annotations UI integrated; model and runtime acceptance remain
 
 - Severity: M
 - Added: 2026-09-13
-- Evidence: `MessageActionRepositoryImpl.editFavoriteTags/editFavoriteRemark`, `FavoriteBloc`, `FavoriteListPage`
-- Current state: tag/remark edits persist and their failure/retry behavior is covered. An additive IFavoriteDetailsRepository capability now returns immutable SavedMessageFavorite entries (message/tags/remark) from one account-scoped storage snapshot; the existing message-only interface and record format are preserved. Five new persistence cases cover reopen, immutable results, account partitioning, stale reads and malformed annotations without writes. All 26 persistence tests pass; scoped analysis has two existing info diagnostics on the unchanged favorite-load cleanup, no errors/warnings. FavoriteListPage and FavoriteBloc still need metadata display/search/edit integration, and this follow-up is not pinned into uploaded 73473. These backend methods are not evidence of a usable tagged-favorites feature. The newer FavoriteEntity/reminder storage is a separate path and must not be confused with this repository.
-- Next step: consolidate the two favorites models, expose persisted metadata through the domain contract, and cover create/edit/search/reopen from the actual profile entry.
+- Evidence: `MessageActionRepositoryImpl`, `IFavoriteDetailsRepository`, `FavoriteBloc`, `FavoriteListPage`, `favorite_annotations_page_test.dart`.
+- Current state: the message-backed favorites route now reads immutable annotations from one account-scoped snapshot, displays tags/remarks, searches them and exposes editors. Empty edits clear annotations; tags trim/deduplicate comma-separated values. Save failure retains the draft, pending save blocks dismissal, and reload preserves the selected type filter. The original message-only interface and record format remain supported. The separate FavoriteEntity/reminder store is not silently migrated or merged.
+- Account acceptance: the editor captures the account and repository before opening the action sheet, validates both before/after persistence, and rejects replaced auth/manager/repository instances. A real-store widget test reproduced rebinding to a valid replacement account before the fix. Six new page tests plus existing BLoC/page/persistence suites pass all 50 tests; scoped analysis has one existing constructor-style info, no errors/warnings. These unreleased changes are not included in uploaded 73473.
+- Next step: complete full regression and profile-entry/native acceptance; design any consolidation with the newer model without dropping reminders or assigning ownerless legacy records to an arbitrary account.
+
+### UI-003 Favorite forward menu currently performs no forwarding
+
+- Severity: M
+- Added: 2026-11-07
+- Evidence: `FavoriteListPage._showFavoriteOptions` Forward action closes the sheet without a picker, callback or repository dispatch.
+- Current state: source inspection confirms that the visible action does not forward either a saved Matrix message or a locally created note/link. Annotation work does not fix this path.
+- Next step: connect destination selection and account-bound dispatch; handle local notes/links separately from Matrix event forwarding and verify failures, retries and account changes before claiming completion.
 
 ### AUTH-001 Email verification contract — Client repair integrated; live acceptance and multi-email handling remain open
 

@@ -6,6 +6,9 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/message_entity.dart';
+import '../../../data/datasources/matrix/matrix_client_manager.dart';
+import '../../../data/services/account_action_capture.dart';
+import '../../../domain/repositories/auth_repository.dart';
 import '../../../domain/repositories/message_action_repository.dart';
 import '../../blocs/favorite/favorite_bloc.dart';
 import '../../blocs/favorite/favorite_event.dart';
@@ -111,7 +114,7 @@ class _FavoriteListView extends StatelessWidget {
       ('image', S.of(context)?.commonImage ?? 'Image'),
       ('link', S.of(context)?.favoriteLinkLabel ?? 'Link'),
       ('file', S.of(context)?.commonFile ?? 'File'),
-      ('video', 'Video'),
+      ('video', S.of(context)?.video ?? 'Video'),
     ];
 
     return BlocBuilder<FavoriteBloc, FavoriteState>(
@@ -176,6 +179,7 @@ class _FavoriteListView extends StatelessWidget {
     final cardColor = context.surfaceColor;
     final textColor = context.textPrimary;
     final subtitleColor = context.textSecondary;
+    final details = context.read<FavoriteBloc>().state.details[favorite.id];
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -201,6 +205,20 @@ class _FavoriteListView extends StatelessWidget {
                   style: TextStyle(color: textColor, height: 1.4),
                 ),
 
+                if (details?.remark.isNotEmpty ?? false) ...[
+                  const SizedBox(height: 8),
+                  Text(details!.remark, style: TextStyle(color: subtitleColor)),
+                ],
+                if (details?.tags.isNotEmpty ?? false) ...[
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 4,
+                    children: [
+                      for (final tag in details!.tags) Chip(label: Text(tag)),
+                    ],
+                  ),
+                ],
                 const SizedBox(height: 8),
 
                 // 来源和时间
@@ -389,12 +407,15 @@ class _FavoriteListView extends StatelessWidget {
     }
 
     favoriteBloc.add(LoadFavorites(filterType: currentFilter));
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(successMessage)));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(successMessage)));
   }
 
   void _showFavoriteOptions(BuildContext context, MessageEntity favorite) {
+    final repository = GetIt.instance<IMessageActionRepository>();
+    final annotationsAvailable = repository is IFavoriteDetailsRepository;
+    final details = context.read<FavoriteBloc>().state.details[favorite.id];
+    final isCurrent = _captureAnnotationSession(repository);
     showModalBottomSheet<void>(
       context: context,
       builder: (sheetContext) => SafeArea(
@@ -408,6 +429,38 @@ class _FavoriteListView extends StatelessWidget {
                 Navigator.pop(sheetContext);
               },
             ),
+            if (annotationsAvailable) ...[
+              ListTile(
+                leading: const Icon(Icons.label_outline),
+                title: Text(S.of(context)?.favoriteEditTags ?? 'Edit Tags'),
+                onTap: () {
+                  Navigator.pop(sheetContext);
+                  _editAnnotation(
+                    context,
+                    favorite,
+                    tags: true,
+                    repository: repository,
+                    isCurrent: isCurrent,
+                    initialValue: details?.tags.join(', ') ?? '',
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.edit_note),
+                title: Text(S.of(context)?.contactEditRemark ?? 'Edit Remark'),
+                onTap: () {
+                  Navigator.pop(sheetContext);
+                  _editAnnotation(
+                    context,
+                    favorite,
+                    tags: false,
+                    repository: repository,
+                    isCurrent: isCurrent,
+                    initialValue: details?.remark ?? '',
+                  );
+                },
+              ),
+            ],
             ListTile(
               leading: const Icon(Icons.delete, color: AppColors.error),
               title: Text(
@@ -421,6 +474,70 @@ class _FavoriteListView extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  bool Function() _captureAnnotationSession(
+    IMessageActionRepository repository,
+  ) {
+    final getIt = GetIt.instance;
+    if (!getIt.isRegistered<MatrixClientManager>() ||
+        !getIt.isRegistered<IAuthRepository>()) {
+      return () => false;
+    }
+    final manager = getIt<MatrixClientManager>();
+    final auth = getIt<IAuthRepository>();
+    final origin = captureAccountAction(manager, auth);
+    return () =>
+        origin?.isCurrent == true &&
+        getIt.isRegistered<IMessageActionRepository>() &&
+        getIt.isRegistered<MatrixClientManager>() &&
+        getIt.isRegistered<IAuthRepository>() &&
+        identical(getIt<IMessageActionRepository>(), repository) &&
+        identical(getIt<MatrixClientManager>(), manager) &&
+        identical(getIt<IAuthRepository>(), auth);
+  }
+
+  Future<void> _editAnnotation(
+    BuildContext context,
+    MessageEntity favorite, {
+    required bool tags,
+    required IMessageActionRepository repository,
+    required bool Function() isCurrent,
+    required String initialValue,
+  }) async {
+    final bloc = context.read<FavoriteBloc>();
+    final l10n = S.of(context);
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => _FavoriteAnnotationDialog(
+        title: tags
+            ? (l10n?.favoriteEditTags ?? 'Edit Tags')
+            : (l10n?.contactEditRemark ?? 'Edit Remark'),
+        hint: tags
+            ? (l10n?.favoriteEnterTagsHint ?? 'Enter tags separated by commas')
+            : (l10n?.profileEnterRemark ?? 'Enter remark'),
+        initialValue: initialValue,
+        onSave: (value) async {
+          if (!isCurrent()) throw StateError('Account changed');
+          if (tags) {
+            final parsed = value
+                .split(RegExp('[,，]'))
+                .map((tag) => tag.trim())
+                .where((tag) => tag.isNotEmpty)
+                .toSet()
+                .toList();
+            await repository.editFavoriteTags(favorite.id, parsed);
+          } else {
+            await repository.editFavoriteRemark(favorite.id, value.trim());
+          }
+          if (!isCurrent()) throw StateError('Account changed');
+          if (!bloc.isClosed) {
+            bloc.add(LoadFavorites(filterType: bloc.state.filterType));
+          }
+        },
       ),
     );
   }
@@ -627,4 +744,105 @@ String? _normalizeFavoriteUrl(String rawUrl) {
     return null;
   }
   return candidate;
+}
+
+class _FavoriteAnnotationDialog extends StatefulWidget {
+  final String title;
+  final String hint;
+  final String initialValue;
+  final Future<void> Function(String value) onSave;
+
+  const _FavoriteAnnotationDialog({
+    required this.title,
+    required this.hint,
+    required this.initialValue,
+    required this.onSave,
+  });
+
+  @override
+  State<_FavoriteAnnotationDialog> createState() =>
+      _FavoriteAnnotationDialogState();
+}
+
+class _FavoriteAnnotationDialogState extends State<_FavoriteAnnotationDialog> {
+  late final _controller = TextEditingController(text: widget.initialValue);
+  bool _saving = false;
+  bool _failed = false;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    if (_saving) return;
+    setState(() {
+      _saving = true;
+      _failed = false;
+    });
+    try {
+      await widget.onSave(_controller.text);
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _saving = false;
+          _failed = true;
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = S.of(context);
+    return PopScope(
+      canPop: !_saving,
+      child: AlertDialog(
+        title: Text(widget.title),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _controller,
+                enabled: !_saving,
+                autofocus: true,
+                minLines: 1,
+                maxLines: 4,
+                decoration: InputDecoration(hintText: widget.hint),
+              ),
+              if (_failed)
+                Padding(
+                  padding: const EdgeInsets.only(top: 12),
+                  child: Text(
+                    l10n?.commonSaveFailed ?? 'Save failed',
+                    style: const TextStyle(color: AppColors.error),
+                  ),
+                ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: _saving ? null : () => Navigator.of(context).pop(),
+            child: Text(l10n?.commonCancel ?? 'Cancel'),
+          ),
+          TextButton(
+            onPressed: _saving ? null : _save,
+            child: _saving
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : Text(l10n?.commonSave ?? 'Save'),
+          ),
+        ],
+      ),
+    );
+  }
 }
