@@ -6310,4 +6310,11 @@ class SId extends S {
   @override
   String get stickerPublishReceiptMissing =>
       'Sudah dipublikasikan, tetapi tautan tidak tersimpan. Bagikan atau salin tautan sebelum meninggalkan halaman ini.';
+
+  @override
+  String get stickerSubscribe => 'Berlangganan pembaruan';
+
+  @override
+  String get stickerSubscribeNotice =>
+      'Ikuti perubahan berikutnya dari administrator paket ini. Gambar dan metadata tidak dienkripsi ujung ke ujung. Anda dapat berhenti berlangganan nanti; tindakan ini tidak membuat Anda bergabung ke chat sumber.';
 }

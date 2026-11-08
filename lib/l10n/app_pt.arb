@@ -2910,5 +2910,7 @@
   "stickerPackImages": "Imagens",
   "stickerPublishNotice": "Publique este pacote no grupo selecionado. As imagens e os metadados não têm encriptação ponto a ponto. Quem puder ler o estado do grupo poderá aceder-lhes.",
   "stickerPublishFailed": "A publicação não foi confirmada. Verifique o grupo antes de tentar novamente.",
-  "stickerPublishReceiptMissing": "Publicado, mas a ligação não foi guardada. Partilhe-a ou copie-a antes de sair desta página."
+  "stickerPublishReceiptMissing": "Publicado, mas a ligação não foi guardada. Partilhe-a ou copie-a antes de sair desta página.",
+  "stickerSubscribe": "Subscrever atualizações",
+  "stickerSubscribeNotice": "Receba futuras alterações dos administradores do pacote. As imagens e os metadados não têm encriptação ponto a ponto. Pode cancelar a subscrição mais tarde; isto não o faz aderir à conversa de origem."
 }

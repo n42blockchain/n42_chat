@@ -2910,5 +2910,7 @@
   "stickerPackImages": "Hình ảnh",
   "stickerPublishNotice": "Đăng gói này vào nhóm đã chọn. Hình ảnh và siêu dữ liệu không được mã hóa đầu cuối. Người có thể đọc trạng thái nhóm có thể truy cập chúng.",
   "stickerPublishFailed": "Chưa xác nhận được việc đăng. Hãy kiểm tra nhóm trước khi thử lại.",
-  "stickerPublishReceiptMissing": "Đã đăng nhưng chưa lưu được liên kết. Hãy chia sẻ hoặc sao chép liên kết trước khi rời trang này."
+  "stickerPublishReceiptMissing": "Đã đăng nhưng chưa lưu được liên kết. Hãy chia sẻ hoặc sao chép liên kết trước khi rời trang này.",
+  "stickerSubscribe": "Đăng ký cập nhật",
+  "stickerSubscribeNotice": "Nhận các thay đổi trong tương lai từ quản trị viên gói. Hình ảnh và siêu dữ liệu không được mã hóa đầu cuối. Bạn có thể hủy đăng ký sau; thao tác này không tham gia cuộc trò chuyện nguồn."
 }

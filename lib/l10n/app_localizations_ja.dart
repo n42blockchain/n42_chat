@@ -6159,4 +6159,11 @@ class SJa extends S {
   @override
   String get stickerPublishReceiptMissing =>
       '公開されましたが、リンクを保存できませんでした。このページを離れる前に共有またはコピーしてください。';
+
+  @override
+  String get stickerSubscribe => '更新を購読';
+
+  @override
+  String get stickerSubscribeNotice =>
+      'パックの管理者による今後の変更を受け取ります。画像とメタデータはエンドツーエンド暗号化されません。購読は後から解除できます。この操作で元のチャットに参加することはありません。';
 }

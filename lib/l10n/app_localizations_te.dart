@@ -6345,4 +6345,11 @@ class STe extends S {
   @override
   String get stickerPublishReceiptMissing =>
       'ప్రచురించబడింది, కానీ లింక్ సేవ్ కాలేదు. ఈ పేజీ నుండి వెళ్లే ముందు దాన్ని షేర్ చేయండి లేదా కాపీ చేయండి.';
+
+  @override
+  String get stickerSubscribe => 'నవీకరణలకు సభ్యత్వం పొందండి';
+
+  @override
+  String get stickerSubscribeNotice =>
+      'ఈ ప్యాక్ నిర్వాహకులు చేసే తదుపరి మార్పులను పొందండి. చిత్రాలు, మెటాడేటాకు ఎండ్-టు-ఎండ్ ఎన్‌క్రిప్షన్ లేదు. తర్వాత సభ్యత్వాన్ని రద్దు చేయవచ్చు; దీనివల్ల మూల చాట్‌లో చేరరు.';
 }

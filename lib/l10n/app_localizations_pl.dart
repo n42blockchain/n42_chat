@@ -6337,4 +6337,11 @@ class SPl extends S {
   @override
   String get stickerPublishReceiptMissing =>
       'Opublikowano, ale link nie został zapisany. Udostępnij lub skopiuj go przed opuszczeniem strony.';
+
+  @override
+  String get stickerSubscribe => 'Subskrybuj aktualizacje';
+
+  @override
+  String get stickerSubscribeNotice =>
+      'Otrzymuj przyszłe zmiany administratorów pakietu. Obrazy i metadane nie są szyfrowane end-to-end. Subskrypcję można później anulować; nie powoduje to dołączenia do czatu źródłowego.';
 }

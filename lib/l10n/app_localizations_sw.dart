@@ -6332,4 +6332,11 @@ class SSw extends S {
   @override
   String get stickerPublishReceiptMissing =>
       'Imechapishwa, lakini kiungo hakijahifadhiwa. Kishiriki au ukinakili kabla ya kuondoka kwenye ukurasa huu.';
+
+  @override
+  String get stickerSubscribe => 'Jiandikishe kwa masasisho';
+
+  @override
+  String get stickerSubscribeNotice =>
+      'Pokea mabadiliko yajayo kutoka kwa wasimamizi wa kifurushi hiki. Picha na metadata hazijasimbwa kutoka mwisho hadi mwisho. Unaweza kujiondoa baadaye; hatua hii haikuungi kwenye gumzo la chanzo.';
 }

@@ -2910,5 +2910,7 @@
   "stickerPackImages": "Görseller",
   "stickerPublishNotice": "Bu paketi seçilen grupta yayımlayın. Görseller ve meta veriler uçtan uca şifrelenmez. Grup durumunu okuyabilen kişiler bunlara erişebilir.",
   "stickerPublishFailed": "Yayımlama onaylanmadı. Yeniden denemeden önce grubu kontrol edin.",
-  "stickerPublishReceiptMissing": "Yayımlandı ancak bağlantı kaydedilmedi. Bu sayfadan ayrılmadan önce paylaşın veya kopyalayın."
+  "stickerPublishReceiptMissing": "Yayımlandı ancak bağlantı kaydedilmedi. Bu sayfadan ayrılmadan önce paylaşın veya kopyalayın.",
+  "stickerSubscribe": "Güncellemelere abone ol",
+  "stickerSubscribeNotice": "Paket yöneticilerinin gelecekteki değişikliklerini takip edin. Görseller ve meta veriler uçtan uca şifrelenmez. Aboneliği daha sonra iptal edebilirsiniz; bu işlem kaynak sohbete katılmanızı sağlamaz."
 }

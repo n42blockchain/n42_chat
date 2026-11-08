@@ -6162,4 +6162,11 @@ class SKo extends S {
   @override
   String get stickerPublishReceiptMissing =>
       '게시되었지만 링크가 저장되지 않았습니다. 이 페이지를 나가기 전에 링크를 공유하거나 복사하세요.';
+
+  @override
+  String get stickerSubscribe => '업데이트 구독';
+
+  @override
+  String get stickerSubscribeNotice =>
+      '팩 관리자의 향후 변경 사항을 받습니다. 이미지와 메타데이터는 종단 간 암호화되지 않습니다. 나중에 구독을 취소할 수 있으며, 이 작업으로 원본 채팅에 참여하지는 않습니다.';
 }

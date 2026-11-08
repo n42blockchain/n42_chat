@@ -6285,4 +6285,11 @@ class SVi extends S {
   @override
   String get stickerPublishReceiptMissing =>
       'Đã đăng nhưng chưa lưu được liên kết. Hãy chia sẻ hoặc sao chép liên kết trước khi rời trang này.';
+
+  @override
+  String get stickerSubscribe => 'Đăng ký cập nhật';
+
+  @override
+  String get stickerSubscribeNotice =>
+      'Nhận các thay đổi trong tương lai từ quản trị viên gói. Hình ảnh và siêu dữ liệu không được mã hóa đầu cuối. Bạn có thể hủy đăng ký sau; thao tác này không tham gia cuộc trò chuyện nguồn.';
 }

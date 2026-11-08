@@ -11584,6 +11584,18 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Published, but the link was not saved. Share or copy it before leaving this page.'**
   String get stickerPublishReceiptMissing;
+
+  /// No description provided for @stickerSubscribe.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscribe to updates'**
+  String get stickerSubscribe;
+
+  /// No description provided for @stickerSubscribeNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow future changes made by this pack’s administrators. Images and metadata are not end-to-end encrypted. You can unsubscribe later; this does not join the source chat.'**
+  String get stickerSubscribeNotice;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

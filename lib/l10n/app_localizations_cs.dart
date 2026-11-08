@@ -6310,4 +6310,11 @@ class SCs extends S {
   @override
   String get stickerPublishReceiptMissing =>
       'Zveřejněno, ale odkaz se neuložil. Před opuštěním stránky jej sdílejte nebo zkopírujte.';
+
+  @override
+  String get stickerSubscribe => 'Odebírat aktualizace';
+
+  @override
+  String get stickerSubscribeNotice =>
+      'Sledujte budoucí změny správců tohoto balíčku. Obrázky a metadata nejsou koncově šifrovány. Odběr můžete později zrušit; do zdrojového chatu tím nevstoupíte.';
 }

@@ -6299,4 +6299,11 @@ class SBn extends S {
   @override
   String get stickerPublishReceiptMissing =>
       'প্রকাশিত হয়েছে, কিন্তু লিঙ্ক সংরক্ষিত হয়নি। এই পৃষ্ঠা ছাড়ার আগে লিঙ্কটি শেয়ার বা কপি করুন।';
+
+  @override
+  String get stickerSubscribe => 'আপডেট সাবস্ক্রাইব করুন';
+
+  @override
+  String get stickerSubscribeNotice =>
+      'এই প্যাকের প্রশাসকদের ভবিষ্যৎ পরিবর্তন অনুসরণ করুন। ছবি ও মেটাডেটা এন্ড-টু-এন্ড এনক্রিপ্ট করা নয়। পরে সাবস্ক্রিপশন বাতিল করতে পারবেন; এতে উৎস চ্যাটে যোগ দেওয়া হবে না।';
 }

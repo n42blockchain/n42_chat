@@ -6296,4 +6296,11 @@ class SMr extends S {
   @override
   String get stickerPublishReceiptMissing =>
       'प्रकाशित झाले, पण दुवा जतन झाला नाही. हे पृष्ठ सोडण्यापूर्वी दुवा शेअर किंवा कॉपी करा.';
+
+  @override
+  String get stickerSubscribe => 'अद्यतनांची सदस्यता घ्या';
+
+  @override
+  String get stickerSubscribeNotice =>
+      'या पॅकच्या प्रशासकांचे पुढील बदल मिळवा. प्रतिमा आणि मेटाडेटा एंड-टू-एंड एन्क्रिप्ट केलेले नाहीत. नंतर सदस्यता रद्द करू शकता; यामुळे मूळ चॅटमध्ये सामील होणार नाही.';
 }

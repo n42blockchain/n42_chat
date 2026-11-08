@@ -6333,6 +6333,13 @@ class SPt extends S {
   @override
   String get stickerPublishReceiptMissing =>
       'Publicado, mas a ligação não foi guardada. Partilhe-a ou copie-a antes de sair desta página.';
+
+  @override
+  String get stickerSubscribe => 'Subscrever atualizações';
+
+  @override
+  String get stickerSubscribeNotice =>
+      'Receba futuras alterações dos administradores do pacote. As imagens e os metadados não têm encriptação ponto a ponto. Pode cancelar a subscrição mais tarde; isto não o faz aderir à conversa de origem.';
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).
@@ -12664,4 +12671,11 @@ class SPtBr extends SPt {
   @override
   String get stickerPublishReceiptMissing =>
       'Publicado, mas o link não foi salvo. Compartilhe ou copie o link antes de sair desta página.';
+
+  @override
+  String get stickerSubscribe => 'Assinar atualizações';
+
+  @override
+  String get stickerSubscribeNotice =>
+      'Receba futuras alterações dos administradores do pacote. Imagens e metadados não têm criptografia de ponta a ponta. Você pode cancelar a assinatura depois; isso não faz você entrar na conversa de origem.';
 }

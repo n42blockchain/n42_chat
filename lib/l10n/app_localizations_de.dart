@@ -6349,4 +6349,11 @@ class SDe extends S {
   @override
   String get stickerPublishReceiptMissing =>
       'Veröffentlicht, aber der Link wurde nicht gespeichert. Teile oder kopiere ihn, bevor du diese Seite verlässt.';
+
+  @override
+  String get stickerSubscribe => 'Updates abonnieren';
+
+  @override
+  String get stickerSubscribeNotice =>
+      'Künftige Änderungen durch die Paketadministratoren übernehmen. Bilder und Metadaten sind nicht Ende-zu-Ende-verschlüsselt. Das Abo kann später beendet werden; dem Quellchat trittst du dadurch nicht bei.';
 }

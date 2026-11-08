@@ -6299,4 +6299,11 @@ class STr extends S {
   @override
   String get stickerPublishReceiptMissing =>
       'Yayımlandı ancak bağlantı kaydedilmedi. Bu sayfadan ayrılmadan önce paylaşın veya kopyalayın.';
+
+  @override
+  String get stickerSubscribe => 'Güncellemelere abone ol';
+
+  @override
+  String get stickerSubscribeNotice =>
+      'Paket yöneticilerinin gelecekteki değişikliklerini takip edin. Görseller ve meta veriler uçtan uca şifrelenmez. Aboneliği daha sonra iptal edebilirsiniz; bu işlem kaynak sohbete katılmanızı sağlamaz.';
 }

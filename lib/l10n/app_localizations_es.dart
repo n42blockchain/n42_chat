@@ -6342,4 +6342,11 @@ class SEs extends S {
   @override
   String get stickerPublishReceiptMissing =>
       'Se publicó, pero el enlace no se guardó. Compártelo o cópialo antes de salir de esta página.';
+
+  @override
+  String get stickerSubscribe => 'Suscribirse a actualizaciones';
+
+  @override
+  String get stickerSubscribeNotice =>
+      'Recibe los cambios futuros de los administradores del paquete. Las imágenes y los metadatos no tienen cifrado de extremo a extremo. Puedes cancelar la suscripción después; esto no te une al chat de origen.';
 }

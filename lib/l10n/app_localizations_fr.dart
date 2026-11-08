@@ -6366,4 +6366,11 @@ class SFr extends S {
   @override
   String get stickerPublishReceiptMissing =>
       'Publié, mais le lien n’a pas été enregistré. Partagez-le ou copiez-le avant de quitter cette page.';
+
+  @override
+  String get stickerSubscribe => 'Suivre les mises à jour';
+
+  @override
+  String get stickerSubscribeNotice =>
+      'Suivez les futures modifications des administrateurs du pack. Les images et métadonnées ne sont pas chiffrées de bout en bout. Vous pourrez vous désabonner ; cela ne vous fait pas rejoindre la discussion source.';
 }

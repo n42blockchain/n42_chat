@@ -2942,5 +2942,7 @@
   },
   "stickerPublishNotice": "Publish this pack to the selected group. Its images and metadata are not end-to-end encrypted. People who can read the group state may access them.",
   "stickerPublishFailed": "Publication was not confirmed. Check the group before trying again.",
-  "stickerPublishReceiptMissing": "Published, but the link was not saved. Share or copy it before leaving this page."
+  "stickerPublishReceiptMissing": "Published, but the link was not saved. Share or copy it before leaving this page.",
+  "stickerSubscribe": "Subscribe to updates",
+  "stickerSubscribeNotice": "Follow future changes made by this pack’s administrators. Images and metadata are not end-to-end encrypted. You can unsubscribe later; this does not join the source chat."
 }

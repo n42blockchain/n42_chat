@@ -6117,6 +6117,13 @@ class SZh extends S {
 
   @override
   String get stickerPublishReceiptMissing => '已发布，但链接未能保存。离开此页面前，请先分享或复制链接。';
+
+  @override
+  String get stickerSubscribe => '订阅更新';
+
+  @override
+  String get stickerSubscribeNotice =>
+      '持续接收贴纸包管理员后续的修改。图片和元数据不受端到端加密保护。你可以稍后取消订阅；此操作不会加入来源群聊。';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -12232,4 +12239,11 @@ class SZhTw extends SZh {
 
   @override
   String get stickerPublishReceiptMissing => '已發佈，但連結未能儲存。離開此頁面前，請先分享或複製連結。';
+
+  @override
+  String get stickerSubscribe => '訂閱更新';
+
+  @override
+  String get stickerSubscribeNotice =>
+      '持續接收貼圖包管理員後續的修改。圖片和中繼資料不受端對端加密保護。你可以稍後取消訂閱；此操作不會加入來源群組。';
 }

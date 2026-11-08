@@ -6,13 +6,14 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../domain/entities/sticker_pack_entity.dart';
+import '../../../domain/entities/sticker_pack_subscription.dart';
 import '../../../domain/repositories/auth_repository.dart';
 import '../../../domain/repositories/sticker_repository.dart';
 import '../../widgets/chat/sticker_thumb.dart';
 
 enum _ImportFailure { unavailable, install, account }
 
-/// Preview is read-only. Only the separate confirmed action installs a copy.
+/// Preview is read-only. Copy installation and live subscription each need consent.
 class StickerImportPage extends StatefulWidget {
   const StickerImportPage({super.key, this.initialLink = ''});
   final String initialLink;
@@ -132,7 +133,7 @@ class _StickerImportPageState extends State<StickerImportPage> {
     });
   }
 
-  Future<void> _install() async {
+  Future<void> _install({bool subscribe = false}) async {
     final pack = _pack;
     if (_previewing || _installing || _confirming || pack == null) return;
     if (!_current) {
@@ -158,7 +159,10 @@ class _StickerImportPageState extends State<StickerImportPage> {
               ),
               const SizedBox(height: 8),
               Text(
-                l10n?.stickerImportCopyNotice ?? 'Add a private copy of this pack. Its images and metadata are not end-to-end encrypted.',
+                subscribe
+                    ? (l10n?.stickerSubscribeNotice ??
+                          'Follow future changes made by this pack’s administrators. Images and metadata are not end-to-end encrypted. You can unsubscribe later; this does not join the source chat.')
+                    : l10n?.stickerImportCopyNotice ?? 'Add a private copy of this pack. Its images and metadata are not end-to-end encrypted.',
               ),
             ],
           ),
@@ -168,9 +172,17 @@ class _StickerImportPageState extends State<StickerImportPage> {
               child: Text(l10n?.commonCancel ?? 'Cancel'),
             ),
             FilledButton(
-              key: const ValueKey('sticker_import_confirm'),
+              key: ValueKey(
+                subscribe
+                    ? 'sticker_subscribe_confirm'
+                    : 'sticker_import_confirm',
+              ),
               onPressed: () => Navigator.pop(context, true),
-              child: Text(l10n?.commonAdd ?? 'Add'),
+              child: Text(
+                subscribe
+                    ? (l10n?.stickerSubscribe ?? 'Subscribe to updates')
+                    : l10n?.commonAdd ?? 'Add',
+              ),
             ),
           ],
         );
@@ -193,7 +205,15 @@ class _StickerImportPageState extends State<StickerImportPage> {
     });
     var success = false;
     try {
-      success = await _repository.installPack(pack.id);
+      success = subscribe
+          ? await _repository.setPackSubscribed(
+              StickerPackSubscription(
+                roomId: pack.origin!.roomId,
+                stateKey: pack.origin!.stateKey,
+              ),
+              enabled: true,
+            )
+          : await _repository.installPack(pack.id);
     } catch (_) {
       /* Keep the preview for retry. */
     }
@@ -361,18 +381,36 @@ class _StickerImportPageState extends State<StickerImportPage> {
             : SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
-                  child: FilledButton(
-                    key: const ValueKey('sticker_import_add'),
-                    onPressed: _current && !_installing && !_confirming
-                        ? _install
-                        : null,
-                    child: _installing
-                        ? const SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : Text(l10n?.commonAdd ?? 'Add'),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      FilledButton(
+                        key: const ValueKey('sticker_import_add'),
+                        onPressed: _current && !_installing && !_confirming
+                            ? () => _install()
+                            : null,
+                        child: _installing
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : Text(l10n?.commonAdd ?? 'Add'),
+                      ),
+                      const SizedBox(height: 8),
+                      OutlinedButton(
+                        key: const ValueKey('sticker_import_subscribe'),
+                        onPressed: _current && !_installing && !_confirming
+                            ? () => _install(subscribe: true)
+                            : null,
+                        child: Text(
+                          (l10n?.stickerSubscribe ?? 'Subscribe to updates'),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),

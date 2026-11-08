@@ -6330,4 +6330,11 @@ class SRu extends S {
   @override
   String get stickerPublishReceiptMissing =>
       'Опубликовано, но ссылка не сохранена. Поделитесь ею или скопируйте её, прежде чем покинуть страницу.';
+
+  @override
+  String get stickerSubscribe => 'Подписаться на обновления';
+
+  @override
+  String get stickerSubscribeNotice =>
+      'Получайте будущие изменения администраторов набора. Изображения и метаданные не защищены сквозным шифрованием. Подписку можно отменить позже; вы не вступите в исходный чат.';
 }

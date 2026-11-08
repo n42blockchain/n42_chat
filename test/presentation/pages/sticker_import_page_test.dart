@@ -9,6 +9,7 @@ import 'package:n42_chat/src/core/services/ai_sticker_service.dart';
 import 'package:n42_chat/src/presentation/pages/sticker/sticker_store_page.dart';
 import 'package:n42_chat/src/domain/entities/sticker_pack_entity.dart';
 import 'package:n42_chat/src/domain/entities/sticker_pack_origin.dart';
+import 'package:n42_chat/src/domain/entities/sticker_pack_subscription.dart';
 import 'package:n42_chat/src/domain/repositories/auth_repository.dart';
 import 'package:n42_chat/src/domain/repositories/sticker_repository.dart';
 import 'package:n42_chat/src/presentation/pages/sticker/sticker_import_page.dart';
@@ -154,6 +155,55 @@ void main() {
       expect(find.text('Open import'), findsOneWidget);
     },
   );
+
+  testWidgets(
+    'live subscription requires separate consent and never installs a copy',
+    (tester) async {
+      const reference = StickerPackSubscription(
+        roomId: '!pack:test',
+        stateKey: 'art',
+      );
+      when(() => repository.setPackSubscribed(reference, enabled: true))
+          .thenAnswer((_) async => true);
+      await open(tester);
+      await preview(tester);
+      verifyNever(() => repository.setPackSubscribed(reference, enabled: true));
+      await tester.tap(find.byKey(const ValueKey('sticker_import_subscribe')));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('future changes'), findsOneWidget);
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+      verifyNever(() => repository.setPackSubscribed(reference, enabled: true));
+      await tester.tap(find.byKey(const ValueKey('sticker_import_subscribe')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('sticker_subscribe_confirm')));
+      await tester.pumpAndSettle();
+      verify(() => repository.setPackSubscribed(reference, enabled: true))
+          .called(1);
+      verifyNever(() => repository.installPack(any()));
+      expect(returned, isTrue);
+    },
+  );
+
+  testWidgets('account change closes subscription consent without writing', (
+    tester,
+  ) async {
+    const reference = StickerPackSubscription(
+      roomId: '!pack:test',
+      stateKey: 'art',
+    );
+    await open(tester);
+    await preview(tester);
+    await tester.tap(find.byKey(const ValueKey('sticker_import_subscribe')));
+    await tester.pumpAndSettle();
+    switchAccount();
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('sticker_subscribe_confirm')),
+      findsNothing,
+    );
+    verifyNever(() => repository.setPackSubscribed(reference, enabled: true));
+  });
 
   testWidgets(
     'sticker management opens import without automatically previewing',
@@ -336,6 +386,17 @@ void main() {
         await tester.tap(find.byKey(const ValueKey('sticker_import_add')));
         await tester.pumpAndSettle();
         expect(find.byType(AlertDialog), findsOneWidget);
+        expect(tester.takeException(), isNull);
+        navigator.currentState!.pop(false);
+        await tester.pumpAndSettle();
+        await tester.tap(
+          find.byKey(const ValueKey('sticker_import_subscribe')),
+        );
+        await tester.pumpAndSettle();
+        expect(
+          find.byKey(const ValueKey('sticker_subscribe_confirm')),
+          findsOneWidget,
+        );
         expect(tester.takeException(), isNull);
       },
     );

@@ -2910,5 +2910,7 @@
   "stickerPackImages": "Immagini",
   "stickerPublishNotice": "Pubblica questo pacchetto nel gruppo selezionato. Le immagini e i metadati non sono crittografati end-to-end. Chi può leggere lo stato del gruppo potrebbe accedervi.",
   "stickerPublishFailed": "La pubblicazione non è stata confermata. Controlla il gruppo prima di riprovare.",
-  "stickerPublishReceiptMissing": "Pubblicato, ma il link non è stato salvato. Condividilo o copialo prima di lasciare questa pagina."
+  "stickerPublishReceiptMissing": "Pubblicato, ma il link non è stato salvato. Condividilo o copialo prima di lasciare questa pagina.",
+  "stickerSubscribe": "Iscriviti agli aggiornamenti",
+  "stickerSubscribeNotice": "Segui le modifiche future degli amministratori del pacchetto. Immagini e metadati non sono crittografati end-to-end. Puoi annullare l’iscrizione in seguito; questa azione non ti unisce alla chat di origine."
 }

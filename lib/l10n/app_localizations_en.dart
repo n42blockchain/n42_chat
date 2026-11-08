@@ -6268,4 +6268,11 @@ class SEn extends S {
   @override
   String get stickerPublishReceiptMissing =>
       'Published, but the link was not saved. Share or copy it before leaving this page.';
+
+  @override
+  String get stickerSubscribe => 'Subscribe to updates';
+
+  @override
+  String get stickerSubscribeNotice =>
+      'Follow future changes made by this pack’s administrators. Images and metadata are not end-to-end encrypted. You can unsubscribe later; this does not join the source chat.';
 }

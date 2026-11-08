@@ -6269,4 +6269,11 @@ class SAr extends S {
   @override
   String get stickerPublishReceiptMissing =>
       'تم النشر، لكن لم يتم حفظ الرابط. شاركه أو انسخه قبل مغادرة هذه الصفحة.';
+
+  @override
+  String get stickerSubscribe => 'الاشتراك في التحديثات';
+
+  @override
+  String get stickerSubscribeNotice =>
+      'متابعة التغييرات المستقبلية التي يجريها مسؤولو هذه الحزمة. الصور والبيانات الوصفية ليست مشفرة من طرف إلى طرف. يمكنك إلغاء الاشتراك لاحقًا؛ لن تنضم إلى المحادثة المصدر.';
 }

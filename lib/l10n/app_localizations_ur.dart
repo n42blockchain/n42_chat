@@ -6312,4 +6312,11 @@ class SUr extends S {
   @override
   String get stickerPublishReceiptMissing =>
       'شائع ہو گیا، لیکن لنک محفوظ نہیں ہوا۔ اس صفحے سے جانے سے پہلے اسے شیئر یا کاپی کریں۔';
+
+  @override
+  String get stickerSubscribe => 'اپ ڈیٹس کی رکنیت لیں';
+
+  @override
+  String get stickerSubscribeNotice =>
+      'اس پیک کے منتظمین کی آئندہ تبدیلیاں حاصل کریں۔ تصاویر اور میٹا ڈیٹا اینڈ ٹو اینڈ مرموز نہیں ہیں۔ بعد میں رکنیت ختم کر سکتے ہیں؛ اس سے اصل چیٹ میں شمولیت نہیں ہوگی۔';
 }

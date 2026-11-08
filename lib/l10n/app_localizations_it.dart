@@ -6328,4 +6328,11 @@ class SIt extends S {
   @override
   String get stickerPublishReceiptMissing =>
       'Pubblicato, ma il link non è stato salvato. Condividilo o copialo prima di lasciare questa pagina.';
+
+  @override
+  String get stickerSubscribe => 'Iscriviti agli aggiornamenti';
+
+  @override
+  String get stickerSubscribeNotice =>
+      'Segui le modifiche future degli amministratori del pacchetto. Immagini e metadati non sono crittografati end-to-end. Puoi annullare l’iscrizione in seguito; questa azione non ti unisce alla chat di origine.';
 }

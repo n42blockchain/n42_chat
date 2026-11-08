@@ -6297,4 +6297,11 @@ class SHi extends S {
   @override
   String get stickerPublishReceiptMissing =>
       'प्रकाशित हो गया, लेकिन लिंक सहेजा नहीं गया। इस पेज से जाने से पहले इसे साझा या कॉपी करें।';
+
+  @override
+  String get stickerSubscribe => 'अपडेट की सदस्यता लें';
+
+  @override
+  String get stickerSubscribeNotice =>
+      'इस पैक के प्रशासकों के भविष्य के बदलाव प्राप्त करें। चित्र और मेटाडेटा एंड-टू-एंड एन्क्रिप्टेड नहीं हैं। बाद में सदस्यता रद्द कर सकते हैं; इससे स्रोत चैट में शामिल नहीं होंगे।';
 }
