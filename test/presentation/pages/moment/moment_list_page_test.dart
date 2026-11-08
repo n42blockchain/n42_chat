@@ -1,6 +1,7 @@
 import 'package:n42_chat/src/domain/entities/contact_entity.dart';
 import 'package:n42_chat/src/presentation/pages/contact/contact_detail_page.dart';
 import 'package:n42_chat/src/presentation/widgets/common/n42_avatar.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -67,16 +68,14 @@ void main() {
     currentMomentState = MomentState(moments: [_buildMoment()], hasMore: false);
 
     when(() => mockMomentBloc.state).thenAnswer((_) => currentMomentState);
-    when(
-      () => mockMomentBloc.stream,
-    ).thenAnswer((_) => momentStateController.stream);
+    when(() => mockMomentBloc.stream)
+        .thenAnswer((_) => momentStateController.stream);
     when(() => mockMomentBloc.add(any())).thenReturn(null);
     when(() => mockMomentBloc.close()).thenAnswer((_) async {});
 
     when(() => mockContactBloc.state).thenReturn(const ContactState.initial());
-    when(
-      () => mockContactBloc.stream,
-    ).thenAnswer((_) => const Stream<ContactState>.empty());
+    when(() => mockContactBloc.stream)
+        .thenAnswer((_) => const Stream<ContactState>.empty());
     when(() => mockContactBloc.close()).thenAnswer((_) async {});
 
     getIt.registerFactory<MomentBloc>(() => mockMomentBloc);
@@ -196,6 +195,17 @@ void main() {
     expect(find.byType(PopupMenuItem<int>), findsNothing);
     expect(tester.takeException(), isNull);
   });
+  testWidgets('post action menu opens the report dialog', (tester) async {
+    await tester.pumpWidget(_buildTestWidget(contactBloc: mockContactBloc));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.more_horiz).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Report'));
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsOneWidget);
+    expect(find.text('Spam'), findsOneWidget);
+  });
+
   testWidgets('post details entry retains the live moment bloc', (
     tester,
   ) async {

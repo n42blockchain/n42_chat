@@ -518,6 +518,15 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
           Expanded(
             child: GestureDetector(
               onTap: () => _setReplyTarget(comment),
+              onLongPress: () {
+                final moment = _getLatestMoment(context);
+                if (moment == null) return;
+                showMomentReportDialog(
+                  context,
+                  moment: moment,
+                  comment: comment,
+                );
+              },
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

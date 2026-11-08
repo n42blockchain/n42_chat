@@ -62,6 +62,8 @@ class _Fixture {
     sourceEventId: r'$post',
   );
 
+  MomentComment? selectedComment;
+
   Widget build() => MaterialApp(
     localizationsDelegates: S.localizationsDelegates,
     supportedLocales: S.supportedLocales,
@@ -69,7 +71,11 @@ class _Fixture {
     home: Scaffold(
       body: Builder(
         builder: (context) => TextButton(
-          onPressed: () => showMomentReportDialog(context, moment: moment),
+          onPressed: () => showMomentReportDialog(
+            context,
+            moment: moment,
+            comment: selectedComment,
+          ),
           child: const Text('Open report'),
         ),
       ),
@@ -87,6 +93,31 @@ Future<void> _openReport(WidgetTester tester, _Fixture fixture) async {
 }
 
 void main() {
+  testWidgets('comment report targets the comment instead of its parent', (
+    tester,
+  ) async {
+    final f = _Fixture();
+    final comment = MomentComment(
+      id: 'comment-1',
+      userId: '@other:hs.test',
+      userName: 'Other',
+      content: 'Comment',
+      timestamp: DateTime(2026),
+      sourceRoomId: '!moments:hs.test',
+      sourceEventId: r'$comment',
+    );
+    f.selectedComment = comment;
+    when(() => f.reporter.reportComment(f.moment, comment, 'Spam\nDetails'))
+        .thenAnswer((_) async {});
+    await _openReport(tester, f);
+    await tester.tap(find.text('Confirm'));
+    await tester.pumpAndSettle();
+    verify(() => f.reporter.reportComment(f.moment, comment, 'Spam\nDetails'))
+        .called(1);
+    verifyNever(() => f.reporter.reportMoment(f.moment, 'Spam\nDetails'));
+    expect(find.text('Report submitted'), findsOneWidget);
+  });
+
   testWidgets('post report waits for exact repository acknowledgement', (
     tester,
   ) async {

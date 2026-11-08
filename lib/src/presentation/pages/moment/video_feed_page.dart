@@ -1,5 +1,9 @@
+import '../../widgets/common/user_report_dialog.dart';
+
 import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../../../l10n/app_localizations.dart';
 import '../../../n42_chat.dart';
 import '../../blocs/moment/moment_bloc.dart';
@@ -8,6 +12,7 @@ import 'create_moment_page.dart';
 
 import '../../../core/services/authenticated_video_source.dart';
 import '../../widgets/common/n42_avatar.dart';
+
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
@@ -501,6 +506,13 @@ class _VideoFeedItemState extends State<_VideoFeedItem> {
           color: Colors.white,
           label: '${m.commentCount}',
           onTap: null,
+        ),
+        const SizedBox(height: 18),
+        _action(
+          icon: Icons.flag_outlined,
+          color: Colors.white,
+          label: S.of(context)?.reportTitle ?? 'Report',
+          onTap: () => showMomentReportDialog(context, moment: m),
         ),
       ],
     );

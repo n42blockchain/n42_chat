@@ -1,5 +1,6 @@
 import 'package:n42_chat/src/presentation/pages/contact/contact_detail_page.dart';
 import 'package:n42_chat/src/presentation/widgets/common/n42_avatar.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -68,9 +69,8 @@ void main() {
     currentState = MomentState(moments: [moment]);
 
     when(() => mockMomentBloc.state).thenAnswer((_) => currentState);
-    when(
-      () => mockMomentBloc.stream,
-    ).thenAnswer((_) => momentStateController.stream);
+    when(() => mockMomentBloc.stream)
+        .thenAnswer((_) => momentStateController.stream);
     when(() => mockMomentBloc.add(any())).thenReturn(null);
     when(() => mockMomentBloc.close()).thenAnswer((_) async {});
   });
@@ -79,7 +79,9 @@ void main() {
     await momentStateController.close();
   });
 
-  testWidgets('detail report action opens the reporting dialog', (tester) async {
+  testWidgets('detail report action opens the reporting dialog', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       _buildTestWidget(momentBloc: mockMomentBloc, moment: moment),
     );
@@ -89,6 +91,19 @@ void main() {
     expect(find.byType(AlertDialog), findsOneWidget);
     expect(find.text('Spam'), findsOneWidget);
     expect(find.text('Report submitted'), findsNothing);
+  });
+
+  testWidgets('comment long press opens reporting without changing reply', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _buildTestWidget(momentBloc: mockMomentBloc, moment: moment),
+    );
+    await tester.pumpAndSettle();
+    await tester.longPress(find.text('Existing comment'));
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsOneWidget);
+    expect(find.text('Spam'), findsOneWidget);
   });
 
   testWidgets('author avatar opens the correct contact profile', (
