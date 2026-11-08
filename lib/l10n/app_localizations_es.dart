@@ -6349,4 +6349,13 @@ class SEs extends S {
   @override
   String get stickerSubscribeNotice =>
       'Recibe los cambios futuros de los administradores del paquete. Las imágenes y los metadatos no tienen cifrado de extremo a extremo. Puedes cancelar la suscripción después; esto no te une al chat de origen.';
+
+  @override
+  String get stickerSubscriptions => 'Suscripciones de stickers';
+
+  @override
+  String get stickerUnsubscribe => 'Cancelar suscripción';
+
+  @override
+  String get stickerSubscriptionsEmpty => 'No hay suscripciones de stickers';
 }

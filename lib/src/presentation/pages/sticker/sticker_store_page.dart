@@ -1,3 +1,5 @@
+import 'sticker_subscriptions_page.dart';
+
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
@@ -194,6 +196,20 @@ class _StickerStorePageState extends State<StickerStorePage>
         ),
         backgroundColor: context.surfaceColor,
         actions: [
+          IconButton(
+            key: const ValueKey('sticker_store_subscriptions'),
+            tooltip:
+                S.of(context)?.stickerSubscriptions ?? 'Sticker subscriptions',
+            icon: const Icon(Icons.sync),
+            onPressed: () async {
+              await Navigator.of(context).push<void>(
+                MaterialPageRoute<void>(
+                  builder: (_) => const StickerSubscriptionsPage(),
+                ),
+              );
+              if (mounted) await _loadData();
+            },
+          ),
           IconButton(
             key: const ValueKey('sticker_store_import'),
             tooltip: S.of(context)?.stickerImportTitle ?? 'Import sticker pack',

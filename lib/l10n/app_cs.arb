@@ -2912,5 +2912,8 @@
   "stickerPublishFailed": "Zveřejnění nebylo potvrzeno. Před dalším pokusem zkontrolujte skupinu.",
   "stickerPublishReceiptMissing": "Zveřejněno, ale odkaz se neuložil. Před opuštěním stránky jej sdílejte nebo zkopírujte.",
   "stickerSubscribe": "Odebírat aktualizace",
-  "stickerSubscribeNotice": "Sledujte budoucí změny správců tohoto balíčku. Obrázky a metadata nejsou koncově šifrovány. Odběr můžete později zrušit; do zdrojového chatu tím nevstoupíte."
+  "stickerSubscribeNotice": "Sledujte budoucí změny správců tohoto balíčku. Obrázky a metadata nejsou koncově šifrovány. Odběr můžete později zrušit; do zdrojového chatu tím nevstoupíte.",
+  "stickerSubscriptions": "Odběry samolepek",
+  "stickerUnsubscribe": "Zrušit odběr",
+  "stickerSubscriptionsEmpty": "Žádné odběry samolepek"
 }

@@ -2912,5 +2912,8 @@
   "stickerPublishFailed": "Yayımlama onaylanmadı. Yeniden denemeden önce grubu kontrol edin.",
   "stickerPublishReceiptMissing": "Yayımlandı ancak bağlantı kaydedilmedi. Bu sayfadan ayrılmadan önce paylaşın veya kopyalayın.",
   "stickerSubscribe": "Güncellemelere abone ol",
-  "stickerSubscribeNotice": "Paket yöneticilerinin gelecekteki değişikliklerini takip edin. Görseller ve meta veriler uçtan uca şifrelenmez. Aboneliği daha sonra iptal edebilirsiniz; bu işlem kaynak sohbete katılmanızı sağlamaz."
+  "stickerSubscribeNotice": "Paket yöneticilerinin gelecekteki değişikliklerini takip edin. Görseller ve meta veriler uçtan uca şifrelenmez. Aboneliği daha sonra iptal edebilirsiniz; bu işlem kaynak sohbete katılmanızı sağlamaz.",
+  "stickerSubscriptions": "Çıkartma abonelikleri",
+  "stickerUnsubscribe": "Abonelikten çık",
+  "stickerSubscriptionsEmpty": "Çıkartma aboneliği yok"
 }

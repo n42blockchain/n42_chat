@@ -6339,4 +6339,13 @@ class SSw extends S {
   @override
   String get stickerSubscribeNotice =>
       'Pokea mabadiliko yajayo kutoka kwa wasimamizi wa kifurushi hiki. Picha na metadata hazijasimbwa kutoka mwisho hadi mwisho. Unaweza kujiondoa baadaye; hatua hii haikuungi kwenye gumzo la chanzo.';
+
+  @override
+  String get stickerSubscriptions => 'Usajili wa vibandiko';
+
+  @override
+  String get stickerUnsubscribe => 'Jiondoe';
+
+  @override
+  String get stickerSubscriptionsEmpty => 'Hakuna usajili wa vibandiko';
 }

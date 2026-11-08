@@ -6166,4 +6166,13 @@ class SJa extends S {
   @override
   String get stickerSubscribeNotice =>
       'パックの管理者による今後の変更を受け取ります。画像とメタデータはエンドツーエンド暗号化されません。購読は後から解除できます。この操作で元のチャットに参加することはありません。';
+
+  @override
+  String get stickerSubscriptions => 'ステッカーの購読';
+
+  @override
+  String get stickerUnsubscribe => '購読を解除';
+
+  @override
+  String get stickerSubscriptionsEmpty => '購読中のステッカーはありません';
 }

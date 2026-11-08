@@ -6276,4 +6276,13 @@ class SAr extends S {
   @override
   String get stickerSubscribeNotice =>
       'متابعة التغييرات المستقبلية التي يجريها مسؤولو هذه الحزمة. الصور والبيانات الوصفية ليست مشفرة من طرف إلى طرف. يمكنك إلغاء الاشتراك لاحقًا؛ لن تنضم إلى المحادثة المصدر.';
+
+  @override
+  String get stickerSubscriptions => 'اشتراكات الملصقات';
+
+  @override
+  String get stickerUnsubscribe => 'إلغاء الاشتراك';
+
+  @override
+  String get stickerSubscriptionsEmpty => 'لا توجد اشتراكات ملصقات';
 }

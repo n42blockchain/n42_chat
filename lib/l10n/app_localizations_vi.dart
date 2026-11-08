@@ -6292,4 +6292,13 @@ class SVi extends S {
   @override
   String get stickerSubscribeNotice =>
       'Nhận các thay đổi trong tương lai từ quản trị viên gói. Hình ảnh và siêu dữ liệu không được mã hóa đầu cuối. Bạn có thể hủy đăng ký sau; thao tác này không tham gia cuộc trò chuyện nguồn.';
+
+  @override
+  String get stickerSubscriptions => 'Đăng ký nhãn dán';
+
+  @override
+  String get stickerUnsubscribe => 'Hủy đăng ký';
+
+  @override
+  String get stickerSubscriptionsEmpty => 'Không có đăng ký nhãn dán';
 }

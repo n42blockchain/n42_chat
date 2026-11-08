@@ -6340,6 +6340,15 @@ class SPt extends S {
   @override
   String get stickerSubscribeNotice =>
       'Receba futuras alterações dos administradores do pacote. As imagens e os metadados não têm encriptação ponto a ponto. Pode cancelar a subscrição mais tarde; isto não o faz aderir à conversa de origem.';
+
+  @override
+  String get stickerSubscriptions => 'Subscrições de autocolantes';
+
+  @override
+  String get stickerUnsubscribe => 'Cancelar subscrição';
+
+  @override
+  String get stickerSubscriptionsEmpty => 'Sem subscrições de autocolantes';
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).
@@ -12678,4 +12687,13 @@ class SPtBr extends SPt {
   @override
   String get stickerSubscribeNotice =>
       'Receba futuras alterações dos administradores do pacote. Imagens e metadados não têm criptografia de ponta a ponta. Você pode cancelar a assinatura depois; isso não faz você entrar na conversa de origem.';
+
+  @override
+  String get stickerSubscriptions => 'Assinaturas de figurinhas';
+
+  @override
+  String get stickerUnsubscribe => 'Cancelar assinatura';
+
+  @override
+  String get stickerSubscriptionsEmpty => 'Nenhuma assinatura de figurinhas';
 }

@@ -6306,4 +6306,13 @@ class SBn extends S {
   @override
   String get stickerSubscribeNotice =>
       'এই প্যাকের প্রশাসকদের ভবিষ্যৎ পরিবর্তন অনুসরণ করুন। ছবি ও মেটাডেটা এন্ড-টু-এন্ড এনক্রিপ্ট করা নয়। পরে সাবস্ক্রিপশন বাতিল করতে পারবেন; এতে উৎস চ্যাটে যোগ দেওয়া হবে না।';
+
+  @override
+  String get stickerSubscriptions => 'স্টিকার সাবস্ক্রিপশন';
+
+  @override
+  String get stickerUnsubscribe => 'সাবস্ক্রিপশন বাতিল করুন';
+
+  @override
+  String get stickerSubscriptionsEmpty => 'কোনো স্টিকার সাবস্ক্রিপশন নেই';
 }

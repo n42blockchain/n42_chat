@@ -2912,5 +2912,8 @@
   "stickerPublishFailed": "La publication n’a pas été confirmée. Vérifiez le groupe avant de réessayer.",
   "stickerPublishReceiptMissing": "Publié, mais le lien n’a pas été enregistré. Partagez-le ou copiez-le avant de quitter cette page.",
   "stickerSubscribe": "Suivre les mises à jour",
-  "stickerSubscribeNotice": "Suivez les futures modifications des administrateurs du pack. Les images et métadonnées ne sont pas chiffrées de bout en bout. Vous pourrez vous désabonner ; cela ne vous fait pas rejoindre la discussion source."
+  "stickerSubscribeNotice": "Suivez les futures modifications des administrateurs du pack. Les images et métadonnées ne sont pas chiffrées de bout en bout. Vous pourrez vous désabonner ; cela ne vous fait pas rejoindre la discussion source.",
+  "stickerSubscriptions": "Abonnements aux stickers",
+  "stickerUnsubscribe": "Se désabonner",
+  "stickerSubscriptionsEmpty": "Aucun abonnement aux stickers"
 }

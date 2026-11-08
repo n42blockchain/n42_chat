@@ -2912,5 +2912,8 @@
   "stickerPublishFailed": "Nie potwierdzono publikacji. Sprawdź grupę przed ponowną próbą.",
   "stickerPublishReceiptMissing": "Opublikowano, ale link nie został zapisany. Udostępnij lub skopiuj go przed opuszczeniem strony.",
   "stickerSubscribe": "Subskrybuj aktualizacje",
-  "stickerSubscribeNotice": "Otrzymuj przyszłe zmiany administratorów pakietu. Obrazy i metadane nie są szyfrowane end-to-end. Subskrypcję można później anulować; nie powoduje to dołączenia do czatu źródłowego."
+  "stickerSubscribeNotice": "Otrzymuj przyszłe zmiany administratorów pakietu. Obrazy i metadane nie są szyfrowane end-to-end. Subskrypcję można później anulować; nie powoduje to dołączenia do czatu źródłowego.",
+  "stickerSubscriptions": "Subskrypcje naklejek",
+  "stickerUnsubscribe": "Anuluj subskrypcję",
+  "stickerSubscriptionsEmpty": "Brak subskrypcji naklejek"
 }

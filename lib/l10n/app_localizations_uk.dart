@@ -6337,4 +6337,13 @@ class SUk extends S {
   @override
   String get stickerSubscribeNotice =>
       'Отримуйте майбутні зміни адміністраторів набору. Зображення й метадані не захищені наскрізним шифруванням. Підписку можна скасувати пізніше; ви не приєднаєтеся до вихідного чату.';
+
+  @override
+  String get stickerSubscriptions => 'Підписки на наліпки';
+
+  @override
+  String get stickerUnsubscribe => 'Скасувати підписку';
+
+  @override
+  String get stickerSubscriptionsEmpty => 'Немає підписок на наліпки';
 }

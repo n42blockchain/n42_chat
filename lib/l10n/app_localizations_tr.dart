@@ -6306,4 +6306,13 @@ class STr extends S {
   @override
   String get stickerSubscribeNotice =>
       'Paket yöneticilerinin gelecekteki değişikliklerini takip edin. Görseller ve meta veriler uçtan uca şifrelenmez. Aboneliği daha sonra iptal edebilirsiniz; bu işlem kaynak sohbete katılmanızı sağlamaz.';
+
+  @override
+  String get stickerSubscriptions => 'Çıkartma abonelikleri';
+
+  @override
+  String get stickerUnsubscribe => 'Abonelikten çık';
+
+  @override
+  String get stickerSubscriptionsEmpty => 'Çıkartma aboneliği yok';
 }

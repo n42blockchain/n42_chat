@@ -6317,4 +6317,13 @@ class SId extends S {
   @override
   String get stickerSubscribeNotice =>
       'Ikuti perubahan berikutnya dari administrator paket ini. Gambar dan metadata tidak dienkripsi ujung ke ujung. Anda dapat berhenti berlangganan nanti; tindakan ini tidak membuat Anda bergabung ke chat sumber.';
+
+  @override
+  String get stickerSubscriptions => 'Langganan stiker';
+
+  @override
+  String get stickerUnsubscribe => 'Berhenti berlangganan';
+
+  @override
+  String get stickerSubscriptionsEmpty => 'Tidak ada langganan stiker';
 }

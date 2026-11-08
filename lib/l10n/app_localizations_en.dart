@@ -6275,4 +6275,13 @@ class SEn extends S {
   @override
   String get stickerSubscribeNotice =>
       'Follow future changes made by this pack’s administrators. Images and metadata are not end-to-end encrypted. You can unsubscribe later; this does not join the source chat.';
+
+  @override
+  String get stickerSubscriptions => 'Sticker subscriptions';
+
+  @override
+  String get stickerUnsubscribe => 'Unsubscribe';
+
+  @override
+  String get stickerSubscriptionsEmpty => 'No sticker subscriptions';
 }

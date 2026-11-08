@@ -6356,4 +6356,13 @@ class SDe extends S {
   @override
   String get stickerSubscribeNotice =>
       'Künftige Änderungen durch die Paketadministratoren übernehmen. Bilder und Metadaten sind nicht Ende-zu-Ende-verschlüsselt. Das Abo kann später beendet werden; dem Quellchat trittst du dadurch nicht bei.';
+
+  @override
+  String get stickerSubscriptions => 'Sticker-Abos';
+
+  @override
+  String get stickerUnsubscribe => 'Abo beenden';
+
+  @override
+  String get stickerSubscriptionsEmpty => 'Keine Sticker-Abos';
 }

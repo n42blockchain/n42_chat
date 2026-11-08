@@ -2912,5 +2912,8 @@
   "stickerPublishFailed": "No se confirmó la publicación. Revisa el grupo antes de volver a intentarlo.",
   "stickerPublishReceiptMissing": "Se publicó, pero el enlace no se guardó. Compártelo o cópialo antes de salir de esta página.",
   "stickerSubscribe": "Suscribirse a actualizaciones",
-  "stickerSubscribeNotice": "Recibe los cambios futuros de los administradores del paquete. Las imágenes y los metadatos no tienen cifrado de extremo a extremo. Puedes cancelar la suscripción después; esto no te une al chat de origen."
+  "stickerSubscribeNotice": "Recibe los cambios futuros de los administradores del paquete. Las imágenes y los metadatos no tienen cifrado de extremo a extremo. Puedes cancelar la suscripción después; esto no te une al chat de origen.",
+  "stickerSubscriptions": "Suscripciones de stickers",
+  "stickerUnsubscribe": "Cancelar suscripción",
+  "stickerSubscriptionsEmpty": "No hay suscripciones de stickers"
 }

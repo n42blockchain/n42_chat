@@ -2944,5 +2944,8 @@
   "stickerPublishFailed": "Publication was not confirmed. Check the group before trying again.",
   "stickerPublishReceiptMissing": "Published, but the link was not saved. Share or copy it before leaving this page.",
   "stickerSubscribe": "Subscribe to updates",
-  "stickerSubscribeNotice": "Follow future changes made by this pack’s administrators. Images and metadata are not end-to-end encrypted. You can unsubscribe later; this does not join the source chat."
+  "stickerSubscribeNotice": "Follow future changes made by this pack’s administrators. Images and metadata are not end-to-end encrypted. You can unsubscribe later; this does not join the source chat.",
+  "stickerSubscriptions": "Sticker subscriptions",
+  "stickerUnsubscribe": "Unsubscribe",
+  "stickerSubscriptionsEmpty": "No sticker subscriptions"
 }

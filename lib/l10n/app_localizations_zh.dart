@@ -6124,6 +6124,15 @@ class SZh extends S {
   @override
   String get stickerSubscribeNotice =>
       '持续接收贴纸包管理员后续的修改。图片和元数据不受端到端加密保护。你可以稍后取消订阅；此操作不会加入来源群聊。';
+
+  @override
+  String get stickerSubscriptions => '贴纸订阅';
+
+  @override
+  String get stickerUnsubscribe => '取消订阅';
+
+  @override
+  String get stickerSubscriptionsEmpty => '暂无贴纸订阅';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -12246,4 +12255,13 @@ class SZhTw extends SZh {
   @override
   String get stickerSubscribeNotice =>
       '持續接收貼圖包管理員後續的修改。圖片和中繼資料不受端對端加密保護。你可以稍後取消訂閱；此操作不會加入來源群組。';
+
+  @override
+  String get stickerSubscriptions => '貼圖訂閱';
+
+  @override
+  String get stickerUnsubscribe => '取消訂閱';
+
+  @override
+  String get stickerSubscriptionsEmpty => '尚無貼圖訂閱';
 }

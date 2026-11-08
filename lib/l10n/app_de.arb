@@ -2912,5 +2912,8 @@
   "stickerPublishFailed": "Die Veröffentlichung wurde nicht bestätigt. Prüfe die Gruppe vor einem erneuten Versuch.",
   "stickerPublishReceiptMissing": "Veröffentlicht, aber der Link wurde nicht gespeichert. Teile oder kopiere ihn, bevor du diese Seite verlässt.",
   "stickerSubscribe": "Updates abonnieren",
-  "stickerSubscribeNotice": "Künftige Änderungen durch die Paketadministratoren übernehmen. Bilder und Metadaten sind nicht Ende-zu-Ende-verschlüsselt. Das Abo kann später beendet werden; dem Quellchat trittst du dadurch nicht bei."
+  "stickerSubscribeNotice": "Künftige Änderungen durch die Paketadministratoren übernehmen. Bilder und Metadaten sind nicht Ende-zu-Ende-verschlüsselt. Das Abo kann später beendet werden; dem Quellchat trittst du dadurch nicht bei.",
+  "stickerSubscriptions": "Sticker-Abos",
+  "stickerUnsubscribe": "Abo beenden",
+  "stickerSubscriptionsEmpty": "Keine Sticker-Abos"
 }

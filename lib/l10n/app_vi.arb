@@ -2912,5 +2912,8 @@
   "stickerPublishFailed": "Chưa xác nhận được việc đăng. Hãy kiểm tra nhóm trước khi thử lại.",
   "stickerPublishReceiptMissing": "Đã đăng nhưng chưa lưu được liên kết. Hãy chia sẻ hoặc sao chép liên kết trước khi rời trang này.",
   "stickerSubscribe": "Đăng ký cập nhật",
-  "stickerSubscribeNotice": "Nhận các thay đổi trong tương lai từ quản trị viên gói. Hình ảnh và siêu dữ liệu không được mã hóa đầu cuối. Bạn có thể hủy đăng ký sau; thao tác này không tham gia cuộc trò chuyện nguồn."
+  "stickerSubscribeNotice": "Nhận các thay đổi trong tương lai từ quản trị viên gói. Hình ảnh và siêu dữ liệu không được mã hóa đầu cuối. Bạn có thể hủy đăng ký sau; thao tác này không tham gia cuộc trò chuyện nguồn.",
+  "stickerSubscriptions": "Đăng ký nhãn dán",
+  "stickerUnsubscribe": "Hủy đăng ký",
+  "stickerSubscriptionsEmpty": "Không có đăng ký nhãn dán"
 }

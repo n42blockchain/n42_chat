@@ -6373,4 +6373,13 @@ class SFr extends S {
   @override
   String get stickerSubscribeNotice =>
       'Suivez les futures modifications des administrateurs du pack. Les images et métadonnées ne sont pas chiffrées de bout en bout. Vous pourrez vous désabonner ; cela ne vous fait pas rejoindre la discussion source.';
+
+  @override
+  String get stickerSubscriptions => 'Abonnements aux stickers';
+
+  @override
+  String get stickerUnsubscribe => 'Se désabonner';
+
+  @override
+  String get stickerSubscriptionsEmpty => 'Aucun abonnement aux stickers';
 }

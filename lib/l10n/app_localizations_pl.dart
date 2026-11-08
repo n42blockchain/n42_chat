@@ -6344,4 +6344,13 @@ class SPl extends S {
   @override
   String get stickerSubscribeNotice =>
       'Otrzymuj przyszłe zmiany administratorów pakietu. Obrazy i metadane nie są szyfrowane end-to-end. Subskrypcję można później anulować; nie powoduje to dołączenia do czatu źródłowego.';
+
+  @override
+  String get stickerSubscriptions => 'Subskrypcje naklejek';
+
+  @override
+  String get stickerUnsubscribe => 'Anuluj subskrypcję';
+
+  @override
+  String get stickerSubscriptionsEmpty => 'Brak subskrypcji naklejek';
 }

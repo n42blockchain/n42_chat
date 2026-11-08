@@ -6317,4 +6317,13 @@ class SCs extends S {
   @override
   String get stickerSubscribeNotice =>
       'Sledujte budoucí změny správců tohoto balíčku. Obrázky a metadata nejsou koncově šifrovány. Odběr můžete později zrušit; do zdrojového chatu tím nevstoupíte.';
+
+  @override
+  String get stickerSubscriptions => 'Odběry samolepek';
+
+  @override
+  String get stickerUnsubscribe => 'Zrušit odběr';
+
+  @override
+  String get stickerSubscriptionsEmpty => 'Žádné odběry samolepek';
 }

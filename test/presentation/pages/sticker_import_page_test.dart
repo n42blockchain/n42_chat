@@ -227,6 +227,15 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byKey(const ValueKey('sticker_import_link')), findsOneWidget);
       verifyNever(() => repository.importPack(any()));
+      tester.state<NavigatorState>(find.byType(Navigator).first).pop();
+      await tester.pumpAndSettle();
+      when(() => repository.getPackSubscriptions()).thenAnswer((_) async => []);
+      await tester.tap(
+        find.byKey(const ValueKey('sticker_store_subscriptions')),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('No sticker subscriptions'), findsOneWidget);
+      verify(() => repository.getPackSubscriptions()).called(1);
     },
   );
 

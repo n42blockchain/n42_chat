@@ -6335,4 +6335,13 @@ class SIt extends S {
   @override
   String get stickerSubscribeNotice =>
       'Segui le modifiche future degli amministratori del pacchetto. Immagini e metadati non sono crittografati end-to-end. Puoi annullare l’iscrizione in seguito; questa azione non ti unisce alla chat di origine.';
+
+  @override
+  String get stickerSubscriptions => 'Iscrizioni agli adesivi';
+
+  @override
+  String get stickerUnsubscribe => 'Annulla iscrizione';
+
+  @override
+  String get stickerSubscriptionsEmpty => 'Nessuna iscrizione agli adesivi';
 }

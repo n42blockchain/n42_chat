@@ -2300,5 +2300,8 @@
   "stickerPublishFailed": "無法確認發佈結果。請先檢查群組，再決定是否重試。",
   "stickerPublishReceiptMissing": "已發佈，但連結未能儲存。離開此頁面前，請先分享或複製連結。",
   "stickerSubscribe": "訂閱更新",
-  "stickerSubscribeNotice": "持續接收貼圖包管理員後續的修改。圖片和中繼資料不受端對端加密保護。你可以稍後取消訂閱；此操作不會加入來源群組。"
+  "stickerSubscribeNotice": "持續接收貼圖包管理員後續的修改。圖片和中繼資料不受端對端加密保護。你可以稍後取消訂閱；此操作不會加入來源群組。",
+  "stickerSubscriptions": "貼圖訂閱",
+  "stickerUnsubscribe": "取消訂閱",
+  "stickerSubscriptionsEmpty": "尚無貼圖訂閱"
 }

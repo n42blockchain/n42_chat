@@ -6319,4 +6319,13 @@ class SUr extends S {
   @override
   String get stickerSubscribeNotice =>
       'اس پیک کے منتظمین کی آئندہ تبدیلیاں حاصل کریں۔ تصاویر اور میٹا ڈیٹا اینڈ ٹو اینڈ مرموز نہیں ہیں۔ بعد میں رکنیت ختم کر سکتے ہیں؛ اس سے اصل چیٹ میں شمولیت نہیں ہوگی۔';
+
+  @override
+  String get stickerSubscriptions => 'اسٹیکر کی رکنیتیں';
+
+  @override
+  String get stickerUnsubscribe => 'رکنیت ختم کریں';
+
+  @override
+  String get stickerSubscriptionsEmpty => 'اسٹیکر کی کوئی رکنیت نہیں';
 }

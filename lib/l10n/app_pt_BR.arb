@@ -2912,5 +2912,8 @@
   "stickerPublishFailed": "A publicação não foi confirmada. Verifique o grupo antes de tentar novamente.",
   "stickerPublishReceiptMissing": "Publicado, mas o link não foi salvo. Compartilhe ou copie o link antes de sair desta página.",
   "stickerSubscribe": "Assinar atualizações",
-  "stickerSubscribeNotice": "Receba futuras alterações dos administradores do pacote. Imagens e metadados não têm criptografia de ponta a ponta. Você pode cancelar a assinatura depois; isso não faz você entrar na conversa de origem."
+  "stickerSubscribeNotice": "Receba futuras alterações dos administradores do pacote. Imagens e metadados não têm criptografia de ponta a ponta. Você pode cancelar a assinatura depois; isso não faz você entrar na conversa de origem.",
+  "stickerSubscriptions": "Assinaturas de figurinhas",
+  "stickerUnsubscribe": "Cancelar assinatura",
+  "stickerSubscriptionsEmpty": "Nenhuma assinatura de figurinhas"
 }

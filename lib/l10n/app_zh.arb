@@ -2300,5 +2300,8 @@
   "stickerPublishFailed": "未能确认发布结果。请先检查群聊，再决定是否重试。",
   "stickerPublishReceiptMissing": "已发布，但链接未能保存。离开此页面前，请先分享或复制链接。",
   "stickerSubscribe": "订阅更新",
-  "stickerSubscribeNotice": "持续接收贴纸包管理员后续的修改。图片和元数据不受端到端加密保护。你可以稍后取消订阅；此操作不会加入来源群聊。"
+  "stickerSubscribeNotice": "持续接收贴纸包管理员后续的修改。图片和元数据不受端到端加密保护。你可以稍后取消订阅；此操作不会加入来源群聊。",
+  "stickerSubscriptions": "贴纸订阅",
+  "stickerUnsubscribe": "取消订阅",
+  "stickerSubscriptionsEmpty": "暂无贴纸订阅"
 }

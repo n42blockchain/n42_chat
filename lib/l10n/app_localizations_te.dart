@@ -6352,4 +6352,13 @@ class STe extends S {
   @override
   String get stickerSubscribeNotice =>
       'ఈ ప్యాక్ నిర్వాహకులు చేసే తదుపరి మార్పులను పొందండి. చిత్రాలు, మెటాడేటాకు ఎండ్-టు-ఎండ్ ఎన్‌క్రిప్షన్ లేదు. తర్వాత సభ్యత్వాన్ని రద్దు చేయవచ్చు; దీనివల్ల మూల చాట్‌లో చేరరు.';
+
+  @override
+  String get stickerSubscriptions => 'స్టికర్ సభ్యత్వాలు';
+
+  @override
+  String get stickerUnsubscribe => 'సభ్యత్వాన్ని రద్దు చేయండి';
+
+  @override
+  String get stickerSubscriptionsEmpty => 'స్టికర్ సభ్యత్వాలు లేవు';
 }

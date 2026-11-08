@@ -11596,6 +11596,24 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Follow future changes made by this pack’s administrators. Images and metadata are not end-to-end encrypted. You can unsubscribe later; this does not join the source chat.'**
   String get stickerSubscribeNotice;
+
+  /// No description provided for @stickerSubscriptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Sticker subscriptions'**
+  String get stickerSubscriptions;
+
+  /// No description provided for @stickerUnsubscribe.
+  ///
+  /// In en, this message translates to:
+  /// **'Unsubscribe'**
+  String get stickerUnsubscribe;
+
+  /// No description provided for @stickerSubscriptionsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No sticker subscriptions'**
+  String get stickerSubscriptionsEmpty;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

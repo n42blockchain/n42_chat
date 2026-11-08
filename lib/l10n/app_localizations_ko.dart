@@ -6169,4 +6169,13 @@ class SKo extends S {
   @override
   String get stickerSubscribeNotice =>
       '팩 관리자의 향후 변경 사항을 받습니다. 이미지와 메타데이터는 종단 간 암호화되지 않습니다. 나중에 구독을 취소할 수 있으며, 이 작업으로 원본 채팅에 참여하지는 않습니다.';
+
+  @override
+  String get stickerSubscriptions => '스티커 구독';
+
+  @override
+  String get stickerUnsubscribe => '구독 취소';
+
+  @override
+  String get stickerSubscriptionsEmpty => '구독 중인 스티커가 없습니다';
 }

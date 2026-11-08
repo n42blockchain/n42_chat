@@ -6372,4 +6372,13 @@ class STa extends S {
   @override
   String get stickerSubscribeNotice =>
       'இந்தத் தொகுப்பின் நிர்வாகிகள் செய்யும் எதிர்கால மாற்றங்களைப் பெறுங்கள். படங்களும் மெட்டாடேட்டாவும் முனையிலிருந்து முனை வரை மறையாக்கப்படவில்லை. பின்னர் சந்தாவை ரத்துசெய்யலாம்; இதனால் மூல அரட்டையில் சேர மாட்டீர்கள்.';
+
+  @override
+  String get stickerSubscriptions => 'ஸ்டிக்கர் சந்தாக்கள்';
+
+  @override
+  String get stickerUnsubscribe => 'சந்தாவை ரத்துசெய்';
+
+  @override
+  String get stickerSubscriptionsEmpty => 'ஸ்டிக்கர் சந்தாக்கள் இல்லை';
 }

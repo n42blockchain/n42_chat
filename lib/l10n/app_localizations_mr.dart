@@ -6303,4 +6303,13 @@ class SMr extends S {
   @override
   String get stickerSubscribeNotice =>
       'या पॅकच्या प्रशासकांचे पुढील बदल मिळवा. प्रतिमा आणि मेटाडेटा एंड-टू-एंड एन्क्रिप्ट केलेले नाहीत. नंतर सदस्यता रद्द करू शकता; यामुळे मूळ चॅटमध्ये सामील होणार नाही.';
+
+  @override
+  String get stickerSubscriptions => 'स्टिकर सदस्यता';
+
+  @override
+  String get stickerUnsubscribe => 'सदस्यता रद्द करा';
+
+  @override
+  String get stickerSubscriptionsEmpty => 'कोणतीही स्टिकर सदस्यता नाही';
 }

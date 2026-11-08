@@ -6337,4 +6337,13 @@ class SRu extends S {
   @override
   String get stickerSubscribeNotice =>
       'Получайте будущие изменения администраторов набора. Изображения и метаданные не защищены сквозным шифрованием. Подписку можно отменить позже; вы не вступите в исходный чат.';
+
+  @override
+  String get stickerSubscriptions => 'Подписки на стикеры';
+
+  @override
+  String get stickerUnsubscribe => 'Отписаться';
+
+  @override
+  String get stickerSubscriptionsEmpty => 'Нет подписок на стикеры';
 }

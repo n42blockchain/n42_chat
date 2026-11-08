@@ -6304,4 +6304,13 @@ class SHi extends S {
   @override
   String get stickerSubscribeNotice =>
       'इस पैक के प्रशासकों के भविष्य के बदलाव प्राप्त करें। चित्र और मेटाडेटा एंड-टू-एंड एन्क्रिप्टेड नहीं हैं। बाद में सदस्यता रद्द कर सकते हैं; इससे स्रोत चैट में शामिल नहीं होंगे।';
+
+  @override
+  String get stickerSubscriptions => 'स्टिकर सदस्यताएँ';
+
+  @override
+  String get stickerUnsubscribe => 'सदस्यता रद्द करें';
+
+  @override
+  String get stickerSubscriptionsEmpty => 'कोई स्टिकर सदस्यता नहीं';
 }
