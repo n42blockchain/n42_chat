@@ -601,13 +601,14 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Current state: the latest pass closed room-level notification granularity by wiring `all messages / mentions only / mute` to Matrix push rules, and it added notification privacy levels for sender/body hiding. However there is still no Slack-style keyword alert list that can trigger notifications outside direct mentions.
 - Next step: decide whether keyword rules should live in homeserver push rules or client-side preferences, then add a shared keyword matcher/editor and integrate it into foreground/background notification evaluation.
 
-### IDHUB-001 Positive ID Hub chat login is blocked on Matrix provisioning
+### IDHUB-001 Positive ID Hub chat login still needs provisioning acceptance
 
 - Severity: H
 - Added: 2026-07-14
 - Evidence: `lib/src/presentation/blocs/auth/auth_bloc.dart`, `lib/src/data/datasources/remote/id_hub_api.dart`, unified-identity device QA against the deployed development Hub
 - Current state: the deployed Hub reports Matrix provisioning disabled, so positive Hub-to-Matrix login cannot yet establish a chat session. The hardened client now permits legacy fallback only when Hub challenge creation fails before signing. Cancellation or any failure after a Hub challenge is signed stops with one clear error and never asks for a second signature. The Hub server code also rejects Chat challenge creation with `matrix-unavailable` before signing when provisioning is disabled.
-- Next step: configure the production Hub with the Synapse shared-registration secret and Matrix password secret, deploy it, then run the positive Hub-to-Matrix login on a real device.
+- Source reconciliation (2026-11-07): current n42-id-hub/src/modules/matrix/service.ts supports both Synapse shared-secret registration and the standard m.login.registration_token UIA flow, with exact derived-user validation and existing-user login. A Tuwunel deployment must use its verified registration-token configuration rather than assume the Synapse admin endpoint exists. When both values are configured, current source selects the shared-secret branch first. The earlier disabled-provisioning probe is historical; current deployed configuration and positive provisioning were not revalidated here.
+- Next step: verify the deployed homeserver/provider configuration, select its supported registration mode and controlled password secret, then perform authorized positive Hub-to-Matrix login and recovery acceptance. Do not replace that evidence with local source tests or disclose provisioning credentials.
 
 ## Verification Gaps
 
