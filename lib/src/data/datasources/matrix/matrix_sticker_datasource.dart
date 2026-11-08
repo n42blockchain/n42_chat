@@ -114,7 +114,11 @@ class MatrixStickerDataSource {
                 url: url,
                 httpUrl: _getHttpUrl(url),
                 name: (value['body'] ?? value['name']) as String?,
-                emoji: key,
+                emoji: value.containsKey('n42.emoji') &&
+                        (value['n42.emoji'] == null ||
+                            value['n42.emoji'] is String)
+                    ? value['n42.emoji'] as String?
+                    : key,
                 width: (value['info']?['w'] as num?)?.toInt(),
                 height: (value['info']?['h'] as num?)?.toInt(),
                 mimeType: value['info']?['mimetype'] as String?,
@@ -240,8 +244,15 @@ class MatrixStickerDataSource {
   Map<String, dynamic> _packToJson(StickerPack pack) {
     final images = <String, dynamic>{};
     for (final sticker in pack.stickers) {
-      images[sticker.emoji ?? sticker.id] = {
+      if (sticker.id.isEmpty || images.containsKey(sticker.id)) {
+        throw const FormatException(
+          'Sticker identifiers must be nonempty and unique',
+        );
+      }
+      // Emoji aliases can repeat; only the stable sticker ID is a unique key.
+      images[sticker.id] = {
         'url': sticker.url,
+        'n42.emoji': sticker.emoji,
         'body': sticker.name ?? sticker.emoji,
         'info': {
           'w': sticker.width,

@@ -794,13 +794,15 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Current state: private AI routes exist and are repaired in M2. Group bot settings only configure welcome/webhook automation. There is no AI Matrix bot identity, invitation-specific configuration, response worker or group-context policy in this checkout. The local device build also lacks an AI provider key/model configuration.
 - Next step: provide/deploy a responding bot service, specify bot identity and group disclosure/context rules, then wire invitation/member state and verify mention/response/removal in an isolated test room. Ordinary member invitation is not evidence of AI responses.
 
-### MEDIA-005 Sticker pack sharing and importing are still stubs
+### MEDIA-005 Sticker sharing/import stubs; persistence identity repair under verification
 
-- Severity: M
+- Severity: H until persistence repair is integrated; sharing/import stubs remain M
 - Added: 2026-09-12
-- Evidence: `lib/src/data/repositories/sticker_repository_impl.dart` importPack/getPackShareUrl
-- Current state: installed/custom packs, upload, search and sending exist; these two cross-user sharing methods still return null. There is no verified share-manifest or import preview path. Do not claim a full sticker sharing ecosystem.
-- Next step: define persistent pack distribution, resource validation and receiver preview/install, then wire and test both sender and receiver.
+- Evidence: `StickerRepositoryImpl.importPack/getPackShareUrl`, `MatrixStickerDataSource._packToJson/_parseStickerPack`, `matrix_sticker_roundtrip_test.dart`.
+- Current state: installed/custom packs, upload, search and sending exist; both sharing methods still return null, with no verified manifest/receiver preview. This remains unfinished.
+- Persistence prerequisite: three pre-fix roundtrip failures reproduced same-emoji image overwrite, identifier drift, and duplicate-ID acceptance. Image entries now use stable sticker IDs; nullable emoji aliases use optional namespaced metadata, while legacy image keys remain readable. Invalid/duplicate IDs reject before any account-data write. Six new regressions cover same-emoji preservation across reopen/rename/selected deletion, absent emoji, legacy records, invalid IDs and malformed optional metadata. The 67-test datasource/repository/picker cluster passes; scoped analysis is clean. This prevents new loss and does not reconstruct already overwritten historical entries.
+- Release boundary: wallet candidate 73481 contains the older serializer and is held. Complete full Chat regression and wallet integration, then build and verify a fresh artifact before delivery.
+- Next step: finish persistence acceptance, then define persistent pack distribution, bounded resource validation and receiver preview/install, and wire/test both sender and receiver before claiming a sharing ecosystem.
 
 ### INTEGRATION-002 Standalone Settings composition — Resolved
 
