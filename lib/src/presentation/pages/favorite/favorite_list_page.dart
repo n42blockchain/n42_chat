@@ -6,6 +6,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/message_entity.dart';
+import '../../../domain/entities/account_action_origin.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../data/services/account_action_capture.dart';
 import '../../../domain/repositories/auth_repository.dart';
@@ -516,7 +517,12 @@ class _FavoriteListView extends StatelessWidget {
               ),
               onTap: () {
                 Navigator.pop(sheetContext);
-                context.read<FavoriteBloc>().add(DeleteFavorite(favorite.id));
+                context.read<FavoriteBloc>().add(
+                  DeleteFavorite(
+                    favorite.id,
+                    origin: AccountActionOrigin(repository, isCurrent),
+                  ),
+                );
               },
             ),
           ],

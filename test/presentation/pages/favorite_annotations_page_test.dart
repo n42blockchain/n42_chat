@@ -165,6 +165,35 @@ class _Fixture {
 
 void main() {
   testWidgets(
+    'old favorite action sheet cannot delete replacement-account data',
+    (tester) async {
+      final f = _Fixture();
+      await f.initialize(tester);
+      await f.open(tester);
+      await tester.longPress(find.text('Saved launch notes'));
+      await tester.pumpAndSettle();
+      f.switchToB();
+      await f.repository.saveMessage(
+        MessageEntity(
+          id: 'one',
+          roomId: '!bob:test',
+          senderId: '@bob:test',
+          senderName: 'Bob',
+          content: 'Bob private note',
+          type: MessageType.text,
+          timestamp: DateTime.now(),
+        ),
+      );
+      await tester.tap(find.text('Delete'));
+      await tester.pumpAndSettle();
+      expect(
+        (await f.repository.getSavedMessages()).map((entry) => entry.content),
+        contains('Bob private note'),
+      );
+    },
+  );
+
+  testWidgets(
     'local favorite forwards its text without looking up a fake Matrix event',
     (tester) async {
       final f = _Fixture();

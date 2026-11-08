@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+import '../../../domain/entities/account_action_origin.dart';
+
 abstract class FavoriteEvent extends Equatable {
   const FavoriteEvent();
 
@@ -31,10 +33,12 @@ class SearchFavorites extends FavoriteEvent {
 class DeleteFavorite extends FavoriteEvent {
   final String favoriteId;
 
-  const DeleteFavorite(this.favoriteId);
+  final AccountActionOrigin? origin;
+
+  const DeleteFavorite(this.favoriteId, {this.origin});
 
   @override
-  List<Object?> get props => [favoriteId];
+  List<Object?> get props => [favoriteId, origin];
 }
 
 /// 修改收藏标签
@@ -42,10 +46,7 @@ class EditFavoriteTags extends FavoriteEvent {
   final String favoriteId;
   final List<String> tags;
 
-  const EditFavoriteTags({
-    required this.favoriteId,
-    required this.tags,
-  });
+  const EditFavoriteTags({required this.favoriteId, required this.tags});
 
   @override
   List<Object?> get props => [favoriteId, tags];
@@ -56,10 +57,7 @@ class EditFavoriteRemark extends FavoriteEvent {
   final String favoriteId;
   final String remark;
 
-  const EditFavoriteRemark({
-    required this.favoriteId,
-    required this.remark,
-  });
+  const EditFavoriteRemark({required this.favoriteId, required this.remark});
 
   @override
   List<Object?> get props => [favoriteId, remark];

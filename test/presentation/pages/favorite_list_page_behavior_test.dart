@@ -2,10 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:matrix/matrix.dart' as matrix;
+import 'package:n42_chat/src/data/datasources/matrix/matrix_client_manager.dart';
+import 'package:n42_chat/src/domain/repositories/auth_repository.dart';
 import 'package:n42_chat/l10n/app_localizations.dart';
 import 'package:n42_chat/src/domain/entities/message_entity.dart';
 import 'package:n42_chat/src/domain/repositories/message_action_repository.dart';
 import 'package:n42_chat/src/presentation/pages/favorite/favorite_list_page.dart';
+
+class _Client extends Mock implements matrix.Client {}
+
+class _Manager extends Mock implements MatrixClientManager {}
+
+class _Auth extends Mock
+    implements IAuthRepository, IAccountBoundDeletionLifecycle {}
 
 class _Repository extends Mock implements IMessageActionRepository {}
 
@@ -33,6 +43,25 @@ void main() {
   setUpAll(() => registerFallbackValue(_Message()));
   setUp(() async {
     await getIt.reset();
+    final client = _Client();
+    final manager = _Manager();
+    final auth = _Auth();
+    when(() => manager.client).thenReturn(client);
+    when(client.isLogged).thenReturn(true);
+    when(() => client.userID).thenReturn('@alice:example.org');
+    when(() => client.homeserver).thenReturn(Uri.parse('https://example.org'));
+    when(() => client.deviceID).thenReturn('D');
+    when(() => client.accessToken).thenReturn('fixture-token');
+    final generation = AuthSessionInvalidation(
+      userId: '@alice:example.org',
+      homeserver: Uri.parse('https://example.org'),
+      deviceId: 'D',
+      isCurrent: () => true,
+      matchesClient: (candidate) => identical(candidate, client),
+    );
+    when(() => auth.currentAccountGeneration).thenReturn(generation);
+    getIt.registerSingleton<MatrixClientManager>(manager);
+    getIt.registerSingleton<IAuthRepository>(auth);
     repository = _Repository();
     getIt.registerSingleton<IMessageActionRepository>(repository);
     when(() => repository.getSavedMessages()).thenAnswer((_) async => []);
@@ -80,9 +109,8 @@ void main() {
       MessageType.text,
       daysAgo: 2,
     );
-    when(
-      () => repository.getSavedMessages(),
-    ).thenAnswer((_) async => [note, image, link]);
+    when(() => repository.getSavedMessages())
+        .thenAnswer((_) async => [note, image, link]);
     when(() => repository.unsaveMessage('image')).thenAnswer((_) async {});
     await open(tester);
 

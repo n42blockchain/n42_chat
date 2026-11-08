@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:n42_chat/src/domain/entities/message_entity.dart';
+import 'package:n42_chat/src/domain/entities/account_action_origin.dart';
 import 'package:n42_chat/src/domain/repositories/message_action_repository.dart';
 import 'package:n42_chat/src/presentation/blocs/favorite/favorite_bloc.dart';
 import 'package:n42_chat/src/presentation/blocs/favorite/favorite_event.dart';
@@ -13,17 +16,16 @@ class MockMessageActionRepository extends Mock
 MessageEntity _makeMessage({
   String id = 'msg-1',
   MessageType type = MessageType.text,
-}) =>
-    MessageEntity(
-      id: id,
-      roomId: '!room:s',
-      senderId: '@alice:s',
-      senderName: 'Alice',
-      content: 'Test message',
-      timestamp: DateTime(2025, 6, 1),
-      type: type,
-      status: MessageStatus.sent,
-    );
+}) => MessageEntity(
+  id: id,
+  roomId: '!room:s',
+  senderId: '@alice:s',
+  senderName: 'Alice',
+  content: 'Test message',
+  timestamp: DateTime(2025, 6, 1),
+  type: type,
+  status: MessageStatus.sent,
+);
 
 void main() {
   late MockMessageActionRepository mockRepo;
@@ -92,8 +94,7 @@ void main() {
       act: (bloc) => bloc.add(const LoadFavorites(filterType: 'text')),
       expect: () => [
         isA<FavoriteState>().having((s) => s.isLoading, 'isLoading', isTrue),
-        isA<FavoriteState>()
-            .having((s) => s.filterType, 'filterType', 'text'),
+        isA<FavoriteState>().having((s) => s.filterType, 'filterType', 'text'),
       ],
     );
   });
@@ -104,13 +105,80 @@ void main() {
       build: buildBloc,
       act: (bloc) => bloc.add(const SearchFavorites('alice')),
       expect: () => [
-        isA<FavoriteState>()
-            .having((s) => s.searchQuery, 'searchQuery', 'alice'),
+        isA<FavoriteState>().having(
+          (s) => s.searchQuery,
+          'searchQuery',
+          'alice',
+        ),
       ],
     );
   });
 
   group('DeleteFavorite', () {
+    blocTest<FavoriteBloc, FavoriteState>(
+      'rejects a stale queued origin without deleting',
+      build: buildBloc,
+      act: (bloc) => bloc.add(
+        DeleteFavorite(
+          'msg-1',
+          origin: AccountActionOrigin(mockRepo, () => false),
+        ),
+      ),
+      expect: () => [
+        isA<FavoriteState>().having((s) => s.error, 'error', isNotNull),
+      ],
+      verify: (_) => verifyNever(() => mockRepo.unsaveMessage(any())),
+    );
+
+    blocTest<FavoriteBloc, FavoriteState>(
+      'rejects an origin captured for a replaced repository',
+      build: buildBloc,
+      act: (bloc) => bloc.add(
+        DeleteFavorite(
+          'msg-1',
+          origin: AccountActionOrigin(Object(), () => true),
+        ),
+      ),
+      expect: () => [
+        isA<FavoriteState>().having((s) => s.error, 'error', isNotNull),
+      ],
+      verify: (_) => verifyNever(() => mockRepo.unsaveMessage(any())),
+    );
+
+    test(
+      'late delete completion cannot publish success after account replacement',
+      () async {
+        final pending = Completer<void>();
+        final started = Completer<void>();
+        var current = true;
+        when(() => mockRepo.unsaveMessage('msg-1')).thenAnswer((_) {
+          started.complete();
+          return pending.future;
+        });
+        final bloc = buildBloc();
+        when(() => mockRepo.getSavedMessages())
+            .thenAnswer((_) async => [_makeMessage()]);
+        final loaded = bloc.stream.firstWhere(
+          (state) => !state.isLoading && state.favorites.isNotEmpty,
+        );
+        bloc.add(const LoadFavorites());
+        await loaded;
+        final rejected = bloc.stream.firstWhere((state) => state.error != null);
+        bloc.add(
+          DeleteFavorite(
+            'msg-1',
+            origin: AccountActionOrigin(mockRepo, () => current),
+          ),
+        );
+        await started.future;
+        current = false;
+        pending.complete();
+        final state = await rejected;
+        expect(state.favorites.map((entry) => entry.id), contains('msg-1'));
+        await bloc.close();
+      },
+    );
+
     blocTest<FavoriteBloc, FavoriteState>(
       'removes favorite from list on success',
       build: buildBloc,
@@ -118,7 +186,10 @@ void main() {
         when(() => mockRepo.unsaveMessage(any())).thenAnswer((_) async {});
       },
       seed: () => FavoriteState(
-        favorites: [_makeMessage(id: 'msg-1'), _makeMessage(id: 'msg-2')],
+        favorites: [
+          _makeMessage(id: 'msg-1'),
+          _makeMessage(id: 'msg-2'),
+        ],
       ),
       act: (bloc) => bloc.add(const DeleteFavorite('msg-1')),
       expect: () => [
@@ -174,9 +245,8 @@ void main() {
         when(() => mockRepo.editFavoriteTags(any(), any()))
             .thenThrow(Exception('Tag edit failed'));
       },
-      act: (bloc) => bloc.add(
-        const EditFavoriteTags(favoriteId: 'msg-1', tags: []),
-      ),
+      act: (bloc) =>
+          bloc.add(const EditFavoriteTags(favoriteId: 'msg-1', tags: [])),
       expect: () => [
         isA<FavoriteState>().having((s) => s.error, 'error', isNotNull),
       ],
@@ -209,8 +279,7 @@ void main() {
       build: buildBloc,
       act: (bloc) => bloc.add(const ChangeFavoriteFilter('image')),
       expect: () => [
-        isA<FavoriteState>()
-            .having((s) => s.filterType, 'filterType', 'image'),
+        isA<FavoriteState>().having((s) => s.filterType, 'filterType', 'image'),
       ],
     );
 
@@ -220,8 +289,7 @@ void main() {
       seed: () => const FavoriteState(filterType: 'text'),
       act: (bloc) => bloc.add(const ChangeFavoriteFilter(null)),
       expect: () => [
-        isA<FavoriteState>()
-            .having((s) => s.filterType, 'filterType', isNull),
+        isA<FavoriteState>().having((s) => s.filterType, 'filterType', isNull),
       ],
     );
   });

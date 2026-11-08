@@ -61,7 +61,15 @@ class FavoriteBloc extends Bloc<FavoriteEvent, FavoriteState> {
     Emitter<FavoriteState> emit,
   ) async {
     try {
+      final origin = event.origin;
+      if (origin != null &&
+          (!identical(origin.owner, _repository) || !origin.isCurrent)) {
+        throw StateError('Favorite account changed');
+      }
       await _repository.unsaveMessage(event.favoriteId);
+      if (origin != null && !origin.isCurrent) {
+        throw StateError('Favorite account changed');
+      }
       final updated = state.favorites
           .where((f) => f.id != event.favoriteId)
           .toList();
