@@ -2085,7 +2085,28 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
     );
   }
 
+  bool Function() _captureDeviceSession() {
+    final client = widget.e2eeManager.client;
+    final user = client.userID;
+    final token = client.accessToken;
+    final deviceId = client.deviceID;
+    final homeserver = client.homeserver;
+    // The encryption manager retains its client after the active account changes.
+    // Device writes must also match the authentication source's current client.
+    return () =>
+        mounted &&
+        _authDataSource.isLoggedIn &&
+        identical(_authDataSource.clientManager.client, client) &&
+        identical(widget.e2eeManager.client, client) &&
+        client.userID == user &&
+        client.accessToken == token &&
+        client.deviceID == deviceId &&
+        client.homeserver == homeserver;
+  }
+
   void _showRenameDeviceDialog(DeviceInfo device) {
+    final isCurrent = _captureDeviceSession();
+    if (!isCurrent()) return;
     final controller = TextEditingController(text: device.deviceName);
     final route = DialogRoute<void>(
       context: context,
@@ -2110,7 +2131,11 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
               final newName = controller.text.trim();
               Navigator.pop(ctx);
               if (newName.isNotEmpty && newName != device.deviceName) {
-                await _renameDevice(device.deviceId, newName);
+                await _renameDevice(
+                  device.deviceId,
+                  newName,
+                  isCurrent: isCurrent,
+                );
               }
             },
             child: Text(S.of(context)?.commonSave ?? 'Save'),
@@ -2122,11 +2147,17 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
     unawaited(route.completed.whenComplete(controller.dispose));
   }
 
-  Future<void> _renameDevice(String deviceId, String newName) async {
+  Future<void> _renameDevice(
+    String deviceId,
+    String newName, {
+    required bool Function() isCurrent,
+  }) async {
+    if (!isCurrent()) return;
     try {
       await _authDataSource.updateDeviceName(deviceId, newName);
+      if (!isCurrent()) return;
       await _loadData();
-      if (mounted) {
+      if (mounted && isCurrent()) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -2136,7 +2167,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
         );
       }
     } catch (e) {
-      if (mounted) {
+      if (mounted && isCurrent()) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -2149,15 +2180,8 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
   }
 
   void _showRemoteLogoutConfirmation(DeviceInfo device) {
-    final client = widget.e2eeManager.client;
-    final user = client.userID;
-    final token = client.accessToken;
-    final deviceId = client.deviceID;
-    final homeserver = client.homeserver;
-    bool isCurrent() => mounted &&
-        identical(widget.e2eeManager.client, client) &&
-        client.userID == user && client.accessToken == token &&
-        client.deviceID == deviceId && client.homeserver == homeserver;
+    final isCurrent = _captureDeviceSession();
+    if (!isCurrent()) return;
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(

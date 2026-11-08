@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -8,6 +10,7 @@ import 'package:n42_chat/l10n/app_localizations.dart';
 import 'package:n42_chat/src/core/encryption/e2ee_manager.dart';
 import 'package:n42_chat/src/core/encryption/key_backup_service.dart';
 import 'package:n42_chat/src/data/datasources/matrix/matrix_auth_datasource.dart';
+import 'package:n42_chat/src/data/datasources/matrix/matrix_client_manager.dart';
 import 'package:n42_chat/src/presentation/pages/settings/security_settings_page.dart';
 
 class _Manager extends Mock implements E2EEManager {}
@@ -18,11 +21,14 @@ class _AuthDataSource extends Mock implements MatrixAuthDataSource {}
 
 class _Client extends Mock implements Client {}
 
+class _ClientManager extends Mock implements MatrixClientManager {}
+
 void main() {
   late _Manager manager;
   late _Backup backup;
   late _AuthDataSource authDataSource;
   late _Client client;
+  late _ClientManager sourceManager;
   late List<Device> devices;
 
   setUp(() {
@@ -31,6 +37,11 @@ void main() {
     backup = _Backup();
     authDataSource = _AuthDataSource();
     client = _Client();
+    sourceManager = _ClientManager();
+    when(() => sourceManager.client).thenReturn(client);
+    when(() => sourceManager.isLoggedIn).thenReturn(true);
+    when(() => authDataSource.clientManager).thenReturn(sourceManager);
+    when(() => authDataSource.isLoggedIn).thenReturn(true);
     final now = DateTime.now().millisecondsSinceEpoch;
     devices = [
       Device(
@@ -62,7 +73,7 @@ void main() {
     when(() => authDataSource.getDevices()).thenAnswer((_) async => devices);
   });
 
-  Future<S> open(WidgetTester tester) async {
+  Future<S> open(WidgetTester tester, {MatrixAuthDataSource? source}) async {
     await tester.pumpWidget(
       MaterialApp(
         locale: const Locale('en'),
@@ -71,7 +82,7 @@ void main() {
         home: SecuritySettingsPage(
           e2eeManager: manager,
           keyBackupService: backup,
-          authDataSource: authDataSource,
+          authDataSource: source ?? authDataSource,
         ),
       ),
     );
@@ -418,6 +429,83 @@ void main() {
       await tester.pumpAndSettle();
       expect(attempts, duringPassword ? 1 : 0);
       expect(find.text(l10n.settingsDeviceLoggedOut), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  for (final duringPassword in [false, true]) {
+    testWidgets('active manager replacement stops logout with old encryption client (UIA=$duringPassword)', (tester) async {
+      final nextClient = _Client();
+      var wrongAccountRequests = 0;
+      when(() => client.getDevices()).thenAnswer((_) async => devices);
+      when(() => nextClient.getDevices()).thenAnswer((_) async => []);
+      when(() => client.deleteDevice(any(), auth: any(named: 'auth'))).thenThrow(
+        MatrixException.fromJson({'flows': [{'stages': ['m.login.password']}], 'session': 'old-account-session'}),
+      );
+      when(() => nextClient.deleteDevice(any(), auth: any(named: 'auth'))).thenAnswer((_) async {
+        wrongAccountRequests++;
+      });
+      final l10n = await open(tester, source: MatrixAuthDataSource(clientManager: sourceManager));
+      await revealDevices(tester, l10n);
+      await tester.tap(find.text('Recent phone'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(l10n.settingsRemoteLogout));
+      await tester.pumpAndSettle();
+      if (duringPassword) {
+        await tester.tap(find.text(l10n.settingsLogout));
+        await tester.pumpAndSettle();
+        await tester.enterText(find.byType(TextField).last, 'old account password');
+      }
+      when(() => sourceManager.client).thenReturn(nextClient);
+      await tester.tap(find.text(duringPassword ? l10n.commonConfirm : l10n.settingsLogout));
+      await tester.pumpAndSettle();
+      expect(wrongAccountRequests, 0);
+      expect(find.text(l10n.settingsDeviceLoggedOut), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  testWidgets('manager replacement stops rename before dispatch', (tester) async {
+    final l10n = await open(tester);
+    await revealDevices(tester, l10n);
+    await tester.tap(find.text('Recent phone'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(l10n.settingsRenameDevice));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).last, 'New device name');
+    when(() => authDataSource.updateDeviceName(any(), any())).thenAnswer((_) async {});
+    when(() => sourceManager.client).thenReturn(_Client());
+    await tester.tap(find.widgetWithText(TextButton, l10n.commonSave));
+    await tester.pumpAndSettle();
+    verifyNever(() => authDataSource.updateDeviceName(any(), any()));
+    expect(find.text(l10n.settingsDeviceRenamed), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  for (final failRequest in [false, true]) {
+    testWidgets('late rename result is isolated after manager switch (failure=$failRequest)', (tester) async {
+      final pending = Completer<void>();
+      when(() => authDataSource.updateDeviceName(any(), any())).thenAnswer((_) => pending.future);
+      final l10n = await open(tester);
+      await revealDevices(tester, l10n);
+      await tester.tap(find.text('Recent phone'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(l10n.settingsRenameDevice));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField).last, 'New device name');
+      await tester.tap(find.widgetWithText(TextButton, l10n.commonSave));
+      await tester.pumpAndSettle();
+      clearInteractions(authDataSource);
+      when(() => sourceManager.client).thenReturn(_Client());
+      if (failRequest) {
+        pending.completeError(StateError('old account failure'));
+      } else {
+        pending.complete();
+      }
+      await tester.pumpAndSettle();
+      verifyNever(() => authDataSource.getDevices());
+      expect(find.text(l10n.settingsDeviceRenamed), findsNothing);
+      expect(find.textContaining('old account failure'), findsNothing);
       expect(tester.takeException(), isNull);
     });
   }
