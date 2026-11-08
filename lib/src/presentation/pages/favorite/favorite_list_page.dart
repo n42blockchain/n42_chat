@@ -10,6 +10,8 @@ import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../data/services/account_action_capture.dart';
 import '../../../domain/repositories/auth_repository.dart';
 import '../../../domain/repositories/message_action_repository.dart';
+import '../../../domain/repositories/message_repository.dart';
+import '../../widgets/chat/forward_message_sheet.dart';
 import '../../blocs/favorite/favorite_bloc.dart';
 import '../../blocs/favorite/favorite_event.dart';
 import '../../blocs/favorite/favorite_state.dart';
@@ -427,6 +429,51 @@ class _FavoriteListView extends StatelessWidget {
               title: Text(S.of(context)?.commonForward ?? 'Forward'),
               onTap: () {
                 Navigator.pop(sheetContext);
+                if (!isCurrent()) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        S.of(context)?.chatForwardFailed('') ??
+                            'Forward failed',
+                      ),
+                    ),
+                  );
+                  return;
+                }
+                final messages = GetIt.instance<IMessageRepository>();
+                showModalBottomSheet<void>(
+                  context: context,
+                  isScrollControlled: true,
+                  isDismissible: false,
+                  enableDrag: false,
+                  builder: (_) => ForwardMessageSheet(
+                    message: favorite,
+                    isDark: context.isDarkMode,
+                    isCurrent: isCurrent,
+                    onForwardAsync: (roomId) async {
+                      if (!isCurrent() ||
+                          !identical(
+                            GetIt.instance<IMessageRepository>(),
+                            messages,
+                          )) {
+                        throw StateError('Account changed');
+                      }
+                      final sent = favorite.roomId == '__favorite_local__'
+                          ? await messages.sendTextMessage(
+                              roomId,
+                              favorite.content,
+                            )
+                          : await repository.forwardMessage(
+                              favorite.roomId,
+                              favorite.id,
+                              roomId,
+                            );
+                      if (!isCurrent() || sent == null || sent.id.isEmpty) {
+                        throw StateError('Forward not acknowledged');
+                      }
+                    },
+                  ),
+                );
               },
             ),
             if (annotationsAvailable) ...[

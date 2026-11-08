@@ -864,13 +864,15 @@ This file tracks unresolved issues intentionally left open during recent agent w
 - Account acceptance: the editor captures the account and repository before opening the action sheet, validates both before/after persistence, and rejects replaced auth/manager/repository instances. A real-store widget test reproduced rebinding to a valid replacement account before the fix. Six new page tests plus existing BLoC/page/persistence suites pass all 50 tests; scoped analysis has one existing constructor-style info, no errors/warnings. These unreleased changes are not included in uploaded 73473.
 - Next step: complete full regression and profile-entry/native acceptance; design any consolidation with the newer model without dropping reminders or assigning ownerless legacy records to an arbitrary account.
 
-### UI-003 Favorite forward menu currently performs no forwarding
+### UI-003 Favorite forwarding integrated; full and live acceptance remain
 
 - Severity: M
 - Added: 2026-11-07
-- Evidence: `FavoriteListPage._showFavoriteOptions` Forward action closes the sheet without a picker, callback or repository dispatch.
-- Current state: source inspection confirms that the visible action does not forward either a saved Matrix message or a locally created note/link. Annotation work does not fix this path.
-- Next step: connect destination selection and account-bound dispatch; handle local notes/links separately from Matrix event forwarding and verify failures, retries and account changes before claiming completion.
+- Evidence: `FavoriteListPage`, `ForwardMessageSheet`, `MatrixReactionDataSource`, `favorite_annotations_page_test.dart`, `matrix_reaction_datasource_test.dart`.
+- Current state: the action opens the existing destination picker. Matrix favorites forward the source event; local notes/links send their stored text through the normal message repository. The async picker waits for acknowledgement, blocks duplicate sends/dismissal while pending, retains the picker on failure and supports retry. Conversation-load failure has a retry action. Existing synchronous picker callers remain supported.
+- Account/security checks: capture the account and repository at action-menu opening, reject a stale picker before dispatch/after acknowledgement, recheck source/target/client/token after event loading and key preparation. The Matrix path uses the existing friendship and encryption preparation guards, preserves encrypted attachment metadata, and removes old relations/mentions without mutating the source.
+- Verification: 58 page/BLoC/persistence/datasource tests pass, including local-note routing, pending-send duplicate prevention, null acknowledgement/retry, account switch and encrypted attachment forwarding. Scoped analysis reports no issues. The earlier full run overlapped source edits and is not acceptance evidence; run a stable-source full regression next. These unreleased changes are not included in uploaded 73473.
+- Next step: complete stable-source full regression and real encrypted-room/profile-entry/native acceptance before closing this item.
 
 ### AUTH-001 Email verification contract — Client repair integrated; live acceptance and multi-email handling remain open
 

@@ -11,11 +11,18 @@ import 'package:n42_chat/src/data/datasources/matrix/matrix_client_manager.dart'
 import 'package:n42_chat/src/data/datasources/matrix/matrix_reaction_datasource.dart';
 import 'package:n42_chat/src/data/repositories/message_action_repository_impl.dart';
 import 'package:n42_chat/src/domain/entities/message_entity.dart';
+import 'package:n42_chat/src/domain/entities/conversation_entity.dart';
+import 'package:n42_chat/src/domain/repositories/conversation_repository.dart';
+import 'package:n42_chat/src/domain/repositories/message_repository.dart';
 import 'package:n42_chat/src/domain/repositories/auth_repository.dart';
 import 'package:n42_chat/src/domain/repositories/message_action_repository.dart';
 import 'package:n42_chat/src/presentation/pages/favorite/favorite_list_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_platform_interface.dart';
+
+class _Conversations extends Mock implements IConversationRepository {}
+
+class _Messages extends Mock implements IMessageRepository {}
 
 class _Client extends Mock implements matrix.Client {}
 
@@ -50,6 +57,9 @@ class _Store extends InMemorySharedPreferencesStore {
 
 class _Fixture {
   final client = _Client();
+  final reaction = _Reaction();
+  final conversations = _Conversations();
+  final messages = _Messages();
   final manager = _Manager();
   final auth = _Auth();
   final store = _Store();
@@ -77,6 +87,13 @@ class _Fixture {
     when(() => auth.currentAccountGeneration).thenReturn(generation);
     GetIt.instance.registerSingleton<MatrixClientManager>(manager);
     GetIt.instance.registerSingleton<IAuthRepository>(auth);
+    GetIt.instance.registerSingleton<IConversationRepository>(conversations);
+    GetIt.instance.registerSingleton<IMessageRepository>(messages);
+    when(() => conversations.getConversations()).thenAnswer(
+      (_) async => [
+        const ConversationEntity(id: '!target:test', name: 'Target group'),
+      ],
+    );
     registerRepository();
     for (final item in [
       ('one', 'Saved launch notes', MessageType.text),
@@ -105,7 +122,7 @@ class _Fixture {
 
   void registerRepository() {
     repository = MessageActionRepositoryImpl(
-      _Reaction(),
+      reaction,
       manager,
       PreferencesDataSource(),
     );
@@ -147,6 +164,97 @@ class _Fixture {
 }
 
 void main() {
+  testWidgets(
+    'local favorite forwards its text without looking up a fake Matrix event',
+    (tester) async {
+      final f = _Fixture();
+      await f.initialize(tester);
+      final note = MessageEntity(
+        id: 'favorite_local_note',
+        type: MessageType.text,
+        roomId: '__favorite_local__',
+        senderId: '@favorite:local',
+        senderName: '',
+        content: 'Local note and https://example.test',
+        timestamp: DateTime.now(),
+      );
+      await f.repository.saveMessage(note);
+      when(() => f.messages.sendTextMessage('!target:test', note.content))
+          .thenAnswer(
+            (_) async => MessageEntity(
+              id: r'$note-sent',
+              type: MessageType.text,
+              roomId: '!target:test',
+              senderId: '@alice:test',
+              senderName: '',
+              content: note.content,
+              timestamp: DateTime.now(),
+            ),
+          );
+      await f.open(tester);
+      await tester.longPress(find.text(note.content));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Forward'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Target group'));
+      await tester.pumpAndSettle();
+      verify(() => f.messages.sendTextMessage('!target:test', note.content))
+          .called(1);
+      verifyNever(() => f.reaction.forwardMessage(any(), any(), any()));
+      expect(find.text('Target group'), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'favorite forward waits for acknowledgement and retries failure',
+    (tester) async {
+      final f = _Fixture();
+      await f.initialize(tester);
+      final pending = Completer<String?>();
+      var calls = 0;
+      when(() => f.reaction.forwardMessage('!room:test', 'one', '!target:test'))
+          .thenAnswer((_) {
+            calls++;
+            return calls == 1 ? pending.future : Future.value(r'$forwarded');
+          });
+      await f.open(tester);
+      await tester.longPress(find.text('Saved launch notes'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Forward'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Target group'));
+      await tester.pump();
+      await tester.tap(find.text('Target group'));
+      expect(calls, 1);
+      pending.complete(null);
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Forward failed'), findsOneWidget);
+      expect(find.text('Target group'), findsOneWidget);
+      await tester.tap(find.text('Target group'));
+      await tester.pumpAndSettle();
+      expect(calls, 2);
+      expect(find.text('Target group'), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'favorite forward refuses an account change after target selection opens',
+    (tester) async {
+      final f = _Fixture();
+      await f.initialize(tester);
+      await f.open(tester);
+      await tester.longPress(find.text('Saved launch notes'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Forward'));
+      await tester.pumpAndSettle();
+      f.switchToB();
+      await tester.tap(find.text('Target group'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Forward failed'), findsOneWidget);
+      verifyNever(() => f.reaction.forwardMessage(any(), any(), any()));
+    },
+  );
+
   testWidgets(
     'account change while options are open cannot rebind the editor',
     (tester) async {
