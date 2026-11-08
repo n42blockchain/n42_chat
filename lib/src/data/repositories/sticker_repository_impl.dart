@@ -153,7 +153,9 @@ class StickerRepositoryImpl implements IStickerRepository {
 
   @override
   Future<bool> uninstallPack(String packId) async {
+    final origin = _dataSource.accountScope;
     final success = await _dataSource.uninstallPack(packId);
+    if (_dataSource.accountScope != origin) return false;
     if (success) {
       _invalidateCache();
       _notifyInstalledPacksChanged();

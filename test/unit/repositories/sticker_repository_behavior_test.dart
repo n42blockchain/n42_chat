@@ -358,7 +358,10 @@ void main() {
     final upload = Completer<String?>();
     when(() => source.uploadStickerImage(any(), any(), any()))
         .thenAnswer((_) => upload.future);
-    final pending = repository.createCustomPack(name: 'Private', avatarBytes: bytes);
+    final pending = repository.createCustomPack(
+      name: 'Private',
+      avatarBytes: bytes,
+    );
     await pumpEventQueue();
     scope = Object();
     upload.complete('mxc://fixture/avatar');
@@ -379,21 +382,40 @@ void main() {
   });
 
   for (final operation in ['rename', 'remove']) {
-    test('$operation cannot write a pack after lookup changes account', () async {
-      Object scope = Object();
-      when(() => source.accountScope).thenAnswer((_) => scope);
-      final lookup = Completer<StickerPack?>();
-      final delayed = _DelayedLookupRepository(source, lookup.future);
-      addTearDown(delayed.dispose);
-      final pending = operation == 'rename'
-          ? delayed.renamePack(custom.id, 'Changed')
-          : delayed.removeStickerFromPack(packId: custom.id, stickerId: 'one');
-      scope = Object();
-      lookup.complete(custom);
-      expect(await pending, isFalse);
-      verifyNever(() => source.installPack(any(), any()));
-    });
+    test(
+      '$operation cannot write a pack after lookup changes account',
+      () async {
+        Object scope = Object();
+        when(() => source.accountScope).thenAnswer((_) => scope);
+        final lookup = Completer<StickerPack?>();
+        final delayed = _DelayedLookupRepository(source, lookup.future);
+        addTearDown(delayed.dispose);
+        final pending = operation == 'rename'
+            ? delayed.renamePack(custom.id, 'Changed')
+            : delayed.removeStickerFromPack(
+                packId: custom.id,
+                stickerId: 'one',
+              );
+        scope = Object();
+        lookup.complete(custom);
+        expect(await pending, isFalse);
+        verifyNever(() => source.installPack(any(), any()));
+      },
+    );
   }
+
+  test('uninstall receipt from the previous account is rejected', () async {
+    Object scope = Object();
+    when(() => source.accountScope).thenAnswer((_) => scope);
+    final receipt = Completer<bool>();
+    when(() => source.uninstallPack(custom.id))
+        .thenAnswer((_) => receipt.future);
+    final pending = repository.uninstallPack(custom.id);
+    scope = Object();
+    receipt.complete(true);
+    expect(await pending, isFalse);
+    verifyNever(() => source.getInstalledPacks());
+  });
 
   test('rename preserves stickers and refreshes cached name', () async {
     expect(await repository.renamePack(custom.id, 'Trips'), isTrue);
