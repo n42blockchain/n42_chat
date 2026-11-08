@@ -29,6 +29,7 @@ class _StickerPublishPageState extends State<StickerPublishPage> {
   IAccountBoundDeletionLifecycle? _lifecycle;
   AuthSessionInvalidation? _generation;
   StreamSubscription<AuthSessionInvalidation>? _invalidations;
+  StreamSubscription<void>? _sessions;
   BuildContext? _dialog;
   StickerPack? _pack;
   List<ConversationEntity> _rooms = [];
@@ -58,6 +59,12 @@ class _StickerPublishPageState extends State<StickerPublishPage> {
           .accountInvalidationStream
           .listen((_) {
             if (!_current && mounted) _invalidate();
+          });
+    }
+    if (_auth is IAccountBoundSessionChanges) {
+      _sessions = (_auth as IAccountBoundSessionChanges).accountSessionChanges
+          .listen((_) {
+            if (mounted && !_current) _invalidate();
           });
     }
     unawaited(_load());
@@ -241,6 +248,7 @@ class _StickerPublishPageState extends State<StickerPublishPage> {
   @override
   void dispose() {
     unawaited(_invalidations?.cancel());
+    unawaited(_sessions?.cancel());
     _closeDialog();
     super.dispose();
   }

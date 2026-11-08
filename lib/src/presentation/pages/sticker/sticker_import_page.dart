@@ -29,6 +29,7 @@ class _StickerImportPageState extends State<StickerImportPage> {
   IAccountBoundDeletionLifecycle? _lifecycle;
   AuthSessionInvalidation? _generation;
   StreamSubscription<AuthSessionInvalidation>? _invalidations;
+  StreamSubscription<void>? _sessions;
   StickerPack? _pack;
   BuildContext? _confirmationContext;
   _ImportFailure? _failure;
@@ -64,12 +65,19 @@ class _StickerImportPageState extends State<StickerImportPage> {
             if (!_current) _invalidate();
           });
     }
+    if (auth is IAccountBoundSessionChanges) {
+      _sessions = (auth as IAccountBoundSessionChanges).accountSessionChanges
+          .listen((_) {
+            if (mounted && !_current) _invalidate();
+          });
+    }
     if (!_current) _failure = _ImportFailure.account;
   }
 
   @override
   void dispose() {
     unawaited(_invalidations?.cancel());
+    unawaited(_sessions?.cancel());
     _closeConfirmation();
     _link.dispose();
     super.dispose();

@@ -21,13 +21,15 @@ class _Auth extends Mock
     implements
         IAuthRepository,
         IAccountBoundDeletionLifecycle,
-        IAccountBoundAuthInvalidation {}
+        IAccountBoundAuthInvalidation,
+        IAccountBoundSessionChanges {}
 
 void main() {
   late _Repository repo;
   late _Conversations conversations;
   late _Auth auth;
   late bool active;
+  late StreamController<void> sessions;
   late AuthSessionInvalidation generation;
   late StreamController<AuthSessionInvalidation> events;
   const pack = StickerPack(
@@ -48,6 +50,8 @@ void main() {
     conversations = _Conversations();
     auth = _Auth();
     active = true;
+    sessions = StreamController<void>.broadcast(sync: true);
+    when(() => auth.accountSessionChanges).thenAnswer((_) => sessions.stream);
     events = StreamController<AuthSessionInvalidation>.broadcast(sync: true);
     generation = AuthSessionInvalidation(
       userId: '@me:test',
@@ -93,6 +97,7 @@ void main() {
   });
   tearDown(() async {
     await events.close();
+    await sessions.close();
     await GetIt.instance.reset();
   });
   Future<void> open(
@@ -379,6 +384,19 @@ void main() {
       ).called(1);
     },
   );
+  testWidgets(
+    'normal session replacement clears private preview without invalidation',
+    (tester) async {
+      await open(tester);
+      await review(tester);
+      active = false;
+      sessions.add(null);
+      await tester.pumpAndSettle();
+      expect(find.text('Private art'), findsNothing);
+      expect(find.byType(AlertDialog), findsNothing);
+    },
+  );
+
   for (final locale in S.supportedLocales) {
     testWidgets('320px large-text publication confirmation fits $locale', (
       tester,

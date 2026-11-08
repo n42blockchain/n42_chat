@@ -23,7 +23,8 @@ class _Auth extends Mock
     implements
         IAuthRepository,
         IAccountBoundDeletionLifecycle,
-        IAccountBoundAuthInvalidation {}
+        IAccountBoundAuthInvalidation,
+        IAccountBoundSessionChanges {}
 
 void main() {
   late _Repository repository;
@@ -32,6 +33,7 @@ void main() {
   late StreamController<AuthSessionInvalidation> invalidations;
   late GlobalKey<NavigatorState> navigator;
   late bool active;
+  late StreamController<void> sessions;
   bool? returned;
   final pack = StickerPack(
     id: 'shared_art',
@@ -52,6 +54,8 @@ void main() {
     repository = _Repository();
     auth = _Auth();
     active = true;
+    sessions = StreamController<void>.broadcast(sync: true);
+    when(() => auth.accountSessionChanges).thenAnswer((_) => sessions.stream);
     returned = null;
     navigator = GlobalKey<NavigatorState>();
     invalidations = StreamController<AuthSessionInvalidation>.broadcast(
@@ -73,6 +77,7 @@ void main() {
   });
   tearDown(() async {
     await invalidations.close();
+    await sessions.close();
     await GetIt.instance.reset();
   });
 
@@ -380,6 +385,21 @@ void main() {
       },
     );
   }
+
+  testWidgets(
+    'normal session replacement clears private preview without invalidation',
+    (tester) async {
+      await open(tester);
+      await preview(tester);
+      await tester.tap(find.byKey(const ValueKey('sticker_import_subscribe')));
+      await tester.pumpAndSettle();
+      active = false;
+      sessions.add(null);
+      await tester.pumpAndSettle();
+      expect(find.text('Private art'), findsNothing);
+      expect(find.byType(AlertDialog), findsNothing);
+    },
+  );
 
   for (final locale in S.supportedLocales) {
     testWidgets(
