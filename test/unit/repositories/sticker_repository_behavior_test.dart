@@ -10,6 +10,15 @@ import 'package:n42_chat/src/domain/entities/sticker_pack_entity.dart';
 
 class _Source extends Mock implements MatrixStickerDataSource {}
 
+class _DelayedLookupRepository extends StickerRepositoryImpl {
+  _DelayedLookupRepository(super.source, this.lookup);
+
+  final Future<StickerPack?> lookup;
+
+  @override
+  Future<StickerPack?> getPackById(String packId) => lookup;
+}
+
 void main() {
   const custom = StickerPack(
     id: 'custom-one',
@@ -368,6 +377,23 @@ void main() {
     expect(await pending, isFalse);
     verifyNever(() => source.installPack(any(), any()));
   });
+
+  for (final operation in ['rename', 'remove']) {
+    test('$operation cannot write a pack after lookup changes account', () async {
+      Object scope = Object();
+      when(() => source.accountScope).thenAnswer((_) => scope);
+      final lookup = Completer<StickerPack?>();
+      final delayed = _DelayedLookupRepository(source, lookup.future);
+      addTearDown(delayed.dispose);
+      final pending = operation == 'rename'
+          ? delayed.renamePack(custom.id, 'Changed')
+          : delayed.removeStickerFromPack(packId: custom.id, stickerId: 'one');
+      scope = Object();
+      lookup.complete(custom);
+      expect(await pending, isFalse);
+      verifyNever(() => source.installPack(any(), any()));
+    });
+  }
 
   test('rename preserves stickers and refreshes cached name', () async {
     expect(await repository.renamePack(custom.id, 'Trips'), isTrue);
