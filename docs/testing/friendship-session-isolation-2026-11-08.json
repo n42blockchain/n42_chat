@@ -12,7 +12,33 @@
     "focusedPassed": 114,
     "focusedFailed": 0,
     "focusedLog": "/tmp/n42-chat-friend-session-final-cluster.log",
-    "fullRegression": "pending"
+    "fullRegression": {
+      "source": "b7d2432e76fe9d133f583638be2de2d607087b53",
+      "exitCode": 0,
+      "passed": 9086,
+      "failed": 0,
+      "environmentSkips": 7,
+      "coveredLines": 107708,
+      "totalLines": 148148,
+      "coveragePercent": 72.7029727029727,
+      "threshold": 70,
+      "jsonLog": "/tmp/n42-chat-friendship-session-full.jsonl",
+      "lcov": "/tmp/n42-chat-friendship-session-full-lcov.info",
+      "hashes": {
+        "/tmp/n42-chat-friendship-session-full.jsonl": "169327c5dd2d5c4db881cd3ea3cc88fb1cafbbbcaac30e34938ff363f17e0238",
+        "/tmp/n42-chat-friendship-session-full-lcov.info": "0f689a27d171e8a805842ac4ff01bead4ae8b6ef040fc484f48d99d89644e4ca"
+      }
+    },
+    "hostIntegration": {
+      "source": "71db01144207672227aa080d388b2a3ea69702ed",
+      "friendshipCluster": 125,
+      "priorCompatibilityCluster": 149,
+      "countsOverlap": true,
+      "resolvedRuntimeAssets": 859,
+      "fullCI": 42517188946,
+      "nativeRun": 42517239234,
+      "fullAndNativeStatus": "running"
+    }
   },
   "preserved": [
     "normal friend acceptance and both social-room invitations",
