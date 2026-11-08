@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -50,9 +51,8 @@ void main() {
           .toList();
       return true;
     });
-    when(
-      () => source.uploadStickerImage(any(), any(), any()),
-    ).thenAnswer((_) async => 'mxc://fixture/new');
+    when(() => source.uploadStickerImage(any(), any(), any()))
+        .thenAnswer((_) async => 'mxc://fixture/new');
     repository = StickerRepositoryImpl(source);
   });
   tearDown(() => repository.dispose());
@@ -181,9 +181,8 @@ void main() {
     expect(pack?.avatarUrl, 'mxc://fixture/new');
     expect(pack?.description, 'Private pack');
     expect(await repository.getPackById(pack!.id), pack);
-    verify(
-      () => source.uploadStickerImage(bytes, 'avatar.png', 'image/png'),
-    ).called(1);
+    verify(() => source.uploadStickerImage(bytes, 'avatar.png', 'image/png'))
+        .called(1);
   });
   test('custom creation without an avatar does not upload an image', () async {
     expect(await repository.createCustomPack(name: 'Text'), isNotNull);
@@ -198,9 +197,8 @@ void main() {
     );
   });
   test('avatar upload exceptions prevent persistence', () async {
-    when(
-      () => source.uploadStickerImage(any(), any(), any()),
-    ).thenThrow(StateError('offline'));
+    when(() => source.uploadStickerImage(any(), any(), any()))
+        .thenThrow(StateError('offline'));
     expect(
       await repository.createCustomPack(name: 'Mine', avatarBytes: bytes),
       isNull,
@@ -233,16 +231,14 @@ void main() {
         expect(updated.stickers.last.size, bytes.length);
         expect(updated.stickers.last.mimeType, entry.value);
         expect(updated.stickers.last.emoji, '⭐');
-        verify(
-          () => source.uploadStickerImage(bytes, entry.key, entry.value),
-        ).called(1);
+        verify(() => source.uploadStickerImage(bytes, entry.key, entry.value))
+            .called(1);
       },
     );
   }
   test('null upload result cannot append an unusable sticker', () async {
-    when(
-      () => source.uploadStickerImage(any(), any(), any()),
-    ).thenAnswer((_) async => null);
+    when(() => source.uploadStickerImage(any(), any(), any()))
+        .thenAnswer((_) async => null);
     expect(
       await repository.addStickerToPack(
         packId: custom.id,
@@ -271,9 +267,8 @@ void main() {
   test(
     'failed image persistence retains the previous sticker collection',
     () async {
-      when(
-        () => source.installPack(any(), any()),
-      ).thenAnswer((_) async => false);
+      when(() => source.installPack(any(), any()))
+          .thenAnswer((_) async => false);
       expect(
         await repository.addStickerToPack(
           packId: custom.id,
@@ -289,9 +284,8 @@ void main() {
     },
   );
   test('image upload exception is surfaced as failure', () async {
-    when(
-      () => source.uploadStickerImage(any(), any(), any()),
-    ).thenThrow(StateError('offline'));
+    when(() => source.uploadStickerImage(any(), any(), any()))
+        .thenThrow(StateError('offline'));
     expect(
       await repository.addStickerToPack(
         packId: custom.id,
@@ -328,6 +322,27 @@ void main() {
       custom.stickers,
     );
   });
+  test(
+    'account switch during upload cannot copy a pack to the new account',
+    () async {
+      Object scope = Object();
+      when(() => source.accountScope).thenAnswer((_) => scope);
+      final upload = Completer<String?>();
+      when(() => source.uploadStickerImage(any(), any(), any()))
+          .thenAnswer((_) => upload.future);
+      final pending = repository.addStickerToPack(
+        packId: custom.id,
+        imageBytes: bytes,
+        filename: 'new.png',
+      );
+      await pumpEventQueue();
+      scope = Object();
+      upload.complete('mxc://fixture/new');
+      expect(await pending, isFalse);
+      verifyNever(() => source.installPack(any(), any()));
+    },
+  );
+
   test('rename preserves stickers and refreshes cached name', () async {
     expect(await repository.renamePack(custom.id, 'Trips'), isTrue);
     final updated = await repository.getPackById(custom.id);
@@ -353,9 +368,8 @@ void main() {
   test(
     'persistence exceptions during rename and removal return failure',
     () async {
-      when(
-        () => source.installPack(any(), any()),
-      ).thenThrow(StateError('offline'));
+      when(() => source.installPack(any(), any()))
+          .thenThrow(StateError('offline'));
       expect(await repository.renamePack(custom.id, 'Trips'), isFalse);
       expect(
         await repository.removeStickerFromPack(

@@ -265,9 +265,10 @@ class StickerRepositoryImpl implements IStickerRepository {
     String? name,
     String? emoji,
   }) async {
+    final origin = _dataSource.accountScope;
     try {
       final pack = await getPackById(packId);
-      if (pack == null) return false;
+      if (pack == null || _dataSource.accountScope != origin) return false;
 
       // 上传贴纸图片
       final url = await _dataSource.uploadStickerImage(
@@ -275,7 +276,7 @@ class StickerRepositoryImpl implements IStickerRepository {
         filename,
         _getMimeType(filename),
       );
-      if (url == null) return false;
+      if (url == null || _dataSource.accountScope != origin) return false;
 
       // 创建新贴纸
       final stickerId = 'sticker_${DateTime.now().millisecondsSinceEpoch}';
@@ -295,6 +296,7 @@ class StickerRepositoryImpl implements IStickerRepository {
       );
 
       final success = await _dataSource.installPack(packId, updatedPack);
+      if (_dataSource.accountScope != origin) return false;
       if (success) {
         _invalidateCache();
         _notifyInstalledPacksChanged();
