@@ -6429,4 +6429,14 @@ class SFr extends S {
 
     return 'Limite de sélection : $countString';
   }
+
+  @override
+  String scheduledSendTonightAt(String time) {
+    return 'Ce soir ($time)';
+  }
+
+  @override
+  String scheduledSendTomorrowMorningAt(String time) {
+    return 'Demain matin ($time)';
+  }
 }

@@ -2961,5 +2961,31 @@
   "chatAttachmentCode": "Code",
   "chatAttachmentShop": "Shop",
   "chatSelectionLimit": "Selection limit: {count}",
-  "@chatSelectionLimit": {"description": "Maximum number of recent media items that may be selected.", "placeholders": {"count": {"type": "int", "format": "decimalPattern"}}}
+  "@chatSelectionLimit": {
+    "description": "Maximum number of recent media items that may be selected.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "scheduledSendTonightAt": "Tonight ({time})",
+  "@scheduledSendTonightAt": {
+    "description": "Scheduled quick option with the local system-formatted time.",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "scheduledSendTomorrowMorningAt": "Tomorrow morning ({time})",
+  "@scheduledSendTomorrowMorningAt": {
+    "description": "Scheduled quick option with the local system-formatted time.",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  }
 }

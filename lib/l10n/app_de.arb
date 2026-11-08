@@ -2928,5 +2928,7 @@
   "chatAttachmentVideoNote": "Videonachricht",
   "chatAttachmentCode": "Code",
   "chatAttachmentShop": "Geschäft",
-  "chatSelectionLimit": "Auswahllimit: {count}"
+  "chatSelectionLimit": "Auswahllimit: {count}",
+  "scheduledSendTonightAt": "Heute Abend ({time})",
+  "scheduledSendTomorrowMorningAt": "Morgen früh ({time})"
 }

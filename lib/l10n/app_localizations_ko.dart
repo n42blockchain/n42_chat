@@ -6223,4 +6223,14 @@ class SKo extends S {
 
     return '선택 한도: $countString';
   }
+
+  @override
+  String scheduledSendTonightAt(String time) {
+    return '오늘 밤($time)';
+  }
+
+  @override
+  String scheduledSendTomorrowMorningAt(String time) {
+    return '내일 아침 ($time)';
+  }
 }

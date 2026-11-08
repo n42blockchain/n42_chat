@@ -6178,6 +6178,16 @@ class SZh extends S {
 
     return '最多选择 $countString 项';
   }
+
+  @override
+  String scheduledSendTonightAt(String time) {
+    return '今晚 ($time)';
+  }
+
+  @override
+  String scheduledSendTomorrowMorningAt(String time) {
+    return '明早 ($time)';
+  }
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -12353,5 +12363,15 @@ class SZhTw extends SZh {
     final String countString = countNumberFormat.format(count);
 
     return '最多選擇 $countString 項';
+  }
+
+  @override
+  String scheduledSendTonightAt(String time) {
+    return '今晚 ($time)';
+  }
+
+  @override
+  String scheduledSendTomorrowMorningAt(String time) {
+    return '明早 ($time)';
   }
 }

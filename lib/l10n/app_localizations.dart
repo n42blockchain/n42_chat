@@ -11692,6 +11692,18 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Selection limit: {count}'**
   String chatSelectionLimit(int count);
+
+  /// Scheduled quick option with the local system-formatted time.
+  ///
+  /// In en, this message translates to:
+  /// **'Tonight ({time})'**
+  String scheduledSendTonightAt(String time);
+
+  /// Scheduled quick option with the local system-formatted time.
+  ///
+  /// In en, this message translates to:
+  /// **'Tomorrow morning ({time})'**
+  String scheduledSendTomorrowMorningAt(String time);
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

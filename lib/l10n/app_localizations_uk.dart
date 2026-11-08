@@ -6393,4 +6393,14 @@ class SUk extends S {
 
     return 'Ліміт вибору: $countString';
   }
+
+  @override
+  String scheduledSendTonightAt(String time) {
+    return 'Сьогодні ввечері ($time)';
+  }
+
+  @override
+  String scheduledSendTomorrowMorningAt(String time) {
+    return 'Завтра вранці ($time)';
+  }
 }

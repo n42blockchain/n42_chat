@@ -6374,4 +6374,14 @@ class SUr extends S {
 
     return 'انتخاب کی حد: $countString';
   }
+
+  @override
+  String scheduledSendTonightAt(String time) {
+    return 'آج رات ($time)';
+  }
+
+  @override
+  String scheduledSendTomorrowMorningAt(String time) {
+    return 'کل صبح ($time)';
+  }
 }

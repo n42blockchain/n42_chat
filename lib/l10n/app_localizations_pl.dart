@@ -6400,4 +6400,14 @@ class SPl extends S {
 
     return 'Limit wyboru: $countString';
   }
+
+  @override
+  String scheduledSendTonightAt(String time) {
+    return 'Dziś wieczorem ($time)';
+  }
+
+  @override
+  String scheduledSendTomorrowMorningAt(String time) {
+    return 'Jutro rano ($time)';
+  }
 }

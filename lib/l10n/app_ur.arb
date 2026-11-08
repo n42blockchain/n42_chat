@@ -2928,5 +2928,7 @@
   "chatAttachmentVideoNote": "ویڈیو پیغام",
   "chatAttachmentCode": "کوڈ",
   "chatAttachmentShop": "دکان",
-  "chatSelectionLimit": "انتخاب کی حد: {count}"
+  "chatSelectionLimit": "انتخاب کی حد: {count}",
+  "scheduledSendTonightAt": "آج رات ({time})",
+  "scheduledSendTomorrowMorningAt": "کل صبح ({time})"
 }

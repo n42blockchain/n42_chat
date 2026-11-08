@@ -2316,5 +2316,7 @@
   "chatAttachmentVideoNote": "视频留言",
   "chatAttachmentCode": "代码",
   "chatAttachmentShop": "商店",
-  "chatSelectionLimit": "最多选择 {count} 项"
+  "chatSelectionLimit": "最多选择 {count} 项",
+  "scheduledSendTonightAt": "今晚 ({time})",
+  "scheduledSendTomorrowMorningAt": "明早 ({time})"
 }

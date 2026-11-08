@@ -6361,4 +6361,14 @@ class SBn extends S {
 
     return 'সর্বোচ্চ নির্বাচন: $countString';
   }
+
+  @override
+  String scheduledSendTonightAt(String time) {
+    return 'আজ রাত ($time)';
+  }
+
+  @override
+  String scheduledSendTomorrowMorningAt(String time) {
+    return 'আগামীকাল সকাল ($time)';
+  }
 }

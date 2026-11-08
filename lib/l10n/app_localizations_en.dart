@@ -6330,4 +6330,14 @@ class SEn extends S {
 
     return 'Selection limit: $countString';
   }
+
+  @override
+  String scheduledSendTonightAt(String time) {
+    return 'Tonight ($time)';
+  }
+
+  @override
+  String scheduledSendTomorrowMorningAt(String time) {
+    return 'Tomorrow morning ($time)';
+  }
 }

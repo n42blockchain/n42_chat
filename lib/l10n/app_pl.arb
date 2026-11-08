@@ -2928,5 +2928,7 @@
   "chatAttachmentVideoNote": "Wiadomość wideo",
   "chatAttachmentCode": "Kod",
   "chatAttachmentShop": "Sklep",
-  "chatSelectionLimit": "Limit wyboru: {count}"
+  "chatSelectionLimit": "Limit wyboru: {count}",
+  "scheduledSendTonightAt": "Dziś wieczorem ({time})",
+  "scheduledSendTomorrowMorningAt": "Jutro rano ({time})"
 }

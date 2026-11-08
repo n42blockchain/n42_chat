@@ -6393,4 +6393,14 @@ class SRu extends S {
 
     return 'Лимит выбора: $countString';
   }
+
+  @override
+  String scheduledSendTonightAt(String time) {
+    return 'Сегодня вечером ($time)';
+  }
+
+  @override
+  String scheduledSendTomorrowMorningAt(String time) {
+    return 'Завтра утром ($time)';
+  }
 }

@@ -6359,4 +6359,14 @@ class SHi extends S {
 
     return 'चयन सीमा: $countString';
   }
+
+  @override
+  String scheduledSendTonightAt(String time) {
+    return 'आज रात ($time)';
+  }
+
+  @override
+  String scheduledSendTomorrowMorningAt(String time) {
+    return 'कल सुबह ($time)';
+  }
 }

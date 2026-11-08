@@ -2928,5 +2928,7 @@
   "chatAttachmentVideoNote": "காணொளிச் செய்தி",
   "chatAttachmentCode": "நிரல் குறியீடு",
   "chatAttachmentShop": "கடை",
-  "chatSelectionLimit": "தேர்வு வரம்பு: {count}"
+  "chatSelectionLimit": "தேர்வு வரம்பு: {count}",
+  "scheduledSendTonightAt": "இன்று இரவு ({time})",
+  "scheduledSendTomorrowMorningAt": "நாளை காலை ({time})"
 }

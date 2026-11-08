@@ -6372,4 +6372,14 @@ class SCs extends S {
 
     return 'Limit výběru: $countString';
   }
+
+  @override
+  String scheduledSendTonightAt(String time) {
+    return 'Dnes večer ($time)';
+  }
+
+  @override
+  String scheduledSendTomorrowMorningAt(String time) {
+    return 'Zítra ráno ($time)';
+  }
 }

@@ -6361,4 +6361,14 @@ class STr extends S {
 
     return 'Seçim sınırı: $countString';
   }
+
+  @override
+  String scheduledSendTonightAt(String time) {
+    return 'Bu gece ($time)';
+  }
+
+  @override
+  String scheduledSendTomorrowMorningAt(String time) {
+    return 'Yarın sabah ($time)';
+  }
 }

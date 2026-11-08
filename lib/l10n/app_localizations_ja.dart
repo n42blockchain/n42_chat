@@ -6220,4 +6220,14 @@ class SJa extends S {
 
     return '選択上限：$countString 件';
   }
+
+  @override
+  String scheduledSendTonightAt(String time) {
+    return '今夜（$time）';
+  }
+
+  @override
+  String scheduledSendTomorrowMorningAt(String time) {
+    return '明日の朝（$time）';
+  }
 }

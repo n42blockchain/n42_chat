@@ -2928,5 +2928,7 @@
   "chatAttachmentVideoNote": "Videozpráva",
   "chatAttachmentCode": "Kód",
   "chatAttachmentShop": "Obchod",
-  "chatSelectionLimit": "Limit výběru: {count}"
+  "chatSelectionLimit": "Limit výběru: {count}",
+  "scheduledSendTonightAt": "Dnes večer ({time})",
+  "scheduledSendTomorrowMorningAt": "Zítra ráno ({time})"
 }

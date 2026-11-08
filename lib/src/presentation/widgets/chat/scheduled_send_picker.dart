@@ -6,6 +6,12 @@ import '../../../core/theme/app_dimensions.dart';
 
 Future<DateTime?> showScheduledSendPicker(BuildContext context) {
   final l10n = S.of(context);
+  final material = MaterialLocalizations.of(context);
+  final use24Hours = MediaQuery.alwaysUse24HourFormatOf(context);
+  String time(int hour) => material.formatTimeOfDay(
+    TimeOfDay(hour: hour, minute: 0),
+    alwaysUse24HourFormat: use24Hours,
+  );
   final now = DateTime.now();
   final tonight = DateTime(now.year, now.month, now.day, 20);
 
@@ -49,14 +55,16 @@ Future<DateTime?> showScheduledSendPicker(BuildContext context) {
               if (tonight.isAfter(now))
                 _ScheduledSendOption(
                   icon: Icons.nightlight_round,
-                  label: l10n?.scheduledSendTonight ?? 'Tonight (8:00 PM)',
+                  label:
+                      l10n?.scheduledSendTonightAt(time(20)) ??
+                      'Tonight (${time(20)})',
                   scheduledAt: tonight,
                 ),
               _ScheduledSendOption(
                 icon: Icons.wb_sunny,
                 label:
-                    l10n?.scheduledSendTomorrowMorning ??
-                    'Tomorrow morning (9:00 AM)',
+                    l10n?.scheduledSendTomorrowMorningAt(time(9)) ??
+                    'Tomorrow morning (${time(9)})',
                 scheduledAt: DateTime(now.year, now.month, now.day + 1, 9, 0),
               ),
               const Divider(),

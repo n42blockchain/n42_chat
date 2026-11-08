@@ -6405,4 +6405,14 @@ class SEs extends S {
 
     return 'Límite de selección: $countString';
   }
+
+  @override
+  String scheduledSendTonightAt(String time) {
+    return 'Esta noche ($time)';
+  }
+
+  @override
+  String scheduledSendTomorrowMorningAt(String time) {
+    return 'Mañana por la mañana ($time)';
+  }
 }

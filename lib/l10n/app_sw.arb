@@ -2928,5 +2928,7 @@
   "chatAttachmentVideoNote": "Ujumbe wa video",
   "chatAttachmentCode": "Msimbo",
   "chatAttachmentShop": "Duka",
-  "chatSelectionLimit": "Kikomo cha uteuzi: {count}"
+  "chatSelectionLimit": "Kikomo cha uteuzi: {count}",
+  "scheduledSendTonightAt": "Leo usiku ({time})",
+  "scheduledSendTomorrowMorningAt": "Kesho asubuhi ({time})"
 }

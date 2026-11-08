@@ -6348,4 +6348,14 @@ class SVi extends S {
 
     return 'Giới hạn lựa chọn: $countString';
   }
+
+  @override
+  String scheduledSendTonightAt(String time) {
+    return 'Tối nay ($time)';
+  }
+
+  @override
+  String scheduledSendTomorrowMorningAt(String time) {
+    return 'Sáng mai ($time)';
+  }
 }

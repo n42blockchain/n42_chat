@@ -6391,4 +6391,14 @@ class SIt extends S {
 
     return 'Limite di selezione: $countString';
   }
+
+  @override
+  String scheduledSendTonightAt(String time) {
+    return 'Stasera ($time)';
+  }
+
+  @override
+  String scheduledSendTomorrowMorningAt(String time) {
+    return 'Domani mattina ($time)';
+  }
 }

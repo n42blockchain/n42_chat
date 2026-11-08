@@ -2928,5 +2928,7 @@
   "chatAttachmentVideoNote": "వీడియో సందేశం",
   "chatAttachmentCode": "కోడ్",
   "chatAttachmentShop": "దుకాణం",
-  "chatSelectionLimit": "ఎంపిక పరిమితి: {count}"
+  "chatSelectionLimit": "ఎంపిక పరిమితి: {count}",
+  "scheduledSendTonightAt": "ఈ రాత్రి ({time})",
+  "scheduledSendTomorrowMorningAt": "రేపు ఉదయం ({time})"
 }

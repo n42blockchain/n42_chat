@@ -6331,4 +6331,14 @@ class SAr extends S {
 
     return 'الحد الأقصى للاختيار: $countString';
   }
+
+  @override
+  String scheduledSendTonightAt(String time) {
+    return 'الليلة ($time)';
+  }
+
+  @override
+  String scheduledSendTomorrowMorningAt(String time) {
+    return 'صباح الغد ($time)';
+  }
 }

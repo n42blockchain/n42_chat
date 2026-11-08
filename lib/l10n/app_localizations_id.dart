@@ -6372,4 +6372,14 @@ class SId extends S {
 
     return 'Batas pilihan: $countString';
   }
+
+  @override
+  String scheduledSendTonightAt(String time) {
+    return 'Malam ini ($time)';
+  }
+
+  @override
+  String scheduledSendTomorrowMorningAt(String time) {
+    return 'Besok pagi ($time)';
+  }
 }

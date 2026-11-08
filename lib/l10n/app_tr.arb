@@ -2928,5 +2928,7 @@
   "chatAttachmentVideoNote": "Video mesajı",
   "chatAttachmentCode": "Kod",
   "chatAttachmentShop": "Mağaza",
-  "chatSelectionLimit": "Seçim sınırı: {count}"
+  "chatSelectionLimit": "Seçim sınırı: {count}",
+  "scheduledSendTonightAt": "Bu gece ({time})",
+  "scheduledSendTomorrowMorningAt": "Yarın sabah ({time})"
 }

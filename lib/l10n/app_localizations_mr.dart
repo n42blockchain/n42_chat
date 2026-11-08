@@ -6358,4 +6358,14 @@ class SMr extends S {
 
     return 'निवड मर्यादा: $countString';
   }
+
+  @override
+  String scheduledSendTonightAt(String time) {
+    return 'आज रात्री ($time)';
+  }
+
+  @override
+  String scheduledSendTomorrowMorningAt(String time) {
+    return 'उद्या सकाळी ($time)';
+  }
 }

@@ -2928,5 +2928,7 @@
   "chatAttachmentVideoNote": "Видеосообщение",
   "chatAttachmentCode": "Код",
   "chatAttachmentShop": "Магазин",
-  "chatSelectionLimit": "Лимит выбора: {count}"
+  "chatSelectionLimit": "Лимит выбора: {count}",
+  "scheduledSendTonightAt": "Сегодня вечером ({time})",
+  "scheduledSendTomorrowMorningAt": "Завтра утром ({time})"
 }

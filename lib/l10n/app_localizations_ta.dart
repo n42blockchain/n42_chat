@@ -6427,4 +6427,14 @@ class STa extends S {
 
     return 'தேர்வு வரம்பு: $countString';
   }
+
+  @override
+  String scheduledSendTonightAt(String time) {
+    return 'இன்று இரவு ($time)';
+  }
+
+  @override
+  String scheduledSendTomorrowMorningAt(String time) {
+    return 'நாளை காலை ($time)';
+  }
 }

@@ -2928,5 +2928,7 @@
   "chatAttachmentVideoNote": "व्हिडिओ संदेश",
   "chatAttachmentCode": "कोड",
   "chatAttachmentShop": "दुकान",
-  "chatSelectionLimit": "निवड मर्यादा: {count}"
+  "chatSelectionLimit": "निवड मर्यादा: {count}",
+  "scheduledSendTonightAt": "आज रात्री ({time})",
+  "scheduledSendTomorrowMorningAt": "उद्या सकाळी ({time})"
 }

@@ -2928,5 +2928,7 @@
   "chatAttachmentVideoNote": "ビデオメッセージ",
   "chatAttachmentCode": "コード",
   "chatAttachmentShop": "ショップ",
-  "chatSelectionLimit": "選択上限：{count} 件"
+  "chatSelectionLimit": "選択上限：{count} 件",
+  "scheduledSendTonightAt": "今夜（{time}）",
+  "scheduledSendTomorrowMorningAt": "明日の朝（{time}）"
 }

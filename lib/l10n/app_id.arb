@@ -2928,5 +2928,7 @@
   "chatAttachmentVideoNote": "Pesan video",
   "chatAttachmentCode": "Kode",
   "chatAttachmentShop": "Toko",
-  "chatSelectionLimit": "Batas pilihan: {count}"
+  "chatSelectionLimit": "Batas pilihan: {count}",
+  "scheduledSendTonightAt": "Malam ini ({time})",
+  "scheduledSendTomorrowMorningAt": "Besok pagi ({time})"
 }

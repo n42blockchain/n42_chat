@@ -6407,4 +6407,14 @@ class STe extends S {
 
     return 'ఎంపిక పరిమితి: $countString';
   }
+
+  @override
+  String scheduledSendTonightAt(String time) {
+    return 'ఈ రాత్రి ($time)';
+  }
+
+  @override
+  String scheduledSendTomorrowMorningAt(String time) {
+    return 'రేపు ఉదయం ($time)';
+  }
 }

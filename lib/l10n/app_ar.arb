@@ -2928,5 +2928,7 @@
   "chatAttachmentVideoNote": "رسالة فيديو",
   "chatAttachmentCode": "شفرة برمجية",
   "chatAttachmentShop": "متجر",
-  "chatSelectionLimit": "الحد الأقصى للاختيار: {count}"
+  "chatSelectionLimit": "الحد الأقصى للاختيار: {count}",
+  "scheduledSendTonightAt": "الليلة ({time})",
+  "scheduledSendTomorrowMorningAt": "صباح الغد ({time})"
 }

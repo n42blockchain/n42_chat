@@ -6396,6 +6396,16 @@ class SPt extends S {
 
     return 'Limite de seleção: $countString';
   }
+
+  @override
+  String scheduledSendTonightAt(String time) {
+    return 'Hoje à noite ($time)';
+  }
+
+  @override
+  String scheduledSendTomorrowMorningAt(String time) {
+    return 'Amanhã de manhã ($time)';
+  }
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).
@@ -12789,5 +12799,15 @@ class SPtBr extends SPt {
     final String countString = countNumberFormat.format(count);
 
     return 'Limite de seleção: $countString';
+  }
+
+  @override
+  String scheduledSendTonightAt(String time) {
+    return 'Hoje à noite ($time)';
+  }
+
+  @override
+  String scheduledSendTomorrowMorningAt(String time) {
+    return 'Amanhã de manhã ($time)';
   }
 }

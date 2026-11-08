@@ -2928,5 +2928,7 @@
   "chatAttachmentVideoNote": "동영상 메시지",
   "chatAttachmentCode": "코드",
   "chatAttachmentShop": "상점",
-  "chatSelectionLimit": "선택 한도: {count}"
+  "chatSelectionLimit": "선택 한도: {count}",
+  "scheduledSendTonightAt": "오늘 밤({time})",
+  "scheduledSendTomorrowMorningAt": "내일 아침 ({time})"
 }

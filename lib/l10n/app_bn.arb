@@ -2928,5 +2928,7 @@
   "chatAttachmentVideoNote": "ভিডিও বার্তা",
   "chatAttachmentCode": "কোড",
   "chatAttachmentShop": "দোকান",
-  "chatSelectionLimit": "সর্বোচ্চ নির্বাচন: {count}"
+  "chatSelectionLimit": "সর্বোচ্চ নির্বাচন: {count}",
+  "scheduledSendTonightAt": "আজ রাত ({time})",
+  "scheduledSendTomorrowMorningAt": "আগামীকাল সকাল ({time})"
 }

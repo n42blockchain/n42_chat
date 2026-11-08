@@ -6412,4 +6412,14 @@ class SDe extends S {
 
     return 'Auswahllimit: $countString';
   }
+
+  @override
+  String scheduledSendTonightAt(String time) {
+    return 'Heute Abend ($time)';
+  }
+
+  @override
+  String scheduledSendTomorrowMorningAt(String time) {
+    return 'Morgen früh ($time)';
+  }
 }

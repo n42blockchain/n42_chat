@@ -1842,6 +1842,8 @@ final _labels = <(String, String Function(S))>[
 
 final _formattedLabels = <(String, List<String> Function(S))>[
   ('chatSelectionLimit', (s) => [s.chatSelectionLimit(1), s.chatSelectionLimit(12)]),
+  ('scheduledSendTonightAt', (s) => [s.scheduledSendTonightAt('20:00')]),
+  ('scheduledSendTomorrowMorningAt', (s) => [s.scheduledSendTomorrowMorningAt('09:00')]),
   ('scheduledMessageCreatedAt', (s) => [s.scheduledMessageCreatedAt('2030-01-01 12:00')]),
   ('authLoginFailed', (s) => [s.authLoginFailed('fixture')]),
   (
@@ -2458,7 +2460,7 @@ void main() {
   });
   test('all supported locales provide readable labels', () async {
     expect(_labels, hasLength(1718));
-    expect(_formattedLabels, hasLength(183));
+    expect(_formattedLabels, hasLength(185));
     expect(_labels.map((entry) => entry.$1).toSet(), hasLength(_labels.length));
     final emptyLabels = <String>[];
 

@@ -6395,4 +6395,14 @@ class SSw extends S {
 
     return 'Kikomo cha uteuzi: $countString';
   }
+
+  @override
+  String scheduledSendTonightAt(String time) {
+    return 'Leo usiku ($time)';
+  }
+
+  @override
+  String scheduledSendTomorrowMorningAt(String time) {
+    return 'Kesho asubuhi ($time)';
+  }
 }
