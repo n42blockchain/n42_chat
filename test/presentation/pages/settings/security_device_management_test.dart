@@ -395,4 +395,33 @@ void main() {
     expect(find.byType(SecuritySettingsPage), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+  for (final duringPassword in [false, true]) {
+    testWidgets('remote logout stops after account change (UIA=$duringPassword)', (tester) async {
+      var attempts = 0;
+      when(() => authDataSource.deleteDevice(any(), auth: any(named: 'auth'))).thenAnswer((invocation) async {
+        attempts++;
+        if (invocation.namedArguments[#auth] == null) {
+          throw MatrixException(http.Response('{"flows":[{"stages":["m.login.password"]}],"session":"old-session"}', 401));
+        }
+      });
+      final l10n = await open(tester);
+      await revealDevices(tester, l10n);
+      await tester.tap(find.text('Recent phone'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(l10n.settingsRemoteLogout));
+      await tester.pumpAndSettle();
+      if (duringPassword) {
+        await tester.tap(find.text(l10n.settingsLogout));
+        await tester.pumpAndSettle();
+        await tester.enterText(find.byType(TextField).last, 'old account password');
+      }
+      when(() => client.userID).thenReturn('@bob:example.org');
+      await tester.tap(find.text(duringPassword ? l10n.commonConfirm : l10n.settingsLogout));
+      await tester.pumpAndSettle();
+      expect(attempts, duringPassword ? 1 : 0);
+      expect(find.text(l10n.settingsDeviceLoggedOut), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
 }
