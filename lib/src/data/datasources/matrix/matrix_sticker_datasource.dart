@@ -98,10 +98,11 @@ class MatrixStickerDataSource {
   /// 解析贴纸包数据
   StickerPack? _parseStickerPack(String packId, Map<String, dynamic> data) {
     try {
-      final pack = data['pack'] as Map<String, dynamic>?;
+      final pack =
+          data['pack'] as Map<String, dynamic>? ?? const <String, dynamic>{};
       final images = data['images'] as Map<String, dynamic>?;
 
-      if (pack == null || images == null) return null;
+      if (images == null) return null;
 
       final stickers = <Sticker>[];
       images.forEach((key, value) {
@@ -135,7 +136,7 @@ class MatrixStickerDataSource {
         description: pack['description'] as String?,
         avatarUrl: pack['avatar_url'] as String?,
         avatarHttpUrl: _getHttpUrl(pack['avatar_url'] as String?),
-        author: pack['author'] as String?,
+        author: (pack['author'] ?? pack['attribution']) as String?,
         source: StickerPackSource.matrix,
         stickers: stickers,
       );

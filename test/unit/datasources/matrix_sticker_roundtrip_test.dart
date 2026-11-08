@@ -94,6 +94,52 @@ void main() {
     },
   );
 
+  test('image packs without optional metadata remain readable', () async {
+    accountData[MatrixStickerDataSource.installedPacksType] = {
+      'pack_ids': ['minimal'],
+    };
+    accountData['${MatrixStickerDataSource.stickerPackType}.minimal'] = {
+      'images': {
+        'cat_wave': {'url': 'mxc://test/cat', 'body': 'A waving cat'},
+      },
+    };
+    final pack = (await source.getInstalledPacks()).singleWhere(
+      (p) => p.id == 'minimal',
+    );
+    expect(pack.name, 'minimal');
+    expect(pack.stickers.single.id, 'cat_wave');
+    expect(pack.stickers.single.name, 'A waving cat');
+  });
+
+  test(
+    'standard attribution is read while legacy author retains precedence',
+    () async {
+      accountData[MatrixStickerDataSource.installedPacksType] = {
+        'pack_ids': ['credit'],
+      };
+      final data = <String, dynamic>{
+        'pack': {'display_name': 'Cats', 'attribution': 'Original artist'},
+        'images': {
+          'cat': {'url': 'mxc://test/cat'},
+        },
+      };
+      accountData['${MatrixStickerDataSource.stickerPackType}.credit'] = data;
+      expect(
+        (await source.getInstalledPacks())
+            .singleWhere((p) => p.id == 'credit')
+            .author,
+        'Original artist',
+      );
+      (data['pack'] as Map<String, dynamic>)['author'] = 'Legacy artist';
+      expect(
+        (await source.getInstalledPacks())
+            .singleWhere((p) => p.id == 'credit')
+            .author,
+        'Legacy artist',
+      );
+    },
+  );
+
   test(
     'legacy image keys remain valid identifiers and emoji aliases',
     () async {
