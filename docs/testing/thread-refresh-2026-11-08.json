@@ -9,7 +9,6 @@
   "analysis_errors": 0,
   "analysis_warnings": 0,
   "remaining": [
-    "Full Chat regression",
     "Wallet immutable pin integration",
     "Native and real-homeserver acceptance",
     "Older remote redactions and initial fallback completeness"
@@ -31,6 +30,30 @@
     "focused_passed": 58,
     "log": "/tmp/n42-chat-thread-refresh-retry-cluster.log",
     "behavior": "Visibility failure discards retained-page position so explicit retry can fetch hidden pages again",
-    "final_source_full_regression": "pending"
+    "final_source_full_regression": "passed"
+  },
+  "final_full_regression": {
+    "source": "af68f8db9fc83c0a470befaa37db98711b812388",
+    "counts": {
+      "success": 9072,
+      "skipped": 7
+    },
+    "skip_names": [
+      "real encrypted forwarding stays ciphertext and decrypts for the recipient",
+      "real server preserves repeated emoji across reopen rename and removal",
+      "room-pack preview respects access and explicit snapshot installation",
+      "live datasource UIA registration, password login and cleanup",
+      "measure 200 manifested images through the Flutter image decoder",
+      "sequential accounts retain independent device identities and decrypt offline messages",
+      "live homeserver media smoke"
+    ],
+    "coverage_hit": 107621,
+    "coverage_total": 148080,
+    "coverage_percent": 72.67760669908158,
+    "log": "/tmp/n42-chat-thread-refresh-final-full.jsonl",
+    "log_sha256": "250f66202d5af0fda8316eb047f93fd6a6a7107e58ab3600e4e0b2842a46f22b",
+    "lcov": "/tmp/n42-chat-thread-refresh-final-full-lcov.info",
+    "lcov_sha256": "8696e6a60666778ffdd6ad20422b0702434dd2bd8adf09c64fb30287b92cb1ee",
+    "original_coverage_restored": true
   }
 }
