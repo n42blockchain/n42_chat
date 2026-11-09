@@ -257,6 +257,56 @@ void main() {
       await bloc.close();
     },
   );
+  for (final success in [false, true]) {
+    test('late Matrix login $success keeps the current account', () async {
+      final entered = Completer<void>();
+      final pending = Completer<AuthResult>();
+      when(
+        () => repo.loginWithToken(
+          homeserver: 'https://matrix.example',
+          accessToken: 'matrix-token',
+          userId: '@alice:matrix.example',
+          deviceId: '',
+        ),
+      ).thenAnswer((_) {
+        entered.complete();
+        return pending.future;
+      });
+      final bloc = build(
+        (_, _) async => SocialLoginResult(provider: 'apple', idToken: 'proof'),
+      );
+      bloc.add(
+        const AuthAppleLoginRequested(homeserver: 'https://legacy.example'),
+      );
+      await entered.future;
+      const other = UserEntity(
+        userId: '@bob:matrix.example',
+        displayName: 'Bob',
+      );
+      when(() => repo.currentUser).thenReturn(other);
+      when(() => repo.isLoggedIn).thenReturn(true);
+      final authenticated = bloc.stream.firstWhere(
+        (s) => s.status == AuthStatus.authenticated,
+      );
+      bloc.add(const AuthCheckRequested());
+      await authenticated;
+      pending.complete(
+        success
+            ? AuthResult.success(
+                const UserEntity(
+                  userId: '@alice:matrix.example',
+                  displayName: 'Alice',
+                ),
+              )
+            : AuthResult.failure('old Matrix login failed'),
+      );
+      await api.closed.future;
+      expect(bloc.state.status, AuthStatus.authenticated);
+      expect(bloc.state.user?.userId, other.userId);
+      expect(bloc.state.errorMessage, isNull);
+      await bloc.close();
+    });
+  }
   for (final platform in [TargetPlatform.iOS, TargetPlatform.android]) {
     test('Google server code reaches isolated login on $platform', () async {
       debugDefaultTargetPlatformOverride = platform;

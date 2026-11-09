@@ -1018,8 +1018,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
       if (emit.isDone || isClosed || epoch != _nativeSocialEpoch) return true;
       if (result.success && result.user != null) {
+        if (result.user!.userId != credentials.matrixUserId ||
+            _authRepository.currentUser?.userId != credentials.matrixUserId) {
+          return true;
+        }
         await _completeAuthenticatedFlow(result.user!, emit);
       } else {
+        if (_authRepository.currentUser?.userId != startingUser) return true;
         emit(
           state.copyWith(
             status: AuthStatus.error,
