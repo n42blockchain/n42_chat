@@ -1,0 +1,39 @@
+{
+  "observedAt": "2026-11-09T02:10:41.865586+00:00",
+  "scope": "Owned loopback Tuwunel 1.9.4, real Matrix 16 HTTP, SQLite and native Vodozemac; two disposable clients",
+  "beforeFix": "Timeout waiting for m.room.pinned_events on both partial rooms; diagnostic stack identified _verifyUnreadAttention pin synchronization. The diagnostic run log was reused for final run; do not treat it as retained red-run evidence.",
+  "fix": "Retain pinned-room state in the shared MatrixClientManager requiredRoomStateEvents configuration. Client receives a mutable copy.",
+  "liveTests": {
+    "passed": 1,
+    "failed": 0,
+    "assertions": [
+      "original encrypted forwarding and attachment decryption",
+      "selective history recipient decryption and source audits",
+      "policy-disable rejects previous preview",
+      "exact user mention and room mention event IDs",
+      "exact direct-reply event ID",
+      "ordinary message excluded",
+      "advancing read marker clears attention",
+      "both clients observe pin and unpin",
+      "server pinned state has no expiry field"
+    ]
+  },
+  "focusedTestsPassed": 30,
+  "analysis": {
+    "errors": 0,
+    "warnings": 0,
+    "infos": 5
+  },
+  "runtimeSourceBeforeFix": "0637fc1f0a2796246cbccd599894af27dcf146cf",
+  "liveLogSha256": "170687ce6c96b88f20ac56ee55da4239e7cc5d990fee4bf3ec2a280f51af28cd",
+  "testSha256": "e540b50e56f47e979e1f0a27b4568d4d59d0036acd2172a0fb8e1fef7241f929",
+  "nativeLibrarySha256": "e5070a80ed8075693bbe93264d01dd918428df96977615e8c34d3ddc7699a8c7",
+  "nativeLibraryScope": "Local native validation library; FRB handshake and Megolm pickle round trip pass. Not a signed app binary.",
+  "boundaries": [
+    "Mocked account lifecycle and in-memory history journal",
+    "No production or physical-device acceptance",
+    "No durable crash-recovery acceptance",
+    "Not included in delivered 73544"
+  ],
+  "cleanup": "Test finally deactivates disposable accounts and removes temporary SQLite databases; owned container stopped afterward"
+}

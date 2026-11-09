@@ -11,6 +11,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:n42_chat/src/data/datasources/matrix/matrix_client_manager.dart';
 import 'package:n42_chat/src/data/datasources/local/secure_storage_datasource.dart';
 import 'package:n42_chat/src/data/services/matrix_history_sharing.dart';
+import 'package:n42_chat/src/data/datasources/matrix/matrix_group_datasource.dart';
 import 'package:n42_chat/src/domain/repositories/auth_repository.dart';
 import 'package:n42_chat/src/domain/repositories/chat_catch_up_repository.dart';
 import 'package:n42_chat/src/data/datasources/matrix/matrix_reaction_datasource.dart';
@@ -77,7 +78,13 @@ void main() {
             database: db,
             sqfliteFactory: databaseFactoryFfi,
           );
-          final client = Client('forward-$i', database: database);
+          final client = Client(
+            'forward-$i',
+            database: database,
+            importantStateEvents: {
+              ...MatrixClientManager.requiredRoomStateEvents,
+            },
+          );
           clients.add(client);
           final random = Random.secure();
           final password = List.generate(
@@ -236,6 +243,7 @@ Future<void> _syncUntil(
   List<Client> clients,
   FutureOr<bool> Function() ready,
 ) async {
+  final caller = StackTrace.current.toString().split('\n').take(3).join('\n');
   final deadline = DateTime.now().add(const Duration(seconds: 60));
   while (DateTime.now().isBefore(deadline)) {
     if (await ready()) return;
@@ -244,7 +252,9 @@ Future<void> _syncUntil(
     );
     await Future<void>.delayed(const Duration(milliseconds: 250));
   }
-  throw TimeoutException('Owned encrypted forwarding condition not reached');
+  throw TimeoutException(
+    'Owned encrypted forwarding condition not reached\n$caller',
+  );
 }
 
 Future<void> _verifyHistorySharing(
@@ -340,7 +350,108 @@ Future<void> _verifyHistorySharing(
     );
     await sharing.setHistorySharing(rooms.first, enabled: false);
     await expectLater(sharing.shareHistory(cancelled), throwsStateError);
+    await _verifyUnreadAttention(
+      clients,
+      manager,
+      sharing,
+      rooms.first,
+      originalId,
+    );
   } finally {
     await sharing.dispose();
   }
+}
+
+Future<void> _verifyUnreadAttention(
+  List<Client> clients,
+  _Manager manager,
+  MatrixHistorySharing sharing,
+  String roomId,
+  String originalId,
+) async {
+  final room = clients.first.getRoomById(roomId)!;
+  final peer = clients.last.getRoomById(roomId)!;
+  print('[catchup-live] checking read marker and unread attention');
+  await room.setReadMarker(originalId);
+  await _syncUntil(clients, () => room.fullyRead == originalId);
+  print('[catchup-live] read marker synchronized');
+  final ordinary = await peer.sendTextEvent('Ordinary catch-up message');
+  final mention = await peer.sendEvent({
+    'msgtype': 'm.text',
+    'body': 'Attention for the owner',
+    'm.mentions': {
+      'user_ids': [clients.first.userID!],
+    },
+  });
+  final roomMention = await peer.sendEvent({
+    'msgtype': 'm.text',
+    'body': 'Attention for everyone',
+    'm.mentions': {'room': true},
+  });
+  final reply = await peer.sendEvent({
+    'msgtype': 'm.text',
+    'body': 'Direct reply to the original',
+    'm.relates_to': {
+      'm.in_reply_to': {'event_id': originalId},
+    },
+  });
+  expect([ordinary, mention, roomMention, reply], everyElement(isNotNull));
+  await _syncUntil(
+    clients,
+    () async =>
+        (await room.getEventById(reply!))?.content['body'] ==
+        'Direct reply to the original',
+  );
+  print('[catchup-live] encrypted attention events synchronized');
+  final attention = await sharing.unreadAttention(roomId);
+  expect(attention.complete, isTrue);
+  expect(
+    attention.mentions.map((e) => e.id),
+    unorderedEquals([mention, roomMention]),
+  );
+  expect(attention.replies.map((e) => e.id), [reply]);
+  expect(attention.mentions.any((e) => e.id == ordinary), isFalse);
+  final groups = MatrixGroupDataSource(manager);
+  await groups.pinMessage(roomId, originalId);
+  await _syncUntil(
+    clients,
+    () => clients.every(
+      (c) =>
+          (c
+                      .getRoomById(roomId)!
+                      .getState('m.room.pinned_events')
+                      ?.content['pinned']
+                  as List?)
+              ?.contains(originalId) ==
+          true,
+    ),
+  );
+  expect(groups.getPinnedEventIds(roomId), contains(originalId));
+  final state = await clients.first.getRoomStateWithKey(
+    roomId,
+    'm.room.pinned_events',
+    '',
+  );
+  expect(state['pinned'], contains(originalId));
+  expect(state.containsKey('expires_at'), isFalse);
+  await groups.unpinMessage(roomId, originalId);
+  await _syncUntil(
+    clients,
+    () => clients.every(
+      (c) =>
+          (c
+                      .getRoomById(roomId)!
+                      .getState('m.room.pinned_events')
+                      ?.content['pinned']
+                  as List?)
+              ?.contains(originalId) ==
+          false,
+    ),
+  );
+  await room.setReadMarker(reply);
+  await _syncUntil(clients, () => room.fullyRead == reply);
+  final read = await sharing.unreadAttention(roomId);
+  expect(read.complete, isTrue);
+  expect(read.mentions, isEmpty);
+  expect(read.replies, isEmpty);
 }

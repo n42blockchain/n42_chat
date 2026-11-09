@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+
 import '../../../domain/entities/chat_sync_phase.dart';
 import '../../../core/encryption/account_session_index.dart';
 import '../../../core/encryption/session_preserving_client.dart';
@@ -15,6 +16,7 @@ import 'package:path/path.dart' as p;
 import 'package:sqflite/sqflite.dart' as sqflite;
 import 'package:n42_chat/src/core/utils/io_helper.dart' as io_helper;
 import 'package:n42_chat/src/n42_chat_config.dart';
+
 import '../../../core/services/privacy_http_client.dart';
 import '../../../core/utils/debug_log.dart';
 import '../../../domain/entities/user_profile_entity.dart';
@@ -28,6 +30,12 @@ import '../local/preferences_datasource.dart';
 /// - 同步状态管理
 /// - 事件分发
 class MatrixClientManager {
+  /// Keep pins available before the SDK post-loads a room's full state.
+  static const requiredRoomStateEvents = {
+    EventTypes.Encryption,
+    'm.room.pinned_events',
+  };
+
   MatrixClientManager._();
 
   static final MatrixClientManager _instance = MatrixClientManager._();
@@ -111,14 +119,15 @@ class MatrixClientManager {
   /// 同步状态流
   Stream<SyncStatusUpdate>? get onSyncStatus => _client?.onSyncStatus.stream;
 
-  Stream<ChatSyncPhase>? get onChatSyncPhase =>
-      onSyncStatus?.map((update) => switch (update.status) {
-        SyncStatus.waitingForResponse => ChatSyncPhase.waiting,
-        SyncStatus.processing => ChatSyncPhase.processing,
-        SyncStatus.cleaningUp => ChatSyncPhase.cleaningUp,
-        SyncStatus.finished => ChatSyncPhase.finished,
-        SyncStatus.error => ChatSyncPhase.error,
-      });
+  Stream<ChatSyncPhase>? get onChatSyncPhase => onSyncStatus?.map(
+    (update) => switch (update.status) {
+      SyncStatus.waitingForResponse => ChatSyncPhase.waiting,
+      SyncStatus.processing => ChatSyncPhase.processing,
+      SyncStatus.cleaningUp => ChatSyncPhase.cleaningUp,
+      SyncStatus.finished => ChatSyncPhase.finished,
+      SyncStatus.error => ChatSyncPhase.error,
+    },
+  );
 
   /// 登录状态变化流
   Stream<LoginState>? get onLoginStateChanged =>
@@ -292,7 +301,7 @@ class MatrixClientManager {
         },
         shareKeysWith: shareKeysWith,
         logLevel: kDebugMode ? Level.debug : Level.warning,
-        importantStateEvents: {EventTypes.Encryption},
+        importantStateEvents: {...requiredRoomStateEvents},
         syncFilter: syncFilter,
       );
 
