@@ -1028,10 +1028,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         );
       }
     } catch (_) {
-      if (!emit.isDone && !isClosed && epoch == _nativeSocialEpoch)
+      if (!emit.isDone &&
+          !isClosed &&
+          epoch == _nativeSocialEpoch &&
+          _authRepository.currentUser?.userId == startingUser) {
         emit(
           state.copyWith(status: AuthStatus.error, errorMessage: failureKey),
         );
+      }
     } finally {
       api?.close();
       _nativeSocialLoginBusy = false;

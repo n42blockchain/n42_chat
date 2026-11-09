@@ -23,6 +23,13 @@ class Storage extends Mock implements SecureStorageDataSource {}
 
 class Api extends IdHubApi {
   Api() : super(baseUrl: 'https://id.n42.world');
+  final closed = Completer<void>();
+  @override
+  void close() {
+    super.close();
+    if (!closed.isCompleted) closed.complete();
+  }
+
   bool fail = false;
   int completed = 0;
   String? receivedToken;
@@ -217,6 +224,39 @@ void main() {
     ).called(1);
     await bloc.close();
   });
+  test(
+    'late native proof failure does not replace another account state',
+    () async {
+      final entered = Completer<void>();
+      final proof = Completer<SocialLoginResult?>();
+      final bloc = build((_, _) {
+        entered.complete();
+        return proof.future;
+      });
+      bloc.add(
+        const AuthAppleLoginRequested(homeserver: 'https://legacy.example'),
+      );
+      await entered.future;
+      const other = UserEntity(
+        userId: '@bob:matrix.example',
+        displayName: 'Bob',
+      );
+      when(() => repo.currentUser).thenReturn(other);
+      when(() => repo.isLoggedIn).thenReturn(true);
+      final authenticated = bloc.stream.firstWhere(
+        (s) => s.status == AuthStatus.authenticated,
+      );
+      bloc.add(const AuthCheckRequested());
+      await authenticated;
+      proof.completeError(StateError('provider unavailable'));
+      await api.closed.future;
+      expect(bloc.state.status, AuthStatus.authenticated);
+      expect(bloc.state.user?.userId, other.userId);
+      expect(bloc.state.errorMessage, isNull);
+      expect(api.completed, 0);
+      await bloc.close();
+    },
+  );
   for (final platform in [TargetPlatform.iOS, TargetPlatform.android]) {
     test('Google server code reaches isolated login on $platform', () async {
       debugDefaultTargetPlatformOverride = platform;
