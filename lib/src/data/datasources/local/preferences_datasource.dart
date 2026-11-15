@@ -1,11 +1,16 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:crypto/crypto.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../services/scheduled_attachment_cleanup.dart';
+import '../../services/scheduled_draft_operation.dart';
 import '../../../domain/entities/message_entity.dart';
 import '../../../domain/entities/scheduled_message_draft.dart';
+import '../../../domain/entities/scheduled_recovery_copy.dart';
 import '../../../domain/entities/user_profile_entity.dart';
 import '../../../core/utils/debug_log.dart';
 import '../../../core/utils/preference_write_utils.dart';
@@ -791,6 +796,173 @@ class PreferencesDataSource {
   // 定时消息管理
   // ============================================
 
+  String _scheduledKey(String? ownerUserId) {
+    if (ownerUserId == null) {
+      return _keyScheduledMessages; // Legacy, never auto-claimed.
+    }
+    if (ownerUserId.trim().isEmpty || ownerUserId != ownerUserId.trim()) {
+      throw ArgumentError.value(ownerUserId, 'ownerUserId');
+    }
+    return '${_keyScheduledMessages}_account_${sha256.convert(utf8.encode(ownerUserId))}';
+  }
+
+  // All instances in this isolate share one persisted scheduled-message map.
+  // Serialize its reads and mutations, including reload and platform ack.
+  static Future<void> _scheduledStoreTail = Future<void>.value();
+
+  Future<T> _withScheduledStore<T>(Future<T> Function() operation) async {
+    final previous = _scheduledStoreTail;
+    final release = Completer<void>();
+    _scheduledStoreTail = release.future;
+    await previous;
+    try {
+      return await operation();
+    } finally {
+      release.complete();
+    }
+  }
+
+  /// Read this account's saved copies even when its active queue is empty.
+  /// Integrity failures stay in the result; never silently drop recovery data.
+  Future<List<ScheduledRecoveryCopy>> getScheduledRecoveryCopies({
+    required String ownerUserId,
+    required bool Function() isCurrent,
+  }) => _withScheduledStore(() async {
+    final prefix = '${_scheduledKey(ownerUserId)}_recovery_';
+    if (!isCurrent()) throw StateError('Scheduled recovery account changed');
+    final p = await prefs;
+    await p.reload();
+    if (!isCurrent()) throw StateError('Scheduled recovery account changed');
+    final keys = p.getKeys().where((key) => key.startsWith(prefix)).toList()..sort();
+    return List.unmodifiable(keys.map((key) {
+      final id = key.substring(prefix.length);
+      final value = p.get(key);
+      final raw = value is String ? value : null;
+      return ScheduledRecoveryCopy(
+        id: id, raw: raw,
+        isIntact: raw != null && id == sha256.convert(utf8.encode(raw)).toString(),
+      );
+    }));
+  });
+
+  /// Import only into evidence storage. Never replace active queues, receipts,
+  /// legacy ownership or attachments, and never enqueue imported content.
+  Future<ScheduledRecoveryCopy> importScheduledRecoveryCopy({
+    required Uint8List bytes,
+    required String ownerUserId,
+    required bool Function() isCurrent,
+  }) {
+    if (!isCurrent()) throw StateError('Scheduled recovery account changed');
+    // Decode synchronously before awaiting the store lock. Mutable caller bytes
+    // cannot substitute another file while a preceding operation is pending.
+    final copy = ScheduledRecoveryCopy.fromExportBytes(bytes, ownerUserId: ownerUserId);
+    final key = _scheduledKey(ownerUserId);
+    return _withScheduledStore(() async {
+      if (!isCurrent()) throw StateError('Scheduled recovery account changed');
+      final p = await prefs;
+      await p.reload();
+      if (!isCurrent()) throw StateError('Scheduled recovery account changed');
+      await _preserveScheduledCopy(p, key, copy.raw!);
+      if (!isCurrent()) throw StateError('Scheduled recovery account changed');
+      return copy;
+    });
+  }
+
+  /// Remove only the reviewed intact copy, never the active queue or legacy data.
+  Future<void> deleteScheduledRecoveryCopy({
+    required String ownerUserId,
+    required String expectedRaw,
+    required bool Function() isCurrent,
+  }) => _withScheduledStore(() async {
+    final key = '${_scheduledKey(ownerUserId)}_recovery_${sha256.convert(utf8.encode(expectedRaw))}';
+    if (!isCurrent()) throw StateError('Scheduled recovery account changed');
+    final p = await prefs;
+    await p.reload();
+    if (!isCurrent()) throw StateError('Scheduled recovery account changed');
+    if (p.get(key) != expectedRaw) throw StateError('Scheduled recovery copy changed');
+    try {
+      if (!await p.remove(key)) throw StateError('Recovery copy deletion was not saved');
+    } catch (_) {
+      try { await p.reload(); } catch (_) {}
+      rethrow;
+    }
+  });
+
+  /// Preserve the exact account-owned queue before any manual recovery.
+  /// Recovery copies are never read by the dispatcher. Keep the account prefix
+  /// so attachment cleanup also preserves files referenced by these copies.
+  Future<String?> saveScheduledRecoveryCopy({
+    required String ownerUserId,
+    required bool Function() isCurrent,
+  }) => _withScheduledStore(() async {
+    final key = _scheduledKey(ownerUserId);
+    if (!isCurrent()) throw StateError('Scheduled recovery account changed');
+    final p = await prefs;
+    await p.reload();
+    if (!isCurrent()) throw StateError('Scheduled recovery account changed');
+    final raw = p.getString(key);
+    if (raw == null) return null;
+    await _preserveScheduledCopy(p, key, raw);
+    if (!isCurrent()) throw StateError('Scheduled recovery account changed');
+    return raw;
+  });
+
+  Future<void> _preserveScheduledCopy(SharedPreferences p, String key, String raw) async {
+    final digest = sha256.convert(utf8.encode(raw));
+    final backupKey = '${key}_recovery_$digest';
+    final previous = p.getString(backupKey);
+    if (previous != null && previous != raw) {
+      throw StateError('Scheduled recovery copy integrity mismatch');
+    }
+    if (previous == null) await saveStringPreference(p, backupKey, raw);
+  }
+
+  /// Explicitly retire a corrupt active queue only after an exact durable copy.
+  /// Never repair fields, clear receipts, remove attachments, or resend drafts.
+  Future<void> resetCorruptScheduledMessages({
+    required String ownerUserId,
+    required String expectedRaw,
+    required bool Function() isCurrent,
+  }) async {
+    final key = _scheduledKey(ownerUserId);
+    if (!isCurrent()) throw StateError('Scheduled recovery account changed');
+    final lease = ScheduledDraftOperation.tryAcquireRecovery(ownerUserId);
+    if (lease == null) throw StateError('Scheduled messages are busy');
+    try {
+      await _withScheduledStore(() async {
+        final p = await prefs;
+        await p.reload();
+        if (!isCurrent()) throw StateError('Scheduled recovery account changed');
+        final raw = p.getString(key);
+        if (raw != expectedRaw) throw StateError('Scheduled queue changed');
+        var corrupt = false;
+        try {
+          final rooms = jsonDecode(raw!) as Map<String, dynamic>;
+          for (final entry in rooms.entries) {
+            for (final item in entry.value as List<dynamic>) {
+              _scheduledDraftForRoom(item, entry.key);
+            }
+          }
+        } on FormatException {
+          corrupt = true;
+        } on TypeError {
+          corrupt = true;
+        }
+        if (!corrupt) throw StateError('Scheduled queue does not need recovery');
+        await _preserveScheduledCopy(p, key, raw!);
+        if (!isCurrent()) throw StateError('Scheduled recovery account changed');
+        try {
+          if (!await p.remove(key)) throw StateError('Scheduled queue reset was not saved');
+        } catch (_) {
+          try { await p.reload(); } catch (_) {}
+          rethrow;
+        }
+      });
+    } finally {
+      lease.release();
+    }
+  }
+
   /// 保存定时消息
   ///
   /// [roomId] 房间ID
@@ -802,6 +974,7 @@ class PreferencesDataSource {
   /// [mentionsRoom] 是否 @全体成员
   Future<void> saveScheduledMessage({
     required String roomId,
+    String? ownerUserId,
     required String messageId,
     required String text,
     MessageType type = MessageType.text,
@@ -810,10 +983,11 @@ class PreferencesDataSource {
     int? selfDestructAfter,
     List<String>? mentionedUserIds,
     bool mentionsRoom = false,
-  }) async {
+  }) => _withScheduledStore(() async {
     try {
       final p = await prefs;
-      final data = p.getString(_keyScheduledMessages);
+      await p.reload();
+      final data = p.getString(_scheduledKey(ownerUserId));
       Map<String, dynamic> allData = {};
 
       if (data != null) {
@@ -824,6 +998,9 @@ class PreferencesDataSource {
       final roomMessages =
           (allData[roomId] as List<dynamic>?)?.cast<Map<String, dynamic>>() ??
           [];
+
+      // Repeated saves of the same local ID replace the draft, not duplicate it.
+      roomMessages.removeWhere((item) => item['messageId'] == messageId);
 
       // 添加新的定时消息
       roomMessages.add(
@@ -842,21 +1019,106 @@ class PreferencesDataSource {
 
       allData[roomId] = roomMessages;
 
-      await p.setString(_keyScheduledMessages, jsonEncode(allData));
+      await saveStringPreference(
+        p,
+        _scheduledKey(ownerUserId),
+        jsonEncode(allData),
+      );
 
       prefsLog('Scheduled message saved - $messageId for $scheduledAt');
     } catch (e) {
       prefsLog('Failed to save scheduled message - $e');
+      rethrow;
     }
+  });
+
+  /// Persist the server receipt before removing the local draft.
+  Future<bool> markScheduledDeliveryAccepted({
+    required String ownerUserId,
+    required String roomId,
+    required String messageId,
+    required String eventId,
+  }) => _withScheduledStore(() async {
+    if (!ScheduledMessageDraft.isValidAcceptedEventId(eventId)) {
+      throw ArgumentError('Invalid scheduled delivery receipt');
+    }
+    final p = await prefs;
+    await p.reload();
+    final key = _scheduledKey(ownerUserId);
+    final raw = p.getString(key);
+    if (raw == null) return false;
+    final data = jsonDecode(raw) as Map<String, dynamic>;
+    final messages = data[roomId] as List<dynamic>?;
+    if (messages == null) return false;
+    final index = messages.indexWhere((item) => (item as Map)['messageId'] == messageId);
+    if (index < 0) return false;
+    final updated = Map<String, dynamic>.from(messages[index] as Map)
+      ..['acceptedEventId'] = eventId
+      ..['deliveryUnconfirmed'] = false
+      ..['failedAttempts'] = 0
+      ..remove('retryAt');
+    messages[index] = updated;
+    await saveStringPreference(p, key, jsonEncode(data));
+    return true;
+  });
+
+  /// Record a failed/unconfirmed attempt without recreating a cancelled draft.
+  Future<bool> markScheduledDeliveryUnconfirmed({
+    required String ownerUserId,
+    required String roomId,
+    required String messageId,
+  }) => _withScheduledStore(() async {
+    final p = await prefs;
+    await p.reload();
+    final key = _scheduledKey(ownerUserId);
+    final raw = p.getString(key);
+    if (raw == null) return false;
+    final data = jsonDecode(raw) as Map<String, dynamic>;
+    final messages = data[roomId] as List<dynamic>?;
+    if (messages == null) return false;
+    final index = messages.indexWhere(
+      (item) => (item as Map)['messageId'] == messageId,
+    );
+    if (index < 0) return false;
+    final previous = Map<String, dynamic>.from(messages[index] as Map);
+    final draft = ScheduledMessageDraft.fromJson(previous);
+    if (draft.acceptedEventId != null) return false;
+    final attempts = draft.failedAttempts.clamp(0, 5) + 1;
+    final delayMinutes = attempts == 6 ? 30 : 1 << (attempts - 1);
+    messages[index] = {
+      ...previous,
+      'failedAttempts': attempts,
+      'retryAt': DateTime.now().toUtc().add(Duration(minutes: delayMinutes)).toIso8601String(),
+      'deliveryUnconfirmed': true,
+    };
+    await saveStringPreference(p, key, jsonEncode(data));
+    return true;
+  });
+
+  static ScheduledMessageDraft _scheduledDraftForRoom(
+    Object? item,
+    String roomId,
+  ) {
+    final draft = ScheduledMessageDraft.fromJson(
+      Map<String, dynamic>.from(item as Map),
+    );
+    if (roomId.trim().isEmpty ||
+        (draft.roomId != null && draft.roomId != roomId)) {
+      throw const FormatException('Scheduled message room identity mismatch');
+    }
+    // Older records omit roomId; the containing room supplies their identity.
+    return draft.copyWith(roomId: roomId);
   }
 
   /// 获取房间的所有定时消息
   Future<List<ScheduledMessageDraft>> getScheduledMessages(
-    String roomId,
-  ) async {
+    String roomId, {
+    String? ownerUserId,
+  }) => _withScheduledStore(() async {
     try {
       final p = await prefs;
-      final data = p.getString(_keyScheduledMessages);
+      await p.reload();
+      final data = p.getString(_scheduledKey(ownerUserId));
       if (data == null) return [];
 
       final allData = jsonDecode(data) as Map<String, dynamic>;
@@ -864,23 +1126,24 @@ class PreferencesDataSource {
       if (roomMessages == null) return [];
 
       return roomMessages
-          .whereType<Map<dynamic, dynamic>>()
           .map(
-            (item) =>
-                ScheduledMessageDraft.fromJson(Map<String, dynamic>.from(item)),
+            (item) => _scheduledDraftForRoom(item, roomId),
           )
           .toList(growable: false);
     } catch (e) {
-      prefsLog('Failed to read scheduled messages - $e');
-      return [];
+      prefsLog('Failed to read scheduled messages - ${e.runtimeType}');
+      rethrow;
     }
-  }
+  });
 
   /// 获取所有房间的到期定时消息
-  Future<List<ScheduledMessageDraft>> getDueScheduledMessages() async {
+  Future<List<ScheduledMessageDraft>> getDueScheduledMessages({
+    String? ownerUserId,
+  }) => _withScheduledStore(() async {
     try {
       final p = await prefs;
-      final data = p.getString(_keyScheduledMessages);
+      await p.reload();
+      final data = p.getString(_scheduledKey(ownerUserId));
       if (data == null) return [];
 
       final allData = jsonDecode(data) as Map<String, dynamic>;
@@ -889,34 +1152,32 @@ class PreferencesDataSource {
 
       for (final entry in allData.entries) {
         final roomId = entry.key;
-        final messages = (entry.value as List<dynamic>)
-            .whereType<Map<dynamic, dynamic>>()
-            .map(
-              (item) => ScheduledMessageDraft.fromJson(
-                Map<String, dynamic>.from(item),
-              ),
-            );
-
-        for (final msg in messages) {
-          final scheduledAt = msg.scheduledAt;
-          if (now.isAfter(scheduledAt) || now.isAtSameMomentAs(scheduledAt)) {
-            dueMessages.add(msg.copyWith(roomId: roomId));
+        final messages = entry.value as List<dynamic>;
+        for (final item in messages) {
+          final msg = _scheduledDraftForRoom(item, roomId);
+          if (msg.isDue(now)) {
+            dueMessages.add(msg);
           }
         }
       }
-
       return dueMessages;
     } catch (e) {
-      prefsLog('Failed to get due scheduled messages - $e');
-      return [];
+      prefsLog('Failed to get due scheduled messages - ${e.runtimeType}');
+      rethrow;
     }
-  }
+  });
 
   /// 删除定时消息
-  Future<void> removeScheduledMessage(String roomId, String messageId) async {
+  Future<void> removeScheduledMessage(
+    String roomId,
+    String messageId, {
+    String? ownerUserId,
+  }) => _withScheduledStore(() async {
+    final p = await prefs;
     try {
-      final p = await prefs;
-      final data = p.getString(_keyScheduledMessages);
+      // Read durable state again: a failed platform write can change the cache.
+      await p.reload();
+      final data = p.getString(_scheduledKey(ownerUserId));
       if (data == null) return;
 
       final allData = jsonDecode(data) as Map<String, dynamic>;
@@ -924,6 +1185,7 @@ class PreferencesDataSource {
           ?.cast<Map<String, dynamic>>();
       if (roomMessages == null) return;
 
+      final removed = roomMessages.where((msg) => msg['messageId'] == messageId).toList();
       roomMessages.removeWhere((msg) => msg['messageId'] == messageId);
 
       if (roomMessages.isEmpty) {
@@ -932,39 +1194,110 @@ class PreferencesDataSource {
         allData[roomId] = roomMessages;
       }
 
-      if (allData.isEmpty) {
-        await p.remove(_keyScheduledMessages);
-      } else {
-        await p.setString(_keyScheduledMessages, jsonEncode(allData));
-      }
+      final saved = allData.isEmpty
+          ? await p.remove(_scheduledKey(ownerUserId))
+          : await p.setString(_scheduledKey(ownerUserId), jsonEncode(allData));
+      if (!saved) throw StateError('Scheduled message deletion was not saved');
 
+      await _cleanupRemovedScheduledAttachments(p, removed);
       prefsLog('Scheduled message removed - $messageId');
     } catch (e) {
       prefsLog('Failed to remove scheduled message - $e');
+      // SharedPreferences mutates its cache before the platform acknowledges it.
+      try {
+        await p.reload();
+      } catch (_) {}
+      rethrow;
+    }
+  });
+
+  Future<void> _cleanupRemovedScheduledAttachments(
+    SharedPreferences storage,
+    List<Map<String, dynamic>> removed,
+  ) async {
+    try {
+      final candidates = <String>{};
+      for (final draft in removed) {
+        final payload = draft['payload'] as Map<String, dynamic>?;
+        final path = payload?['localPath'] as String?;
+        if (path != null && path.isNotEmpty) candidates.add(path);
+      }
+      if (candidates.isEmpty) return;
+      // Include other accounts and unattributed legacy drafts. Never interpret
+      // a corrupt/unavailable queue as an empty queue when deleting user files.
+      await storage.reload();
+      final references = <String>{};
+      for (final key in storage.getKeys()) {
+        if (key != _keyScheduledMessages &&
+            !key.startsWith('${_keyScheduledMessages}_account_')) {
+          continue;
+        }
+        final encoded = storage.getString(key);
+        if (encoded == null) throw StateError('Scheduled queue unavailable');
+        final rooms = jsonDecode(encoded) as Map<String, dynamic>;
+        for (final value in rooms.values) {
+          for (final draft in value as List<dynamic>) {
+            final payload =
+                (draft as Map<String, dynamic>)['payload']
+                    as Map<String, dynamic>?;
+            final path = payload?['localPath'] as String?;
+            if (path != null && path.isNotEmpty) references.add(path);
+          }
+        }
+      }
+      for (final candidate in candidates) {
+        await ScheduledAttachmentCleanup.deleteUnreferenced(
+          candidate,
+          references,
+        );
+      }
+    } catch (error) {
+      // Draft deletion is acknowledged; uncertain file cleanup is deferred.
+      prefsLog('Scheduled attachment cleanup deferred - ${error.runtimeType}');
     }
   }
 
   /// 清除房间所有定时消息
-  Future<void> clearScheduledMessages(String roomId) async {
-    try {
-      final p = await prefs;
-      final data = p.getString(_keyScheduledMessages);
-      if (data == null) return;
+  Future<void> clearScheduledMessages(String roomId, {String? ownerUserId}) =>
+      _withScheduledStore(() async {
+        try {
+          final p = await prefs;
+          await p.reload();
+          final data = p.getString(_scheduledKey(ownerUserId));
+          if (data == null) return;
 
-      final allData = jsonDecode(data) as Map<String, dynamic>;
-      allData.remove(roomId);
+          final allData = jsonDecode(data) as Map<String, dynamic>;
+          final removed = (allData[roomId] as List<dynamic>?)
+              ?.cast<Map<String, dynamic>>();
+          if (removed == null) return;
+          allData.remove(roomId);
 
-      if (allData.isEmpty) {
-        await p.remove(_keyScheduledMessages);
-      } else {
-        await p.setString(_keyScheduledMessages, jsonEncode(allData));
-      }
+          if (allData.isEmpty) {
+            try {
+              if (!await p.remove(_scheduledKey(ownerUserId))) {
+                throw StateError('Scheduled messages were not cleared');
+              }
+            } catch (_) {
+              try {
+                await p.reload();
+              } catch (_) {}
+              rethrow;
+            }
+          } else {
+            await saveStringPreference(
+              p,
+              _scheduledKey(ownerUserId),
+              jsonEncode(allData),
+            );
+          }
 
-      prefsLog('Cleared all scheduled messages for $roomId');
-    } catch (e) {
-      prefsLog('Failed to clear scheduled messages - $e');
-    }
-  }
+          await _cleanupRemovedScheduledAttachments(p, removed);
+          prefsLog('Cleared all scheduled messages for $roomId');
+        } catch (e) {
+          prefsLog('Failed to clear scheduled messages - $e');
+          rethrow;
+        }
+      });
 
   // ============================================
   // 朋友圈设置
@@ -1514,6 +1847,47 @@ class PreferencesDataSource {
   // 草稿持久化
   // ============================================
 
+  String _accountDraftKey(String ownerUserId, String roomId) {
+    if (ownerUserId.trim().isEmpty || ownerUserId != ownerUserId.trim() || roomId.trim().isEmpty) {
+      throw ArgumentError('Draft account and room are required');
+    }
+    return 'n42_chat_account_draft_v1_${sha256.convert(utf8.encode(jsonEncode([ownerUserId, roomId])))}';
+  }
+
+  /// Account-scoped composer draft. Unknown legacy drafts stay untouched.
+  Future<String?> getAccountDraft(String roomId, {
+    required String ownerUserId, required bool Function() isCurrent,
+  }) => _withScheduledStore(() async {
+    final key = _accountDraftKey(ownerUserId, roomId);
+    if (!isCurrent()) throw StateError('Draft account changed');
+    final p = await prefs;
+    await p.reload();
+    if (!isCurrent()) throw StateError('Draft account changed');
+    return p.getString(key);
+  });
+
+  Future<void> saveAccountDraft(String roomId, String text, {
+    required String ownerUserId, required bool Function() isCurrent,
+  }) => _withScheduledStore(() async {
+    final key = _accountDraftKey(ownerUserId, roomId);
+    if (!isCurrent()) throw StateError('Draft account changed');
+    final p = await prefs;
+    await p.reload();
+    if (!isCurrent()) throw StateError('Draft account changed');
+    if (text.isNotEmpty) {
+      await saveStringPreference(p, key, text);
+    } else {
+      try {
+        if (!await p.remove(key)) throw StateError('Draft deletion rejected');
+      } catch (_) {
+        try { await p.reload(); } catch (_) {}
+        rethrow;
+      }
+    }
+  });
+
+  /// Legacy unowned draft compatibility only. The composer uses account-scoped
+  /// methods above; do not assign these retained values to a current account.
   /// 保存房间草稿（独立 key 存储，避免 N+1 读写）
   Future<void> saveDraft(String roomId, String text) async {
     try {

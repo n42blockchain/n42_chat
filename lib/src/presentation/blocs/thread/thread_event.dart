@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:equatable/equatable.dart';
 
 import '../../../domain/entities/message_entity.dart';
@@ -14,14 +16,16 @@ abstract class ThreadEvent extends Equatable {
 class InitializeThread extends ThreadEvent {
   final String roomId;
   final String threadRootEventId;
+  final bool isRetry;
 
   const InitializeThread({
     required this.roomId,
     required this.threadRootEventId,
+    this.isRetry = false,
   });
 
   @override
-  List<Object?> get props => [roomId, threadRootEventId];
+  List<Object?> get props => [roomId, threadRootEventId, if (isRetry) true];
 }
 
 /// 加载线程消息
@@ -38,10 +42,12 @@ class LoadMoreThreadMessages extends ThreadEvent {
 class SendThreadTextMessage extends ThreadEvent {
   final String text;
 
-  const SendThreadTextMessage(this.text);
+  final Completer<bool>? completion;
+
+  const SendThreadTextMessage(this.text, {this.completion});
 
   @override
-  List<Object?> get props => [text];
+  List<Object?> get props => [text, if (completion != null) completion];
 }
 
 /// 发送线程图片消息
@@ -90,10 +96,12 @@ class SetThreadReplyTarget extends ThreadEvent {
 class ThreadMessagesUpdated extends ThreadEvent {
   final List<MessageEntity> messages;
 
-  const ThreadMessagesUpdated(this.messages);
+  final bool Function()? isCurrent;
+
+  const ThreadMessagesUpdated(this.messages, {this.isCurrent});
 
   @override
-  List<Object?> get props => [messages];
+  List<Object?> get props => [messages, if (isCurrent != null) isCurrent];
 }
 
 /// 释放线程资源

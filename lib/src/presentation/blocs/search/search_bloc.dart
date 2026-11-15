@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -10,7 +12,14 @@ import 'search_state.dart';
 class SearchBloc extends Bloc<SearchEvent, SearchState> {
   final ISearchRepository _searchRepository;
 
-  SearchBloc(this._searchRepository) : super(const SearchInitial()) {
+  SearchBloc(
+    this._searchRepository, {
+    Iterable<Stream<void>> invalidationStreams = const [],
+  }) : super(const SearchInitial()) {
+    on<SearchContextInvalidated>((event, emit) {
+      final generation = _eventGenerations[event] ?? _generation;
+      if (_isCurrent(event, emit, generation)) emit(const SearchInitial());
+    });
     on<PerformSearch>(
       _onPerformSearch,
       transformer: _debounce(const Duration(milliseconds: 300)),
@@ -31,6 +40,68 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     on<NavigateToPreviousResult>(_onNavigateToPreviousResult);
     on<NavigateToResultIndex>(_onNavigateToResultIndex);
     on<LoadMoreChatResults>(_onLoadMoreChatResults);
+    for (final stream in invalidationStreams) {
+      _invalidationSubscriptions.add(
+        stream.listen(
+          (_) => _invalidateContext(),
+          onError: (Object _, StackTrace _) => _invalidateContext(),
+        ),
+      );
+    }
+  }
+
+  final _invalidationSubscriptions = <StreamSubscription<void>>[];
+  bool _disposing = false;
+
+  void _invalidateContext() {
+    if (!_disposing && !isClosed) add(const SearchContextInvalidated());
+  }
+
+  int _generation = 0;
+  int _historyRevision = 0;
+  final Expando<int> _eventGenerations = Expando<int>();
+  final Expando<int> _historyRevisions = Expando<int>();
+
+  @override
+  void onEvent(SearchEvent event) {
+    if (event is PerformSearch ||
+        event is SearchInChat ||
+        event is SearchContacts ||
+        event is SearchGroups ||
+        event is SearchMessages ||
+        event is ClearSearch ||
+        event is LoadSearchHistory ||
+        event is SearchContextInvalidated) {
+      _generation++;
+    }
+    if (event is DeleteSearchHistoryItem ||
+        event is ClearSearchHistory ||
+        event is SearchContextInvalidated) {
+      _historyRevision++;
+    }
+    _eventGenerations[event] = _generation;
+    _historyRevisions[event] = _historyRevision;
+    super.onEvent(event);
+  }
+
+  bool _isCurrent(
+    SearchEvent event,
+    Emitter<SearchState> emit,
+    int generation,
+  ) =>
+      !isClosed &&
+      !emit.isDone &&
+      generation == _generation &&
+      _eventGenerations[event] == generation;
+
+  @override
+  Future<void> close() async {
+    _disposing = true;
+    _generation++;
+    await Future.wait(
+      _invalidationSubscriptions.map((subscription) => subscription.cancel()),
+    );
+    await super.close();
   }
 
   /// 防抖转换器
@@ -38,15 +109,42 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     return (events, mapper) => events.debounceTime(duration).switchMap(mapper);
   }
 
+  // A history mutation does not cancel the user's search. Refresh only the
+  // history snapshot when its revision changed while the read was pending.
+  Future<List<String>?> _readCurrentHistory(bool Function() current) async {
+    while (current()) {
+      final revision = _historyRevision;
+      try {
+        final history = await _searchRepository.getRecentSearches();
+        if (!current()) return null;
+        if (revision == _historyRevision) return history;
+      } catch (_) {
+        if (!current()) return null;
+        if (revision == _historyRevision) rethrow;
+      }
+    }
+    return null;
+  }
+
   Future<void> _onPerformSearch(
     PerformSearch event,
     Emitter<SearchState> emit,
   ) async {
+    final generation = _eventGenerations[event] ?? _generation;
+    bool current() => _isCurrent(event, emit, generation);
+    if (!current()) return;
+
     final query = event.query.trim();
 
     if (query.isEmpty) {
-      final history = await _searchRepository.getRecentSearches();
-      emit(SearchInitial(recentSearches: history));
+      try {
+        final history = await _readCurrentHistory(current);
+        if (!current() || history == null) return;
+        emit(SearchInitial(recentSearches: history));
+      } catch (e) {
+        if (!current()) return;
+        emit(SearchError(e.toString()));
+      }
       return;
     }
 
@@ -60,8 +158,10 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
               type: event.type,
               filter: event.filter,
             );
-      final history = await _searchRepository.getRecentSearches();
+      if (!current()) return;
+      final history = await _readCurrentHistory(current);
 
+      if (!current() || history == null) return;
       emit(
         SearchLoaded(
           results: results,
@@ -70,6 +170,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         ),
       );
     } catch (e) {
+      if (!current()) return;
       emit(SearchError(e.toString()));
     }
   }
@@ -78,6 +179,8 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     SearchContacts event,
     Emitter<SearchState> emit,
   ) async {
+    if (_eventGenerations[event] != _generation || emit.isDone) return;
+
     add(PerformSearch(event.query, type: SearchResultType.contact));
   }
 
@@ -85,6 +188,8 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     SearchGroups event,
     Emitter<SearchState> emit,
   ) async {
+    if (_eventGenerations[event] != _generation || emit.isDone) return;
+
     add(PerformSearch(event.query, type: SearchResultType.group));
   }
 
@@ -92,6 +197,8 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     SearchMessages event,
     Emitter<SearchState> emit,
   ) async {
+    if (_eventGenerations[event] != _generation || emit.isDone) return;
+
     if (event.roomId != null) {
       add(SearchInChat(event.roomId!, event.query, filter: event.filter));
     } else {
@@ -109,29 +216,66 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     ClearSearch event,
     Emitter<SearchState> emit,
   ) async {
-    final history = await _searchRepository.getRecentSearches();
-    emit(SearchInitial(recentSearches: history));
+    final generation = _eventGenerations[event] ?? _generation;
+    bool current() => _isCurrent(event, emit, generation);
+    if (!current()) return;
+
+    if (state is! SearchInitial ||
+        (state as SearchInitial).recentSearches.isNotEmpty) {
+      emit(const SearchInitial());
+    }
+    final revision = _historyRevisions[event] ?? _historyRevision;
+    try {
+      final history = await _searchRepository.getRecentSearches();
+      if (!current() || revision != _historyRevision) return;
+      emit(SearchInitial(recentSearches: history));
+    } catch (error) {
+      if (current() && revision == _historyRevision) {
+        emit(SearchError(error.toString()));
+      }
+    }
   }
 
   Future<void> _onLoadSearchHistory(
     LoadSearchHistory event,
     Emitter<SearchState> emit,
   ) async {
-    final history = await _searchRepository.getRecentSearches();
-    emit(SearchInitial(recentSearches: history));
+    final generation = _eventGenerations[event] ?? _generation;
+    bool current() => _isCurrent(event, emit, generation);
+    if (!current()) return;
+
+    final revision = _historyRevisions[event] ?? _historyRevision;
+    try {
+      final history = await _searchRepository.getRecentSearches();
+      if (!current() || revision != _historyRevision) return;
+      emit(SearchInitial(recentSearches: history));
+    } catch (error) {
+      if (current() && revision == _historyRevision) {
+        emit(SearchError(error.toString()));
+      }
+    }
   }
 
   Future<void> _onDeleteSearchHistoryItem(
     DeleteSearchHistoryItem event,
     Emitter<SearchState> emit,
   ) async {
-    await _searchRepository.deleteSearchQuery(event.query);
-    final history = await _searchRepository.getRecentSearches();
+    final generation = _eventGenerations[event] ?? _generation;
+    final revision = _historyRevisions[event] ?? _historyRevision;
+    bool current() =>
+        _isCurrent(event, emit, generation) && revision == _historyRevision;
+    try {
+      await _searchRepository.deleteSearchQuery(event.query);
+      final history = await _searchRepository.getRecentSearches();
 
-    if (state is SearchInitial) {
-      emit(SearchInitial(recentSearches: history));
-    } else if (state is SearchLoaded) {
-      emit((state as SearchLoaded).copyWith(recentSearches: history));
+      if (!current()) return;
+      if (state is SearchInitial) {
+        emit(SearchInitial(recentSearches: history));
+      } else if (state is SearchLoaded) {
+        emit((state as SearchLoaded).copyWith(recentSearches: history));
+      }
+    } catch (error) {
+      if (current()) emit(SearchError(error.toString()));
     }
   }
 
@@ -139,12 +283,21 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     ClearSearchHistory event,
     Emitter<SearchState> emit,
   ) async {
-    await _searchRepository.clearSearchHistory();
+    final generation = _eventGenerations[event] ?? _generation;
+    final revision = _historyRevisions[event] ?? _historyRevision;
+    bool current() =>
+        _isCurrent(event, emit, generation) && revision == _historyRevision;
+    try {
+      await _searchRepository.clearSearchHistory();
 
-    if (state is SearchInitial) {
-      emit(const SearchInitial());
-    } else if (state is SearchLoaded) {
-      emit((state as SearchLoaded).copyWith(recentSearches: []));
+      if (!current()) return;
+      if (state is SearchInitial) {
+        emit(const SearchInitial());
+      } else if (state is SearchLoaded) {
+        emit((state as SearchLoaded).copyWith(recentSearches: []));
+      }
+    } catch (error) {
+      if (current()) emit(SearchError(error.toString()));
     }
   }
 
@@ -159,9 +312,14 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     SearchInChat event,
     Emitter<SearchState> emit,
   ) async {
+    final generation = _eventGenerations[event] ?? _generation;
+    bool current() => _isCurrent(event, emit, generation);
+    if (!current()) return;
+
     final query = event.query.trim();
 
     if (query.isEmpty) {
+      if (!current()) return;
       emit(ChatSearchState(results: ChatSearchResults(roomId: event.roomId)));
       return;
     }
@@ -187,8 +345,10 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
               query,
               filter: event.filter,
             );
+      if (!current()) return;
       emit(ChatSearchState(results: results));
     } catch (e) {
+      if (!current()) return;
       emit(SearchError(e.toString()));
     }
   }
@@ -249,10 +409,14 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     LoadMoreChatResults event,
     Emitter<SearchState> emit,
   ) async {
+    final generation = _eventGenerations[event] ?? _generation;
+    bool current() => _isCurrent(event, emit, generation);
+    if (!current()) return;
+
     if (state is! ChatSearchState) return;
 
     final currentState = state as ChatSearchState;
-    if (!currentState.results.hasMore) return;
+    if (currentState.isSearching || !currentState.results.hasMore) return;
 
     emit(currentState.copyWith(isSearching: true));
 
@@ -260,8 +424,10 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       final results = await _searchRepository.loadMoreChatSearchResults(
         currentState.results,
       );
+      if (!current()) return;
       emit(ChatSearchState(results: results));
     } catch (e) {
+      if (!current()) return;
       emit(currentState.copyWith(isSearching: false));
     }
   }

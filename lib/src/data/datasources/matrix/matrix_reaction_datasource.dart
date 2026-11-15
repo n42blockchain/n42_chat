@@ -1,4 +1,5 @@
 import 'message/direct_chat_send_guard.dart';
+
 import 'dart:convert';
 
 import 'package:matrix/matrix.dart' as matrix;
@@ -182,8 +183,13 @@ class MatrixReactionDataSource {
     String eventId,
     String toRoomId,
   ) async {
-    final fromRoom = _client?.getRoomById(fromRoomId);
-    final toRoom = roomForSending(_client, toRoomId);
+    final client = _client;
+    final userId = client?.userID;
+    final token = client?.accessToken;
+    final deviceId = client?.deviceID;
+    final homeserver = client?.homeserver;
+    final fromRoom = client?.getRoomById(fromRoomId);
+    final toRoom = roomForSending(client, toRoomId);
     if (fromRoom == null || toRoom == null) {
       throw Exception('Room not found');
     }
@@ -204,6 +210,21 @@ class MatrixReactionDataSource {
 
     if (originalEvent == null) {
       throw Exception('Original message not found');
+    }
+
+    final preparedRoom = await prepareRoomForSending(client, toRoomId);
+    // Loading the event and preparing keys may outlive the originating login.
+    if (client == null ||
+        !identical(_client, client) ||
+        !client.isLogged() ||
+        client.userID != userId ||
+        client.accessToken != token ||
+        client.deviceID != deviceId ||
+        client.homeserver != homeserver ||
+        !identical(client.getRoomById(fromRoomId), fromRoom) ||
+        !identical(preparedRoom, toRoom) ||
+        !identical(roomForSending(client, toRoomId), toRoom)) {
+      throw StateError('Forwarding session changed');
     }
 
     // 根据消息类型转发

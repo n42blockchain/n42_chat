@@ -34,6 +34,37 @@ extension ChatBlocSendHandlers on ChatBloc {
     return true;
   }
 
+  // Room generations also reject leaving and returning to the same room.
+  // Account generations reject logout/login with otherwise identical IDs.
+  bool Function() _captureChatContext(Emitter<ChatState>? emit, String? roomId) {
+    final generation = _chatGeneration;
+    final manager = _clientManager;
+    final auth = _authRepository;
+    final origin = manager != null && auth != null
+        ? captureAccountAction(manager, auth)
+        : null;
+    final client = manager?.client;
+    final user = client?.userID,
+        token = client?.accessToken,
+        device = client?.deviceID,
+        server = client?.homeserver;
+    return () =>
+        !isClosed &&
+        !(emit?.isDone ?? false) &&
+        _chatGeneration == generation &&
+        _currentRoomId == roomId &&
+        (auth == null || origin != null) &&
+        (origin == null || origin.isCurrent) &&
+        (manager == null ||
+            (client != null &&
+                identical(manager.client, client) &&
+                client.isLogged() &&
+                client.userID == user &&
+                client.accessToken == token &&
+                client.deviceID == device &&
+                client.homeserver == server));
+  }
+
   ChatState _buildPostSendState({
     List<MessageEntity>? messages,
     bool isSending = false,
@@ -57,7 +88,7 @@ extension ChatBlocSendHandlers on ChatBloc {
     );
   }
 
-  ChatState _finishMediaSend({String? error}) {
+  ChatState _finishMediaSend({required String? replyTargetId, String? error}) {
     final activeMediaSends = (state.activeMediaSends - 1)
         .clamp(0, 1 << 30)
         .toInt();
@@ -66,7 +97,7 @@ extension ChatBlocSendHandlers on ChatBloc {
       isSending: activeMediaSends > 0 || state.isSendingText,
       error: error,
       clearError: error == null,
-      clearReplyTarget: error == null,
+      clearReplyTarget: error == null && state.replyTarget?.id == replyTargetId,
       lastMessageSentAt: error == null
           ? DateTime.now()
           : state.lastMessageSentAt,
@@ -78,7 +109,17 @@ extension ChatBlocSendHandlers on ChatBloc {
     SendTextMessage event,
     Emitter<ChatState> emit,
   ) async {
-    if (_currentRoomId == null || event.text.trim().isEmpty) return;
+    void completePreflight(TextSendPreflight result) {
+      final completion = event.preflightCompletion;
+      if (completion != null && !completion.isCompleted) {
+        completion.complete(result);
+      }
+    }
+
+    if (_currentRoomId == null || event.text.trim().isEmpty) {
+      completePreflight(TextSendPreflight.rejected);
+      return;
+    }
 
     // 斜杠命令拦截
     final trimmed = event.text.trim();
@@ -86,6 +127,7 @@ extension ChatBlocSendHandlers on ChatBloc {
       final parts = trimmed.substring(1).split(_whitespaceRe);
       final cmd = parts.isNotEmpty ? parts[0].toLowerCase() : '';
       final args = parts.length > 1 ? parts.sublist(1).join(' ') : '';
+      completePreflight(TextSendPreflight.handled);
       add(ExecuteSlashCommand(command: cmd, args: args));
       return;
     }
@@ -97,22 +139,47 @@ extension ChatBlocSendHandlers on ChatBloc {
           .inSeconds;
       if (elapsed < state.slowModeInterval) {
         final remaining = state.slowModeInterval - elapsed;
+        completePreflight(TextSendPreflight.rejected);
         emit(state.copyWith(error: 'Slow mode: wait ${remaining}s'));
         return;
       }
     }
 
+    final roomId = _currentRoomId!;
+    final replyTarget = state.replyTarget;
+    final translate = state.smartReplyTranslate;
+    final recipientLanguage = state.detectedRecipientLanguage;
+    final mentionedUsers = event.mentionedUserIds == null
+        ? null
+        : List<String>.of(event.mentionedUserIds!);
+    final current = _captureChatContext(emit, roomId);
+    if (!current()) {
+      completePreflight(TextSendPreflight.rejected);
+      return;
+    }
+
     // 智能回复翻译：发送前自动翻译为对方语言
     String textToSend = event.text;
     String? originalText;
-    final selfDestructAfter = await _resolveSelfDestructAfter(
-      event.selfDestructAfter,
-    );
+    int? selfDestructAfter;
+    try {
+      selfDestructAfter = await _resolveSelfDestructAfter(
+        event.selfDestructAfter,
+      );
+    } catch (e) {
+      completePreflight(TextSendPreflight.rejected);
+      if (current()) {
+        emit(state.copyWith(error: _sendFailure(e, 'Failed to send')));
+      }
+      return;
+    }
+    if (!current()) {
+      completePreflight(TextSendPreflight.rejected);
+      return;
+    }
 
-    if (state.smartReplyTranslate &&
-        _translationService != null &&
-        state.detectedRecipientLanguage != null) {
-      final recipientLang = state.detectedRecipientLanguage!;
+    if (translate && _translationService != null && recipientLanguage != null) {
+      final recipientLang = recipientLanguage;
       final userLang = getDeviceLanguageCode();
       if (translationLanguageBaseCode(recipientLang) !=
           translationLanguageBaseCode(userLang)) {
@@ -133,25 +200,31 @@ extension ChatBlocSendHandlers on ChatBloc {
       }
     }
 
+    if (!current()) {
+      completePreflight(TextSendPreflight.rejected);
+      return;
+    }
+    completePreflight(TextSendPreflight.admitted);
     emit(
       state.copyWith(isSending: true, isSendingText: true, clearError: true),
     );
 
     try {
       // 如果有回复目标，使用回复功能
-      if (state.replyTarget != null) {
+      if (replyTarget != null) {
         final sentMsg = await _messageRepository.replyToMessage(
-          _currentRoomId!,
-          state.replyTarget!.id,
+          roomId,
+          replyTarget.id,
           textToSend,
           selfDestructAfter: selfDestructAfter,
-          mentionedUserIds: event.mentionedUserIds,
+          mentionedUserIds: mentionedUsers,
           mentionsRoom: event.mentionsRoom,
         );
+        if (!current()) return;
         var newState = state.copyWith(
           isSending: state.activeMediaSends > 0,
           isSendingText: false,
-          clearReplyTarget: true,
+          clearReplyTarget: state.replyTarget?.id == replyTarget.id,
           lastMessageSentAt: DateTime.now(),
         );
         // 记录智能回复原文
@@ -173,12 +246,13 @@ extension ChatBlocSendHandlers on ChatBloc {
         emit(newState);
       } else {
         final sentMsg = await _messageRepository.sendTextMessage(
-          _currentRoomId!,
+          roomId,
           textToSend,
           selfDestructAfter: selfDestructAfter,
-          mentionedUserIds: event.mentionedUserIds,
+          mentionedUserIds: mentionedUsers,
           mentionsRoom: event.mentionsRoom,
         );
+        if (!current()) return;
         var newState = state.copyWith(
           isSending: state.activeMediaSends > 0,
           isSendingText: false,
@@ -202,6 +276,7 @@ extension ChatBlocSendHandlers on ChatBloc {
         emit(newState);
       }
     } catch (e) {
+      if (!current()) return;
       emit(
         state.copyWith(
           isSending: state.activeMediaSends > 0,
@@ -221,25 +296,32 @@ extension ChatBlocSendHandlers on ChatBloc {
       return;
     }
 
+    final roomId = _currentRoomId!;
+    final replyTargetId = state.replyTarget?.id;
+    final current = _captureChatContext(emit, roomId);
+    if (!current()) return;
     _beginMediaSend(emit);
 
     try {
       final selfDestructAfter = await _resolveSelfDestructAfter(
         event.selfDestructAfter,
       );
+      if (!current()) return;
       debugLog(
         'ChatBloc: Sending image ${event.filename}, size: ${event.imageBytes.length}',
       );
       await _messageRepository.sendImageMessage(
-        _currentRoomId!,
+        roomId,
         imageBytes: event.imageBytes,
         filename: event.filename,
         mimeType: event.mimeType,
         selfDestructAfter: selfDestructAfter,
       );
       debugLog('ChatBloc: Image sent successfully');
-      emit(_finishMediaSend());
+      if (!current()) return;
+      emit(_finishMediaSend(replyTargetId: replyTargetId));
     } catch (e, stackTrace) {
+      if (!current()) return;
       debugLog('ChatBloc: Send image error - $e');
       debugLog('ChatBloc: Stack trace - $stackTrace');
       emit(
@@ -263,17 +345,22 @@ extension ChatBlocSendHandlers on ChatBloc {
       return;
     }
 
+    final roomId = _currentRoomId!;
+    final replyTargetId = state.replyTarget?.id;
+    final current = _captureChatContext(emit, roomId);
+    if (!current()) return;
     _beginMediaSend(emit);
 
     try {
       final selfDestructAfter = await _resolveSelfDestructAfter(
         event.selfDestructAfter,
       );
+      if (!current()) return;
       debugLog(
         'ChatBloc: Sending voice ${event.filename}, size: ${event.audioBytes.length}, duration: ${event.duration}ms',
       );
       await _messageRepository.sendVoiceMessage(
-        _currentRoomId!,
+        roomId,
         audioBytes: event.audioBytes,
         filename: event.filename,
         duration: event.duration,
@@ -281,8 +368,10 @@ extension ChatBlocSendHandlers on ChatBloc {
         selfDestructAfter: selfDestructAfter,
       );
       debugLog('ChatBloc: Voice sent successfully');
-      emit(_finishMediaSend());
+      if (!current()) return;
+      emit(_finishMediaSend(replyTargetId: replyTargetId));
     } catch (e, stackTrace) {
+      if (!current()) return;
       debugLog('ChatBloc: Send voice error - $e');
       debugLog('ChatBloc: Stack trace - $stackTrace');
       emit(
@@ -304,15 +393,20 @@ extension ChatBlocSendHandlers on ChatBloc {
   ) async {
     if (!_canSendUserMessage(emit, 'file')) return;
 
+    final roomId = _currentRoomId!;
+    final replyTargetId = state.replyTarget?.id;
+    final current = _captureChatContext(emit, roomId);
+    if (!current()) return;
     _beginMediaSend(emit);
 
     try {
       final selfDestructAfter = await _resolveSelfDestructAfter(
         event.selfDestructAfter,
       );
+      if (!current()) return;
       if (event.filePath != null || event.fileStream != null) {
         await _messageRepository.sendFileMessage(
-          _currentRoomId!,
+          roomId,
           filename: event.filename,
           mimeType: event.mimeType,
           selfDestructAfter: selfDestructAfter,
@@ -322,7 +416,7 @@ extension ChatBlocSendHandlers on ChatBloc {
         );
       } else if (event.fileBytes != null) {
         await _messageRepository.sendFileMessage(
-          _currentRoomId!,
+          roomId,
           fileBytes: event.fileBytes!,
           filename: event.filename,
           mimeType: event.mimeType,
@@ -332,8 +426,10 @@ extension ChatBlocSendHandlers on ChatBloc {
       } else {
         throw Exception('No file content available');
       }
-      emit(_finishMediaSend());
+      if (!current()) return;
+      emit(_finishMediaSend(replyTargetId: replyTargetId));
     } catch (e) {
+      if (!current()) return;
       emit(
         state.copyWith(
           activeMediaSends: (state.activeMediaSends - 1)
@@ -353,17 +449,22 @@ extension ChatBlocSendHandlers on ChatBloc {
   ) async {
     if (!_canSendUserMessage(emit, 'video')) return;
 
+    final roomId = _currentRoomId!;
+    final replyTargetId = state.replyTarget?.id;
+    final current = _captureChatContext(emit, roomId);
+    if (!current()) return;
     _beginMediaSend(emit);
 
     try {
       final selfDestructAfter = await _resolveSelfDestructAfter(
         event.selfDestructAfter,
       );
+      if (!current()) return;
       debugLog(
         'ChatBloc: Sending video with thumbnail: ${event.thumbnailBytes?.length ?? 0} bytes',
       );
       await _messageRepository.sendVideoMessage(
-        _currentRoomId!,
+        roomId,
         videoBytes: event.videoBytes,
         filename: event.filename,
         mimeType: event.mimeType,
@@ -371,8 +472,10 @@ extension ChatBlocSendHandlers on ChatBloc {
         selfDestructAfter: selfDestructAfter,
       );
       debugLog('ChatBloc: Video sent successfully');
-      emit(_finishMediaSend());
+      if (!current()) return;
+      emit(_finishMediaSend(replyTargetId: replyTargetId));
     } catch (e, stackTrace) {
+      if (!current()) return;
       debugLog('ChatBloc: Send video error - $e');
       debugLog('ChatBloc: Stack trace - $stackTrace');
       emit(

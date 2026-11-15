@@ -1,5 +1,6 @@
 import '../../blocs/group/group_bloc.dart';
 import '../group/group_members_page.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -34,6 +35,8 @@ import '../group/group_media_hub_page.dart';
 import '../group/group_settings_page.dart';
 import 'chat_export_page.dart';
 import 'scheduled_messages_page.dart';
+import '../../../domain/entities/recovered_composer_text.dart';
+import '../../blocs/chat/scheduled_message_origin.dart';
 import '../settings/auto_download_settings_page.dart';
 import '../settings/backup_restore_page.dart';
 import '../settings/chat_background_page.dart';
@@ -64,6 +67,8 @@ class ChatDetailPage extends StatefulWidget {
 
   /// 清空聊天记录的回调
   final VoidCallback? onClearHistory;
+  final Future<bool> Function()? onClearHistoryAsync;
+  final bool Function()? canClearHistory;
 
   const ChatDetailPage({
     super.key,
@@ -74,6 +79,8 @@ class ChatDetailPage extends StatefulWidget {
     this.onRemoveMember,
     this.onMemberTap,
     this.onClearHistory,
+    this.onClearHistoryAsync,
+    this.canClearHistory,
   });
 
   @override
@@ -496,9 +503,9 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
   String _notificationModeLabel() {
     switch (_notificationMode) {
       case ConversationNotificationMode.allMessages:
-        return 'All Messages';
+        return S.of(context)?.chatNotifyAll ?? 'All Messages';
       case ConversationNotificationMode.mentionsOnly:
-        return 'Mentions Only';
+        return S.of(context)?.chatNotifyMentions ?? 'Mentions Only';
       case ConversationNotificationMode.muted:
         return S.of(context)?.commonMute ?? 'Mute';
     }
@@ -512,51 +519,69 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       context: context,
       backgroundColor: context.surfaceColor,
       builder: (ctx) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              title: Text('All Messages', style: TextStyle(color: textColor)),
-              subtitle: Text(
-                'Notify for every new message in this chat',
-                style: TextStyle(color: secondaryTextColor),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: Text(
+                  S.of(context)?.chatNotifyAll ?? 'All Messages',
+                  style: TextStyle(color: textColor),
+                ),
+                subtitle: Text(
+                  S.of(context)?.chatNotifyAllDescription ??
+                      'Notify for every new message in this chat',
+                  style: TextStyle(color: secondaryTextColor),
+                ),
+                trailing:
+                    _notificationMode ==
+                        ConversationNotificationMode.allMessages
+                    ? const Icon(Icons.check, color: AppColors.primary)
+                    : null,
+                onTap: () => Navigator.pop(
+                  ctx,
+                  ConversationNotificationMode.allMessages,
+                ),
               ),
-              trailing:
-                  _notificationMode == ConversationNotificationMode.allMessages
-                  ? const Icon(Icons.check, color: AppColors.primary)
-                  : null,
-              onTap: () =>
-                  Navigator.pop(ctx, ConversationNotificationMode.allMessages),
-            ),
-            ListTile(
-              title: Text('Mentions Only', style: TextStyle(color: textColor)),
-              subtitle: Text(
-                'Only notify when you are mentioned or @room is used',
-                style: TextStyle(color: secondaryTextColor),
+              ListTile(
+                title: Text(
+                  S.of(context)?.chatNotifyMentions ?? 'Mentions Only',
+                  style: TextStyle(color: textColor),
+                ),
+                subtitle: Text(
+                  S.of(context)?.chatNotifyMentionsDescription ??
+                      'Only notify when you are mentioned or @room is used',
+                  style: TextStyle(color: secondaryTextColor),
+                ),
+                trailing:
+                    _notificationMode ==
+                        ConversationNotificationMode.mentionsOnly
+                    ? const Icon(Icons.check, color: AppColors.primary)
+                    : null,
+                onTap: () => Navigator.pop(
+                  ctx,
+                  ConversationNotificationMode.mentionsOnly,
+                ),
               ),
-              trailing:
-                  _notificationMode == ConversationNotificationMode.mentionsOnly
-                  ? const Icon(Icons.check, color: AppColors.primary)
-                  : null,
-              onTap: () =>
-                  Navigator.pop(ctx, ConversationNotificationMode.mentionsOnly),
-            ),
-            ListTile(
-              title: Text(
-                S.of(context)?.commonMute ?? 'Mute',
-                style: TextStyle(color: textColor),
+              ListTile(
+                title: Text(
+                  S.of(context)?.commonMute ?? 'Mute',
+                  style: TextStyle(color: textColor),
+                ),
+                subtitle: Text(
+                  S.of(context)?.chatNotifyMutedDescription ??
+                      'Disable notifications for this chat on all devices',
+                  style: TextStyle(color: secondaryTextColor),
+                ),
+                trailing:
+                    _notificationMode == ConversationNotificationMode.muted
+                    ? const Icon(Icons.check, color: AppColors.primary)
+                    : null,
+                onTap: () =>
+                    Navigator.pop(ctx, ConversationNotificationMode.muted),
               ),
-              subtitle: Text(
-                'Disable notifications for this chat on all devices',
-                style: TextStyle(color: secondaryTextColor),
-              ),
-              trailing: _notificationMode == ConversationNotificationMode.muted
-                  ? const Icon(Icons.check, color: AppColors.primary)
-                  : null,
-              onTap: () =>
-                  Navigator.pop(ctx, ConversationNotificationMode.muted),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -891,7 +916,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                 ),
                 _buildDivider(dividerColor),
                 _buildMenuItem(
-                  title: 'Scheduled Messages',
+                  title: S.of(context)?.scheduledMessagesTitle ?? 'Scheduled messages',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
                   onTap: () => _openScheduledMessages(),
@@ -1725,15 +1750,19 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     );
   }
 
-  void _openScheduledMessages() {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
+  void _openScheduledMessages() async {
+    final origin = ScheduledMessageOrigin.capture();
+    final result = await Navigator.of(context).push<RecoveredComposerText>(
+      MaterialPageRoute<RecoveredComposerText>(
         builder: (_) => ScheduledMessagesPage(
           roomId: widget.conversation.id,
           roomName: widget.conversation.name,
         ),
       ),
     );
+    if (mounted && origin?.isCurrent == true && result != null && result.roomId == widget.conversation.id) {
+      Navigator.of(context).pop(result);
+    }
   }
 
   void _openBackupRestore() {
@@ -1771,8 +1800,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
           S.of(context)?.chatClearChatHistoryTitle ?? 'Clear Chat History',
         ),
         content: Text(
-          S.of(context)?.chatClearHistoryConfirm ??
-              'Are you sure you want to clear all chat history? This action cannot be undone.',
+          S.of(context)?.chatClearHistoryConfirm ?? 'Are you sure you want to clear all chat history? This action cannot be undone.',
         ),
         actions: [
           TextButton(
@@ -1780,14 +1808,28 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
             child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.of(ctx).pop();
-              widget.onClearHistory?.call();
+              if ((widget.onClearHistory == null && widget.onClearHistoryAsync == null) ||
+                  (widget.canClearHistory != null && !widget.canClearHistory!())) {
+                return;
+              }
+              var success = false;
+              try {
+                if (widget.onClearHistoryAsync != null) {
+                  success = await widget.onClearHistoryAsync!();
+                } else {
+                  widget.onClearHistory!();
+                  success = true;
+                }
+              } catch (_) {}
+              if (!mounted || (widget.canClearHistory != null && !widget.canClearHistory!())) return;
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                    S.of(context)?.commonChatHistoryCleared ??
-                        'Chat history cleared',
+                    success
+                        ? (S.of(context)?.commonChatHistoryCleared ?? 'Chat history cleared')
+                        : (S.of(context)?.commonFailedToSave ?? 'Failed to save'),
                   ),
                   duration: const Duration(seconds: 1),
                 ),

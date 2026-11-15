@@ -1,4 +1,10 @@
 import 'dart:io';
+import 'package:n42_chat/src/core/services/gif_service.dart';
+import 'package:n42_chat/src/core/services/giphy_service.dart';
+import 'package:n42_chat/src/presentation/widgets/chat/gif_picker.dart';
+import 'package:n42_chat/src/domain/repositories/sticker_repository.dart';
+import 'package:n42_chat/src/presentation/widgets/chat/sticker_picker.dart';
+import 'package:n42_chat/src/domain/entities/sticker_pack_entity.dart';
 import 'dart:typed_data';
 
 import 'package:bloc_test/bloc_test.dart';
@@ -46,6 +52,10 @@ import 'package:n42_chat/src/presentation/widgets/chat/poll_create_sheet.dart';
 import 'package:n42_chat/src/presentation/widgets/chat/open_red_packet_dialog.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+class _Gifs extends Mock implements GifService {}
+
+class _Stickers extends Mock implements IStickerRepository {}
 
 class _Chat extends MockBloc<ChatEvent, ChatState> implements ChatBloc {}
 
@@ -310,6 +320,7 @@ void main() {
     configureAuth?.call(account.auth);
 
     final chat = _Chat();
+    when(() => chat.isClosed).thenReturn(false);
     when(() => chat.state).thenReturn(
       ChatState(
         roomId: _roomId,
@@ -367,6 +378,91 @@ void main() {
     await tester.tap(find.text('Share Real-time Location'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 350));
+  }
+
+  testWidgets(
+    'attachments wait for keyboard dismissal without dropping panel intent',
+    (tester) async {
+      await pumpChat(
+        tester,
+        messages: [
+          MessageEntity(
+            id: 'seed',
+            roomId: _roomId,
+            senderId: '@friend:hs.test',
+            senderName: 'Friend',
+            content: 'Hello',
+            type: MessageType.text,
+            timestamp: DateTime(2026, 1, 1),
+          ),
+        ],
+      );
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.view.resetViewInsets);
+      await tester.binding.setSurfaceSize(const Size(360, 640));
+      tester.view.viewInsets = const FakeViewPadding(bottom: 300);
+      await tester.pump();
+      await tester.tap(
+        find.byKey(const ValueKey('chat_input_attachment_toggle')),
+      );
+      await tester.pump();
+      expect(tester.takeException(), isNull);
+      expect(find.byKey(const ValueKey('chat_more_panel')), findsNothing);
+      tester.view.viewInsets = FakeViewPadding.zero;
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+      expect(find.byKey(const ValueKey('chat_more_panel')), findsOneWidget);
+      expect(find.text('Photos'), findsOneWidget);
+      expect(find.text('Take Photo'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('empty chat remains readable in the reduced keyboard viewport', (
+    tester,
+  ) async {
+    await pumpChat(tester);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetViewInsets);
+    await tester.binding.setSurfaceSize(const Size(360, 640));
+    tester.view.viewInsets = const FakeViewPadding(bottom: 300);
+    await tester.pump();
+    expect(tester.takeException(), isNull);
+    expect(find.text('No messages'), findsOneWidget);
+  });
+
+  for (final outcome in ['saved', 'failed', 'edited', 'relogin']) {
+    testWidgets('scheduled composer retains text until acknowledgement: $outcome', (tester) async {
+      late _Auth auth;
+      final chat = await pumpChat(tester, configureAuth: (value) {
+        auth = value;
+        when(() => auth.currentUser).thenReturn(const UserEntity(userId: '@me:hs.test', displayName: 'Me'));
+      });
+      when(() => chat.isClosed).thenReturn(false);
+      final events = <SendScheduledMessage>[];
+      when(() => chat.add(any())).thenAnswer((invocation) {
+        final event = invocation.positionalArguments.single;
+        if (event is SendScheduledMessage) events.add(event);
+      });
+      final field = find.descendant(of: find.byType(ChatInputBar), matching: find.byType(TextField));
+      await tester.enterText(field, 'Keep this draft');
+      final input = tester.widget<ChatInputBar>(find.byType(ChatInputBar));
+      input.onScheduledSend!(DateTime.now().add(const Duration(hours: 1)));
+      await tester.pump();
+      expect(events, hasLength(1));
+      expect(tester.widget<TextField>(field).controller!.text, 'Keep this draft');
+      input.onScheduledSend!(DateTime.now().add(const Duration(hours: 1)));
+      expect(events, hasLength(1));
+      if (outcome == 'edited') await tester.enterText(field, 'New draft');
+      if (outcome == 'relogin') when(() => auth.currentAccountGeneration).thenReturn(null);
+      events.single.completion!.complete(outcome != 'failed');
+      await tester.pump();
+      expect(tester.widget<TextField>(field).controller!.text,
+          outcome == 'saved' ? '' : outcome == 'edited' ? 'New draft' : 'Keep this draft');
+      expect(tester.takeException(), isNull);
+    });
   }
 
   testWidgets('photo picker cancel does not invoke the platform picker', (
@@ -494,7 +590,9 @@ void main() {
     expect(message.videoBytes, Uint8List.fromList([4, 5, 6]));
   });
 
-  testWidgets('scheduled original image persists a safe readable attachment', (
+  for (final outcome in ['saved', 'failed', 'reloginBefore', 'reloginAfter', 'disposed']) {
+  final relogin = outcome == 'reloginBefore';
+  testWidgets('scheduled original image waits for persistence: $outcome', (
     tester,
   ) async {
     imagePicker.images = [
@@ -503,7 +601,12 @@ void main() {
         'Vacation: Original Photo.png',
       ),
     ];
-    final chat = await pumpChat(tester);
+    late _Auth schedulingAuth;
+    final chat = await pumpChat(tester, configureAuth: (auth) {
+      schedulingAuth = auth;
+      when(() => auth.currentUser).thenReturn(const UserEntity(userId: '@me:hs.test', displayName: 'Me'));
+    });
+    when(() => chat.isClosed).thenReturn(false);
     final sentEvents = <ChatEvent>[];
     when(() => chat.add(any())).thenAnswer((invocation) {
       sentEvents.add(invocation.positionalArguments.single as ChatEvent);
@@ -518,6 +621,7 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 350));
     expect(find.text('Original Images'), findsOneWidget);
+    if (relogin) when(() => schedulingAuth.currentAccountGeneration).thenReturn(null);
     await tester.tap(find.text('Original Images'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 350));
@@ -533,8 +637,16 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(imagePicker.multiImageCalls, 1);
+    if (relogin) {
+      expect(sentEvents.whereType<SendScheduledMessage>(), isEmpty);
+      expect(find.textContaining('Scheduled original image:'), findsNothing);
+      expect(tester.takeException(), isNull);
+      return;
+    }
     expect(sentEvents, isNotEmpty);
     final scheduled = sentEvents.whereType<SendScheduledMessage>().single;
+    expect(scheduled.origin?.isCurrent, isTrue);
+    expect(scheduled.ownerUserId, '@me:hs.test');
     final localPath = scheduled.payload!['localPath'] as String;
     final persistedFile = File(localPath);
     expect(scheduled.type, MessageType.file);
@@ -551,13 +663,26 @@ void main() {
     expect(localPath, isNot(contains(':')));
     expect(persistedFile.readAsBytesSync(), [7, 8, 9, 10]);
     expect(persistedFile.lengthSync(), 4);
-    expect(
-      find.text('Scheduled original image: ${scheduled.text}'),
-      findsOneWidget,
-    );
+    expect(find.text('Scheduled original image: ${scheduled.text}'), findsNothing);
+    if (outcome == 'reloginAfter') {
+      when(() => schedulingAuth.currentAccountGeneration).thenReturn(null);
+    }
+    if (outcome == 'disposed') await tester.pumpWidget(const SizedBox());
+    scheduled.completion!.complete(outcome != 'failed');
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 350));
+    expect(find.text('Scheduled original image: ${scheduled.text}'),
+      outcome == 'saved' ? findsOneWidget : findsNothing);
+    expect(persistedFile.existsSync(), isTrue);
+    expect(sentEvents.whereType<SendScheduledMessage>(), hasLength(1));
+    if (outcome == 'failed') {
+      expect(find.textContaining('save not confirmed'), findsOneWidget);
+    }
+
     expect(imagePicker.multiImageCalls, 1);
     expect(tester.takeException(), isNull);
   });
+  }
 
   testWidgets('camera menu cancel does not open the camera picker', (
     tester,
@@ -756,6 +881,40 @@ void main() {
     },
   );
 
+  testWidgets('send button restores locally rejected input without a second clear', (tester) async {
+    final chat = await pumpChat(tester);
+    when(() => chat.add(any())).thenAnswer((invocation) {
+      final event = invocation.positionalArguments.single;
+      if (event is SendTextMessage) {
+        event.preflightCompletion!.complete(TextSendPreflight.rejected);
+      }
+    });
+    final input = find.byType(TextField).last;
+    await tester.enterText(input, 'rejected draft');
+    await tester.pump();
+    await tester.tap(find.byIcon(Icons.send));
+    await tester.pump();
+    expect(tester.widget<TextField>(input).controller!.text, 'rejected draft');
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('closed chat preserves composer input and does not dispatch', (tester) async {
+    final chat = await pumpChat(tester);
+    final events = <ChatEvent>[];
+    when(() => chat.add(any())).thenAnswer((invocation) {
+      events.add(invocation.positionalArguments.single as ChatEvent);
+    });
+    final input = find.byType(TextField).last;
+    await tester.enterText(input, 'keep this draft');
+    await tester.pump();
+    when(() => chat.isClosed).thenReturn(true);
+    await tester.tap(find.byIcon(Icons.send));
+    await tester.pump();
+    expect(events.whereType<SendTextMessage>(), isEmpty);
+    expect(tester.widget<TextField>(input).controller!.text, 'keep this draft');
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('emoji and attachment panels are mutually exclusive', (
     tester,
   ) async {
@@ -815,6 +974,131 @@ void main() {
     expect(messages.single.content, '```dart\nvoid main() {}\n```');
     expect(messages.single.type, MessageType.codeBlock);
   });
+
+  for (final saved in [true, false]) {
+    testWidgets('GIF scheduling passes persistence acknowledgement without immediate resend: $saved', (tester) async {
+      final chat = await pumpChat(tester, configureAuth: (auth) {
+        when(() => auth.currentUser).thenReturn(const UserEntity(userId: '@me:hs.test', displayName: 'Me'));
+      });
+      when(() => chat.isClosed).thenReturn(false);
+      final gifs = _Gifs();
+      when(() => gifs.isAvailable).thenReturn(true);
+      when(() => gifs.getTrendingGifs()).thenAnswer((_) async => const GiphySearchResult(gifs: [], totalCount: 0, offset: 0));
+      getIt.registerSingleton<GifService>(gifs);
+      final events = <ChatEvent>[];
+      when(() => chat.add(any())).thenAnswer((invocation) => events.add(invocation.positionalArguments.single as ChatEvent));
+      await openAttachmentPanel(tester);
+      tester.widget<ChatMorePanel>(find.byType(ChatMorePanel)).onGifPressed!();
+      await tester.pumpAndSettle();
+      final picker = tester.widget<GifPicker>(find.byType(GifPicker));
+      final operation = picker.onGifLongPressed!(const GiphyGif(id: 'sample', title: 'Sample', originalUrl: 'https://test/gif', previewUrl: 'https://test/preview', width: 20, height: 30, previewWidth: 20, previewHeight: 30));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('In 1 hour'));
+      await tester.pumpAndSettle();
+      final scheduled = events.whereType<SendScheduledMessage>().single;
+      expect(scheduled.origin?.isCurrent, isTrue);
+      expect(scheduled.payload!['gifUrl'], 'https://test/gif');
+      expect(find.byType(GifPicker), findsOneWidget);
+      scheduled.completion!.complete(saved);
+      await tester.pumpAndSettle();
+      await operation;
+      expect(find.byType(GifPicker), saved ? findsNothing : findsOneWidget);
+      expect(events.whereType<SendScheduledMessage>(), hasLength(1));
+      expect(events.whereType<SendGifMessage>(), isEmpty);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  for (final outcome in ['saved', 'failed', 'cancel']) {
+    testWidgets('scheduled sticker keeps picker until saved: $outcome', (tester) async {
+      final chat = await pumpChat(tester, configureAuth: (auth) {
+        when(() => auth.currentUser).thenReturn(const UserEntity(userId: '@me:hs.test', displayName: 'Me'));
+      });
+      when(() => chat.isClosed).thenReturn(false);
+      final events = <SendScheduledMessage>[];
+      when(() => chat.add(any())).thenAnswer((invocation) {
+        final event = invocation.positionalArguments.single;
+        if (event is SendScheduledMessage) events.add(event);
+      });
+      final stickers = _Stickers();
+      when(() => stickers.getRecentStickers(limit: any(named: 'limit'))).thenAnswer((_) async => []);
+      when(() => stickers.watchInstalledPacks()).thenAnswer((_) => const Stream.empty());
+      when(() => stickers.getInstalledPacks()).thenAnswer((_) async => const [StickerPack(id: 'pack', name: 'Test', stickers: [])]);
+      getIt.registerSingleton<IStickerRepository>(stickers);
+      await openAttachmentPanel(tester);
+      tester.widget<ChatMorePanel>(find.byType(ChatMorePanel)).onStickerPressed!();
+      await tester.pumpAndSettle();
+      final picker = tester.widget<StickerPicker>(find.byType(StickerPicker));
+      final operation = picker.onStickerLongPressed!(const Sticker(id: 'hello', url: 'mxc://test/hello', name: 'Hello'), 'pack');
+      await tester.pumpAndSettle();
+      if (outcome == 'cancel') {
+        Navigator.of(tester.element(find.text('In 1 hour'))).pop();
+      } else {
+        await tester.tap(find.text('In 1 hour'));
+        await tester.pumpAndSettle();
+        expect(events, hasLength(1));
+        expect(find.byType(StickerPicker), findsOneWidget);
+        events.single.completion!.complete(outcome == 'saved');
+      }
+      await tester.pumpAndSettle();
+      await operation;
+      expect(find.byType(StickerPicker), outcome == 'saved' ? findsNothing : findsOneWidget);
+      if (outcome == 'cancel') expect(events, isEmpty);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  for (final outcome in ['saved', 'failed', 'cancel']) {
+    testWidgets('scheduled quiz composer preserves draft until saved: $outcome', (tester) async {
+      final chat = await pumpChat(tester, configureAuth: (auth) {
+        when(() => auth.currentUser).thenReturn(const UserEntity(userId: '@me:hs.test', displayName: 'Me'));
+      });
+      when(() => chat.isClosed).thenReturn(false);
+      final events = <SendScheduledMessage>[];
+      when(() => chat.add(any())).thenAnswer((invocation) {
+        final event = invocation.positionalArguments.single;
+        if (event is SendScheduledMessage) events.add(event);
+      });
+      await openAttachmentPanel(tester);
+      tester.widget<ChatMorePanel>(find.byType(ChatMorePanel)).onPollPressed!();
+      await tester.pumpAndSettle();
+      final fields = find.descendant(of: find.byType(PollCreateSheet), matching: find.byType(TextField));
+      final questionController = tester.widget<TextField>(fields.at(0)).controller!;
+      await tester.enterText(fields.at(0), 'Best color?');
+      await tester.enterText(fields.at(1), 'Blue');
+      await tester.enterText(fields.at(2), 'Green');
+      await tester.scrollUntilVisible(find.text('Quiz mode'), 250, scrollable: find.descendant(of: find.byType(PollCreateSheet), matching: find.byType(Scrollable)).first);
+      final quizSwitch = find.descendant(of: find.ancestor(of: find.text('Quiz mode'), matching: find.byType(Row)).first, matching: find.byType(Switch));
+      await tester.ensureVisible(quizSwitch);
+      await tester.pumpAndSettle();
+      await tester.tap(quizSwitch);
+      await tester.pumpAndSettle();
+      final explanation = find.byWidgetPredicate((widget) => widget is TextField && widget.decoration?.hintText == 'Answer explanation (optional)');
+      await tester.ensureVisible(explanation);
+      await tester.pumpAndSettle();
+      await tester.enterText(explanation, 'Blue is correct');
+      await tester.ensureVisible(find.text('Schedule message'));
+      await tester.tap(find.text('Schedule message'));
+      await tester.pumpAndSettle();
+      if (outcome == 'cancel') {
+        Navigator.of(tester.element(find.text('In 1 hour'))).pop();
+        await tester.pumpAndSettle();
+        expect(events, isEmpty);
+      } else {
+        await tester.tap(find.text('In 1 hour'));
+        await tester.pumpAndSettle();
+        expect(events, hasLength(1));
+        expect(events.single.payload!['quizCorrectIndex'], 0);
+        expect(events.single.payload!['quizExplanation'], 'Blue is correct');
+        expect(find.byType(PollCreateSheet), findsOneWidget);
+        events.single.completion!.complete(outcome == 'saved');
+        await tester.pumpAndSettle();
+      }
+      expect(find.byType(PollCreateSheet), outcome == 'saved' ? findsNothing : findsOneWidget);
+      if (outcome != 'saved') expect(questionController.text, 'Best color?');
+      expect(tester.takeException(), isNull);
+    });
+  }
 
   testWidgets('poll composer sends a trimmed poll to the chat bloc', (
     tester,

@@ -25,6 +25,23 @@ class ContactPrivacyService {
   Stream<void> get changes => _changes.stream;
   matrix.Client? get _client => _manager.client;
 
+  void Function() _captureSession() {
+    final client = _client;
+    final account = client?.userID;
+    final device = client?.deviceID;
+    final token = client?.accessToken;
+    final homeserver = client?.homeserver;
+    return () {
+      if (!identical(client, _client) ||
+          account != client?.userID ||
+          device != client?.deviceID ||
+          token != client?.accessToken ||
+          homeserver != client?.homeserver) {
+        throw StateError('Account changed');
+      }
+    };
+  }
+
   Map<String, dynamic> get all => Map<String, dynamic>.from(
     _client?.accountData[accountType]?.content ?? const {},
   );
@@ -75,6 +92,7 @@ class ContactPrivacyService {
   }
 
   Future<Map<String, dynamic>> load(String userId) async {
+    final ensureCurrent = _captureSession();
     final client = _client;
     if (client == null || client.userID == null)
       throw StateError('No active account');
@@ -87,7 +105,7 @@ class ContactPrivacyService {
       if (e.errcode != 'M_NOT_FOUND') rethrow;
       data = {};
     }
-    if (!identical(client, _client)) throw StateError('Account changed');
+    ensureCurrent();
     client.accountData[accountType] = matrix.BasicEvent(
       type: accountType,
       content: data,
@@ -249,6 +267,7 @@ class ContactPrivacyService {
     bool story = false,
     String? restoreUser,
   }) async {
+    final ensureCurrent = _captureSession();
     final client = _client;
     if (client == null || !isOwn(room))
       throw StateError('Not an owned social room');
@@ -258,6 +277,7 @@ class ContactPrivacyService {
     };
     if (jsonEncode(room.getState(policyType)?.content) != jsonEncode(policy)) {
       await client.setRoomStateWithKey(room.id, policyType, '', policy);
+      ensureCurrent();
     }
     // A removed reader must not be able to rejoin or fetch later history.
     if (room.getState(matrix.EventTypes.RoomJoinRules)?.content['join_rule'] !=
@@ -268,6 +288,7 @@ class ContactPrivacyService {
         '',
         {'join_rule': 'invite'},
       );
+      ensureCurrent();
     }
     final audience = room.getState(audienceType)?.content['users'];
     final historyVisibility = audience is List ? 'invited' : 'joined';
@@ -281,6 +302,7 @@ class ContactPrivacyService {
         '',
         {'history_visibility': historyVisibility},
       );
+      ensureCurrent();
     }
     for (final id in all.keys) {
       if (id == client.userID) continue;
@@ -288,17 +310,21 @@ class ContactPrivacyService {
           .getState(matrix.EventTypes.RoomMember, id)
           ?.content['membership'];
       if (hides(id, story: story)) {
-        if (membership != 'ban')
+        if (membership != 'ban') {
           await client.ban(room.id, id, reason: 'Contact privacy');
+          ensureCurrent();
+        }
       } else if (id == restoreUser &&
           membership == 'ban' &&
           (audience is! List || audience.contains(id))) {
         await client.unban(room.id, id);
+        ensureCurrent();
         await client.inviteUser(
           room.id,
           id,
           reason: story ? storyReason : momentReason,
         );
+        ensureCurrent();
       }
     }
   }
@@ -334,6 +360,7 @@ class ContactPrivacyService {
     matrix.Client client, {
     required bool story,
   }) async {
+    final ensureCurrent = _captureSession();
     final tag = story ? storyTag : momentTag;
     final id = await client.createRoom(
       name: story ? 'My Status' : 'My Moments',
@@ -364,26 +391,30 @@ class ContactPrivacyService {
     );
     matrix.Room? room;
     for (var i = 0; i < 30; i++) {
-      if (!identical(client, _client)) throw StateError('Account changed');
+      ensureCurrent();
       room = client.getRoomById(id);
       if (room != null) break;
       await Future<void>.delayed(const Duration(milliseconds: 300));
     }
     if (room == null) throw StateError('Social room sync timed out');
     await room.addTag(tag);
+    ensureCurrent();
     await apply(room, story: story);
+    ensureCurrent();
     // Give the separate status room the same friends as the existing moment room,
     // excluding readers denied status access.
     if (story) {
       for (final other in client.rooms.where(isOwn)) {
         if (!other.tags.containsKey(momentTag)) continue;
         final members = await other.requestParticipants();
+        ensureCurrent();
         for (final user in members) {
           if (user.id != client.userID &&
               !hides(user.id, story: true) &&
               (user.membership == matrix.Membership.join ||
                   user.membership == matrix.Membership.invite)) {
             await client.inviteUser(room.id, user.id, reason: storyReason);
+            ensureCurrent();
           }
         }
       }

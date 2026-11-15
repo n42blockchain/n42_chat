@@ -9,7 +9,9 @@ import '../../domain/entities/group_album_entity.dart';
 import '../../domain/entities/group_file_entity.dart';
 import '../../domain/entities/message_entity.dart';
 import '../../domain/repositories/message_repository.dart';
+import '../../domain/repositories/thread_pagination_repository.dart';
 import '../datasources/local/preferences_datasource.dart';
+import '../datasources/local/chat_history_clear_store.dart';
 import '../mappers/archived_message_mapper.dart';
 import '../datasources/matrix/matrix_client_manager.dart';
 import '../datasources/matrix/matrix_message_datasource.dart';
@@ -17,11 +19,12 @@ import '../../core/utils/debug_log.dart';
 import '../../core/utils/matrix_utils.dart';
 
 /// 消息仓库实现
-class MessageRepositoryImpl implements IMessageRepository {
+class MessageRepositoryImpl implements IMessageRepository, IThreadPaginationRepository, IThreadHistoryVisibilityRepository, IThreadHistoryChangesRepository {
   final MatrixMessageDataSource _messageDataSource;
   final MatrixClientManager _clientManager;
   final PreferencesDataSource _secureStorage;
   MessageArchiveService? _archiveService;
+  final ChatHistoryClearStore? _historyClearStore;
   final ArchivedMessageMapper _archiveMapper = const ArchivedMessageMapper();
 
   static final _trailingSlashRegExp = RegExp(r'/$');
@@ -79,7 +82,40 @@ class MessageRepositoryImpl implements IMessageRepository {
     this._clientManager,
     this._secureStorage, {
     MessageArchiveService? archiveService,
-  }) : _archiveService = archiveService;
+    ChatHistoryClearStore? historyClearStore,
+  }) : _archiveService = archiveService,
+       _historyClearStore = historyClearStore;
+
+  ({String? owner, bool Function() isCurrent}) _historyOrigin() {
+    final client = _client;
+    final owner = client?.userID;
+    final token = client?.accessToken;
+    final device = client?.deviceID;
+    final server = client?.homeserver;
+    return (owner: owner, isCurrent: () => identical(_client, client) &&
+      client?.userID == owner && client?.accessToken == token &&
+      client?.deviceID == device && client?.homeserver == server);
+  }
+
+  Future<List<MessageEntity>> _visibleHistory(
+    String roomId, List<MessageEntity> messages,
+    ({String? owner, bool Function() isCurrent}) origin,
+  ) async {
+    final store = _historyClearStore;
+    if (store == null) return messages;
+    final owner = origin.owner;
+    if (owner == null || owner.isEmpty || !origin.isCurrent()) return [];
+    try {
+      final boundary = await store.read(ownerUserId: owner, roomId: roomId,
+        isCurrent: origin.isCurrent);
+      if (!origin.isCurrent()) return [];
+      return messages.where((m) => m.roomId == roomId &&
+        (boundary == null || m.timestamp.isAfter(boundary))).toList();
+    } catch (error) {
+      debugLog('MessageRepository: history visibility unavailable: $error');
+      return [];
+    }
+  }
 
   /// 延迟注入归档服务
   void setArchiveService(MessageArchiveService service) {
@@ -243,6 +279,7 @@ class MessageRepositoryImpl implements IMessageRepository {
 
   @override
   Stream<MessageEntity?> watchMessage(String roomId, String messageId) async* {
+    final origin = _historyOrigin();
     final room = _client?.getRoomById(roomId);
     if (room == null) return;
 
@@ -258,7 +295,10 @@ class MessageRepositoryImpl implements IMessageRepository {
 
     try {
       final initialMessage = _findMessageInTimeline(timeline, room, messageId);
-      if (initialMessage != null) yield initialMessage;
+      if (initialMessage != null) {
+        final visible = await _visibleHistory(roomId, [initialMessage], origin);
+        yield visible.isEmpty ? null : visible.single;
+      }
       await for (final _ in updates.stream) {
         if (!_isCurrentTimeline(roomId, timeline)) break;
         _requestMissingTimelineKeys(room, timeline);
@@ -268,7 +308,8 @@ class MessageRepositoryImpl implements IMessageRepository {
           messageId,
         );
         if (updatedMessage != null) {
-          yield updatedMessage;
+          final visible = await _visibleHistory(roomId, [updatedMessage], origin);
+          yield visible.isEmpty ? null : visible.single;
         }
       }
     } finally {
@@ -344,17 +385,27 @@ class MessageRepositoryImpl implements IMessageRepository {
     int? selfDestructAfter,
     List<String>? mentionedUserIds,
     bool mentionsRoom = false,
+    String? transactionId,
   }) async {
+    final senderId = _client?.userID ?? '';
     final eventId = await _messageDataSource.sendTextMessage(
       roomId,
       text,
+      transactionId: transactionId,
       selfDestructAfter: selfDestructAfter,
       mentionedUserIds: mentionedUserIds,
       mentionsRoom: mentionsRoom,
     );
     if (eventId == null) return null;
 
-    return _getMessageById(roomId, eventId);
+    return _resolveScheduledSendAcknowledgement(
+      roomId: roomId,
+      eventId: eventId,
+      transactionId: transactionId,
+      senderId: senderId,
+      content: text,
+      type: MessageType.text,
+    );
   }
 
   @override
@@ -364,9 +415,12 @@ class MessageRepositoryImpl implements IMessageRepository {
     required String filename,
     String? mimeType,
     int? selfDestructAfter,
+    String? transactionId,
   }) async {
+    final senderId = _client?.userID ?? '';
     final eventId = await _messageDataSource.sendImageMessage(
       roomId,
+      transactionId: transactionId,
       imageBytes: imageBytes,
       filename: filename,
       mimeType: mimeType,
@@ -374,7 +428,14 @@ class MessageRepositoryImpl implements IMessageRepository {
     );
     if (eventId == null) return null;
 
-    return _getMessageById(roomId, eventId);
+    return _resolveScheduledSendAcknowledgement(
+      roomId: roomId,
+      eventId: eventId,
+      transactionId: transactionId,
+      senderId: senderId,
+      content: filename,
+      type: MessageType.image,
+    );
   }
 
   @override
@@ -407,9 +468,12 @@ class MessageRepositoryImpl implements IMessageRepository {
     String? mimeType,
     Uint8List? thumbnailBytes,
     int? selfDestructAfter,
+    String? transactionId,
   }) async {
+    final senderId = _client?.userID ?? '';
     final eventId = await _messageDataSource.sendVideoMessage(
       roomId,
+      transactionId: transactionId,
       videoBytes: videoBytes,
       filename: filename,
       mimeType: mimeType,
@@ -418,7 +482,14 @@ class MessageRepositoryImpl implements IMessageRepository {
     );
     if (eventId == null) return null;
 
-    return _getMessageById(roomId, eventId);
+    return _resolveScheduledSendAcknowledgement(
+      roomId: roomId,
+      eventId: eventId,
+      transactionId: transactionId,
+      senderId: senderId,
+      content: filename,
+      type: MessageType.video,
+    );
   }
 
   @override
@@ -431,9 +502,12 @@ class MessageRepositoryImpl implements IMessageRepository {
     String? filePath,
     Stream<List<int>>? fileStream,
     int? fileSize,
+    String? transactionId,
   }) async {
+    final senderId = _client?.userID ?? '';
     final eventId = await _messageDataSource.sendFileMessage(
       roomId,
+      transactionId: transactionId,
       fileBytes: fileBytes,
       filename: filename,
       mimeType: mimeType,
@@ -444,7 +518,14 @@ class MessageRepositoryImpl implements IMessageRepository {
     );
     if (eventId == null) return null;
 
-    return _getMessageById(roomId, eventId);
+    return _resolveScheduledSendAcknowledgement(
+      roomId: roomId,
+      eventId: eventId,
+      transactionId: transactionId,
+      senderId: senderId,
+      content: filename,
+      type: MessageType.file,
+    );
   }
 
   @override
@@ -473,9 +554,12 @@ class MessageRepositoryImpl implements IMessageRepository {
     int? width,
     int? height,
     String? title,
+    String? transactionId,
   }) async {
+    final senderId = _client?.userID ?? '';
     final eventId = await _messageDataSource.sendGifMessage(
       roomId,
+      transactionId: transactionId,
       gifUrl: gifUrl,
       previewUrl: previewUrl,
       width: width,
@@ -484,7 +568,14 @@ class MessageRepositoryImpl implements IMessageRepository {
     );
     if (eventId == null) return null;
 
-    return _getMessageById(roomId, eventId);
+    return _resolveScheduledSendAcknowledgement(
+      roomId: roomId,
+      eventId: eventId,
+      transactionId: transactionId,
+      senderId: senderId,
+      content: title ?? 'GIF',
+      type: MessageType.image,
+    );
   }
 
   @override
@@ -500,9 +591,12 @@ class MessageRepositoryImpl implements IMessageRepository {
     int? height,
     String? mimeType,
     int? size,
+    String? transactionId,
   }) async {
+    final senderId = _client?.userID ?? '';
     final eventId = await _messageDataSource.sendStickerMessage(
       roomId,
+      transactionId: transactionId,
       stickerId: stickerId,
       packId: packId,
       url: url,
@@ -516,7 +610,14 @@ class MessageRepositoryImpl implements IMessageRepository {
     );
     if (eventId == null) return null;
 
-    return _getMessageById(roomId, eventId);
+    return _resolveScheduledSendAcknowledgement(
+      roomId: roomId,
+      eventId: eventId,
+      transactionId: transactionId,
+      senderId: senderId,
+      content: name ?? emoji ?? stickerId,
+      type: MessageType.sticker,
+    );
   }
 
   @override
@@ -907,13 +1008,16 @@ class MessageRepositoryImpl implements IMessageRepository {
     bool isAnonymous = false,
     int? quizCorrectIndex,
     String? quizExplanation,
+    String? transactionId,
   }) async {
+    final senderId = _client?.userID ?? '';
     try {
       debugLog(
         'MessageRepositoryImpl: Sending poll - question: $question, options: $options, isAnonymous: $isAnonymous',
       );
       final eventId = await _messageDataSource.sendPollMessage(
         roomId,
+        transactionId: transactionId,
         question: question,
         options: options,
         maxSelections: maxSelections,
@@ -921,7 +1025,25 @@ class MessageRepositoryImpl implements IMessageRepository {
         quizCorrectIndex: quizCorrectIndex,
         quizExplanation: quizExplanation,
       );
-      if (eventId != null) {
+      if (eventId != null && eventId.isNotEmpty) {
+        if (transactionId != null) {
+          return await _resolveScheduledSendAcknowledgement(
+            roomId: roomId,
+            eventId: eventId,
+            transactionId: transactionId,
+            senderId: senderId,
+            content: question,
+            type: MessageType.poll,
+            metadata: MessageMetadata(
+              pollQuestion: question,
+              pollOptions: options,
+              isAnonymousPoll: isAnonymous,
+              maxSelections: maxSelections,
+              quizCorrectIndex: quizCorrectIndex,
+              quizExplanation: quizExplanation,
+            ),
+          );
+        }
         debugLog(
           'MessageRepositoryImpl: Poll sent successfully - eventId: $eventId',
         );
@@ -1401,6 +1523,36 @@ class MessageRepositoryImpl implements IMessageRepository {
     );
   }
 
+  /// A server event ID confirms acceptance even if the local echo is delayed.
+  /// Scheduled callers need that receipt to stop retries, not a populated cache.
+  /// Ordinary sends retain their existing local-message lookup behavior.
+  Future<MessageEntity?> _resolveScheduledSendAcknowledgement({
+    required String roomId,
+    required String eventId,
+    required String? transactionId,
+    required String senderId,
+    required String content,
+    required MessageType type,
+    MessageMetadata? metadata,
+  }) async {
+    if (transactionId == null) return _getMessageById(roomId, eventId);
+    if (eventId.isEmpty) return null;
+    // Minimal acceptance receipt. Normal sync supplies authoritative timestamps
+    // and full media metadata; this is not a recipient delivery/read receipt.
+    return MessageEntity(
+      id: eventId,
+      roomId: roomId,
+      senderId: senderId,
+      senderName: senderId,
+      content: content,
+      type: type,
+      timestamp: DateTime.now(),
+      status: MessageStatus.sent,
+      isFromMe: true,
+      metadata: metadata,
+    );
+  }
+
   Future<MessageEntity?> _getMessageById(String roomId, String eventId) async {
     final room = _client?.getRoomById(roomId);
     if (room == null) return null;
@@ -1608,18 +1760,49 @@ class MessageRepositoryImpl implements IMessageRepository {
   // ============================================
 
   @override
+  Stream<void> watchThreadHistoryChanges(String roomId) {
+    final origin = _historyOrigin();
+    final owner = origin.owner;
+    final store = _historyClearStore;
+    if (owner == null || owner.isEmpty || store == null) return const Stream.empty();
+    return store.watch(ownerUserId: owner, roomId: roomId)
+        .where((_) => origin.isCurrent());
+  }
+
+  @override
+  bool Function() captureThreadSession() => _historyOrigin().isCurrent;
+
+  @override
+  Future<List<MessageEntity>> filterThreadHistory(String roomId, List<MessageEntity> messages) =>
+      _visibleHistory(roomId, messages, _historyOrigin());
+
+  @override
+  Future<ThreadMessagePage> getThreadMessagePage(
+    String roomId, String threadRootEventId, {int limit = 50, String? fromToken,
+  }) async {
+    final origin = _historyOrigin();
+    final page = await _messageDataSource.getThreadMessagePage(roomId, threadRootEventId,
+      limit: limit, fromToken: fromToken);
+    final visible = await _visibleHistory(roomId, page.messages, origin);
+    if (!origin.isCurrent()) return const ThreadMessagePage();
+    return ThreadMessagePage(messages: visible, nextBatch: page.nextBatch);
+  }
+
+  @override
   Future<List<MessageEntity>> getThreadMessages(
     String roomId,
     String threadRootEventId, {
     int limit = 50,
     String? fromEventId,
   }) async {
-    return await _messageDataSource.getThreadMessages(
+    final origin = _historyOrigin();
+    final messages = await _messageDataSource.getThreadMessages(
       roomId,
       threadRootEventId,
       limit: limit,
-      fromToken: fromEventId,
+      beforeEventId: fromEventId,
     );
+    return _visibleHistory(roomId, messages, origin);
   }
 
   @override
@@ -1627,7 +1810,9 @@ class MessageRepositoryImpl implements IMessageRepository {
     String roomId,
     String threadRootEventId,
   ) {
-    return _messageDataSource.watchThreadMessages(roomId, threadRootEventId);
+    final origin = _historyOrigin();
+    return _messageDataSource.watchThreadMessages(roomId, threadRootEventId)
+        .asyncMap((messages) => _visibleHistory(roomId, messages, origin));
   }
 
   @override
@@ -1724,7 +1909,9 @@ class MessageRepositoryImpl implements IMessageRepository {
 
   @override
   Future<List<MessageEntity>> getRoomThreadRoots(String roomId) async {
-    return await _messageDataSource.getRoomThreadRoots(roomId);
+    final origin = _historyOrigin();
+    final messages = await _messageDataSource.getRoomThreadRoots(roomId);
+    return _visibleHistory(roomId, messages, origin);
   }
 
   @override

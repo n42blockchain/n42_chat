@@ -1,3 +1,4 @@
+import '../../../domain/repositories/thread_pagination_repository.dart';
 import 'dart:async';
 import 'dart:typed_data';
 
@@ -33,10 +34,17 @@ class MatrixMessageDataSource {
   late final MatrixThreadHandler _threadHandler;
   late final MatrixRoomMedia _roomMedia;
 
-  MatrixMessageDataSource(this._clientManager) {
+  MatrixMessageDataSource(
+    this._clientManager, {
+    int maxAttachmentBytes = 50 * 1024 * 1024,
+  }) {
     _uploader = MatrixMediaUploader(_clientManager);
     _eventMapper = MatrixEventMapper(() => _client);
-    _sender = MatrixMessageSender(_clientManager, _uploader);
+    _sender = MatrixMessageSender(
+      _clientManager,
+      _uploader,
+      maxAttachmentBytes: maxAttachmentBytes,
+    );
     _operations = MatrixMessageOperations(_clientManager);
     _pollHandler = MatrixPollHandler(_clientManager);
     _threadHandler = MatrixThreadHandler(_clientManager, _eventMapper);
@@ -201,9 +209,11 @@ class MatrixMessageDataSource {
     int? selfDestructAfter,
     List<String>? mentionedUserIds,
     bool mentionsRoom = false,
+    String? transactionId,
   }) => _sender.sendTextMessage(
     roomId,
     text,
+    transactionId: transactionId,
     selfDestructAfter: selfDestructAfter,
     mentionedUserIds: mentionedUserIds,
     mentionsRoom: mentionsRoom,
@@ -216,8 +226,10 @@ class MatrixMessageDataSource {
     required String filename,
     String? mimeType,
     int? selfDestructAfter,
+    String? transactionId,
   }) => _sender.sendImageMessage(
     roomId,
+    transactionId: transactionId,
     imageBytes: imageBytes,
     filename: filename,
     mimeType: mimeType,
@@ -249,8 +261,10 @@ class MatrixMessageDataSource {
     String? mimeType,
     Uint8List? thumbnailBytes,
     int? selfDestructAfter,
+    String? transactionId,
   }) => _sender.sendVideoMessage(
     roomId,
+    transactionId: transactionId,
     videoBytes: videoBytes,
     filename: filename,
     mimeType: mimeType,
@@ -268,8 +282,10 @@ class MatrixMessageDataSource {
     String? filePath,
     Stream<List<int>>? fileStream,
     int? fileSize,
+    String? transactionId,
   }) => _sender.sendFileMessage(
     roomId,
+    transactionId: transactionId,
     fileBytes: fileBytes,
     filename: filename,
     mimeType: mimeType,
@@ -300,8 +316,10 @@ class MatrixMessageDataSource {
     int? width,
     int? height,
     String? title,
+    String? transactionId,
   }) => _sender.sendGifMessage(
     roomId,
+    transactionId: transactionId,
     gifUrl: gifUrl,
     previewUrl: previewUrl,
     width: width,
@@ -322,8 +340,10 @@ class MatrixMessageDataSource {
     int? height,
     String? mimeType,
     int? size,
+    String? transactionId,
   }) => _sender.sendStickerMessage(
     roomId,
+    transactionId: transactionId,
     stickerId: stickerId,
     packId: packId,
     url: url,
@@ -456,8 +476,10 @@ class MatrixMessageDataSource {
     bool isAnonymous = false,
     int? quizCorrectIndex,
     String? quizExplanation,
+    String? transactionId,
   }) => _pollHandler.sendPollMessage(
     roomId,
+    transactionId: transactionId,
     question: question,
     options: options,
     maxSelections: maxSelections,
@@ -690,12 +712,19 @@ class MatrixMessageDataSource {
     String threadRootEventId, {
     int limit = 50,
     String? fromToken,
+    String? beforeEventId,
   }) => _threadHandler.getThreadMessages(
     roomId,
     threadRootEventId,
     limit: limit,
     fromToken: fromToken,
+    beforeEventId: beforeEventId,
   );
+
+  Future<ThreadMessagePage> getThreadMessagePage(
+    String roomId, String threadRootEventId, {int limit = 50, String? fromToken,
+  }) => _threadHandler.getThreadMessagePage(roomId, threadRootEventId,
+      limit: limit, fromToken: fromToken);
 
   /// 监听线程消息更新
   Stream<List<MessageEntity>> watchThreadMessages(

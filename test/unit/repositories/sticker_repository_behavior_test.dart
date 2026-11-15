@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -8,6 +9,15 @@ import 'package:n42_chat/src/data/repositories/sticker_repository_impl.dart';
 import 'package:n42_chat/src/domain/entities/sticker_pack_entity.dart';
 
 class _Source extends Mock implements MatrixStickerDataSource {}
+
+class _DelayedLookupRepository extends StickerRepositoryImpl {
+  _DelayedLookupRepository(super.source, this.lookup);
+
+  final Future<StickerPack?> lookup;
+
+  @override
+  Future<StickerPack?> getPackById(String packId) => lookup;
+}
 
 void main() {
   const custom = StickerPack(
@@ -50,9 +60,8 @@ void main() {
           .toList();
       return true;
     });
-    when(
-      () => source.uploadStickerImage(any(), any(), any()),
-    ).thenAnswer((_) async => 'mxc://fixture/new');
+    when(() => source.uploadStickerImage(any(), any(), any()))
+        .thenAnswer((_) async => 'mxc://fixture/new');
     repository = StickerRepositoryImpl(source);
   });
   tearDown(() => repository.dispose());
@@ -96,7 +105,14 @@ void main() {
     'store pagination respects category ordering and exhausted offsets',
     () async {
       final all = await repository.getStorePacks(category: 'popular');
-      expect(all.first.downloadCount, greaterThan(all.last.downloadCount));
+      expect(all, isNotEmpty);
+      expect(
+        all.every((pack) => pack.downloadCount == 0),
+        isTrue,
+        reason:
+            'Bundled sample collections have no measured download statistics',
+      );
+      expect(all, await repository.getStorePacks());
       expect(
         await repository.getStorePacks(
           category: 'popular',
@@ -181,9 +197,8 @@ void main() {
     expect(pack?.avatarUrl, 'mxc://fixture/new');
     expect(pack?.description, 'Private pack');
     expect(await repository.getPackById(pack!.id), pack);
-    verify(
-      () => source.uploadStickerImage(bytes, 'avatar.png', 'image/png'),
-    ).called(1);
+    verify(() => source.uploadStickerImage(bytes, 'avatar.png', 'image/png'))
+        .called(1);
   });
   test('custom creation without an avatar does not upload an image', () async {
     expect(await repository.createCustomPack(name: 'Text'), isNotNull);
@@ -198,9 +213,8 @@ void main() {
     );
   });
   test('avatar upload exceptions prevent persistence', () async {
-    when(
-      () => source.uploadStickerImage(any(), any(), any()),
-    ).thenThrow(StateError('offline'));
+    when(() => source.uploadStickerImage(any(), any(), any()))
+        .thenThrow(StateError('offline'));
     expect(
       await repository.createCustomPack(name: 'Mine', avatarBytes: bytes),
       isNull,
@@ -233,16 +247,14 @@ void main() {
         expect(updated.stickers.last.size, bytes.length);
         expect(updated.stickers.last.mimeType, entry.value);
         expect(updated.stickers.last.emoji, '⭐');
-        verify(
-          () => source.uploadStickerImage(bytes, entry.key, entry.value),
-        ).called(1);
+        verify(() => source.uploadStickerImage(bytes, entry.key, entry.value))
+            .called(1);
       },
     );
   }
   test('null upload result cannot append an unusable sticker', () async {
-    when(
-      () => source.uploadStickerImage(any(), any(), any()),
-    ).thenAnswer((_) async => null);
+    when(() => source.uploadStickerImage(any(), any(), any()))
+        .thenAnswer((_) async => null);
     expect(
       await repository.addStickerToPack(
         packId: custom.id,
@@ -271,9 +283,8 @@ void main() {
   test(
     'failed image persistence retains the previous sticker collection',
     () async {
-      when(
-        () => source.installPack(any(), any()),
-      ).thenAnswer((_) async => false);
+      when(() => source.installPack(any(), any()))
+          .thenAnswer((_) async => false);
       expect(
         await repository.addStickerToPack(
           packId: custom.id,
@@ -289,9 +300,8 @@ void main() {
     },
   );
   test('image upload exception is surfaced as failure', () async {
-    when(
-      () => source.uploadStickerImage(any(), any(), any()),
-    ).thenThrow(StateError('offline'));
+    when(() => source.uploadStickerImage(any(), any(), any()))
+        .thenThrow(StateError('offline'));
     expect(
       await repository.addStickerToPack(
         packId: custom.id,
@@ -328,6 +338,113 @@ void main() {
       custom.stickers,
     );
   });
+  test(
+    'account switch during upload cannot copy a pack to the new account',
+    () async {
+      Object scope = Object();
+      when(() => source.accountScope).thenAnswer((_) => scope);
+      final upload = Completer<String?>();
+      when(() => source.uploadStickerImage(any(), any(), any()))
+          .thenAnswer((_) => upload.future);
+      final pending = repository.addStickerToPack(
+        packId: custom.id,
+        imageBytes: bytes,
+        filename: 'new.png',
+      );
+      await pumpEventQueue();
+      scope = Object();
+      upload.complete('mxc://fixture/new');
+      expect(await pending, isFalse);
+      verifyNever(() => source.installPack(any(), any()));
+    },
+  );
+
+  test('account switch during avatar upload cannot create a pack', () async {
+    Object scope = Object();
+    when(() => source.accountScope).thenAnswer((_) => scope);
+    final upload = Completer<String?>();
+    when(() => source.uploadStickerImage(any(), any(), any()))
+        .thenAnswer((_) => upload.future);
+    final pending = repository.createCustomPack(
+      name: 'Private',
+      avatarBytes: bytes,
+    );
+    await pumpEventQueue();
+    scope = Object();
+    upload.complete('mxc://fixture/avatar');
+    expect(await pending, isNull);
+    verifyNever(() => source.installPack(any(), any()));
+  });
+
+  test('account switch during lookup cannot install a store pack', () async {
+    Object scope = Object();
+    when(() => source.accountScope).thenAnswer((_) => scope);
+    final lookup = Completer<List<StickerPack>>();
+    when(() => source.getInstalledPacks()).thenAnswer((_) => lookup.future);
+    final pending = repository.installPack('store_food');
+    scope = Object();
+    lookup.complete([]);
+    expect(await pending, isFalse);
+    verifyNever(() => source.installPack(any(), any()));
+  });
+
+  for (final operation in ['rename', 'remove']) {
+    test(
+      '$operation cannot write a pack after lookup changes account',
+      () async {
+        Object scope = Object();
+        when(() => source.accountScope).thenAnswer((_) => scope);
+        final lookup = Completer<StickerPack?>();
+        final delayed = _DelayedLookupRepository(source, lookup.future);
+        addTearDown(delayed.dispose);
+        final pending = operation == 'rename'
+            ? delayed.renamePack(custom.id, 'Changed')
+            : delayed.removeStickerFromPack(
+                packId: custom.id,
+                stickerId: 'one',
+              );
+        scope = Object();
+        lookup.complete(custom);
+        expect(await pending, isFalse);
+        verifyNever(() => source.installPack(any(), any()));
+      },
+    );
+  }
+
+  for (final switchAccount in [false, true]) {
+    test('cached pack stream retains account: switch=$switchAccount', () async {
+      Object scope = Object();
+      when(() => source.accountScope).thenAnswer((_) => scope);
+      await repository.getInstalledPacks();
+      final emissions = <List<StickerPack>>[];
+      final subscription = repository.watchInstalledPacks().listen(
+        emissions.add,
+      );
+      if (switchAccount) scope = Object();
+      await Future<void>.delayed(Duration.zero);
+      await subscription.cancel();
+      expect(
+        emissions
+            .expand((packs) => packs)
+            .where((pack) => pack.id == custom.id),
+        switchAccount ? isEmpty : hasLength(1),
+      );
+    });
+  }
+
+  test('uninstall receipt from the previous account is rejected', () async {
+    Object scope = Object();
+    when(() => source.accountScope).thenAnswer((_) => scope);
+    final receipt = Completer<bool>();
+    when(() => source.uninstallPack(custom.id))
+        .thenAnswer((_) => receipt.future);
+    final pending = repository.uninstallPack(custom.id);
+    scope = Object();
+    receipt.complete(true);
+    expect(await pending, isFalse);
+    verifyNever(() => source.getInstalledPacks());
+  });
+
   test('rename preserves stickers and refreshes cached name', () async {
     expect(await repository.renamePack(custom.id, 'Trips'), isTrue);
     final updated = await repository.getPackById(custom.id);
@@ -353,9 +470,8 @@ void main() {
   test(
     'persistence exceptions during rename and removal return failure',
     () async {
-      when(
-        () => source.installPack(any(), any()),
-      ).thenThrow(StateError('offline'));
+      when(() => source.installPack(any(), any()))
+          .thenThrow(StateError('offline'));
       expect(await repository.renamePack(custom.id, 'Trips'), isFalse);
       expect(
         await repository.removeStickerFromPack(

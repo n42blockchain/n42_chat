@@ -35,6 +35,12 @@ abstract interface class IAccountBoundAuthInvalidation {
   Stream<AuthSessionInvalidation> get accountInvalidationStream;
 }
 
+/// Optional session rebinding signal, including successful authentication.
+/// This is separate from invalidation so it never implies account deletion.
+abstract interface class IAccountBoundSessionChanges {
+  Stream<void> get accountSessionChanges;
+}
+
 /// Optional deletion lifecycle. The request wrapper marks the captured SDK
 /// generation only when the server request itself completes successfully.
 abstract interface class IAccountBoundDeletionLifecycle {
@@ -322,6 +328,12 @@ class AuthResult {
 
 /// 认证错误类型
 enum AuthErrorType {
+  /// Temporarily locked by the homeserver; retain local recovery material.
+  accountLocked,
+
+  /// Deactivated by the homeserver.
+  accountDeactivated,
+
   /// 未知错误
   unknown,
 

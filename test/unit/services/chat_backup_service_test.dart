@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -227,6 +228,81 @@ void main() {
   });
 
   group('restoreToArchive', () {
+    for (final replaceService in [false, true]) {
+      test(
+        'restore stops after pending lookup changes context service=$replaceService',
+        () async {
+          final service = buildService();
+          final file = File('${backupDir.path}/stale.n42backup');
+          await file.writeAsString(
+            jsonEncode({
+              'manifest': <String, dynamic>{},
+              'rooms': {
+                'room': {
+                  'messages': [
+                    {
+                      'eventId': 'old',
+                      'sender': 'sender',
+                      'body': 'secret',
+                      'type': 'm.text',
+                      'timestamp': DateTime.utc(2026).toIso8601String(),
+                    },
+                  ],
+                },
+              },
+            }),
+          );
+          when(() => client.userID).thenReturn('@a:test');
+          final entered = Completer<void>();
+          final lookup = Completer<bool>();
+          when(() => archiveService.isEventArchived('old')).thenAnswer((_) {
+            entered.complete();
+            return lookup.future;
+          });
+          final pending = service.restoreToArchive(backupFilePath: file.path);
+          await entered.future;
+          if (replaceService) {
+            service.setArchiveService(MockMessageArchiveService());
+          } else {
+            when(() => client.userID).thenReturn('@b:test');
+          }
+          lookup.complete(false);
+          final result = await pending;
+          expect(result.errors, isNotEmpty);
+          expect(result.roomsRestored, 0);
+          verifyNever(
+            () => archiveService.importArchivedMessages(any(), any()),
+          );
+        },
+      );
+    }
+
+    for (final privateFirst in [false, true]) {
+      test('restore excludes all copies of a private event: first=$privateFirst', () async {
+        final ordinary = <String, dynamic>{
+          'eventId': r'$private', 'sender': '@alice:server',
+          'type': 'm.text', 'body': 'must not return', 'ts': 123,
+        };
+        final private = {...ordinary, 'isViewOnce': true};
+        final public = {...ordinary, 'eventId': r'$public', 'body': 'keep this'};
+        final file = File('${backupDir.path}/private_duplicates.n42backup');
+        await file.writeAsString(jsonEncode({
+          'manifest': {'backupId': 'legacy'},
+          'rooms': {'!room:server': {'messages': [
+            ...privateFirst ? [private, ordinary] : [ordinary, private], public,
+          ]}},
+        }));
+        when(() => archiveService.isEventArchived(any())).thenAnswer((_) async => false);
+        when(() => archiveService.importArchivedMessages(any(), any())).thenAnswer((_) async => 1);
+        final result = await buildService().restoreToArchive(backupFilePath: file.path);
+        expect(result.errors, isEmpty);
+        final imported = verify(() => archiveService.importArchivedMessages('!room:server', captureAny())).captured.single as List<ArchivedMessagesCompanion>;
+        expect(imported, hasLength(1));
+        expect(imported.single.eventId.value, r'$public');
+        expect(imported.single.body.value, 'keep this');
+      });
+    }
+
     test('writes archived messages through MessageArchiveService', () async {
       final service = buildService();
       final backupFile = File('${backupDir.path}/restore_archive.n42backup');
@@ -251,12 +327,10 @@ void main() {
           },
         }),
       );
-      when(
-        () => archiveService.isEventArchived(any()),
-      ).thenAnswer((_) async => false);
-      when(
-        () => archiveService.importArchivedMessages(any(), any()),
-      ).thenAnswer((_) async => 1);
+      when(() => archiveService.isEventArchived(any()))
+          .thenAnswer((_) async => false);
+      when(() => archiveService.importArchivedMessages(any(), any()))
+          .thenAnswer((_) async => 1);
 
       final result = await service.restoreToArchive(
         backupFilePath: backupFile.path,

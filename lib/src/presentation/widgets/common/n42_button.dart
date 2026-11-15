@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
+import '../../../core/theme/app_text_styles.dart';
 
 /// 微信风格按钮组件
 ///
@@ -157,10 +158,12 @@ class N42Button extends StatelessWidget {
     final fontSize = _getFontSize();
     final radius = borderRadius ?? AppDimensions.buttonRadius;
 
-    return SizedBox(
-      width: expanded ? double.infinity : null,
-      height: height,
-      child: _buildButton(context, isDisabled, radius, fontSize),
+    return ConstrainedBox(
+      constraints: BoxConstraints(minWidth: 44, minHeight: height),
+      child: SizedBox(
+        width: expanded ? double.infinity : null,
+        child: _buildButton(context, isDisabled, radius, fontSize),
+      ),
     );
   }
 
@@ -172,18 +175,23 @@ class N42Button extends StatelessWidget {
   ) {
     switch (type) {
       case N42ButtonType.primary:
-        return _buildPrimaryButton(isDisabled, radius, fontSize);
+        return _buildPrimaryButton(context, isDisabled, radius, fontSize);
       case N42ButtonType.secondary:
-        return _buildSecondaryButton(isDisabled, radius, fontSize);
+        return _buildSecondaryButton(context, isDisabled, radius, fontSize);
       case N42ButtonType.text:
-        return _buildTextButton(isDisabled, fontSize);
+        return _buildTextButton(context, isDisabled, fontSize);
       case N42ButtonType.danger:
         return _buildDangerButton(isDisabled, radius, fontSize);
     }
   }
 
-  Widget _buildPrimaryButton(bool isDisabled, double radius, double fontSize) {
-    final bgColor = backgroundColor ?? AppColors.primary;
+  Widget _buildPrimaryButton(
+    BuildContext context,
+    bool isDisabled,
+    double radius,
+    double fontSize,
+  ) {
+    final bgColor = backgroundColor ?? AppColors.primaryOf(context);
 
     return ElevatedButton(
       onPressed: isDisabled ? null : onPressed,
@@ -202,11 +210,12 @@ class N42Button extends StatelessWidget {
   }
 
   Widget _buildSecondaryButton(
+    BuildContext context,
     bool isDisabled,
     double radius,
     double fontSize,
   ) {
-    final color = foregroundColor ?? AppColors.primary;
+    final color = foregroundColor ?? AppColors.primaryOf(context);
 
     return OutlinedButton(
       onPressed: isDisabled ? null : onPressed,
@@ -225,8 +234,12 @@ class N42Button extends StatelessWidget {
     );
   }
 
-  Widget _buildTextButton(bool isDisabled, double fontSize) {
-    final color = foregroundColor ?? AppColors.primary;
+  Widget _buildTextButton(
+    BuildContext context,
+    bool isDisabled,
+    double fontSize,
+  ) {
+    final color = foregroundColor ?? AppColors.primaryOf(context);
 
     return TextButton(
       onPressed: isDisabled ? null : onPressed,
@@ -271,13 +284,10 @@ class N42Button extends StatelessWidget {
 
     final textWidget = Text(
       text,
-      maxLines: 1,
-      overflow: TextOverflow.ellipsis,
       textAlign: TextAlign.center,
-      style: TextStyle(
+      style: AppTextStyles.buttonPrimary.copyWith(
         fontSize: fontSize,
-        fontWeight: FontWeight.w500,
-        letterSpacing: 0.2,
+        color: color,
       ),
     );
 
@@ -313,20 +323,29 @@ class N42Button extends StatelessWidget {
       case N42ButtonSize.small:
         return 13;
       case N42ButtonSize.medium:
-        return 15;
+        return 17;
       case N42ButtonSize.large:
-        return 16;
+        return 17;
     }
   }
 
   EdgeInsets _getPadding() {
     switch (size) {
       case N42ButtonSize.small:
-        return const EdgeInsets.symmetric(horizontal: AppDimensions.spacingM);
+        return const EdgeInsets.symmetric(
+          horizontal: AppDimensions.spacingM,
+          vertical: 12,
+        );
       case N42ButtonSize.medium:
-        return const EdgeInsets.symmetric(horizontal: AppDimensions.spacing);
+        return const EdgeInsets.symmetric(
+          horizontal: AppDimensions.spacing,
+          vertical: 12,
+        );
       case N42ButtonSize.large:
-        return const EdgeInsets.symmetric(horizontal: AppDimensions.spacingL);
+        return const EdgeInsets.symmetric(
+          horizontal: AppDimensions.spacingL,
+          vertical: 12,
+        );
     }
   }
 }

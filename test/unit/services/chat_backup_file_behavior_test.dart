@@ -1,10 +1,15 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:drift/drift.dart' show Value;
+import 'package:drift/native.dart';
+import 'package:n42_chat/src/data/datasources/local/archive_database.dart';
 import 'package:matrix/matrix.dart' as matrix;
 import 'package:mocktail/mocktail.dart';
 import 'package:n42_chat/src/core/services/chat_backup_service.dart';
+import 'package:n42_chat/src/core/services/message_archive_service.dart';
 import 'package:n42_chat/src/data/datasources/local/preferences_datasource.dart';
 import 'package:n42_chat/src/data/datasources/local/secure_storage_datasource.dart';
 import 'package:n42_chat/src/data/datasources/matrix/matrix_client_manager.dart';
@@ -18,11 +23,20 @@ class _Client extends Mock implements matrix.Client {}
 
 class _Secure extends Mock implements SecureStorageDataSource {}
 
+class _Room extends Mock implements matrix.Room {}
+
+class _Archive extends Mock implements MessageArchiveService {}
+
+class _Summary extends Mock implements matrix.RoomSummary {}
+
+class _Timeline extends Mock implements matrix.Timeline {}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   late Directory directory;
   late _Manager manager;
   late _Secure secure;
+  late _Client client;
   late PreferencesDataSource preferences;
   late ChatBackupService service;
   setUp(() async {
@@ -31,14 +45,15 @@ void main() {
     manager = _Manager();
     secure = _Secure();
     final stored = <String, String?>{};
-    when(
-      () => secure.read(any()),
-    ).thenAnswer((i) async => stored[i.positionalArguments[0]]);
+    when(() => secure.read(any()))
+        .thenAnswer((i) async => stored[i.positionalArguments[0]]);
     when(() => secure.write(any(), any())).thenAnswer((i) async {
       stored[i.positionalArguments[0] as String] =
           i.positionalArguments[1] as String?;
     });
-    final client = _Client();
+    client = _Client();
+    when(() => client.userID).thenReturn('@alice:example.org');
+    when(() => client.homeserver).thenReturn(Uri.parse('https://example.org'));
     when(() => manager.client).thenReturn(client);
     when(() => client.rooms).thenReturn([]);
     preferences = PreferencesDataSource();
@@ -51,6 +66,474 @@ void main() {
   });
   tearDown(() async => directory.delete(recursive: true));
 
+  (_Room, _Timeline) roomFixture(String id) {
+    final room = _Room();
+    final timeline = _Timeline();
+    when(() => room.id).thenReturn(id);
+    when(() => room.getLocalizedDisplayname()).thenReturn(id);
+    when(() => room.getTimeline()).thenAnswer((_) async => timeline);
+    when(() => timeline.events).thenReturn([
+      matrix.Event(
+        eventId: 'event-$id',
+        senderId: '@alice:example.org',
+        originServerTs: DateTime.utc(2020),
+        type: 'm.room.message',
+        content: {'msgtype': 'm.text', 'body': 'historical message'},
+        room: room,
+      ),
+    ]);
+    return (room, timeline);
+  }
+
+  for (final incremental in [false, true]) {
+    for (final broken in [false, true]) {
+      test(
+        'export releases timeline: incremental=$incremental broken=$broken',
+        () async {
+          final (room, timeline) = roomFixture('!cleanup:example.org');
+          when(() => client.rooms).thenReturn([room]);
+          when(() => room.name).thenReturn('Cleanup');
+          when(() => room.topic).thenReturn('');
+          when(() => room.isDirectChat).thenReturn(false);
+          when(() => room.summary).thenReturn(_Summary());
+          if (broken)
+            when(() => timeline.events).thenThrow(StateError('read failed'));
+          if (incremental) {
+            await service.createIncrementalBackup();
+          } else {
+            final result = await service.createBackup();
+            final data = jsonDecode(await File(result.filePath).readAsString()) as Map;
+            expect(data['manifest']['hasReadErrors'], broken);
+            if (broken) {
+              expect(result.warnings, isNotEmpty);
+              expect((await service.previewBackup(result.filePath)).warnings, isNotEmpty);
+              expect((await service.restoreFromBackup(backupFilePath: result.filePath, restoreSettings: false)).hasWarnings, isTrue);
+            }
+          }
+          verify(() => timeline.cancelSubscriptions()).called(1);
+        },
+      );
+    }
+  }
+
+  for (final changeAccount in [false, true]) {
+    test('remote paging completion preserves session: change=$changeAccount', () async {
+      final (room, timeline) = roomFixture('!paged:example.org');
+      when(() => room.topic).thenReturn('');
+      when(() => room.isDirectChat).thenReturn(false);
+      when(() => room.summary).thenReturn(_Summary());
+      when(() => client.rooms).thenReturn([room]);
+      final original = timeline.events.toList();
+      var more = true;
+      when(() => timeline.canRequestHistory).thenAnswer((_) => more);
+      when(() => timeline.requestHistory(historyCount: 500)).thenAnswer((_) async {
+        more = false;
+        if (changeAccount) when(() => client.accessToken).thenReturn('replacement');
+        when(() => timeline.events).thenReturn([...original, matrix.Event(
+          eventId: 'older-event', senderId: '@alice:example.org',
+          originServerTs: DateTime(2019), type: 'm.room.message',
+          content: {'msgtype': 'm.text', 'body': 'older'}, room: room,
+        )]);
+      });
+      if (changeAccount) {
+        await expectLater(service.createBackup(fetchRemoteHistory: true), throwsStateError);
+      } else {
+        final result = await service.createBackup(fetchRemoteHistory: true);
+        expect(result.messageCount, 2);
+        final data = jsonDecode(await File(result.filePath).readAsString()) as Map;
+        expect(data['manifest']['historyScope'], 'requestedRemoteHistory');
+        expect(data['manifest']['hasReadErrors'], isFalse);
+      }
+      verify(() => timeline.requestHistory(historyCount: 500)).called(1);
+      verify(() => timeline.cancelSubscriptions()).called(1);
+    });
+  }
+
+  for (final failAfterPage in [false, true]) {
+    test('remote paging error keeps loaded data: partial=$failAfterPage', () async {
+      final (room, timeline) = roomFixture('!partial:example.org');
+      when(() => room.topic).thenReturn('');
+      when(() => room.isDirectChat).thenReturn(false);
+      when(() => room.summary).thenReturn(_Summary());
+      when(() => client.rooms).thenReturn([room]);
+      final original = timeline.events.toList();
+      when(() => timeline.canRequestHistory).thenReturn(true);
+      var pages = 0;
+      when(() => timeline.requestHistory(historyCount: 500)).thenAnswer((_) async {
+        pages++;
+        if (!failAfterPage || pages > 1) throw StateError('fixture-network-failure');
+        when(() => timeline.events).thenReturn([...original, matrix.Event(
+          eventId: 'older-partial', senderId: '@alice:example.org',
+          originServerTs: DateTime(2019), type: 'm.room.message',
+          content: {'msgtype': 'm.text', 'body': 'retained older message'}, room: room,
+        )]);
+      });
+      final result = await service.createBackup(fetchRemoteHistory: true);
+      final data = jsonDecode(await File(result.filePath).readAsString()) as Map;
+      expect(result.messageCount, failAfterPage ? 2 : 1);
+      expect(data['manifest']['hasReadErrors'], isTrue);
+      expect(result.warnings, isNotEmpty);
+      expect(await service.verifyBackup(result.filePath), isTrue);
+      verify(() => timeline.requestHistory(historyCount: 500)).called(failAfterPage ? 2 : 1);
+      verify(() => timeline.cancelSubscriptions()).called(1);
+    });
+  }
+
+  test('remote history paging stops when the SDK makes no progress', () async {
+    final (room, timeline) = roomFixture('!history:example.org');
+    when(() => room.topic).thenReturn('');
+    when(() => room.isDirectChat).thenReturn(false);
+    when(() => room.summary).thenReturn(_Summary());
+    when(() => client.rooms).thenReturn([room]);
+    when(() => timeline.canRequestHistory).thenReturn(true);
+    when(() => timeline.requestHistory(historyCount: 500)).thenAnswer((_) async {});
+    final result = await service.createBackup(fetchRemoteHistory: true);
+    expect(result.messageCount, 1);
+    expect(result.warnings, isNotEmpty);
+    verify(() => timeline.requestHistory(historyCount: 500)).called(1);
+    verify(() => timeline.cancelSubscriptions()).called(1);
+  });
+
+  for (final incremental in [false, true]) {
+    for (final privateFirst in [false, true]) {
+      test('private duplicate excludes all copies: incremental=$incremental first=$privateFirst', () async {
+        final (room, timeline) = roomFixture('!private:example.org');
+        when(() => room.topic).thenReturn('');
+        when(() => room.isDirectChat).thenReturn(false);
+        when(() => room.summary).thenReturn(_Summary());
+        when(() => client.rooms).thenReturn([room]);
+        final original = timeline.events.single;
+        final private = matrix.Event(eventId: original.eventId,
+          senderId: original.senderId, originServerTs: original.originServerTs,
+          type: 'm.room.message', room: room,
+          content: {'msgtype': 'm.text', 'body': 'private fixture', 'n42.self_destruct': {'seconds': 10}});
+        when(() => timeline.events).thenReturn(privateFirst ? [private, original] : [original, private]);
+        final result = incremental ? await service.createIncrementalBackup() : await service.createBackup();
+        expect(result.messageCount, 0);
+        expect(await File(result.filePath).readAsString(), isNot(contains('historical message')));
+      });
+    }
+  }
+
+  for (final incremental in [false, true]) {
+    for (final redactedFirst in [false, true]) {
+      test('redacted duplicate excludes old content: incremental=$incremental first=$redactedFirst', () async {
+        final (room, timeline) = roomFixture('!redacted:example.org');
+        when(() => room.topic).thenReturn('');
+        when(() => room.isDirectChat).thenReturn(false);
+        when(() => room.summary).thenReturn(_Summary());
+        when(() => client.rooms).thenReturn([room]);
+        final original = timeline.events.single;
+        final redacted = matrix.Event(eventId: original.eventId,
+          senderId: original.senderId, originServerTs: original.originServerTs,
+          type: 'm.room.message', room: room, content: {},
+          unsigned: {'redacted_because': <String, dynamic>{
+            'event_id': 'redaction', 'type': 'm.room.redaction',
+            'sender': original.senderId, 'origin_server_ts': 1, 'content': <String, dynamic>{},
+          }});
+        expect(redacted.redacted, isTrue);
+        when(() => timeline.events).thenReturn(redactedFirst ? [redacted, original] : [original, redacted]);
+        final result = incremental ? await service.createIncrementalBackup() : await service.createBackup();
+        expect(result.messageCount, 0);
+        expect(await File(result.filePath).readAsString(), isNot(contains('historical message')));
+        verify(() => timeline.cancelSubscriptions()).called(1);
+      });
+    }
+  }
+
+  test('full export deduplicates overlapping loaded event IDs', () async {
+    final (room, timeline) = roomFixture('!overlap:example.org');
+    when(() => room.topic).thenReturn('');
+    when(() => room.isDirectChat).thenReturn(false);
+    when(() => room.summary).thenReturn(_Summary());
+    when(() => client.rooms).thenReturn([room]);
+    final original = timeline.events.single;
+    when(() => timeline.events).thenReturn([original, original, original]);
+    final result = await service.createBackup();
+    final data = jsonDecode(await File(result.filePath).readAsString()) as Map;
+    expect(result.messageCount, 1);
+    expect(data['rooms']['!overlap:example.org']['messages'], hasLength(1));
+    verify(() => timeline.cancelSubscriptions()).called(1);
+  });
+
+  test('full export retains more than 1000 loaded messages', () async {
+    final (room, timeline) = roomFixture('!large:example.org');
+    when(() => room.topic).thenReturn('');
+    when(() => room.isDirectChat).thenReturn(false);
+    when(() => room.summary).thenReturn(_Summary());
+    when(() => client.rooms).thenReturn([room]);
+    when(() => timeline.events).thenReturn(List.generate(1005, (index) => matrix.Event(
+      eventId: 'event-$index', senderId: '@alice:example.org',
+      originServerTs: DateTime(2026), type: 'm.room.message',
+      content: {'msgtype': 'm.text', 'body': 'message-$index'}, room: room,
+    )));
+    final result = await service.createBackup();
+    final data = jsonDecode(await File(result.filePath).readAsString()) as Map;
+    expect(result.messageCount, 1005);
+    expect(data['rooms']['!large:example.org']['messages'], hasLength(1005));
+    expect(data['manifest']['historyScope'], 'loadedTimeline');
+    verify(() => timeline.cancelSubscriptions()).called(1);
+  });
+
+  for (final invalid in ['unknown-user', 'empty-user', 'unknown-server']) {
+    test('restore rejects declared but invalid owner: $invalid', () async {
+      if (invalid == 'unknown-user') when(() => client.userID).thenReturn(null);
+      if (invalid == 'empty-user') when(() => client.userID).thenReturn('');
+      if (invalid == 'unknown-server') when(() => client.homeserver).thenReturn(null);
+      final backup = await service.createBackup();
+      expect(backup.warnings, contains(contains('ownership is unavailable')));
+      final result = await service.restoreFromBackup(backupFilePath: backup.filePath);
+      expect(result.hasErrors, isTrue);
+      expect(result.settingsRestored, 0);
+      expect(result.errors.single, contains('owner is invalid'));
+    });
+  }
+
+  for (final mismatch in ['user', 'server']) {
+    test('restore rejects backup owner mismatch: $mismatch', () async {
+      final backup = await service.createBackup();
+      if (mismatch == 'user') {
+        when(() => client.userID).thenReturn('@other:example.org');
+      } else {
+        when(() => client.homeserver).thenReturn(Uri.parse('https://other.example.org'));
+      }
+      await expectLater(service.previewBackup(backup.filePath), throwsStateError);
+      final result = await service.restoreFromBackup(backupFilePath: backup.filePath);
+      expect(result.hasErrors, isTrue);
+      expect(result.settingsRestored, 0);
+      final archive = _Archive();
+      service.setArchiveService(archive);
+      final archived = await service.restoreToArchive(backupFilePath: backup.filePath);
+      expect(archived.hasErrors, isTrue);
+      verifyZeroInteractions(archive);
+    });
+  }
+
+  test('restore refuses stale confirmation origin even with unchanged client', () async {
+    final backup = await service.createBackup();
+    final result = await service.restoreFromBackup(
+      backupFilePath: backup.filePath,
+      isCurrent: () => false,
+    );
+    expect(result.hasErrors, isTrue);
+    expect(result.settingsRestored, 0);
+  });
+
+  for (final progress in [0.1, 0.5, 1.0]) {
+    test('restore rejects account change at progress $progress', () async {
+      final backup = await service.createBackup();
+      final result = await service.restoreFromBackup(
+        backupFilePath: backup.filePath,
+        restoreSettings: false,
+        onProgress: (value) {
+          if (value == progress) when(() => client.accessToken).thenReturn('replacement');
+        },
+      );
+      expect(result.hasErrors, isTrue);
+    });
+  }
+
+  test(
+    'incremental archive pagination exports every equal-timestamp event',
+    () async {
+      final database = ArchiveDatabase.forTesting(NativeDatabase.memory());
+      addTearDown(database.close);
+      final (room, timeline) = roomFixture('!dense:example.org');
+      when(() => timeline.events).thenReturn([]);
+      when(() => client.rooms).thenReturn([room]);
+      service.setArchiveService(
+        MessageArchiveService(db: database, clientManager: manager),
+      );
+      final expected = <String>{};
+      final entries = <ArchivedMessagesCompanion>[];
+      for (var i = 0; i < 1203; i++) {
+        final id = 'event-${i.toString().padLeft(4, '0')}';
+        expected.add(id);
+        entries.add(
+          ArchivedMessagesCompanion.insert(
+            eventId: id,
+            roomId: room.id,
+            senderId: '@alice:example.org',
+            originServerTs: i == 0
+                ? 999
+                : i == 1202
+                ? 1001
+                : 1000,
+            type: 'm.room.message',
+            body: Value('message $i'),
+            quarter: 197001,
+            archivedAt: DateTime.utc(2026),
+          ),
+        );
+      }
+      await database.insertMessages(entries);
+      final result = await service.createIncrementalBackup();
+      expect(result.warnings, isEmpty);
+      expect(result.messageCount, expected.length);
+      final data =
+          jsonDecode(await File(result.filePath).readAsString()) as Map;
+      final messages =
+          ((data['rooms'] as Map)[room.id] as Map)['messages'] as List;
+      expect(messages.map((e) => (e as Map)['eventId']).toSet(), expected);
+      expect(messages.length, expected.length);
+    },
+  );
+
+  for (final scope in [
+    'different subset',
+    'new room',
+    'same reordered scope',
+  ]) {
+    test('incremental history survives $scope', () async {
+      final (firstRoom, _) = roomFixture('!first:example.org');
+      final (secondRoom, _) = roomFixture('!second:example.org');
+      when(
+        () => client.rooms,
+      ).thenReturn(scope == 'new room' ? [firstRoom] : [firstRoom, secondRoom]);
+      final first = await service.createIncrementalBackup(
+        roomIds: scope == 'different subset' ? [firstRoom.id] : null,
+      );
+      when(() => client.rooms).thenReturn([secondRoom, firstRoom]);
+      final second = await service.createIncrementalBackup(
+        roomIds: scope == 'different subset' ? [secondRoom.id] : null,
+      );
+      final data =
+          jsonDecode(await File(second.filePath).readAsString()) as Map;
+      expect(
+        (data['manifest'] as Map)['lastBackupTimestamp'],
+        scope == 'same reordered scope'
+            ? first.createdAt.millisecondsSinceEpoch
+            : 0,
+      );
+      expect(
+        second.messageCount,
+        scope == 'same reordered scope'
+            ? 0
+            : scope == 'new room'
+            ? 2
+            : 1,
+      );
+    });
+  }
+  for (final source in ['timeline', 'archive', 'metadata']) {
+    test(
+      'failed $source export warns and preserves the incremental cursor',
+      () async {
+        final (room, timeline) = roomFixture('!failure:example.org');
+        when(() => client.rooms).thenReturn([room]);
+        final archive = _Archive();
+        if (source == 'timeline') {
+          when(() => room.getTimeline())
+              .thenThrow(StateError('fixture timeline failed'));
+        } else if (source == 'metadata') {
+          when(() => room.getLocalizedDisplayname())
+              .thenThrow(StateError('fixture metadata failed'));
+        } else {
+          service.setArchiveService(archive);
+          when(
+            () => archive.getArchivedMessages(
+              '!failure:example.org',
+              beforeTimestamp: null,
+              limit: 500,
+            ),
+          ).thenThrow(StateError('fixture archive failed'));
+        }
+        final failed = await service.createIncrementalBackup();
+        expect(failed.warnings, isNotEmpty);
+        final data =
+            jsonDecode(await File(failed.filePath).readAsString()) as Map;
+        expect((data['manifest'] as Map)['hasReadErrors'], isTrue);
+        expect((data['manifest'] as Map)['warnings'], failed.warnings);
+        verifyNever(() => secure.write(any(), any()));
+        when(() => room.getTimeline()).thenAnswer((_) async => timeline);
+        when(() => room.getLocalizedDisplayname()).thenReturn(room.id);
+        if (source == 'archive') {
+          when(
+            () => archive.getArchivedMessages(
+              '!failure:example.org',
+              beforeTimestamp: null,
+              limit: 500,
+            ),
+          ).thenAnswer((_) async => []);
+        }
+        final recovered = await service.createIncrementalBackup();
+        expect(recovered.messageCount, 1);
+        expect(recovered.warnings, isEmpty);
+        expect(await service.verifyBackup(recovered.filePath), isTrue);
+      },
+    );
+  }
+
+  for (final change in ['user', 'server', 'unknown', 'legacy']) {
+    test('incremental cursor does not cross $change ownership', () async {
+      final first = await service.createIncrementalBackup();
+      if (change == 'user') {
+        when(() => client.userID).thenReturn('@bob:example.org');
+      } else if (change == 'server') {
+        when(() => client.homeserver)
+            .thenReturn(Uri.parse('https://other.org'));
+      } else if (change == 'unknown') {
+        when(() => client.userID).thenReturn(null);
+      } else {
+        when(() => client.userID).thenReturn('@new:example.org');
+        await secure.write(
+          'n42_chat_last_incremental_backup_ts',
+          first.createdAt.millisecondsSinceEpoch.toString(),
+        );
+      }
+      final next = await service.createIncrementalBackup();
+      final data = jsonDecode(await File(next.filePath).readAsString()) as Map;
+      expect((data['manifest'] as Map)['lastBackupTimestamp'], 0);
+      if (change == 'user') {
+        when(() => client.userID).thenReturn('@alice:example.org');
+        final resumed = await service.createIncrementalBackup();
+        final restored =
+            jsonDecode(await File(resumed.filePath).readAsString()) as Map;
+        expect(
+          (restored['manifest'] as Map)['lastBackupTimestamp'],
+          first.createdAt.millisecondsSinceEpoch,
+        );
+      }
+    });
+  }
+  for (final incremental in [false, true]) {
+    for (final phase in [0.1, 0.85]) {
+      for (final mutation in ['user', 'server', 'token', 'device', 'client']) {
+        test(
+          'backup rejects session changes at $phase incremental=$incremental mutation=$mutation',
+          () async {
+            void progress(double value) {
+              if (value == phase) {
+                switch (mutation) {
+                  case 'user':
+                    when(() => client.userID).thenReturn('@other:example.org');
+                  case 'server':
+                    when(() => client.homeserver)
+                        .thenReturn(Uri.parse('https://other.org'));
+                  case 'token':
+                    when(() => client.accessToken)
+                        .thenReturn('changed-fixture-token');
+                  case 'device':
+                    when(() => client.deviceID).thenReturn('changed-device');
+                  case 'client':
+                    when(() => manager.client).thenReturn(_Client());
+                }
+              }
+            }
+
+            await expectLater(
+              incremental
+                  ? service.createIncrementalBackup(onProgress: progress)
+                  : service.createBackup(onProgress: progress),
+              throwsStateError,
+            );
+            expect(await directory.list(recursive: true).where((entry) => entry is File).toList(), isEmpty);
+            verifyNever(() => secure.write(any(), any()));
+          },
+        );
+      }
+    }
+  }
   for (final incremental in [false, true]) {
     test(
       '${incremental ? 'incremental' : 'full'} consecutive backups preserve both files',
@@ -94,7 +577,7 @@ void main() {
       when(() => manager.client).thenReturn(null);
       await expectLater(service.createBackup(), throwsStateError);
       await expectLater(service.createIncrementalBackup(), throwsStateError);
-      expect(await directory.list().toList(), isEmpty);
+      expect(await directory.list(recursive: true).where((entry) => entry is File).toList(), isEmpty);
       final estimate = await service.estimateBackupSize(includeMedia: true);
       expect(estimate.estimatedBytes, 0);
       expect(estimate.roomCount, 0);
@@ -258,6 +741,150 @@ void main() {
     );
     expect(await service.verifyBackup(result.filePath), isTrue);
   });
+  test('backup files list and deletion are partitioned by account and server', () async {
+    final first = await service.createBackup();
+    when(() => client.userID).thenReturn('@bob:example.org');
+    expect(await service.listBackups(), isEmpty);
+    await service.deleteBackup(first.backupId);
+    expect(await File(first.filePath).exists(), isTrue);
+    final second = await service.createBackup();
+    expect(File(first.filePath).parent.path, isNot(File(second.filePath).parent.path));
+    when(() => client.userID).thenReturn('@alice:example.org');
+    when(() => client.homeserver).thenReturn(Uri.parse('https://other.example.org'));
+    expect(await service.listBackups(), isEmpty);
+    await service.deleteBackup(first.backupId);
+    expect(await File(first.filePath).exists(), isTrue);
+    when(() => client.homeserver).thenReturn(Uri.parse('https://example.org'));
+    expect((await service.listBackups()).single.backupId, first.backupId);
+    await service.deleteBackup(first.backupId);
+    expect(await File(first.filePath).exists(), isFalse);
+    expect(await File(second.filePath).exists(), isTrue);
+  });
+
+  test('legacy root backups remain available for explicit preview only', () async {
+    final result = await service.createBackup();
+    final rootCopy = File('${directory.path}/legacy-root.n42backup');
+    await File(result.filePath).copy(rootCopy.path);
+    await File(result.filePath).delete();
+    expect(await service.listBackups(), isEmpty);
+    expect((await service.previewBackup(rootCopy.path)).backupId, result.backupId);
+    expect(await rootCopy.exists(), isTrue);
+  });
+
+  for (final deleting in [false, true]) {
+    test('account change while resolving backup directory cancels ${deleting ? 'deletion' : 'listing'}', () async {
+      final result = await service.createBackup();
+      final gate = Completer<Directory>();
+      final guarded = ChatBackupService(clientManager: manager, secureStorage: secure,
+        preferencesStorage: preferences, backupDirProvider: () => gate.future);
+      final pending = deleting ? guarded.deleteBackup(result.backupId) : guarded.listBackups();
+      final rejected = expectLater(pending, throwsStateError);
+      when(() => client.userID).thenReturn('@bob:example.org');
+      gate.complete(directory);
+      await rejected;
+      expect(await File(result.filePath).exists(), isTrue);
+    });
+  }
+
+  test('legacy discovery lists only root backup files and preserves them', () async {
+    final owned = await service.createBackup();
+    final old = await File(owned.filePath).copy('${directory.path}/old.n42backup');
+    await File('${directory.path}/notes.txt').writeAsString('ignore');
+    await Directory('${directory.path}/folder.n42backup').create();
+    final files = await service.listLegacyBackupFiles();
+    expect(files.map((file) => file.path), [old.path]);
+    expect(await old.exists(), isTrue);
+    expect((await service.listBackups()).single.backupId, owned.backupId);
+  });
+
+  test('combined restore uses one snapshot for settings and selected-room history', () async {
+    final database = ArchiveDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(database.close);
+    service.setArchiveService(MessageArchiveService(db: database, clientManager: manager));
+    final file = File('${directory.path}/combined.n42backup');
+    Map<String, dynamic> message(String id, String body) => {
+      'eventId': id, 'sender': '@alice:example.org', 'type': 'm.text', 'body': body, 'ts': 100,
+    };
+    await file.writeAsString(jsonEncode({
+      'manifest': {'backupId': 'combined', 'owner': {'userId': '@alice:example.org', 'homeserver': 'https://example.org'}},
+      'settings': {'n42_chat_settings': '{"fixture":"restored"}'},
+      'rooms': {
+        '!selected:example.org': {'messages': [message('retained', 'original snapshot'),
+          message('private', 'must not return'), {...message('private', 'private'), 'isViewOnce': true}]},
+        '!excluded:example.org': {'messages': [message('excluded', 'not selected')]},
+      },
+    }));
+    final result = await service.restoreFromBackup(backupFilePath: file.path,
+      restoreMessages: true, roomIds: ['!selected:example.org'],
+      onProgress: (progress) { if (progress == 0.5) file.writeAsStringSync('replaced file'); });
+    expect(result.errors, isEmpty);
+    expect(result.roomsRestored, 1);
+    expect(result.settingsRestored, 1);
+    expect(await preferences.read('n42_chat_settings'), contains('restored'));
+    expect((await database.getMessages('!selected:example.org')).single.body, 'original snapshot');
+    expect(await database.isEventArchived('private'), isFalse);
+    expect(await database.isEventArchived('excluded'), isFalse);
+  });
+
+  test('requested message restoration reports unavailable archive instead of success', () async {
+    final backup = await service.createBackup();
+    final result = await service.restoreFromBackup(backupFilePath: backup.filePath,
+      restoreMessages: true, restoreSettings: false);
+    expect(result.hasErrors, isTrue);
+    expect(result.errors, contains('Archive service not available'));
+    expect(result.roomsRestored, 0);
+  });
+
+  test('combined restore cancels before message writes when confirmation expires', () async {
+    final database = ArchiveDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(database.close);
+    service.setArchiveService(MessageArchiveService(db: database, clientManager: manager));
+    final file = File('${directory.path}/cancelled-combined.n42backup');
+    await file.writeAsString(jsonEncode({
+      'manifest': {'backupId': 'cancelled'},
+      'rooms': {'!selected:example.org': {'messages': [
+        {'eventId': 'not-restored', 'sender': '@alice:example.org', 'type': 'm.text', 'body': 'not restored', 'ts': 100},
+      ]}},
+    }));
+    var current = true;
+    final result = await service.restoreFromBackup(backupFilePath: file.path,
+      restoreMessages: true, restoreSettings: false, isCurrent: () => current,
+      onProgress: (progress) { if (progress > 0.5 && progress < 1) current = false; });
+    expect(result.hasErrors, isTrue);
+    expect(await database.getMessageCount('!selected:example.org'), 0);
+    expect(await database.searchMessages('restored'), isEmpty);
+  });
+
+  test('deletion rechecks confirmation generation after directory await', () async {
+    final backup = await service.createBackup();
+    final gate = Completer<Directory>();
+    var current = true;
+    final guarded = ChatBackupService(clientManager: manager, secureStorage: secure,
+      preferencesStorage: preferences, backupDirProvider: () => gate.future);
+    final pending = guarded.deleteBackup(backup.backupId, isCurrent: () => current);
+    final rejected = expectLater(pending, throwsStateError);
+    current = false;
+    gate.complete(directory);
+    await rejected;
+    expect(await File(backup.filePath).exists(), isTrue);
+  });
+
+  for (final protected in [false, true]) {
+    test('preview rejects account change while reading: protected=$protected', () async {
+      final file = File('${directory.path}/preview-race.n42backup');
+      if (protected) {
+        await file.writeAsString('N42ENC3:password-required');
+      } else {
+        await file.writeAsString(jsonEncode({'manifest': {'backupId': 'old'},
+          'rooms': {'!old:example.org': {'name': 'private old room'}}}));
+      }
+      final pending = service.previewBackup(file.path);
+      final rejected = expectLater(pending, throwsA(isA<BackupSessionChanged>()));
+      when(() => client.userID).thenReturn('@bob:example.org');
+      await rejected;
+    });
+  }
+
   test('list ignores unrelated files and directories', () async {
     await File('${directory.path}/notes.txt').writeAsString('ignore');
     await Directory('${directory.path}/folder.n42backup').create();
@@ -300,6 +927,21 @@ void main() {
       );
     });
   }
+  test('ownerless legacy archive restore reports ownership warning', () async {
+    final database = ArchiveDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(database.close);
+    service.setArchiveService(MessageArchiveService(db: database, clientManager: manager));
+    const fixture = chatBackupV3Interop;
+    final file = File('${directory.path}/legacy-owner.n42backup');
+    await file.writeAsBytes(base64Decode(fixture['v3']!));
+    expect((await service.previewBackup(file.path, password: fixture['fixturePassword']!)).warnings,
+      contains('This legacy backup has no verified account owner.'));
+    final result = await service.restoreToArchive(
+      backupFilePath: file.path, password: fixture['fixturePassword']!,
+    );
+    expect(result.warnings, contains('This legacy backup has no verified account owner.'));
+  });
+
   test('missing archive service returns an explicit restore failure', () async {
     final result = await service.createBackup();
     final restored = await service.restoreToArchive(

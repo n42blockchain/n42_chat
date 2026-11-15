@@ -35,3 +35,15 @@ bool matrixUiaSupportsStage(String? rawBody, String stage) {
 bool matrixUiaSupportsPassword(String? rawBody) {
   return matrixUiaSupportsStage(rawBody, 'm.login.password');
 }
+
+/// Keep the server-issued continuation identifier unchanged.
+String? matrixUiaSession(String? rawBody) {
+  if (rawBody == null) return null;
+  try {
+    final decoded = jsonDecode(rawBody);
+    final session = decoded is Map ? decoded['session'] : null;
+    return session is String && session.isNotEmpty ? session : null;
+  } catch (_) {
+    return null;
+  }
+}

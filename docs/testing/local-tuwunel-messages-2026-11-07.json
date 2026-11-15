@@ -1,0 +1,12 @@
+{
+  "started": 1794048586.1921978,
+  "homeserver": "http://127.0.0.1:18948",
+  "synthetic_accounts_only": true,
+  "exit_code": 0,
+  "finished": 1794049009.795454,
+  "environment": "isolated local Tuwunel 1.9.4",
+  "matrix_sdk": "15.0.0",
+  "production_touched": false,
+  "e2ee_accepted": false,
+  "log_sha256": "99852efb9e67dd6a3487d0c83be1e3087f7d7bf81edf0efe2e98b580e954b37e"
+}

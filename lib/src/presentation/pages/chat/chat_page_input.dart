@@ -52,6 +52,7 @@ extension _ChatPageInputMethods on _ChatPageState {
       controller: _inputController,
       focusNode: _inputFocusNode,
       onSendText: _sendMessage,
+      clearTextOnSend: false,
       onSendVoice: _sendVoiceMessage,
       onRecordingStateChanged: _onRecordingStateChanged,
       onChanged: _onInputChanged,
@@ -378,8 +379,9 @@ extension _ChatPageInputMethods on _ChatPageState {
       },
       onPhotoLongPress: () async {
         _hideMorePanel();
+        final ownerUserId = _currentUserId;
         final scheduledAt = await showScheduledSendPicker(context);
-        if (!mounted || scheduledAt == null) {
+        if (!mounted || scheduledAt == null || ownerUserId != _currentUserId) {
           return;
         }
         await _showPhotoPickerOptions(scheduledAt: scheduledAt);
@@ -410,8 +412,9 @@ extension _ChatPageInputMethods on _ChatPageState {
       },
       onFileLongPress: () async {
         _hideMorePanel();
+        final ownerUserId = _currentUserId;
         final scheduledAt = await showScheduledSendPicker(context);
-        if (!mounted || scheduledAt == null) {
+        if (!mounted || scheduledAt == null || ownerUserId != _currentUserId) {
           return;
         }
         await _pickFile(scheduledAt: scheduledAt);
@@ -506,8 +509,17 @@ extension _ChatPageInputMethods on _ChatPageState {
     );
   }
 
-  void _scheduleComposerText(DateTime scheduledAt) {
-    final text = _inputController.text.trim();
+  Future<void> _scheduleComposerText(DateTime scheduledAt) async {
+    if (_isSchedulingComposerText) return;
+    final ownerUserId = _currentUserId;
+    final roomId = widget.conversation.id;
+    if (ownerUserId == null ||
+        ownerUserId.isEmpty ||
+        _scheduledOrigin?.isCurrent != true) {
+      return;
+    }
+    final originalText = _inputController.text;
+    final text = originalText.trim();
     if (text.isEmpty) {
       return;
     }
@@ -517,15 +529,35 @@ extension _ChatPageInputMethods on _ChatPageState {
       selections: _composerMentions,
       members: _groupMembers,
     );
-    context.read<ChatBloc>().add(
-      SendScheduledMessage(
-        text: text,
-        scheduledAt: scheduledAt,
-        mentionedUserIds: mentionPayload.mentionedUserIds,
-        mentionsRoom: mentionPayload.mentionsRoom,
-      ),
-    );
-    _clearComposerMentions();
+    _isSchedulingComposerText = true;
+    try {
+      final completion = Completer<bool>();
+      final bloc = context.read<ChatBloc>();
+      if (bloc.isClosed) return;
+      bloc.add(
+        SendScheduledMessage(
+          origin: _scheduledOrigin,
+          completion: completion,
+          ownerUserId: ownerUserId,
+          roomId: roomId,
+          text: text,
+          scheduledAt: scheduledAt,
+          mentionedUserIds: mentionPayload.mentionedUserIds,
+          mentionsRoom: mentionPayload.mentionsRoom,
+        ),
+      );
+      final saved = await completion.future;
+      if (!saved ||
+          !mounted ||
+          _scheduledOrigin?.isCurrent != true ||
+          _inputController.text != originalText) {
+        return;
+      }
+      _inputController.clear();
+      _clearComposerMentions();
+    } finally {
+      _isSchedulingComposerText = false;
+    }
   }
 
   Future<void> _openScheduledComposerPicker() async {
@@ -540,14 +572,15 @@ extension _ChatPageInputMethods on _ChatPageState {
       return;
     }
 
+    final ownerUserId = _currentUserId;
     final scheduledAt = await showScheduledSendPicker(context);
     if (!mounted || scheduledAt == null) {
       return;
     }
 
-    _scheduleComposerText(scheduledAt);
-    _inputController.clear();
-    _inputFocusNode.requestFocus();
+    if (_currentUserId != ownerUserId || _scheduledOrigin?.isCurrent != true) return;
+    await _scheduleComposerText(scheduledAt);
+    if (mounted) _inputFocusNode.requestFocus();
   }
 
   void _openMiniApps({MiniAppCategory? initialCategory}) {

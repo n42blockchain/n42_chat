@@ -41,6 +41,70 @@ void main() {
 
   tearDown(() => database.close());
 
+  for (final pageSize in [1, 2, 5]) {
+    test(
+      'composite archive cursor preserves ties with page size $pageSize',
+      () async {
+        final ids = ['a', 'A', 'b', 'B', 'zero', 'older', 'newer'];
+        await database.insertMessages([
+          for (final id in ids)
+            _message(
+              id: id,
+              room: '!cursor:hs',
+              sender: '@a:hs',
+              timestamp: id == 'older'
+                  ? 9
+                  : id == 'newer'
+                  ? 11
+                  : 10,
+              quarter: 197001,
+              body: id,
+            ),
+          _message(
+            id: 'other-room',
+            room: '!other:hs',
+            sender: '@a:hs',
+            timestamp: 10,
+            quarter: 197001,
+            body: 'not selected',
+          ),
+        ]);
+        int? timestamp;
+        String? eventId;
+        final seen = <String>[];
+        for (var page = 0; page < 10; page++) {
+          final entries = await database.getMessages(
+            '!cursor:hs',
+            beforeTimestamp: timestamp,
+            beforeEventId: eventId,
+            limit: pageSize,
+          );
+          if (entries.isEmpty) break;
+          seen.addAll(entries.map((e) => e.eventId));
+          timestamp = entries.last.originServerTs;
+          eventId = entries.last.eventId;
+        }
+        expect(seen.length, ids.length);
+        expect(seen.toSet(), ids.toSet());
+        expect(seen.first, 'newer');
+        expect(seen.last, 'older');
+        expect(
+          (await database.getMessages(
+            '!cursor:hs',
+            beforeTimestamp: 10,
+          )).map((e) => e.eventId),
+          ['older'],
+        );
+      },
+    );
+  }
+  test('event cursor cannot be used without its timestamp', () async {
+    await expectLater(
+      database.getMessages('!cursor:hs', beforeEventId: 'a'),
+      throwsArgumentError,
+    );
+  });
+
   test('inserts, queries, filters, and removes archived messages', () async {
     final firstTime = DateTime.utc(2026, 1, 2).millisecondsSinceEpoch;
     final secondTime = DateTime.utc(2026, 2, 2).millisecondsSinceEpoch;

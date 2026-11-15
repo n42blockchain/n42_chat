@@ -1,8 +1,8 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
+
+import '../../../../core/services/text_document_loader.dart';
+import '../../../../core/services/media_telemetry.dart';
+import '../../../widgets/chat/safe_markdown_document.dart';
 
 import '../../../../core/extensions/context_extension.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -13,12 +13,18 @@ class TextDocumentPreviewPage extends StatefulWidget {
   final String fileName;
   final String url;
   final Map<String, String>? headers;
+  final String? encryptKey;
+  final String? encryptIv;
+  final String? encryptSha256;
 
   const TextDocumentPreviewPage({
     super.key,
     required this.fileName,
     required this.url,
     this.headers,
+    this.encryptKey,
+    this.encryptIv,
+    this.encryptSha256,
   });
 
   @override
@@ -27,7 +33,13 @@ class TextDocumentPreviewPage extends StatefulWidget {
 }
 
 class _TextDocumentPreviewPageState extends State<TextDocumentPreviewPage> {
-  static const _maxPreviewSize = 2 * 1024 * 1024;
+  final _loader = TextDocumentLoader();
+
+  @override
+  void dispose() {
+    _loader.dispose();
+    super.dispose();
+  }
 
   bool _isLoading = true;
   String? _error;
@@ -40,48 +52,34 @@ class _TextDocumentPreviewPageState extends State<TextDocumentPreviewPage> {
   }
 
   Future<void> _loadDocument() async {
-    final uri = Uri.parse(widget.url);
-    if (uri.scheme != 'http' && uri.scheme != 'https') {
-      setState(() {
-        _error = 'Unsupported URL scheme: ${uri.scheme}';
-        _isLoading = false;
-      });
-      return;
-    }
-
-    final httpClient = HttpClient()
-      ..connectionTimeout = const Duration(seconds: 15);
-
     try {
-      final request = await httpClient.getUrl(uri);
-      widget.headers?.forEach(request.headers.set);
-
-      final response = await request.close();
-      if (response.statusCode < 200 || response.statusCode >= 300) {
-        throw Exception('HTTP ${response.statusCode}');
-      }
-
-      final bytes = <int>[];
-      await for (final chunk in response) {
-        bytes.addAll(chunk);
-        if (bytes.length > _maxPreviewSize) {
-          throw Exception('Preview limit exceeded (max 2MB)');
-        }
-      }
-
+      final content = await _loader.load(
+        widget.url,
+        headers: widget.headers,
+        encryptKey: widget.encryptKey,
+        encryptIv: widget.encryptIv,
+        encryptSha256: widget.encryptSha256,
+      );
       if (!mounted) return;
+      final preview = MediaTelemetry.start(
+        MediaStage.preview,
+        operationId: _loader.operationId,
+      );
       setState(() {
-        _content = const Utf8Decoder(allowMalformed: true).convert(bytes);
+        _content = content;
         _isLoading = false;
       });
-    } catch (e) {
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => preview.finish(
+          mounted ? MediaOutcome.succeeded : MediaOutcome.cancelled,
+        ),
+      );
+    } catch (_) {
       if (!mounted) return;
       setState(() {
-        _error = e.toString();
+        _error = 'Unable to preview this document safely. Check the connection and file size (max 2MB).';
         _isLoading = false;
       });
-    } finally {
-      httpClient.close();
     }
   }
 
@@ -149,7 +147,7 @@ class _TextDocumentPreviewPageState extends State<TextDocumentPreviewPage> {
 
     const padding = EdgeInsets.all(AppDimensions.spacing);
     if (_isMarkdown) {
-      return Markdown(data: _content, padding: padding, selectable: true);
+      return SafeMarkdownDocument(data: _content);
     }
 
     return SingleChildScrollView(

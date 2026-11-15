@@ -1,4 +1,5 @@
-#!/usr/bin/env dart
+// Run with Flutter's VM: this tool imports Flutter-backed media services.
+// flutter test tool/live_media_smoke_test.dart --no-pub --reporter expanded
 // ignore_for_file: avoid_print
 
 import 'dart:async';
@@ -16,6 +17,8 @@ import 'package:n42_chat/src/data/datasources/matrix/message/matrix_media_sender
 import 'package:n42_chat/src/data/datasources/matrix/message/matrix_media_uploader.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
+import 'live_smoke_credentials.dart';
+
 Future<void> main() async {
   try {
     await runLiveMediaSmoke();
@@ -32,28 +35,14 @@ Future<void> runLiveMediaSmoke({Map<String, String>? environment}) async {
   final homeserver = env['N42_TEST_HOMESERVER']?.trim().isNotEmpty == true
       ? env['N42_TEST_HOMESERVER']!.trim()
       : 'https://m.si46.world';
-  final configuredUsername = env['N42_TEST_USERNAME']?.trim();
-  final configuredPassword = env['N42_TEST_PASSWORD']?.trim();
   final inviteCode = env['N42_TEST_INVITE_CODE']?.trim();
-
-  final createdAccount =
-      configuredUsername == null || configuredUsername.isEmpty;
-  late final String username;
-  if (createdAccount) {
-    username = _generateUsername();
-  } else {
-    username = configuredUsername;
-  }
-  final password =
-      (createdAccount ? env['N42_TEST_PASSWORD'] : configuredPassword) ??
-      'N42LivePass123!@#';
-
-  if (createdAccount && (inviteCode == null || inviteCode.isEmpty)) {
-    throw StateError(
-      'Missing N42_TEST_INVITE_CODE. '
-      'Provide an invite code or a reusable N42_TEST_USERNAME/N42_TEST_PASSWORD.',
-    );
-  }
+  final credentials = LiveSmokeCredentials.fromEnvironment(
+    env,
+    temporaryUsername: _generateUsername,
+  );
+  final createdAccount = credentials.isTemporary;
+  final username = credentials.username;
+  final password = credentials.password;
 
   print('Homeserver: $homeserver');
   print(

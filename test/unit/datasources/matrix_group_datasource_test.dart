@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+
 import 'package:matrix/src/utils/cached_stream_controller.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:matrix/matrix.dart' as matrix;
@@ -38,11 +39,45 @@ void main() {
     when(() => client.getRoomById(roomId)).thenReturn(room);
   });
 
+  test(
+    'message pin persists without an expiry and preserves existing pins',
+    () async {
+      final pinned = _MockEvent();
+      when(() => room.client).thenReturn(client);
+      when(() => room.getState('m.room.pinned_events')).thenReturn(pinned);
+      when(() => pinned.content).thenReturn({
+        'pinned': ['old'],
+      });
+      when(
+        () => client.setRoomStateWithKey(
+          roomId,
+          'm.room.pinned_events',
+          '',
+          any(),
+        ),
+      ).thenAnswer((call) async {
+        expect(call.positionalArguments[3], {
+          'pinned': ['old', 'new'],
+        });
+        return 'state-event';
+      });
+      await dataSource.pinMessage(roomId, 'new');
+      await dataSource.pinMessage(roomId, 'old');
+      verify(
+        () => client.setRoomStateWithKey(
+          roomId,
+          'm.room.pinned_events',
+          '',
+          any(),
+        ),
+      ).called(1);
+    },
+  );
+
   test('Matrix PowerLevel preserves exact integer permissions', () {
     for (final level in [-1, 0, 49, 50, 100, 9007199254740991]) {
-      when(
-        () => room.getPowerLevelByUserId('@me:hs'),
-      ).thenReturn(matrix.PowerLevel(level));
+      when(() => room.getPowerLevelByUserId('@me:hs'))
+          .thenReturn(matrix.PowerLevel(level));
       expect(dataSource.getUserPowerLevel(roomId, '@me:hs'), level);
     }
   });
@@ -96,9 +131,8 @@ void main() {
       when(() => room.client).thenReturn(client);
       when(() => room.membership).thenReturn(matrix.Membership.join);
       when(() => client.userID).thenReturn('@me:hs');
-      when(
-        () => room.getState(matrix.EventTypes.RoomMember, '@me:hs'),
-      ).thenReturn(event);
+      when(() => room.getState(matrix.EventTypes.RoomMember, '@me:hs'))
+          .thenReturn(event);
       when(() => event.content).thenReturn({
         'membership': 'join',
         'avatar_url': 'mxc://hs/avatar',
@@ -206,9 +240,8 @@ void main() {
     when(() => banned.id).thenReturn('@banned:hs');
     when(() => banned.membership).thenReturn(matrix.Membership.ban);
     when(() => room.requestParticipants()).thenAnswer((_) async => []);
-    when(
-      () => room.getParticipants(),
-    ).thenReturn([owner, invited, left, banned]);
+    when(() => room.getParticipants())
+        .thenReturn([owner, invited, left, banned]);
     when(() => room.states).thenReturn({});
 
     final members = await dataSource.getGroupMembers(roomId);
@@ -219,62 +252,62 @@ void main() {
   test('moderator fallback preserves the 50 power-level threshold', () {
     when(() => room.canSendEvent('m.room.name')).thenReturn(false);
     when(() => client.userID).thenReturn('@me:hs');
-    when(
-      () => room.getPowerLevelByUserId('@me:hs'),
-    ).thenReturn(matrix.PowerLevel(50));
+    when(() => room.getPowerLevelByUserId('@me:hs'))
+        .thenReturn(matrix.PowerLevel(50));
 
     expect(dataSource.canChangeSettings(roomId), isTrue);
   });
 
   test('user power level remains an integer at the datasource boundary', () {
-    when(
-      () => room.getPowerLevelByUserId('@member:hs'),
-    ).thenReturn(matrix.PowerLevel(37));
+    when(() => room.getPowerLevelByUserId('@member:hs'))
+        .thenReturn(matrix.PowerLevel(37));
 
     expect(dataSource.getUserPowerLevel(roomId, '@member:hs'), 37);
   });
 
-  test('member joins read the prior membership from event unsigned data', () async {
-    final sync = CachedStreamController<matrix.SyncUpdate>();
-    when(() => client.onSync).thenReturn(sync);
-    when(() => client.userID).thenReturn('@me:hs');
-    matrix.MatrixEvent joinedEvent({
-      required String userId,
-      required String previous,
-    }) =>
-        matrix.MatrixEvent(
-          type: 'm.room.member',
-          content: {'membership': 'join'},
-          senderId: userId,
-          stateKey: userId,
-          eventId: '\$$userId',
-          originServerTs: DateTime.utc(2026),
-          unsigned: {
-            'prev_content': {'membership': previous},
-          },
-        );
+  test(
+    'member joins read the prior membership from event unsigned data',
+    () async {
+      final sync = CachedStreamController<matrix.SyncUpdate>();
+      when(() => client.onSync).thenReturn(sync);
+      when(() => client.userID).thenReturn('@me:hs');
+      matrix.MatrixEvent joinedEvent({
+        required String userId,
+        required String previous,
+      }) => matrix.MatrixEvent(
+        type: 'm.room.member',
+        content: {'membership': 'join'},
+        senderId: userId,
+        stateKey: userId,
+        eventId: '\$$userId',
+        originServerTs: DateTime.utc(2026),
+        unsigned: {
+          'prev_content': {'membership': previous},
+        },
+      );
 
-    final joinedUser = dataSource.watchMemberJoinEvents(roomId).first;
-    sync.add(
-      matrix.SyncUpdate(
-        nextBatch: 'next',
-        rooms: matrix.RoomsUpdate(
-          join: {
-            roomId: matrix.JoinedRoomUpdate(
-              timeline: matrix.TimelineUpdate(
-                events: [
-                  joinedEvent(userId: '@existing:hs', previous: 'join'),
-                  joinedEvent(userId: '@new:hs', previous: 'invite'),
-                ],
+      final joinedUser = dataSource.watchMemberJoinEvents(roomId).first;
+      sync.add(
+        matrix.SyncUpdate(
+          nextBatch: 'next',
+          rooms: matrix.RoomsUpdate(
+            join: {
+              roomId: matrix.JoinedRoomUpdate(
+                timeline: matrix.TimelineUpdate(
+                  events: [
+                    joinedEvent(userId: '@existing:hs', previous: 'join'),
+                    joinedEvent(userId: '@new:hs', previous: 'invite'),
+                  ],
+                ),
               ),
-            ),
-          },
+            },
+          ),
         ),
-      ),
-    );
+      );
 
-    expect(await joinedUser, '@new:hs');
-  });
+      expect(await joinedUser, '@new:hs');
+    },
+  );
 
   for (final reason in ['n42_moments', 'n42_stories']) {
     test('stripped $reason invitations are not ordinary group requests', () {
@@ -286,12 +319,10 @@ void main() {
       when(() => room.topic).thenReturn('');
       when(() => room.membership).thenReturn(matrix.Membership.invite);
       final member = _MockEvent();
-      when(
-        () => member.content,
-      ).thenReturn({'membership': 'invite', 'reason': reason});
-      when(
-        () => room.getState(matrix.EventTypes.RoomMember, '@me:hs'),
-      ).thenReturn(member);
+      when(() => member.content)
+          .thenReturn({'membership': 'invite', 'reason': reason});
+      when(() => room.getState(matrix.EventTypes.RoomMember, '@me:hs'))
+          .thenReturn(member);
       expect(dataSource.getPendingGroupInvites(), isEmpty);
       when(() => member.content).thenReturn({'membership': 'invite'});
       expect(dataSource.getPendingGroupInvites(), [room]);

@@ -16,8 +16,16 @@ class RoomAdmissionException implements Exception {
   String toString() => result.errorMessage ?? 'Token gate verification failed';
 }
 
-typedef TokenGateVerifier =
-    Future<TokenGateVerificationResult> Function(String roomId);
+typedef TokenGateVerifier = Future<TokenGateVerificationResult> Function(
+  String roomId,
+);
+
+typedef _JoinSession = ({
+  matrix.Client client,
+  String? userId,
+  String? deviceId,
+  String? accessToken,
+});
 
 /// Joins an immutable room ID after checking any locally known token gate.
 ///
@@ -26,11 +34,7 @@ typedef TokenGateVerifier =
 class RoomJoinService {
   final MatrixClientManager _manager;
   final TokenGateVerifier? verifyGate;
-  final _pending =
-      <
-        ({matrix.Client client, String? userId, String roomId}),
-        Future<String>
-      >{};
+  final _pending = <({_JoinSession session, String roomId}), Future<String>>{};
 
   RoomJoinService(this._manager, {this.verifyGate});
 
@@ -41,7 +45,12 @@ class RoomJoinService {
     }
     final client = _manager.client;
     if (client == null) throw StateError('Matrix client not initialized');
-    final userId = client.userID;
+    final session = (
+      client: client,
+      userId: client.userID,
+      deviceId: client.deviceID,
+      accessToken: client.accessToken,
+    );
     var roomId = target;
     List<String>? via;
     if (target.startsWith('#')) {
@@ -52,11 +61,11 @@ class RoomJoinService {
         throw const FormatException('Invalid resolved room ID');
       }
     }
-    _ensureSession(client, userId);
-    final key = (client: client, userId: userId, roomId: roomId);
+    _ensureSession(session);
+    final key = (session: session, roomId: roomId);
     final pending = _pending[key];
     if (pending != null) return pending;
-    final operation = _join(client, userId, roomId, via);
+    final operation = _join(session, roomId, via);
     _pending[key] = operation;
     try {
       return await operation;
@@ -66,11 +75,11 @@ class RoomJoinService {
   }
 
   Future<String> _join(
-    matrix.Client client,
-    String? userId,
+    _JoinSession session,
     String roomId,
     List<String>? via,
   ) async {
+    final client = session.client;
     final room = client.getRoomById(roomId);
     if (room?.membership == matrix.Membership.join) return roomId;
     final gate = room?.getState('n42.token_gate')?.content;
@@ -84,7 +93,7 @@ class RoomJoinService {
         );
       }
       final result = await verifier(roomId);
-      _ensureSession(client, userId);
+      _ensureSession(session);
       if (!result.passed) throw RoomAdmissionException(roomId, result);
       final latestGate = client
           .getRoomById(roomId)
@@ -99,20 +108,24 @@ class RoomJoinService {
         );
       }
     }
-    _ensureSession(client, userId);
+    _ensureSession(session);
     if (room != null) {
       await room.join();
-      _ensureSession(client, userId);
+      _ensureSession(session);
       return roomId;
     }
     final joinedId = await client.joinRoom(roomId, via: via);
-    _ensureSession(client, userId);
+    _ensureSession(session);
     if (joinedId != roomId) throw StateError('Joined room ID does not match');
     return joinedId;
   }
 
-  void _ensureSession(matrix.Client client, String? userId) {
-    if (!identical(_manager.client, client) || client.userID != userId) {
+  void _ensureSession(_JoinSession session) {
+    final client = session.client;
+    if (!identical(_manager.client, client) ||
+        client.userID != session.userId ||
+        client.deviceID != session.deviceId ||
+        client.accessToken != session.accessToken) {
       throw StateError('Matrix session changed during room admission');
     }
   }

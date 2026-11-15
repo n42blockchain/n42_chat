@@ -1,3 +1,7 @@
+import 'dart:async';
+
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:n42_chat/src/data/datasources/local/chat_history_clear_store.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:matrix/matrix.dart' as matrix;
 import 'package:mocktail/mocktail.dart';
@@ -37,6 +41,7 @@ class _Usernames extends Mock implements UsernameService {}
 class _Archive extends Mock implements ArchiveSearchService {}
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   late _Source source;
   late _Manager manager;
   late _Client client;
@@ -166,6 +171,129 @@ void main() {
       usernameService: usernames,
       archiveSearch: archive,
     );
+  });
+
+  group('cleared history visibility', () {
+    setUp(() async {
+      SharedPreferences.setMockInitialValues({});
+      final store = ChatHistoryClearStore();
+      await store.clearThrough(
+        ownerUserId: '@alice:test',
+        roomId: '!visible:test',
+        boundary: date.add(const Duration(minutes: 1)),
+        isCurrent: () => true,
+      );
+      repository = SearchRepositoryImpl(
+        source,
+        manager,
+        historyClearStore: ChatHistoryClearStore(),
+        preferences: preferences,
+        chatLockService: locks,
+        archiveSearch: archive,
+      );
+      scoped([
+        event('new', minute: 2),
+        event('boundary', minute: 1),
+        event('old'),
+      ]);
+    });
+
+    test(
+      'room search excludes old and boundary events after store recreation',
+      () async {
+        final results = await repository.searchMessages(
+          'hello',
+          roomId: '!visible:test',
+        );
+        expect(results.map((m) => m.id), ['new']);
+      },
+    );
+
+    test(
+      'global results filter both live and archive without hiding other rooms',
+      () async {
+        live([
+          MessageSearchResult(
+            event: event('live-old'),
+            room: room('!visible:test'),
+          ),
+          MessageSearchResult(
+            event: event('live-new', minute: 3),
+            room: room('!visible:test'),
+          ),
+        ]);
+        archived([
+          message('archive-old'),
+          message('archive-new', minute: 2),
+          message('other-room', roomId: '!other:test'),
+        ]);
+        final results = await repository.searchMessages('hello');
+        expect(results.map((m) => m.id), [
+          'live-new',
+          'archive-new',
+          'other-room',
+        ]);
+      },
+    );
+
+    test(
+      'chat search and subsequent pagination retain only visible messages',
+      () async {
+        final first = await repository.searchInChat(
+          '!visible:test',
+          'hello',
+          limit: 1,
+        );
+        expect(first.messages.map((m) => m.id), ['new']);
+        scoped([
+          event('newest', minute: 3),
+          event('new', minute: 2),
+          event('old'),
+        ]);
+        final next = await repository.loadMoreChatSearchResults(
+          first,
+          limit: 5,
+        );
+        expect(next.messages.map((m) => m.id), ['newest', 'new']);
+        expect(next.currentIndex, 1);
+        expect(next.hasMore, isFalse);
+      },
+    );
+
+    test('another owner retains their same-room results', () async {
+      when(() => client.userID).thenReturn('@bob:test');
+      final results = await repository.searchInChat('!visible:test', 'hello');
+      expect(results.messages.map((m) => m.id), ['new', 'boundary', 'old']);
+    });
+
+    test(
+      'account change while source is pending drops old-owner results',
+      () async {
+        final response = Completer<List<matrix.Event>>();
+        when(
+          () => source.searchMessagesInRoom(
+            any(),
+            any(),
+            filter: any(named: 'filter'),
+            limit: any(named: 'limit'),
+          ),
+        ).thenAnswer((_) => response.future);
+        final pending = repository.searchInChat('!visible:test', 'hello');
+        when(() => client.userID).thenReturn('@bob:test');
+        response.complete([event('new', minute: 2)]);
+        expect((await pending).messages, isEmpty);
+      },
+    );
+
+    test('corrupt visibility record does not disclose history', () async {
+      final prefs = await SharedPreferences.getInstance();
+      final key = prefs.getKeys().single;
+      await prefs.setString(key, 'broken');
+      expect(
+        (await repository.searchMessages('hello', roomId: '!visible:test')),
+        isEmpty,
+      );
+    });
   });
 
   group('contact discovery', () {

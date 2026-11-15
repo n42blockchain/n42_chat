@@ -1,9 +1,72 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/widgets.dart';
 import 'package:n42_chat/l10n/app_localizations.dart';
 
 // Update these accessors after regenerating the localization classes.
 // This test loads every supported locale and reads each non-parameter label.
 final _labels = <(String, String Function(S))>[
+  ('chatAttachmentTip', (s) => s.chatAttachmentTip),
+  ('chatAttachmentWhiteboard', (s) => s.chatAttachmentWhiteboard),
+  ('chatAttachmentVideoNote', (s) => s.chatAttachmentVideoNote),
+  ('chatAttachmentCode', (s) => s.chatAttachmentCode),
+  ('chatAttachmentShop', (s) => s.chatAttachmentShop),
+  ('chatAttachmentEvent', (s) => s.chatAttachmentEvent),
+  ('chatRecentMedia', (s) => s.chatRecentMedia),
+  ('chatRecentMediaLoadFailed', (s) => s.chatRecentMediaLoadFailed),
+  ('chatRecentMediaPermission', (s) => s.chatRecentMediaPermission),
+  ('chatRecentMediaEmpty', (s) => s.chatRecentMediaEmpty),
+  ('chatRecentPhoto', (s) => s.chatRecentPhoto),
+  ('chatRecentVideo', (s) => s.chatRecentVideo),
+  ('stickerImportTitle', (s) => s.stickerImportTitle),
+  ('stickerImportLinkHint', (s) => s.stickerImportLinkHint),
+  ('stickerImportPreview', (s) => s.stickerImportPreview),
+  ('stickerImportUnavailable', (s) => s.stickerImportUnavailable),
+  ('stickerImportCopyNotice', (s) => s.stickerImportCopyNotice),
+  ('stickerImportFailed', (s) => s.stickerImportFailed),
+  ('stickerImportAccountChanged', (s) => s.stickerImportAccountChanged),
+  ('stickerPackSourceRoom', (s) => s.stickerPackSourceRoom),
+  ('stickerPackImages', (s) => s.stickerPackImages),
+  ('stickerPublishReceiptMissing', (s) => s.stickerPublishReceiptMissing),
+  ('stickerPublishNotice', (s) => s.stickerPublishNotice),
+  ('stickerPublishFailed', (s) => s.stickerPublishFailed),
+  ('scheduledMessagesTitle', (s) => s.scheduledMessagesTitle),
+  ('scheduledMessagesEmpty', (s) => s.scheduledMessagesEmpty),
+  ('scheduledMessagesHint', (s) => s.scheduledMessagesHint),
+  ('scheduledMessageCancelled', (s) => s.scheduledMessageCancelled),
+  ('chatCatchUp', (s) => s.chatCatchUp),
+  ('chatCatchUpMentions', (s) => s.chatCatchUpMentions),
+  ('chatCatchUpReplies', (s) => s.chatCatchUpReplies),
+  ('chatCatchUpPinned', (s) => s.chatCatchUpPinned),
+  ('chatCatchUpScope', (s) => s.chatCatchUpScope),
+  ('chatCatchUpLoadMore', (s) => s.chatCatchUpLoadMore),
+  ('chatActionPreview', (s) => s.chatActionPreview),
+  ('chatActionPrivacy', (s) => s.chatActionPrivacy),
+  ('chatActionTitle', (s) => s.chatActionTitle),
+  ('chatActionSuggestion', (s) => s.chatActionSuggestion),
+  ('chatUnreadAttention', (s) => s.chatUnreadAttention),
+  ('chatScanAgain', (s) => s.chatScanAgain),
+  ('chatUnreadScope', (s) => s.chatUnreadScope),
+  ('chatScanIncomplete', (s) => s.chatScanIncomplete),
+  ('chatHistoryShare', (s) => s.chatHistoryShare),
+  ('chatHistoryExplanation', (s) => s.chatHistoryExplanation),
+  ('chatHistoryEnable', (s) => s.chatHistoryEnable),
+  ('chatHistoryDisable', (s) => s.chatHistoryDisable),
+  ('chatHistoryPolicy', (s) => s.chatHistoryPolicy),
+  ('chatHistoryPolicyDetail', (s) => s.chatHistoryPolicyDetail),
+  ('chatHistoryPolicySaved', (s) => s.chatHistoryPolicySaved),
+  ('chatHistoryRecipient', (s) => s.chatHistoryRecipient),
+  ('chatHistoryReview', (s) => s.chatHistoryReview),
+  ('chatHistoryMessages', (s) => s.chatHistoryMessages),
+  ('chatHistoryConfirmDetail', (s) => s.chatHistoryConfirmDetail),
+  ('chatHistoryCompleted', (s) => s.chatHistoryCompleted),
+  ('chatHistoryPending', (s) => s.chatHistoryPending),
+  ('chatHistoryReconcile', (s) => s.chatHistoryReconcile),
+  ('chatHistoryFailed', (s) => s.chatHistoryFailed),
+  ('chatDeviceActions', (s) => s.chatDeviceActions),
+  ('chatDeviceActionsReview', (s) => s.chatDeviceActionsReview),
+  ('chatHistoryMaxMessages', (s) => s.chatHistoryMaxMessages),
+  ('chatHistoryMaxHours', (s) => s.chatHistoryMaxHours),
+
   ('commonRetry', (s) => s.commonRetry),
   ('commonUnknownUser', (s) => s.commonUnknownUser),
   ('transferWalletNotConnected', (s) => s.transferWalletNotConnected),
@@ -1778,6 +1841,10 @@ final _labels = <(String, String Function(S))>[
 ];
 
 final _formattedLabels = <(String, List<String> Function(S))>[
+  ('chatSelectionLimit', (s) => [s.chatSelectionLimit(1), s.chatSelectionLimit(12)]),
+  ('scheduledSendTonightAt', (s) => [s.scheduledSendTonightAt('20:00')]),
+  ('scheduledSendTomorrowMorningAt', (s) => [s.scheduledSendTomorrowMorningAt('09:00')]),
+  ('scheduledMessageCreatedAt', (s) => [s.scheduledMessageCreatedAt('2030-01-01 12:00')]),
   ('authLoginFailed', (s) => [s.authLoginFailed('fixture')]),
   (
     'commonStartRecordingFailed',
@@ -2387,13 +2454,19 @@ final _formattedLabels = <(String, List<String> Function(S))>[
 ];
 
 void main() {
+  test('publication uses the correct Chinese script for each locale', () async {
+    expect((await S.delegate.load(const Locale('zh'))).groupPublish, '发布');
+    expect((await S.delegate.load(const Locale('zh', 'TW'))).groupPublish, '發佈');
+  });
   test('all supported locales provide readable labels', () async {
-    expect(_labels, hasLength(1657));
-    expect(_formattedLabels, hasLength(181));
+    expect(_labels, hasLength(1718));
+    expect(_formattedLabels, hasLength(185));
+    expect(_labels.map((entry) => entry.$1).toSet(), hasLength(_labels.length));
     final emptyLabels = <String>[];
 
     for (final locale in S.supportedLocales) {
       final strings = await S.delegate.load(locale);
+      expect(strings.scheduledMessageCreatedAt('2030-01-01 12:00'), contains('2030-01-01 12:00'));
       for (final (key, read) in _labels) {
         if (read(strings).trim().isEmpty) {
           emptyLabels.add('$locale:$key');

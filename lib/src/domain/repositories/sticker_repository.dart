@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import '../entities/sticker_pack_entity.dart';
+import '../entities/sticker_pack_subscription.dart';
 
 /// 贴纸仓库接口
 abstract class IStickerRepository {
@@ -72,11 +73,30 @@ abstract class IStickerRepository {
   /// 重命名贴纸包
   Future<bool> renamePack(String packId, String newName);
 
-  /// 导入贴纸包（从其他用户分享）
+  /// Load a readable Matrix image-pack snapshot for preview.
+  /// Does not join rooms or install; installPack confirms the preview separately.
   Future<StickerPack?> importPack(String shareUrl);
 
-  /// 获取贴纸包分享链接
-  Future<String?> getPackShareUrl(String packId);
+  /// Read a shared snapshot link or the latest saved owned-pack publication.
+  /// Optional reviewed content must match. This never publishes private packs.
+  Future<String?> getPackShareUrl(String packId, {StickerPack? reviewedPack});
+
+  /// Publish an owned pack to a joined room after explicit user confirmation.
+  /// Room state and its media are not end-to-end encrypted.
+  Future<String?> publishPack(
+    String packId,
+    String roomId, {
+    required StickerPack reviewedPack,
+  });
+
+  /// Standard live references, including rooms that are no longer readable.
+  Future<List<StickerPackSubscription>> getPackSubscriptions();
+
+  /// Requires separate user consent to future administrator-controlled changes.
+  Future<bool> setPackSubscribed(
+    StickerPackSubscription reference, {
+    required bool enabled,
+  });
 
   /// 监听已安装贴纸包变化
   Stream<List<StickerPack>> watchInstalledPacks();

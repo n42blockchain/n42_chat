@@ -22,6 +22,20 @@ class MatrixSearchDataSource {
   /// 获取Matrix客户端
   matrix.Client? get _client => _clientManager.client;
 
+  bool Function() _captureSearchSession() {
+    final client = _client;
+    final user = client?.userID;
+    final token = client?.accessToken;
+    final device = client?.deviceID;
+    final server = client?.homeserver;
+    return () =>
+        identical(_client, client) &&
+        client?.userID == user &&
+        client?.accessToken == token &&
+        client?.deviceID == device &&
+        client?.homeserver == server;
+  }
+
   // ============================================
   // 全局搜索
   // ============================================
@@ -33,9 +47,10 @@ class MatrixSearchDataSource {
   }) async {
     if (_client == null || query.trim().isEmpty) return [];
 
+    final current = _captureSearchSession();
     try {
       final result = await _client!.searchUserDirectory(query, limit: limit);
-      return result.results;
+      return current() ? result.results : [];
     } catch (e) {
       return [];
     }
@@ -48,12 +63,13 @@ class MatrixSearchDataSource {
   }) async {
     if (_client == null) return [];
 
+    final current = _captureSearchSession();
     try {
       final result = await _client!.queryPublicRooms(
         limit: limit,
         filter: matrix.PublicRoomQueryFilter(genericSearchTerm: query),
       );
-      return result.chunk;
+      return current() ? result.chunk : [];
     } catch (e) {
       return [];
     }
@@ -140,14 +156,17 @@ class MatrixSearchDataSource {
     MessageSearchFilter? filter,
     int limit = 50,
   }) async {
+    final current = _captureSearchSession();
     final room = _client?.getRoomById(roomId);
-    if (room == null || query.trim().isEmpty) return [];
+    if (room == null || query.trim().isEmpty || limit <= 0) return [];
 
     final lowerQuery = query.toLowerCase();
     final results = <matrix.Event>[];
 
+    matrix.Timeline? timeline;
     try {
-      final timeline = await room.getTimeline();
+      timeline = await room.getTimeline();
+      if (!current()) return [];
 
       // 遍历时间线中的消息
       for (final event in timeline.events) {
@@ -162,6 +181,7 @@ class MatrixSearchDataSource {
       // 如果结果不够，尝试加载更多历史
       if (results.length < limit) {
         await timeline.requestHistory(historyCount: 100);
+        if (!current()) return [];
 
         for (final event in timeline.events) {
           if (!_isMessageEvent(event)) continue;
@@ -176,9 +196,11 @@ class MatrixSearchDataSource {
     } catch (e) {
       // 搜索失败
       debugLog('Error: $e');
+    } finally {
+      timeline?.cancelSubscriptions();
     }
 
-    return results;
+    return current() ? results : [];
   }
 
   /// 全局搜索消息（所有房间）
@@ -188,16 +210,26 @@ class MatrixSearchDataSource {
     int limit = 50,
     int limitPerRoom = 10,
   }) async {
-    if (_client == null || query.trim().isEmpty) return [];
+    final current = _captureSearchSession();
+    final client = _client;
+    if (client == null ||
+        query.trim().isEmpty ||
+        limit <= 0 ||
+        limitPerRoom <= 0) {
+      return [];
+    }
 
     final results = <MessageSearchResult>[];
     final lowerQuery = query.toLowerCase();
 
-    for (final room in _client!.rooms) {
+    for (final room in List<matrix.Room>.of(client.rooms)) {
+      if (!current()) return [];
       if (room.membership != matrix.Membership.join) continue;
 
+      matrix.Timeline? timeline;
       try {
-        final timeline = await room.getTimeline();
+        timeline = await room.getTimeline();
+        if (!current()) return [];
         var roomResultCount = 0;
 
         for (final event in timeline.events) {
@@ -215,9 +247,12 @@ class MatrixSearchDataSource {
       } catch (e) {
         // 继续搜索其他房间
         debugLog('Error: $e');
+      } finally {
+        timeline?.cancelSubscriptions();
       }
     }
 
+    if (!current()) return [];
     // 按时间排序
     results.sort((a, b) {
       final aTime = a.event.originServerTs;
@@ -231,6 +266,7 @@ class MatrixSearchDataSource {
   /// 检查是否是消息事件
   bool _isMessageEvent(matrix.Event event) {
     return event.type == matrix.EventTypes.Message &&
+        !event.redacted &&
         event.status != matrix.EventStatus.error;
   }
 
@@ -319,64 +355,98 @@ class MatrixSearchDataSource {
   // 搜索历史
   // ============================================
 
-  /// 获取最近的搜索记录
-  Future<List<String>> getRecentSearches({int limit = 10}) async {
-    try {
+  // Shared across data-source instances in this isolate. Reads join the queue
+  // so they cannot observe the optimistic cache of an unfinished mutation.
+  static Future<void> _historyQueue = Future<void>.value();
+
+  Future<T> _withHistory<T>(
+    T empty,
+    Future<T> Function(SharedPreferences prefs, String key) operation,
+  ) {
+    final client = _client;
+    final user = client?.userID;
+    final server = client?.homeserver;
+    final token = client?.accessToken;
+    final device = client?.deviceID;
+    if (client == null || user == null || server == null || token == null) {
+      return Future.value(empty);
+    }
+    // Never adopt the legacy unowned key into the first account that logs in.
+    final key =
+        '${_kSearchHistoryKey}_v2_${base64Url.encode(utf8.encode(jsonEncode([server.toString(), user])))}';
+    bool current() =>
+        identical(_client, client) &&
+        client.userID == user &&
+        client.homeserver == server &&
+        client.accessToken == token &&
+        client.deviceID == device;
+    final result = _historyQueue.then((_) async {
+      if (!current()) return empty;
       final prefs = await SharedPreferences.getInstance();
-      final raw = prefs.getString(_kSearchHistoryKey);
-      if (raw == null) return [];
-      final list = (jsonDecode(raw) as List).cast<String>();
-      return list.take(limit).toList();
-    } catch (e) {
-      debugLog('MatrixSearchDataSource.getRecentSearches error: $e');
-      return [];
+      await prefs.reload();
+      if (!current()) return empty;
+      final value = await operation(prefs, key);
+      return current() ? value : empty;
+    });
+    _historyQueue = result.then<void>(
+      (_) {},
+      onError: (Object _, StackTrace _) {},
+    );
+    return result;
+  }
+
+  List<String> _readHistory(SharedPreferences prefs, String key) {
+    final raw = prefs.getString(key);
+    if (raw == null) return [];
+    final decoded = jsonDecode(raw);
+    if (decoded is! List || decoded.any((value) => value is! String)) {
+      throw const FormatException('Invalid search history');
+    }
+    return decoded.cast<String>().toList();
+  }
+
+  Future<void> _writeHistory(
+    SharedPreferences prefs,
+    String key,
+    List<String>? values,
+  ) async {
+    try {
+      final saved = values == null
+          ? await prefs.remove(key)
+          : await prefs.setString(key, jsonEncode(values));
+      if (!saved) throw StateError('Search history write failed');
+    } catch (_) {
+      // SharedPreferences changes its cache before platform acknowledgement.
+      await prefs.reload();
+      rethrow;
     }
   }
 
-  /// 保存搜索记录（去重后插到队首，最多保留 $_kSearchHistoryLimit 条）
-  Future<void> saveSearchQuery(String query) async {
-    if (query.trim().isEmpty) return;
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final raw = prefs.getString(_kSearchHistoryKey);
-      final list = raw != null
-          ? (jsonDecode(raw) as List).cast<String>()
-          : <String>[];
-      list.remove(query);
+  /// Account-scoped recent searches; unauthenticated callers see no history.
+  Future<List<String>> getRecentSearches({int limit = 10}) => _withHistory(
+    <String>[],
+    (prefs, key) async =>
+        _readHistory(prefs, key).take(limit < 0 ? 0 : limit).toList(),
+  );
+
+  Future<void> saveSearchQuery(String query) {
+    if (query.trim().isEmpty) return Future.value();
+    return _withHistory<void>(null, (prefs, key) async {
+      final list = _readHistory(prefs, key)..remove(query);
       list.insert(0, query);
-      if (list.length > _kSearchHistoryLimit) {
-        list.removeRange(_kSearchHistoryLimit, list.length);
-      }
-      await prefs.setString(_kSearchHistoryKey, jsonEncode(list));
-    } catch (e) {
-      debugLog('MatrixSearchDataSource.saveSearchQuery error: $e');
-    }
+      await _writeHistory(prefs, key, list.take(_kSearchHistoryLimit).toList());
+    });
   }
 
-  /// 清除搜索历史
-  Future<void> clearSearchHistory() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.remove(_kSearchHistoryKey);
-    } catch (e) {
-      debugLog('MatrixSearchDataSource.clearSearchHistory error: $e');
-    }
-  }
+  Future<void> clearSearchHistory() =>
+      _withHistory<void>(null, (prefs, key) => _writeHistory(prefs, key, null));
 
-  /// 删除单条搜索记录
-  Future<void> deleteSearchQuery(String query) async {
-    if (query.trim().isEmpty) return;
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final raw = prefs.getString(_kSearchHistoryKey);
-      if (raw == null) return;
-
-      final list = (jsonDecode(raw) as List).cast<String>();
-      list.remove(query);
-      await prefs.setString(_kSearchHistoryKey, jsonEncode(list));
-    } catch (e) {
-      debugLog('MatrixSearchDataSource.deleteSearchQuery error: $e');
-    }
+  Future<void> deleteSearchQuery(String query) {
+    if (query.trim().isEmpty) return Future.value();
+    return _withHistory<void>(null, (prefs, key) async {
+      final list = _readHistory(prefs, key)..remove(query);
+      await _writeHistory(prefs, key, list);
+    });
   }
 }
 

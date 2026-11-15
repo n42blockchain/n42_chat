@@ -16,7 +16,6 @@ import '../../../core/services/biometric_service.dart';
 import '../../../core/services/totp_2fa_store.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
-import '../../../core/utils/matrix_uia_utils.dart';
 import '../../../core/utils/matrix_deletion_uia_coordinator.dart';
 import '../../../data/datasources/local/secure_storage_datasource.dart';
 import '../../../data/datasources/matrix/matrix_auth_datasource.dart';
@@ -2086,7 +2085,28 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
     );
   }
 
+  bool Function() _captureDeviceSession() {
+    final client = widget.e2eeManager.client;
+    final user = client.userID;
+    final token = client.accessToken;
+    final deviceId = client.deviceID;
+    final homeserver = client.homeserver;
+    // The encryption manager retains its client after the active account changes.
+    // Device writes must also match the authentication source's current client.
+    return () =>
+        mounted &&
+        _authDataSource.isLoggedIn &&
+        identical(_authDataSource.clientManager.client, client) &&
+        identical(widget.e2eeManager.client, client) &&
+        client.userID == user &&
+        client.accessToken == token &&
+        client.deviceID == deviceId &&
+        client.homeserver == homeserver;
+  }
+
   void _showRenameDeviceDialog(DeviceInfo device) {
+    final isCurrent = _captureDeviceSession();
+    if (!isCurrent()) return;
     final controller = TextEditingController(text: device.deviceName);
     final route = DialogRoute<void>(
       context: context,
@@ -2111,7 +2131,11 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
               final newName = controller.text.trim();
               Navigator.pop(ctx);
               if (newName.isNotEmpty && newName != device.deviceName) {
-                await _renameDevice(device.deviceId, newName);
+                await _renameDevice(
+                  device.deviceId,
+                  newName,
+                  isCurrent: isCurrent,
+                );
               }
             },
             child: Text(S.of(context)?.commonSave ?? 'Save'),
@@ -2123,11 +2147,17 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
     unawaited(route.completed.whenComplete(controller.dispose));
   }
 
-  Future<void> _renameDevice(String deviceId, String newName) async {
+  Future<void> _renameDevice(
+    String deviceId,
+    String newName, {
+    required bool Function() isCurrent,
+  }) async {
+    if (!isCurrent()) return;
     try {
       await _authDataSource.updateDeviceName(deviceId, newName);
+      if (!isCurrent()) return;
       await _loadData();
-      if (mounted) {
+      if (mounted && isCurrent()) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -2137,7 +2167,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
         );
       }
     } catch (e) {
-      if (mounted) {
+      if (mounted && isCurrent()) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -2150,6 +2180,8 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
   }
 
   void _showRemoteLogoutConfirmation(DeviceInfo device) {
+    final isCurrent = _captureDeviceSession();
+    if (!isCurrent()) return;
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -2166,7 +2198,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
-              _performRemoteLogout(device);
+              _performRemoteLogout(device, isCurrent: isCurrent);
             },
             style: TextButton.styleFrom(foregroundColor: AppColors.error),
             child: Text(S.of(context)?.settingsLogout ?? 'Logout'),
@@ -2176,7 +2208,11 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
     );
   }
 
-  Future<void> _performRemoteLogout(DeviceInfo device) async {
+  Future<void> _performRemoteLogout(
+    DeviceInfo device, {
+    required bool Function() isCurrent,
+  }) async {
+    if (!mounted || !isCurrent()) return;
     _invalidatePendingDataLoads();
     setState(() => _isLoading = true);
     try {
@@ -2184,19 +2220,28 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
       try {
         await _authDataSource.deleteDevice(device.deviceId);
       } on MatrixException catch (e) {
-        if (e.response?.statusCode == 401 &&
-            matrixUiaSupportsPassword(e.response?.body)) {
+        if (!mounted || !isCurrent()) return;
+        if (e.requireAdditionalAuthentication &&
+            (e.authenticationFlows?.any(
+                  (flow) => flow.stages.contains('m.login.password'),
+                ) ??
+                false)) {
           // UIA required - show password dialog
           if (mounted) {
             setState(() => _isLoading = false);
-            await _showUiaPasswordDialog(device);
+            await _showUiaPasswordDialog(
+              device,
+              session: e.session,
+              isCurrent: isCurrent,
+            );
             return;
           }
         }
         rethrow;
       }
+      if (!mounted || !isCurrent()) return;
       await _loadData();
-      if (mounted) {
+      if (mounted && isCurrent()) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -2206,7 +2251,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
         );
       }
     } catch (e) {
-      if (!mounted) return;
+      if (!mounted || !isCurrent()) return;
       setState(() => _isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -2215,10 +2260,17 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
           ),
         ),
       );
+    } finally {
+      if (mounted && !isCurrent()) setState(() => _isLoading = false);
     }
   }
 
-  Future<void> _showUiaPasswordDialog(DeviceInfo device) async {
+  Future<void> _showUiaPasswordDialog(
+    DeviceInfo device, {
+    String? session,
+    required bool Function() isCurrent,
+  }) async {
+    if (!mounted || !isCurrent()) return;
     final passwordController = TextEditingController();
     final route = DialogRoute<bool>(
       context: context,
@@ -2260,8 +2312,8 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
       final confirmed = await navigator.push<bool>(route);
       await route.completed;
 
-      if (confirmed == true) {
-        final password = passwordController.text.trim();
+      if (mounted && confirmed == true && isCurrent()) {
+        final password = passwordController.text;
         if (password.isNotEmpty) {
           if (!mounted) return;
           _invalidatePendingDataLoads();
@@ -2269,12 +2321,14 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
           try {
             final userId = widget.e2eeManager.client.userID ?? '';
             final auth = AuthenticationPassword(
+              session: session,
               password: password,
               identifier: AuthenticationUserIdentifier(user: userId),
             );
             await _authDataSource.deleteDevice(device.deviceId, auth: auth);
+            if (!mounted || !isCurrent()) return;
             await _loadData();
-            if (mounted) {
+            if (mounted && isCurrent()) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
@@ -2285,7 +2339,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
               );
             }
           } catch (e) {
-            if (!mounted) return;
+            if (!mounted || !isCurrent()) return;
             setState(() => _isLoading = false);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -2299,6 +2353,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
       }
     } finally {
       passwordController.dispose();
+      if (mounted && !isCurrent()) setState(() => _isLoading = false);
     }
   }
 

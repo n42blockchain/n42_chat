@@ -15,6 +15,7 @@ import '../../../core/utils/debug_log.dart';
 /// 群聊BLoC
 class GroupBloc extends Bloc<GroupEvent, GroupState> {
   final IGroupRepository _groupRepository;
+  int _memberRequestRevision = 0;
   final BotWebhookService? _botWebhookService;
 
   StreamSubscription<List<GroupEntity>>? _groupsSubscription;
@@ -109,6 +110,7 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
     LoadGroupDetails event,
     Emitter<GroupState> emit,
   ) async {
+    ++_memberRequestRevision;
     emit(state.copyWith(status: GroupStatus.loading));
 
     try {
@@ -143,10 +145,37 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
     LoadGroupMembers event,
     Emitter<GroupState> emit,
   ) async {
+    final revision = ++_memberRequestRevision;
+    bool current() => !emit.isDone && revision == _memberRequestRevision;
     try {
       final members = await _groupRepository.getGroupMembers(event.roomId);
-      emit(state.copyWith(members: members));
+      if (!current()) return;
+      GroupEntity? group;
+      try {
+        group = await _groupRepository.getGroup(event.roomId);
+      } catch (e) {
+        debugLog('Failed to refresh group details after loading members: $e');
+      }
+      if (!current()) return;
+      final refreshedGroup = group?.roomId == event.roomId ? group : null;
+      emit(
+        state.copyWith(
+          members: members,
+          currentGroup: state.currentGroup?.roomId == event.roomId
+              ? refreshedGroup ?? state.currentGroup
+              : state.currentGroup,
+          groups: refreshedGroup == null
+              ? state.groups
+              : state.groups
+                    .map(
+                      (item) =>
+                          item.roomId == event.roomId ? refreshedGroup : item,
+                    )
+                    .toList(growable: false),
+        ),
+      );
     } catch (e) {
+      if (!current()) return;
       emit(
         state.copyWith(status: GroupStatus.error, errorMessage: e.toString()),
       );

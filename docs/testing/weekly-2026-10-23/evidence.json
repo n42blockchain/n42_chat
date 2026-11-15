@@ -1,0 +1,80 @@
+{
+  "date": "2026-10-23",
+  "flutter": "3.47.5",
+  "dart": "3.13.4",
+  "codeCommit": "61d32227b384601f576d4854f0d152b49550b327",
+  "chatFull": {
+    "passed": 7710,
+    "skipped": 4,
+    "failed": 0
+  },
+  "analyze": {
+    "exitCode": 0,
+    "errors": 0,
+    "warnings": 0,
+    "infos": 306
+  },
+  "targetedPassed": 470,
+  "providerConfirmationPassed": 3,
+  "imageSamples": 200,
+  "reportTests": 4,
+  "logs": {
+    "chat_full": {
+      "localLog": "/tmp/n42-weekly-chat-full-final.log",
+      "sha256": "c36b05caa600f164f4a36a20a6bcd16b752a6ba713503f2845d20690088a0b5a"
+    },
+    "chat_analyze": {
+      "localLog": "/tmp/n42-weekly-chat-analyze-acceptance.log",
+      "sha256": "e6a23b65c1d323b621374e6a5555da4f6eb30cbb1f4399fbea1036f77ed12627"
+    },
+    "targeted": {
+      "localLog": "/tmp/n42-weekly-targeted-tests.log",
+      "sha256": "32f91b9e7e8d0a82c8e62aaeeed13592e99ac8016a804857c47d89cfa168a009"
+    },
+    "image_decode": {
+      "localLog": "/tmp/n42-weekly-decode.log",
+      "sha256": "db8cc390a04b46ca771e97f41ded2c5c8a394497dc333378b6ec46596a86af48"
+    },
+    "reports": {
+      "localLog": "/tmp/n42-weekly-report-tests.log",
+      "sha256": "e6ec182765cd965f2837d8eeaef5a64af48a104f245cd1a0b7281559194c57c1"
+    },
+    "old_baseline": {
+      "localLog": "/tmp/n42-weekly-baseline-tests.log",
+      "sha256": "a650d37e24d45cac7c1103859d439e353d66b300b0005035058c4114058448c6"
+    },
+    "chat_full_final": {
+      "localLog": "/tmp/n42-weekly-delivery-full-final.log",
+      "sha256": "902c3be44cc9e8edddafe96c7343dd9ea6660e95269b10057a88b758103fd4f9"
+    },
+    "chat_analyze_final": {
+      "localLog": "/tmp/n42-weekly-delivery-analyze-final.log",
+      "sha256": "1bd38da493aac3dcc764d4b2cbd7098c6a5232ff728f0dd7d0ef16f9f51bad65"
+    },
+    "functional_targeted": {
+      "localLog": "/tmp/n42-weekly-functional-targeted-final.log",
+      "sha256": "6bfe06768077e1ecea686c8c778608876eb8a0e5afa31efb1bd74932d7d00c02"
+    },
+    "download_targeted": {
+      "localLog": "/tmp/n42-weekly-download-tests-final.log",
+      "sha256": "601c3080727485393445b74d5bc5979c537d4c5309b1eae59dbce23fdaaf6634"
+    }
+  },
+  "initialCheckpoint": {
+    "codeCommit": "189ed356250d93db1f3aea3e05751a60afbb989e",
+    "chatFull": {
+      "passed": 7690,
+      "skipped": 4,
+      "failed": 0
+    },
+    "analyze": {
+      "exitCode": 0,
+      "errors": 0,
+      "warnings": 0,
+      "infos": 306
+    }
+  },
+  "functionalTargetedPassed": 94,
+  "downloadTargetedPassed": 41,
+  "targetedGroupsOverlap": true
+}

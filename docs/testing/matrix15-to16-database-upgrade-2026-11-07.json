@@ -1,0 +1,37 @@
+{
+  "passed": true,
+  "sourceVersion": "15.0.0",
+  "targetVersion": "16.0.1",
+  "accounts": 2,
+  "retainedDevices": 2,
+  "retainedFingerprints": 2,
+  "offlineHistoricalReads": 8,
+  "postUpgradeReadableEventsPerClient": 6,
+  "postUpgradeReadChecks": 12,
+  "offlineTransportBlockedRequests": 0,
+  "newPasswordLogins": 0,
+  "scope": "actual SQLite/crypto SDK upgrade; not native secure storage or physical UI",
+  "schema": 1,
+  "phaseExits": {
+    "seed": 0,
+    "verify": 0
+  },
+  "seed": {
+    "seeded": true,
+    "matrixVersion": "15.0.0",
+    "accounts": 2,
+    "persistedEvents": 4,
+    "readChecks": 8
+  },
+  "toolSourceSha256": "61140a1dafec2329e4ffa7a1fd82a7397a8fa3ae1e629ae6468fbfdd2e74d268",
+  "privateLogSha256": {
+    "seed": "9468b13070f4874209a275f51a5fe5aad780b70681416130493161084b0ad72a",
+    "verify": "ff6fcb73875c6d79ba1940d87970465d2221943c542cead63aafb1c4ff5cd8bc"
+  },
+  "privateFixtureRemoved": true,
+  "limitations": [
+    "direct Matrix SDK/SQLite state; native app secure-storage and UI upgrade not established",
+    "two synthetic accounts, no production data",
+    "accounts logged out, not deactivated"
+  ]
+}

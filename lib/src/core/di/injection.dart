@@ -1,9 +1,16 @@
+import '../../data/services/matrix_sticker_subscriptions.dart';
+import '../../data/services/matrix_sticker_publication.dart';
+import 'archive_registration.dart';
+import '../../data/datasources/local/chat_history_clear_store.dart';
+import '../../domain/repositories/chat_catch_up_repository.dart';
+import '../../data/services/matrix_history_sharing.dart';
 import 'dart:async';
 
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/room_join_service.dart';
+import '../services/mini_app_security_service.dart';
 import '../services/giphy_service.dart';
 import '../services/tenor_service.dart';
 import '../services/gif_service.dart';
@@ -36,7 +43,6 @@ import '../../data/datasources/matrix/matrix_story_datasource.dart';
 import '../../presentation/pages/game/services/game_score_service.dart';
 import '../services/chat_backup_service.dart';
 import '../services/data_tier_service.dart';
-import '../services/archive_integrity_service.dart';
 import '../services/archive_search_service.dart';
 import '../services/message_archive_service.dart';
 import '../services/download_service.dart';
@@ -153,6 +159,7 @@ import '../services/points_tracking_service.dart';
 import '../../presentation/blocs/points/points_bloc.dart';
 import '../utils/debug_log.dart';
 import '../theme/chat_background_presets.dart';
+
 import 'package:path_provider/path_provider.dart';
 
 /// 全局GetIt实例
@@ -168,6 +175,10 @@ Future<void> configureDependencies(
 }) async {
   // 注册配置
   getIt.registerSingleton<N42ChatConfig>(config);
+  getIt.registerLazySingleton<MiniAppSecurityService>(
+    () => MiniAppSecurityService(config: config.miniAppSecurity),
+    dispose: (service) => service.dispose(),
+  );
 
   // 注入应用文档目录，供自定义聊天背景把相对文件名解析为绝对路径
   // （存相对名而非绝对路径，避免 iOS 更新后容器 UUID 变化导致背景丢失）。
@@ -523,23 +534,7 @@ Future<void> _registerServices(
     }
   });
 
-  // 消息归档服务
-  getIt.registerLazySingleton<MessageArchiveService>(
-    () => MessageArchiveService(
-      db: getIt<ArchiveDatabase>(),
-      clientManager: getIt<MatrixClientManager>(),
-    ),
-  );
-
-  // 归档完整性服务
-  getIt.registerLazySingleton<ArchiveIntegrityService>(
-    () => ArchiveIntegrityService(db: getIt<ArchiveDatabase>()),
-  );
-
-  // 归档搜索服务
-  getIt.registerLazySingleton<ArchiveSearchService>(
-    () => ArchiveSearchService(db: getIt<ArchiveDatabase>()),
-  );
+  registerAccountArchiveServices(getIt);
 
   // 媒体生命周期服务
   getIt.registerLazySingleton<MediaLifecycleService>(() {
@@ -740,7 +735,10 @@ Future<void> _registerDataSources() async {
 
   // Matrix消息数据源
   getIt.registerLazySingleton<MatrixMessageDataSource>(
-    () => MatrixMessageDataSource(getIt<MatrixClientManager>()),
+    () => MatrixMessageDataSource(
+      getIt<MatrixClientManager>(),
+      maxAttachmentBytes: getIt<N42ChatConfig>().maxFileSize,
+    ),
   );
 
   // Matrix联系人数据源
@@ -889,6 +887,11 @@ void _registerRepositories() {
     () => MatrixContentReportRepository(getIt<MatrixClientManager>()),
   );
 
+  getIt.registerLazySingleton<IChatCatchUpRepository>(() => MatrixHistorySharing(
+    getIt<MatrixClientManager>(), getIt<IAuthRepository>() as IAccountBoundDeletionLifecycle,
+    getIt<SecureStorageDataSource>(),
+  ), dispose: (repo) => (repo as MatrixHistorySharing).dispose());
+
   // 会话仓库
   getIt.registerLazySingleton<IConversationRepository>(
     () => ConversationRepositoryImpl(
@@ -904,6 +907,7 @@ void _registerRepositories() {
       getIt<MatrixClientManager>(),
       getIt<PreferencesDataSource>(),
       archiveService: getIt<MessageArchiveService>(),
+      historyClearStore: ChatHistoryClearStore(),
     ),
   );
 
@@ -942,6 +946,7 @@ void _registerRepositories() {
     () => SearchRepositoryImpl(
       getIt<MatrixSearchDataSource>(),
       getIt<MatrixClientManager>(),
+      historyClearStore: ChatHistoryClearStore(),
       ensCacheService: getIt<EnsCacheService>(),
       usernameService: getIt<UsernameService>(),
       // FTS5 归档全文搜索：跨会话搜索合并完整历史（内存扫描只覆盖已加载）
@@ -972,7 +977,17 @@ void _registerRepositories() {
 
   // 贴纸仓库
   getIt.registerLazySingleton<IStickerRepository>(
-    () => StickerRepositoryImpl(getIt<MatrixStickerDataSource>()),
+    () => StickerRepositoryImpl(
+      getIt<MatrixStickerDataSource>(),
+      subscriptions: MatrixStickerSubscriptions(
+        getIt<MatrixClientManager>(),
+        getIt<IAuthRepository>() as IAccountBoundDeletionLifecycle,
+      ),
+      publication: MatrixStickerPublication(
+        getIt<MatrixClientManager>(),
+        getIt<IAuthRepository>() as IAccountBoundDeletionLifecycle,
+      ),
+    ),
   );
 
   // AI 生成贴纸服务（云端文生图 → 贴纸包）。AiProviderRouter 总注册，
@@ -1077,11 +1092,13 @@ void _registerBlocs() {
   // 聊天BLoC
   getIt.registerFactory<ChatBloc>(
     () => ChatBloc(
+      historyClearStore: ChatHistoryClearStore(),
       messageRepository: getIt<IMessageRepository>(),
       secureStorage: getIt<PreferencesDataSource>(),
       groupRepository: getIt<IGroupRepository>(),
       translationService: getIt<ITranslationService>(),
       clientManager: getIt<MatrixClientManager>(),
+      authRepository: getIt<IAuthRepository>(),
     ),
   );
 
@@ -1105,7 +1122,24 @@ void _registerBlocs() {
 
   // 搜索BLoC
   getIt.registerFactory<SearchBloc>(
-    () => SearchBloc(getIt<ISearchRepository>()),
+    () => SearchBloc(
+      getIt<ISearchRepository>(),
+      invalidationStreams: [
+        getIt<AuthBloc>().stream
+            .map((state) => (state.status, state.user?.userId))
+            .distinct()
+            .map<void>((_) {}),
+        getIt<IAuthRepository>().loginStateStream.map<void>((_) {}),
+        if (getIt<IAuthRepository>()
+            case final IAccountBoundAuthInvalidation auth)
+          auth.accountInvalidationStream
+              .where((origin) => origin.isCurrent)
+              .map<void>((_) {}),
+        ChatHistoryClearStore().changedOwners
+            .where((owner) => owner == getIt<MatrixClientManager>().userId)
+            .map<void>((_) {}),
+      ],
+    ),
   );
 
   // 消息操作BLoC

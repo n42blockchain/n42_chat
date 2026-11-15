@@ -4,11 +4,23 @@
 // No platform/network dependencies — pure Dart.
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/material.dart';
 import 'package:n42_chat/src/integration/api_hub_bridge.dart';
 import 'package:n42_chat/src/integration/wallet_bridge.dart';
 import 'package:n42_chat/src/n42_chat_config.dart';
 
 void main() {
+  test('native Apple builder survives copying and can be cleared', () {
+    Widget builder(BuildContext context, VoidCallback? callback) =>
+        const SizedBox();
+    final config = N42ChatConfig(appleSignInButtonBuilder: builder);
+    expect(config.copyWith().appleSignInButtonBuilder, same(builder));
+    expect(
+      config.copyWith(appleSignInButtonBuilder: null).appleSignInButtonBuilder,
+      isNull,
+    );
+  });
+
   // ─────────────────────────────────────────────────
   // N42ChatConfig — defaults
   // ─────────────────────────────────────────────────

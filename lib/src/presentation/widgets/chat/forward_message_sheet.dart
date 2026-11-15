@@ -12,14 +12,18 @@ import '../../../core/theme/app_colors.dart';
 class ForwardMessageSheet extends StatefulWidget {
   final MessageEntity message;
   final bool isDark;
-  final void Function(String conversationId) onForwardToChat;
+  final void Function(String conversationId)? onForwardToChat;
+  final Future<void> Function(String conversationId)? onForwardAsync;
+  final bool Function()? isCurrent;
 
   const ForwardMessageSheet({
     super.key,
     required this.message,
     required this.isDark,
-    required this.onForwardToChat,
-  });
+    this.onForwardToChat,
+    this.onForwardAsync,
+    this.isCurrent,
+  }) : assert((onForwardToChat == null) != (onForwardAsync == null));
 
   @override
   State<ForwardMessageSheet> createState() => _ForwardMessageSheetState();
@@ -30,6 +34,7 @@ class _ForwardMessageSheetState extends State<ForwardMessageSheet> {
   final TextEditingController _searchController = TextEditingController();
   List<ConversationEntity> _conversations = [];
   bool _isLoading = true;
+  bool _loadFailed = false;
   bool _isForwarding = false; // 防止重复点击
 
   @override
@@ -42,6 +47,9 @@ class _ForwardMessageSheetState extends State<ForwardMessageSheet> {
     try {
       final repository = getIt<IConversationRepository>();
       final conversations = await repository.getConversations();
+      if (widget.isCurrent?.call() == false) {
+        throw StateError('Account changed');
+      }
       if (mounted) {
         setState(() {
           _conversations = conversations;
@@ -51,7 +59,10 @@ class _ForwardMessageSheetState extends State<ForwardMessageSheet> {
     } catch (e) {
       debugLog('Error loading conversations: $e');
       if (mounted) {
-        setState(() => _isLoading = false);
+        setState(() {
+          _isLoading = false;
+          _loadFailed = true;
+        });
       }
     }
   }
@@ -64,118 +75,170 @@ class _ForwardMessageSheetState extends State<ForwardMessageSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.7,
-      decoration: BoxDecoration(
-        color: AppColors.surfaceOf(widget.isDark),
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      child: Column(
-        children: [
-          // 拖动条
-          Container(
-            margin: const EdgeInsets.symmetric(vertical: 12),
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: Colors.grey[400],
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-
-          // 标题
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
-              children: [
-                Text(
-                  S.of(context)?.chatSelectForwardTargetTitle ??
-                      'Select Forward Target',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimaryOf(widget.isDark),
-                  ),
-                ),
-                const Spacer(),
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: () => Navigator.pop(context),
-                ),
-              ],
-            ),
-          ),
-
-          // 搜索框
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: S.of(context)?.chatSearchHint ?? 'Search',
-                prefixIcon: const Icon(Icons.search),
-                filled: true,
-                fillColor: AppColors.inputBgOf(widget.isDark),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide.none,
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
+    return PopScope(
+      canPop: !_isForwarding || widget.onForwardAsync == null,
+      child: Container(
+        height: MediaQuery.of(context).size.height * 0.7,
+        decoration: BoxDecoration(
+          color: AppColors.surfaceOf(widget.isDark),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+        child: Column(
+          children: [
+            // 拖动条
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: 12),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey[400],
+                borderRadius: BorderRadius.circular(2),
               ),
-              onChanged: (value) {
-                setState(() {
-                  _searchQuery = value.toLowerCase();
-                });
-              },
             ),
-          ),
 
-          // 消息预览
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: AppColors.inputBgOf(widget.isDark),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  _getMessageIcon(widget.message.type),
-                  size: 20,
-                  color: AppColors.textSecondaryOf(widget.isDark),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    _getMessagePreview(widget.message),
+            // 标题
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                children: [
+                  Text(
+                    S.of(context)?.chatSelectForwardTargetTitle ??
+                        'Select Forward Target',
                     style: TextStyle(
-                      fontSize: 14,
-                      color: AppColors.textSecondaryOf(widget.isDark),
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimaryOf(widget.isDark),
                     ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: _isForwarding
+                        ? null
+                        : () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+            ),
+
+            // 搜索框
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  hintText: S.of(context)?.chatSearchHint ?? 'Search',
+                  prefixIcon: const Icon(Icons.search),
+                  filled: true,
+                  fillColor: AppColors.inputBgOf(widget.isDark),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
                   ),
                 ),
-              ],
+                onChanged: (value) {
+                  setState(() {
+                    _searchQuery = value.toLowerCase();
+                  });
+                },
+              ),
             ),
-          ),
 
-          const Divider(),
+            // 消息预览
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.inputBgOf(widget.isDark),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    _getMessageIcon(widget.message.type),
+                    size: 20,
+                    color: AppColors.textSecondaryOf(widget.isDark),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      _getMessagePreview(widget.message),
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppColors.textSecondaryOf(widget.isDark),
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
 
-          // 最近会话列表
-          Expanded(child: _buildRecentChats()),
-        ],
+            const Divider(),
+
+            // 最近会话列表
+            Expanded(child: _buildRecentChats()),
+          ],
+        ),
       ),
     );
+  }
+
+  Future<void> _forward(String roomId) async {
+    if (_isForwarding) return;
+    setState(() => _isForwarding = true);
+    try {
+      if (widget.isCurrent?.call() == false) {
+        throw StateError('Account changed');
+      }
+      final send = widget.onForwardAsync;
+      if (send == null) {
+        widget.onForwardToChat!(roomId);
+        return;
+      }
+      await send(roomId);
+      if (!mounted) return;
+      if (widget.isCurrent?.call() == false) {
+        throw StateError('Account changed');
+      }
+      setState(() => _isForwarding = false);
+      Navigator.pop(context);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _isForwarding = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            S.of(context)?.chatForwardFailed('') ?? 'Forward failed',
+          ),
+        ),
+      );
+    }
   }
 
   Widget _buildRecentChats() {
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
+    }
+
+    if (_loadFailed) {
+      return Center(
+        child: TextButton(
+          onPressed: () {
+            setState(() {
+              _loadFailed = false;
+              _isLoading = true;
+            });
+            _loadConversations();
+          },
+          child: Text(S.of(context)?.commonRetry ?? 'Retry'),
+        ),
+      );
     }
 
     final filteredChats = _searchQuery.isEmpty
@@ -241,9 +304,7 @@ class _ForwardMessageSheetState extends State<ForwardMessageSheet> {
             onTap: _isForwarding
                 ? null
                 : () {
-                    if (_isForwarding) return;
-                    setState(() => _isForwarding = true);
-                    widget.onForwardToChat(chat.id);
+                    _forward(chat.id);
                   },
           ),
         );

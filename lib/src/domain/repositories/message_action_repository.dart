@@ -1,5 +1,6 @@
 import '../entities/message_entity.dart';
 import '../entities/message_reaction_entity.dart';
+import '../entities/saved_message_favorite.dart';
 
 /// 消息操作仓库接口
 abstract class IMessageActionRepository {
@@ -95,3 +96,8 @@ abstract class IMessageActionRepository {
   Future<void> editFavoriteRemark(String favoriteId, String remark);
 }
 
+/// Optional annotated-favorites capability; existing host implementations retain
+/// their message-only contract and storage behavior.
+abstract interface class IFavoriteDetailsRepository {
+  Future<List<SavedMessageFavorite>> getSavedMessageFavorites();
+}

@@ -48,7 +48,7 @@ void main() {
 
     test('configureGoogleProxy posts JSON to the proxy endpoint', () async {
       service.configureGoogleProxy(
-        baseUrl: 'https://api.n42.ai/proxy/v1/speech/google',
+        baseUrl: 'https://api.n42.world/proxy/v1/speech/google',
         authToken: 'proxy-token',
       );
 
@@ -71,7 +71,7 @@ void main() {
           },
           statusCode: 200,
           requestOptions: RequestOptions(
-            path: 'https://api.n42.ai/proxy/v1/speech/google',
+            path: 'https://api.n42.world/proxy/v1/speech/google',
           ),
         ),
       );
@@ -84,7 +84,7 @@ void main() {
       expect(result, 'hello world');
       verify(
         () => mockDio.post<Map<String, dynamic>>(
-          'https://api.n42.ai/proxy/v1/speech/google',
+          'https://api.n42.world/proxy/v1/speech/google',
           data: any(named: 'data'),
           options: any(named: 'options'),
         ),
@@ -93,7 +93,7 @@ void main() {
 
     test('configureAzureProxy sends audio bytes with accept-language header', () async {
       service.configureAzureProxy(
-        baseUrl: 'https://api.n42.ai/proxy/v1/speech/azure',
+        baseUrl: 'https://api.n42.world/proxy/v1/speech/azure',
         authToken: 'proxy-token',
       );
 
@@ -108,7 +108,7 @@ void main() {
           data: {'DisplayText': 'ni hao'},
           statusCode: 200,
           requestOptions: RequestOptions(
-            path: 'https://api.n42.ai/proxy/v1/speech/azure',
+            path: 'https://api.n42.world/proxy/v1/speech/azure',
           ),
         ),
       );
@@ -121,7 +121,7 @@ void main() {
       expect(result, 'ni hao');
       verify(
         () => mockDio.post<Map<String, dynamic>>(
-          'https://api.n42.ai/proxy/v1/speech/azure',
+          'https://api.n42.world/proxy/v1/speech/azure',
           data: any(named: 'data'),
           options: any(named: 'options'),
         ),
@@ -130,7 +130,7 @@ void main() {
 
     test('resetConfiguration clears the active provider', () {
       service.configureGoogleProxy(
-        baseUrl: 'https://api.n42.ai/proxy/v1/speech/google',
+        baseUrl: 'https://api.n42.world/proxy/v1/speech/google',
       );
 
       expect(service.isConfigured, isTrue);

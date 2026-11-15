@@ -132,7 +132,7 @@ abstract class AppDimensions {
   // ============================================
 
   /// 输入框高度 - 最小
-  static const double inputMinHeight = 36.0;
+  static const double inputMinHeight = 44.0;
 
   /// 输入框高度 - 最大
   static const double inputMaxHeight = 120.0;
@@ -145,13 +145,13 @@ abstract class AppDimensions {
   // ============================================
 
   /// 按钮高度 - 标准
-  static const double buttonHeight = 48.0;
+  static const double buttonHeight = 44.0;
 
   /// 按钮高度 - 小
-  static const double buttonHeightSmall = 36.0;
+  static const double buttonHeightSmall = 44.0;
 
   /// 按钮圆角
-  static const double buttonRadius = 4.0;
+  static const double buttonRadius = 12.0;
 
   // ============================================
   // 徽章
@@ -224,4 +224,3 @@ abstract class AppDimensions {
   /// 慢速动画
   static const Duration animationSlow = Duration(milliseconds: 450);
 }
-

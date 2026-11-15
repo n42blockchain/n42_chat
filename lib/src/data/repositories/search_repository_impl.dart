@@ -1,5 +1,7 @@
 import 'package:matrix/matrix.dart' as matrix;
 
+import '../datasources/local/chat_history_clear_store.dart';
+
 import '../../domain/entities/contact_entity.dart';
 import '../../domain/entities/conversation_entity.dart';
 import '../../domain/entities/message_entity.dart';
@@ -24,6 +26,7 @@ class SearchRepositoryImpl implements ISearchRepository {
   final ArchiveSearchService? _archiveSearch;
   final PreferencesDataSource? _preferences;
   final ChatLockService _chatLockService;
+  final ChatHistoryClearStore? _historyClearStore;
 
   SearchRepositoryImpl(
     this._searchDataSource,
@@ -33,11 +36,65 @@ class SearchRepositoryImpl implements ISearchRepository {
     ArchiveSearchService? archiveSearch,
     PreferencesDataSource? preferences,
     ChatLockService? chatLockService,
+    ChatHistoryClearStore? historyClearStore,
   }) : _ensCacheService = ensCacheService,
        _usernameService = usernameService,
        _archiveSearch = archiveSearch,
        _preferences = preferences,
+       _historyClearStore = historyClearStore,
        _chatLockService = chatLockService ?? ChatLockService();
+
+  ({String? owner, bool Function() isCurrent}) _historyOrigin() {
+    final client = _clientManager.client;
+    final owner = client?.userID;
+    final token = client?.accessToken;
+    final device = client?.deviceID;
+    final homeserver = client?.homeserver;
+    return (
+      owner: owner,
+      isCurrent: () =>
+          identical(_clientManager.client, client) &&
+          client?.userID == owner &&
+          client?.accessToken == token &&
+          client?.deviceID == device &&
+          client?.homeserver == homeserver,
+    );
+  }
+
+  Future<List<T>> _visibleHistory<T>(
+    List<T> items,
+    ({String? owner, bool Function() isCurrent}) origin, {
+    required String? Function(T) roomOf,
+    required DateTime? Function(T) timeOf,
+  }) async {
+    if (!origin.isCurrent()) return [];
+    final store = _historyClearStore;
+    if (store == null) return items;
+    final owner = origin.owner;
+    if (owner == null || owner.isEmpty || !origin.isCurrent()) return [];
+    try {
+      final boundaries = <String, DateTime?>{};
+      for (final room in items.map(roomOf).whereType<String>().toSet()) {
+        boundaries[room] = await store.read(
+          ownerUserId: owner,
+          roomId: room,
+          isCurrent: origin.isCurrent,
+        );
+      }
+      if (!origin.isCurrent()) return [];
+      return items.where((item) {
+        final room = roomOf(item);
+        if (room == null || !boundaries.containsKey(room)) return false;
+        final boundary = boundaries[room];
+        final timestamp = timeOf(item);
+        return boundary == null ||
+            (timestamp != null && timestamp.isAfter(boundary));
+      }).toList();
+    } catch (error) {
+      debugLog('SearchRepository: history visibility unavailable: $error');
+      return [];
+    }
+  }
 
   /// Returns hidden and locked room IDs for global-search filtering.
   ///
@@ -45,9 +102,11 @@ class SearchRepositoryImpl implements ISearchRepository {
   /// then fail closed instead of exposing a protected room. Search within an
   /// explicitly opened room remains unaffected.
   Future<Set<String>?> _excludedRoomIds() async {
+    final origin = _historyOrigin();
     final excluded = <String>{};
     try {
       final hidden = await _preferences?.getHiddenChatIdsStrict();
+      if (!origin.isCurrent()) return null;
       if (hidden != null) excluded.addAll(hidden);
     } catch (e) {
       debugLog('SearchRepository: load hidden chats failed: $e');
@@ -59,7 +118,7 @@ class SearchRepositoryImpl implements ISearchRepository {
       debugLog('SearchRepository: load locked chats failed: $e');
       return null;
     }
-    return excluded;
+    return origin.isCurrent() ? excluded : null;
   }
 
   @override
@@ -73,8 +132,11 @@ class SearchRepositoryImpl implements ISearchRepository {
       return const SearchResults();
     }
 
+    final origin = _historyOrigin();
+
     // 保存搜索记录
     await saveSearchQuery(query);
+    if (!origin.isCurrent()) return const SearchResults();
 
     List<SearchResultItem> contacts = [];
     List<SearchResultItem> groups = [];
@@ -84,22 +146,30 @@ class SearchRepositoryImpl implements ISearchRepository {
     // 根据类型搜索
     if (type == null || type == SearchResultType.all) {
       contacts = await searchContacts(query, limit: limit ~/ 4);
+      if (!origin.isCurrent()) return const SearchResults();
       groups = await searchGroups(query, limit: limit ~/ 4);
+      if (!origin.isCurrent()) return const SearchResults();
       conversations = await searchConversations(query, limit: limit ~/ 4);
+      if (!origin.isCurrent()) return const SearchResults();
       messages = await searchMessages(query, limit: limit ~/ 4, filter: filter);
+      if (!origin.isCurrent()) return const SearchResults();
     } else {
       switch (type) {
         case SearchResultType.contact:
           contacts = await searchContacts(query, limit: limit);
+          if (!origin.isCurrent()) return const SearchResults();
           break;
         case SearchResultType.group:
           groups = await searchGroups(query, limit: limit);
+          if (!origin.isCurrent()) return const SearchResults();
           break;
         case SearchResultType.conversation:
           conversations = await searchConversations(query, limit: limit);
+          if (!origin.isCurrent()) return const SearchResults();
           break;
         case SearchResultType.message:
           messages = await searchMessages(query, limit: limit, filter: filter);
+          if (!origin.isCurrent()) return const SearchResults();
           break;
         case SearchResultType.all:
           break;
@@ -121,6 +191,7 @@ class SearchRepositoryImpl implements ISearchRepository {
     String query, {
     int limit = 20,
   }) async {
+    final origin = _historyOrigin();
     final results = <SearchResultItem>[];
 
     // @username 搜索
@@ -131,6 +202,7 @@ class SearchRepositoryImpl implements ISearchRepository {
           final usernameResults = await _usernameService.searchUsernames(
             usernameQuery,
           );
+          if (!origin.isCurrent()) return [];
           for (final usernameResult in usernameResults) {
             results.add(
               SearchResultItem(
@@ -148,10 +220,13 @@ class SearchRepositoryImpl implements ISearchRepository {
       }
     }
 
+    if (!origin.isCurrent()) return [];
+
     // .eth/.n42 ENS 域名搜索
     if (_isEnsQuery(query) && _ensCacheService != null) {
       try {
         final address = await _ensCacheService.resolveEnsName(query);
+        if (!origin.isCurrent()) return [];
         if (address != null) {
           results.add(
             SearchResultItem(
@@ -168,6 +243,8 @@ class SearchRepositoryImpl implements ISearchRepository {
         debugLog('SearchRepository: ENS search failed: $e');
       }
     }
+
+    if (!origin.isCurrent()) return [];
 
     // 常规本地联系人搜索
     final users = _searchDataSource.searchLocalContacts(query);
@@ -201,8 +278,9 @@ class SearchRepositoryImpl implements ISearchRepository {
     String query, {
     int limit = 20,
   }) async {
+    final origin = _historyOrigin();
     final excluded = await _excludedRoomIds();
-    if (excluded == null) return const [];
+    if (!origin.isCurrent() || excluded == null) return const [];
     final rooms = _searchDataSource
         .searchLocalGroups(query)
         .where((room) => !excluded.contains(room.id));
@@ -221,8 +299,9 @@ class SearchRepositoryImpl implements ISearchRepository {
     String query, {
     int limit = 20,
   }) async {
+    final origin = _historyOrigin();
     final excluded = await _excludedRoomIds();
-    if (excluded == null) return const [];
+    if (!origin.isCurrent() || excluded == null) return const [];
     final rooms = _searchDataSource
         .searchLocalConversations(query)
         .where((room) => !excluded.contains(room.id));
@@ -243,6 +322,7 @@ class SearchRepositoryImpl implements ISearchRepository {
     String? roomId,
     MessageSearchFilter? filter,
   }) async {
+    final origin = _historyOrigin();
     if (roomId != null) {
       // 在指定房间搜索
       final events = filter == null || filter.isEmpty
@@ -258,11 +338,12 @@ class SearchRepositoryImpl implements ISearchRepository {
               limit: limit,
             );
 
+      if (!origin.isCurrent()) return [];
       final room = _clientManager.client?.getRoomById(roomId);
       final roomName = room?.getLocalizedDisplayname() ?? '未知会话';
       final roomAvatar = _getRoomAvatarUrl(room);
 
-      return events.map((event) {
+      final items = events.map((event) {
         final message = _mapEventToMessage(event);
         return SearchResultItem.fromMessage(
           message,
@@ -272,6 +353,12 @@ class SearchRepositoryImpl implements ISearchRepository {
           matchedKeyword: query,
         );
       }).toList();
+      return _visibleHistory(
+        items,
+        origin,
+        roomOf: (item) => item.roomId,
+        timeOf: (item) => item.timestamp,
+      );
     } else {
       // 全局搜索消息
       final results = filter == null || filter.isEmpty
@@ -282,9 +369,10 @@ class SearchRepositoryImpl implements ISearchRepository {
               limit: limit,
             );
 
+      if (!origin.isCurrent()) return [];
       // Filter both live and archived results for hidden or locked rooms.
       final excluded = await _excludedRoomIds();
-      if (excluded == null) return const [];
+      if (!origin.isCurrent() || excluded == null) return const [];
       final liveItems = results
           .where((result) => !excluded.contains(result.room.id))
           .map((result) {
@@ -310,7 +398,7 @@ class SearchRepositoryImpl implements ISearchRepository {
         limit: limit,
         filter: filter,
       );
-      if (archiveItems.isEmpty) return liveItems;
+
       // 合并后按时间倒序重排——否则 live 全部排在 archive 之前,时间顺序错乱
       // (复审 P2)。无 timestamp 的排最后。
       final merged = [...liveItems, ...archiveItems]
@@ -322,7 +410,13 @@ class SearchRepositoryImpl implements ISearchRepository {
           if (tb == null) return -1;
           return tb.compareTo(ta);
         });
-      return merged.take(limit).toList();
+      final visible = await _visibleHistory(
+        merged,
+        origin,
+        roomOf: (item) => item.roomId,
+        timeOf: (item) => item.timestamp,
+      );
+      return visible.take(limit).toList();
     }
   }
 
@@ -334,6 +428,7 @@ class SearchRepositoryImpl implements ISearchRepository {
     int limit = 50,
     MessageSearchFilter? filter,
   }) async {
+    final origin = _historyOrigin();
     final archive = _archiveSearch;
     if (archive == null) return const [];
     try {
@@ -346,6 +441,7 @@ class SearchRepositoryImpl implements ISearchRepository {
             ? _clientManager.client?.userID
             : null,
       );
+      if (!origin.isCurrent()) return [];
       final items = <SearchResultItem>[];
       for (final hit in hits) {
         final msg = hit.message;
@@ -377,6 +473,7 @@ class SearchRepositoryImpl implements ISearchRepository {
     MessageSearchFilter? filter,
     int limit = 50,
   }) async {
+    final origin = _historyOrigin();
     if (query.trim().isEmpty) {
       return ChatSearchResults(roomId: roomId);
     }
@@ -394,7 +491,12 @@ class SearchRepositoryImpl implements ISearchRepository {
             limit: limit,
           );
 
-    final messages = events.map(_mapEventToMessage).toList();
+    final messages = await _visibleHistory(
+      events.map(_mapEventToMessage).toList(),
+      origin,
+      roomOf: (message) => message.roomId,
+      timeOf: (message) => message.timestamp,
+    );
 
     return ChatSearchResults(
       messages: messages,
@@ -411,6 +513,7 @@ class SearchRepositoryImpl implements ISearchRepository {
     ChatSearchResults currentResults, {
     int limit = 50,
   }) async {
+    final origin = _historyOrigin();
     // 加载更多结果
     final filter = currentResults.filter;
     final events = filter == null || filter.isEmpty
@@ -426,7 +529,12 @@ class SearchRepositoryImpl implements ISearchRepository {
             limit: currentResults.messages.length + limit,
           );
 
-    final messages = events.map(_mapEventToMessage).toList();
+    final messages = await _visibleHistory(
+      events.map(_mapEventToMessage).toList(),
+      origin,
+      roomOf: (message) => message.roomId,
+      timeOf: (message) => message.timestamp,
+    );
 
     // A refreshed timeline may insert or remove results before the selected
     // message. Preserve its identity, then fall back to a valid nearby index.

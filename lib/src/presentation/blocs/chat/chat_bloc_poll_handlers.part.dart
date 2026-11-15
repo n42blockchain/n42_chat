@@ -7,13 +7,16 @@ extension ChatBlocPollHandlers on ChatBloc {
     SendPollMessage event,
     Emitter<ChatState> emit,
   ) async {
-    if (_currentRoomId == null) return;
+    final roomId = _currentRoomId;
+    if (roomId == null) return;
+    final isCurrent = _captureChatContext(emit, roomId);
+    if (!isCurrent()) return;
 
     try {
       debugLog('ChatBloc: Sending poll - question: ${event.question}, options: ${event.options}');
 
       final message = await _messageRepository.sendPollMessage(
-        _currentRoomId!,
+        roomId,
         question: event.question,
         options: event.options,
         maxSelections: event.maxSelections,
@@ -28,7 +31,7 @@ extension ChatBlocPollHandlers on ChatBloc {
       }
     } catch (e) {
       debugLog('ChatBloc: Failed to send poll: $e');
-      if (!isClosed) {
+      if (isCurrent()) {
         emit(state.copyWith(error: 'Failed to send poll'));
       }
     }
@@ -39,25 +42,30 @@ extension ChatBlocPollHandlers on ChatBloc {
     VoteOnPoll event,
     Emitter<ChatState> emit,
   ) async {
-    if (_currentRoomId == null) return;
+    final roomId = _currentRoomId;
+    if (roomId == null) return;
+    final isCurrent = _captureChatContext(emit, roomId);
+    if (!isCurrent()) return;
 
     try {
       debugLog('ChatBloc: Voting on poll - pollEventId: ${event.pollEventId}, options: ${event.selectedOptionIds}');
 
       final success = await _messageRepository.voteOnPoll(
-        _currentRoomId!,
+        roomId,
         pollEventId: event.pollEventId,
         selectedOptionIds: event.selectedOptionIds,
       );
 
-      if (success && !isClosed) {
+      if (success && isCurrent()) {
         debugLog('ChatBloc: Vote submitted successfully, fetching fresh poll data');
 
         // 从服务器获取最新的投票聚合数据
         final freshAggregations = await _messageRepository.getPollAggregations(
-          _currentRoomId!,
+          roomId,
           event.pollEventId,
         );
+
+        if (!isCurrent()) return;
 
         // 使用服务器数据更新UI
         final updatedMessages = state.messages.map((msg) {
@@ -128,7 +136,7 @@ extension ChatBlocPollHandlers on ChatBloc {
       }
     } catch (e) {
       debugLog('ChatBloc: Failed to vote: $e');
-      if (!isClosed) {
+      if (isCurrent()) {
         emit(state.copyWith(error: 'Failed to vote'));
       }
     }
@@ -139,7 +147,7 @@ extension ChatBlocPollHandlers on ChatBloc {
     PollResponseReceived event,
     Emitter<ChatState> emit,
   ) async {
-    if (isClosed) return;
+    if (isClosed || (event.isCurrent != null && !event.isCurrent!())) return;
 
     // 如果是当前用户的投票，已在 _onVoteOnPoll 中处理
     if (event.isCurrentUser) return;
@@ -177,17 +185,21 @@ extension ChatBlocPollHandlers on ChatBloc {
     EndPoll event,
     Emitter<ChatState> emit,
   ) async {
-    if (_currentRoomId == null) return;
+    final roomId = _currentRoomId;
+    if (roomId == null) return;
+    final isCurrent = _captureChatContext(emit, roomId);
+    if (!isCurrent()) return;
 
     try {
       debugLog('ChatBloc: Ending poll - poll: ${event.pollEventId}');
 
       // 调用 API 结束投票
       final success = await _messageRepository.endPoll(
-        _currentRoomId!,
+        roomId,
         event.pollEventId,
       );
 
+      if (!isCurrent()) return;
       if (success) {
         // 立即更新本地状态
         final updatedMessages = state.messages.map((msg) {
@@ -207,7 +219,9 @@ extension ChatBlocPollHandlers on ChatBloc {
       }
     } catch (e) {
       debugLog('ChatBloc: Error ending poll: $e');
-      emit(state.copyWith(error: 'Error ending poll: $e'));
+      if (isCurrent()) {
+        emit(state.copyWith(error: 'Error ending poll: $e'));
+      }
     }
   }
 
@@ -216,7 +230,7 @@ extension ChatBlocPollHandlers on ChatBloc {
     PollEnded event,
     Emitter<ChatState> emit,
   ) async {
-    if (isClosed) return;
+    if (isClosed || (event.isCurrent != null && !event.isCurrent!())) return;
 
     debugLog('ChatBloc: Poll ended - poll: ${event.pollEventId}');
 

@@ -275,7 +275,12 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
       final maxSelection = widget.maxRecentMediaSelection.clamp(1, 30);
       if (_selectedRecentMediaIds.length >= maxSelection) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Select up to $maxSelection items')),
+          SnackBar(
+            content: Text(
+              S.of(context)?.chatSelectionLimit(maxSelection) ??
+                  'Selection limit: $maxSelection',
+            ),
+          ),
         );
         return;
       }
@@ -458,7 +463,7 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
       ),
       _MoreItem(
         icon: Icons.event_outlined,
-        label: 'Event',
+        label: S.of(context)?.chatAttachmentEvent ?? 'Event',
         onTap: widget.onEventPressed,
         iconColor: AppColors.info,
       ),
@@ -482,7 +487,7 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
       ),
       _MoreItem(
         icon: Icons.volunteer_activism_outlined,
-        label: 'Tip',
+        label: S.of(context)?.chatAttachmentTip ?? 'Tip',
         onTap: widget.onTipPressed,
         iconColor: const Color(0xFFFF6B9D),
       ),
@@ -504,7 +509,7 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
       ),
       _MoreItem(
         icon: Icons.storefront_outlined,
-        label: widget.shopLabel ?? 'Shop',
+        label: widget.shopLabel ?? S.of(context)?.chatAttachmentShop ?? 'Shop',
         onTap: widget.onShopPressed,
         iconColor: AppColors.warning,
       ),
@@ -528,17 +533,21 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
       ),
       _MoreItem(
         icon: Icons.draw_outlined,
-        label: 'Whiteboard',
+        label: S.of(context)?.chatAttachmentWhiteboard ?? 'Whiteboard',
         onTap: widget.onWhiteboardPressed,
         iconColor: Colors.brown,
       ),
       _MoreItem(
         icon: Icons.video_camera_front_outlined,
-        label: 'Video note',
+        label: S.of(context)?.chatAttachmentVideoNote ?? 'Video note',
         onTap: widget.onVideoNotePressed,
         iconColor: Colors.pinkAccent,
       ),
-      _MoreItem(icon: Icons.code, label: 'Code', onTap: widget.onCodePressed),
+      _MoreItem(
+        icon: Icons.code,
+        label: S.of(context)?.chatAttachmentCode ?? 'Code',
+        onTap: widget.onCodePressed,
+      ),
       if (widget.onAiAssistantPressed != null)
         _MoreItem(
           icon: Icons.auto_awesome,
@@ -606,7 +615,7 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
                   children: [
                     Expanded(
                       child: Text(
-                        l10n?.chatRecentPlayed ?? 'Recent',
+                        l10n?.chatRecentMedia ?? 'Recent photos and videos',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -696,7 +705,9 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
       return _buildRecentMediaMessage(
         context,
         icon: Icons.broken_image_outlined,
-        message: 'Could not load recent media',
+        message:
+            S.of(context)?.chatRecentMediaLoadFailed ??
+            'Could not load recent media',
         actionLabel: S.of(context)?.commonRetry ?? 'Retry',
         onAction: _loadRecentMedia,
       );
@@ -707,7 +718,9 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
       return _buildRecentMediaMessage(
         context,
         icon: Icons.photo_library_outlined,
-        message: 'Photo access is needed to show recent media',
+        message:
+            S.of(context)?.chatRecentMediaPermission ??
+            'Photo access is needed to show recent media',
         actionLabel: S.of(context)?.contactPhotos ?? 'Open Photos',
         onAction: widget.onPhotoPressed,
         secondaryLabel: S.of(context)?.commonSettings ?? 'Settings',
@@ -720,7 +733,8 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
       return _buildRecentMediaMessage(
         context,
         icon: Icons.photo_library_outlined,
-        message: 'No recent photos or videos',
+        message:
+            S.of(context)?.chatRecentMediaEmpty ?? 'No recent photos or videos',
         actionLabel: S.of(context)?.contactPhotos ?? 'Open Photos',
         onAction: widget.onPhotoPressed,
       );
@@ -745,7 +759,9 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
     return Semantics(
       button: true,
       selected: selected,
-      label: item.isVideo ? 'Recent video' : 'Recent photo',
+      label: item.isVideo
+          ? S.of(context)?.chatRecentVideo ?? 'Recent video'
+          : S.of(context)?.chatRecentPhoto ?? 'Recent photo',
       child: GestureDetector(
         onTap: () => _toggleRecentMedia(item),
         child: Stack(
@@ -958,9 +974,8 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
               const SizedBox(height: 8),
               Text(
                 item.label,
-                style: Theme.of(
-                  context,
-                ).textTheme.bodySmall?.copyWith(color: context.textSecondary),
+                style: Theme.of(context).textTheme.bodySmall
+                    ?.copyWith(color: context.textSecondary),
                 textAlign: TextAlign.center,
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,

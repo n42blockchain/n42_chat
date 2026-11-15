@@ -2863,5 +2863,129 @@
     }
   },
   "transferAssetUnavailable": "Payment asset is unavailable",
-  "transferPaymentRequestUnavailable": "Payment request is unavailable"
+  "transferPaymentRequestUnavailable": "Payment request is unavailable",
+  "chatCatchUp": "Catch up",
+  "chatCatchUpMentions": "Mentions",
+  "chatCatchUpReplies": "Replies to me",
+  "chatCatchUpPinned": "Pinned messages",
+  "chatCatchUpScope": "Mentions and replies use loaded messages, including read messages. Load older messages to find earlier replies.",
+  "chatCatchUpLoadMore": "Load older messages",
+  "chatActionPreview": "Review calendar suggestion",
+  "chatActionPrivacy": "Only the title and time below will be shared with your calendar app after confirmation. Check the time zone. Your calendar account may sync this event.",
+  "chatActionTitle": "Chat event",
+  "chatActionSuggestion": "Calendar suggestion",
+  "chatUnreadAttention": "Unread mentions and replies",
+  "chatScanAgain": "Scan again",
+  "chatUnreadScope": "Scans server history to your read marker. Open a conversation to read it; refresh to rebuild the results.",
+  "chatScanIncomplete": "Incomplete: history, decryption or read marker unavailable. Try again after sync.",
+  "chatHistoryShare": "Share selected history",
+  "chatHistoryExplanation": "Administrators only. Select plain text and an existing encrypted direct chat with a joined group member. Sharing creates visible audit messages in the group.",
+  "chatHistoryEnable": "Enable sharing",
+  "chatHistoryDisable": "Disable sharing",
+  "chatHistoryPolicy": "Group history sharing policy",
+  "chatHistoryPolicyDetail": "Only administrators can share. Enabling also restricts group history visibility to events after joining. Set the text-message limits below and confirm.",
+  "chatHistoryPolicySaved": "Policy saved",
+  "chatHistoryRecipient": "Encrypted recipient conversation",
+  "chatHistoryReview": "Review selected messages",
+  "chatHistoryMessages": "messages",
+  "chatHistoryConfirmDetail": "Confirm this recipient, each message and its time before sharing. A failed or unknown result may already have sent content: reconcile before continuing.",
+  "chatHistoryCompleted": "Selected history sent and group audit confirmed",
+  "chatHistoryPending": "Pending: reconcile, then confirm again to continue. Unknown sends are never resent.",
+  "chatHistoryReconcile": "Reconcile send result",
+  "chatHistoryFailed": "Unable to complete. Check administrator access, group policy, encryption, recipient membership and selection. If sending started, reconcile its result.",
+  "chatDeviceActions": "On-device actions",
+  "chatDeviceActionsReview": "After confirmation, only this message is provided to the system on-device action suggestions. Choose an action to open Calendar, Reminders or Maps.",
+  "chatHistoryMaxMessages": "Message limit (1–50)",
+  "chatHistoryMaxHours": "History window in hours (1–720)",
+  "chatNotifyAll": "All Messages",
+  "chatNotifyAllDescription": "Notify for every new message in this chat",
+  "chatNotifyMentions": "Mentions Only",
+  "chatNotifyMentionsDescription": "Only notify when you are mentioned or @room is used",
+  "chatNotifyMutedDescription": "Disable notifications for this chat on all devices",
+  "scheduledMessagesTitle": "Scheduled messages",
+  "scheduledMessagesEmpty": "No scheduled messages yet",
+  "scheduledMessagesHint": "Long press Send, Photos, Files, a GIF or a sticker to schedule a message.",
+  "scheduledMessageCancelled": "Scheduled message cancelled",
+  "scheduledMessageCreatedAt": "Created {time}",
+  "@scheduledMessageCreatedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "scheduledDeliveryUnconfirmed": "Delivery not confirmed",
+  "scheduledRecoveryCopy": "Save recovery copy",
+  "scheduledRecoveryCopyHint": "Saved on this device without changing or sending messages. Preview shows up to 8,000 characters.",
+  "scheduledRecoveryCopies": "Recovery copies",
+  "scheduledRecoveryReset": "Reset damaged queue",
+  "scheduledRecoveryResetHint": "An exact copy is saved on this device. Reset all scheduled messages for this account? Some may already have been sent. Copies and attachments are kept. Nothing is resent.",
+  "scheduledRecoveryExportHint": "This file contains unencrypted draft text and account details. Attachments are not included. Choose a trusted destination.",
+  "scheduledRecoveryImport": "Import recovery copy",
+  "scheduledRecoveryImportHint": "Save this preview as a recovery copy only. No messages will be scheduled or sent. Attachments are not included. The file author is not verified.",
+  "scheduledRecoveryComposerHint": "Append text to the current draft for review. Nothing is sent. Attachments, mentions and timers are not restored. Check whether this message was already delivered.",
+  "backupRecoverLegacyArchive": "Recover older local history",
+  "backupLegacyArchiveWarning": "This history has no verified owner. Copy only your rooms to the account below. The original is kept.",
+  "backupOlderFiles": "Older backup files",
+  "backupOlderFilesWarning": "These files may belong to another account. Select a file to check its contents and ownership before restoring.",
+  "stickerImportTitle": "Import sticker pack",
+  "stickerImportLinkHint": "Matrix sticker pack link",
+  "stickerImportPreview": "Preview",
+  "stickerImportUnavailable": "This pack is unavailable or you do not have access.",
+  "stickerImportCopyNotice": "Add a private copy of this pack. Its images and metadata are not end-to-end encrypted.",
+  "stickerImportFailed": "Could not add this pack. Try again.",
+  "stickerImportAccountChanged": "Account changed or session expired. Reopen sticker import.",
+  "stickerPackSourceRoom": "Source chat",
+  "stickerPackImages": "Images",
+  "@stickerImportCopyNotice": {
+    "description": "Explains the unencrypted Matrix image-pack boundary before confirmed private-copy installation."
+  },
+  "stickerPublishNotice": "Publish this pack to the selected group. Its images and metadata are not end-to-end encrypted. People who can read the group state may access them.",
+  "stickerPublishFailed": "Publication was not confirmed. Check the group before trying again.",
+  "stickerPublishReceiptMissing": "Published, but the link was not saved. Share or copy it before leaving this page.",
+  "stickerSubscribe": "Subscribe to updates",
+  "stickerSubscribeNotice": "Follow future changes made by this pack’s administrators. Images and metadata are not end-to-end encrypted. You can unsubscribe later; this does not join the source chat.",
+  "stickerSubscriptions": "Sticker subscriptions",
+  "stickerUnsubscribe": "Unsubscribe",
+  "stickerSubscriptionsEmpty": "No sticker subscriptions",
+  "chatAttachmentEvent": "Event",
+  "chatRecentMedia": "Recent photos and videos",
+  "chatRecentMediaLoadFailed": "Could not load recent media",
+  "chatRecentMediaPermission": "Photo access is needed to show recent media",
+  "chatRecentMediaEmpty": "No recent photos or videos",
+  "chatRecentPhoto": "Recent photo",
+  "chatRecentVideo": "Recent video",
+  "chatAttachmentTip": "Tip",
+  "chatAttachmentWhiteboard": "Whiteboard",
+  "chatAttachmentVideoNote": "Video note",
+  "chatAttachmentCode": "Code",
+  "chatAttachmentShop": "Shop",
+  "chatSelectionLimit": "Selection limit: {count}",
+  "@chatSelectionLimit": {
+    "description": "Maximum number of recent media items that may be selected.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "scheduledSendTonightAt": "Tonight ({time})",
+  "@scheduledSendTonightAt": {
+    "description": "Scheduled quick option with the local system-formatted time.",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "scheduledSendTomorrowMorningAt": "Tomorrow morning ({time})",
+  "@scheduledSendTomorrowMorningAt": {
+    "description": "Scheduled quick option with the local system-formatted time.",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  }
 }

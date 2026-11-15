@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -1980,70 +1981,70 @@ class SAr extends S {
   String get settingsSecurityTitle => 'الأمن';
 
   @override
-  String get settingsDeleteAccountTitle => 'Delete account';
+  String get settingsDeleteAccountTitle => 'حذف الحساب';
 
   @override
   String get settingsDeleteAccountSubtitle =>
-      'Deactivate this Matrix account and clean up its local chat data';
+      'تعطيل حساب Matrix هذا وتنظيف بيانات الدردشة المحلية الخاصة به';
 
   @override
   String get settingsDeleteAccountExplanation =>
-      'This requests permanent Matrix account deactivation. After server confirmation, this app removes this account\'s local chat session and encryption keys when safe. Other accounts and your wallet are kept. Federation and server retention may limit data erasure.';
+      'يطلب هذا الإجراء تعطيل حساب Matrix نهائيًا. بعد تأكيد الخادم، يزيل التطبيق جلسة الدردشة المحلية ومفاتيح التشفير لهذا الحساب عندما يكون ذلك آمنًا. تُحفظ الحسابات الأخرى ومحفظتك. قد تحدّ الفيدرالية وسياسات احتفاظ الخادم من محو البيانات.';
 
   @override
   String get settingsDeleteAccountPasswordOptional =>
-      'Matrix password, if requested';
+      'كلمة مرور Matrix، إذا طُلبت';
 
   @override
-  String get settingsDeleteAccountServerErase => 'Request server data erasure';
+  String get settingsDeleteAccountServerErase => 'طلب محو بيانات الخادم';
 
   @override
   String get settingsDeleteAccountServerEraseDetail =>
-      'Ask this homeserver to erase account data where supported. Copies held by other servers or required by retention may remain.';
+      'اطلب من هذا الخادم الرئيسي محو بيانات الحساب حيثما كان ذلك مدعومًا. قد تبقى النسخ الموجودة على خوادم أخرى أو التي تتطلب سياسات الاحتفاظ بقاءها.';
 
   @override
-  String get settingsDeleteAccountChooseStage => 'Verify this Matrix account';
+  String get settingsDeleteAccountChooseStage => 'التحقق من حساب Matrix هذا';
 
   @override
-  String get settingsDeleteAccountUsePassword => 'Use Matrix password';
+  String get settingsDeleteAccountUsePassword => 'استخدام كلمة مرور Matrix';
 
   @override
-  String get settingsDeleteAccountUseBrowser => 'Continue in browser';
+  String get settingsDeleteAccountUseBrowser => 'المتابعة في المتصفح';
 
   @override
   String get settingsDeleteAccountFallbackTitle =>
-      'Return from Matrix verification';
+      'العودة من التحقق عبر Matrix';
 
   @override
   String get settingsDeleteAccountFallbackExplanation =>
-      'Returning from the browser does not confirm deletion. Check the original request with the Matrix server.';
+      'العودة من المتصفح لا تؤكد الحذف. تحقق من الطلب الأصلي لدى خادم Matrix.';
 
   @override
-  String get settingsDeleteAccountCheckServer => 'Check with server';
+  String get settingsDeleteAccountCheckServer => 'التحقق لدى الخادم';
 
   @override
   String get settingsDeleteAccountRequestFailed =>
-      'The Matrix server did not confirm account deletion.';
+      'لم يؤكد خادم Matrix حذف الحساب.';
 
   @override
   String get settingsDeleteAccountPendingTitle =>
-      'Pending local account cleanup';
+      'تنظيف الحساب المحلي قيد الانتظار';
 
   @override
   String get settingsDeleteAccountPendingSubtitle =>
-      'Review cleanup for a previously deactivated Matrix account';
+      'مراجعة تنظيف حساب Matrix تم تعطيله سابقًا';
 
   @override
   String get settingsDeleteAccountPendingReadError =>
-      'Unable to read pending cleanup records. Tap to retry.';
+      'تعذرت قراءة سجلات التنظيف المعلّقة. اضغط لإعادة المحاولة.';
 
   @override
   String get settingsDeleteAccountPendingDetail =>
-      'The Matrix account was deactivated, but local cleanup is still pending. Other accounts remain available.';
+      'تم تعطيل حساب Matrix، لكن التنظيف المحلي لا يزال قيد الانتظار. تبقى الحسابات الأخرى متاحة.';
 
   @override
   String get settingsDeleteAccountManagementNotConfirmed =>
-      'Account management opened in your browser. Deletion has not been confirmed in this app, so your chat session remains available.';
+      'فُتحت إدارة الحساب في متصفحك. لم يُؤكَّد الحذف في هذا التطبيق، لذا تبقى جلسة الدردشة متاحة.';
 
   @override
   String get settingsKeyBackup => 'النسخ الاحتياطي للمفتاح';
@@ -4993,25 +4994,25 @@ class SAr extends S {
   String get reportSelectReason => 'الرجاء تحديد السبب';
 
   @override
-  String get reportUnavailable => 'Sign in to send a report.';
+  String get reportUnavailable => 'سجّل الدخول لإرسال بلاغ.';
 
   @override
   String get reportAccountChanged =>
-      'Account changed. Open this report again to send it.';
+      'تغير الحساب. افتح هذا البلاغ مجددًا لإرساله.';
 
   @override
   String get reportUnsupported =>
-      'This homeserver does not support user reports.';
+      'لا يدعم هذا الخادم الرئيسي البلاغات عن المستخدمين.';
 
   @override
   String get reportRoomUnsupported =>
-      'This homeserver does not support room reports.';
+      'لا يدعم هذا الخادم الرئيسي البلاغات عن الغرف.';
 
   @override
-  String get reportRateLimited => 'Too many reports. Please try again later.';
+  String get reportRateLimited => 'بلاغات كثيرة جدًا. حاول مجددًا لاحقًا.';
 
   @override
-  String get reportCouldNotSend => 'Could not send report. Please try again.';
+  String get reportCouldNotSend => 'تعذر إرسال البلاغ. حاول مجددًا.';
 
   @override
   String get gameCenter => 'العاب';
@@ -5898,31 +5899,31 @@ class SAr extends S {
 
   @override
   String get chatEncryptionNotReady =>
-      'Secure connection is not ready. Message not sent. Check connection and device verification on both accounts, then retry.';
+      'الاتصال الآمن غير جاهز. لم تُرسَل الرسالة. تحقق من الاتصال والتحقق من الأجهزة في كلا الحسابين، ثم أعد المحاولة.';
 
   @override
-  String get contactRequestPending => 'Awaiting acceptance';
+  String get contactRequestPending => 'في انتظار القبول';
 
   @override
   String get chatFriendRequestPending =>
-      'Friendship is not confirmed. Check Contacts > New Friends before sending.';
+      'لم تُؤكَّد الصداقة. تحقق من جهات الاتصال > أصدقاء جدد قبل الإرسال.';
 
   @override
   String contactPhotoCount(int count) {
-    return '$count photos';
+    return '$count صورة';
   }
 
   @override
-  String get videoPublish => 'Publish video';
+  String get videoPublish => 'نشر فيديو';
 
   @override
-  String get videoGoLive => 'Go live';
+  String get videoGoLive => 'بدء بث مباشر';
 
   @override
-  String get videoSelect => 'Select video';
+  String get videoSelect => 'اختيار فيديو';
 
   @override
-  String get videoLiveUnavailable => 'Live broadcasting is unavailable';
+  String get videoLiveUnavailable => 'البث المباشر غير متاح';
 
   @override
   String get qrcodeAlbum => 'الألبوم';
@@ -5931,105 +5932,413 @@ class SAr extends S {
   String get settingsSwitchAccount => 'تبديل الحساب';
 
   @override
-  String get chatFilterUnread => 'Unread';
+  String get chatFilterUnread => 'غير مقروء';
 
   @override
-  String get chatFilterEmpty => 'No conversations in this filter';
+  String get chatFilterEmpty => 'لا توجد محادثات ضمن هذا المرشح';
 
   @override
-  String get accountAdd => 'Add account';
+  String get accountAdd => 'إضافة حساب';
 
   @override
-  String get accountCurrent => 'Current account';
+  String get accountCurrent => 'الحساب الحالي';
 
   @override
-  String get accountSwitching => 'Switching account…';
+  String get accountSwitching => 'جارٍ تبديل الحساب…';
 
   @override
   String get accountSwitchFailed =>
-      'Could not switch accounts. Try again, or add the account to sign in again.';
+      'تعذر تبديل الحساب. حاول مجددًا، أو أضف الحساب لتسجيل الدخول مرة أخرى.';
 
   @override
   String get accountSessionsHint =>
-      'Switch accounts here to keep each account’s messages and secure session separate.';
+      'بدّل الحسابات هنا لإبقاء رسائل كل حساب وجلسته الآمنة منفصلة.';
 
   @override
-  String get accountNoSaved => 'No saved accounts yet';
+  String get accountNoSaved => 'لا توجد حسابات محفوظة بعد';
 
   @override
-  String get contactRequestSent => 'Request sent';
+  String get contactRequestSent => 'تم إرسال الطلب';
 
   @override
-  String get contactRequestsIncoming => 'Received requests';
+  String get contactRequestsIncoming => 'الطلبات الواردة';
 
   @override
-  String get contactRequestsOutgoing => 'Sent requests';
+  String get contactRequestsOutgoing => 'الطلبات المرسلة';
 
   @override
-  String get contactRequestHint =>
-      'You can chat and call after the request is accepted.';
+  String get contactRequestHint => 'يمكنك الدردشة والاتصال بعد قبول الطلب.';
 
   @override
-  String get callReturnToCall => 'Return to call';
+  String get callReturnToCall => 'العودة إلى المكالمة';
 
   @override
-  String get chatMessageSending => 'Sending';
+  String get chatMessageSending => 'جارٍ الإرسال';
 
   @override
-  String get chatMessageSent => 'Sent';
+  String get chatMessageSent => 'تم الإرسال';
 
   @override
-  String get chatMessageDelivered => 'Delivered';
+  String get chatMessageDelivered => 'تم التسليم';
 
   @override
-  String get chatMessageRead => 'Read';
+  String get chatMessageRead => 'مقروء';
 
   @override
-  String get chatMessageFailed => 'Not sent. Tap to retry.';
+  String get chatMessageFailed => 'لم تُرسَل. اضغط لإعادة المحاولة.';
 
   @override
   String get chatMessageUnavailable =>
-      'Message unavailable on this device. Tap to check recovery options.';
+      'الرسالة غير متاحة على هذا الجهاز. اضغط للتحقق من خيارات الاسترداد.';
 
   @override
-  String get contactStarredFriends => 'Starred friends';
+  String get contactStarredFriends => 'الأصدقاء المميّزون بنجمة';
 
   @override
   String get chatRecipientKeysMissing =>
-      'This friend has no available encrypted session. Ask them to sign in and open the app, then retry. Use Switch Account instead of logging out when changing accounts.';
+      'ليس لدى هذا الصديق جلسة مشفّرة متاحة. اطلب منه تسجيل الدخول وفتح التطبيق، ثم أعد المحاولة. استخدم تبديل الحساب بدلًا من تسجيل الخروج عند تغيير الحسابات.';
 
   @override
   String get chatSwitchForMessaging =>
-      'Changing accounts? Use Switch Account to keep your messages and secure sessions. Logging out revokes this device and can make incoming encrypted messages unavailable.';
+      'هل تغيّر الحساب؟ استخدم تبديل الحساب للاحتفاظ برسائلك وجلساتك الآمنة. تسجيل الخروج يلغي وصول هذا الجهاز وقد يجعل الرسائل المشفّرة الواردة غير متاحة.';
 
   @override
   String get aiServiceUnavailable =>
-      'AI summaries are currently unavailable. Please try again after service access is restored.';
+      'ملخصات الذكاء الاصطناعي غير متاحة حاليًا. حاول مجددًا بعد استعادة الوصول إلى الخدمة.';
 
   @override
   String aiSummarizeMessages(int count) {
-    return 'Summarize $count recent messages';
+    return 'تلخيص أحدث $count رسالة';
   }
 
   @override
   String groupMembershipSummary(int joined, int invited) {
-    return '$joined joined · $invited invited';
+    return 'انضم $joined · تمت دعوة $invited';
   }
 
   @override
   String contactPendingCount(int count) {
-    return '$count pending requests';
+    return '$count طلب معلّق';
   }
 
   @override
-  String get chatDraftLabel => 'Draft';
+  String get chatDraftLabel => 'مسودة';
 
   @override
-  String get contactIndexLabel => 'Contact index';
+  String get contactIndexLabel => 'فهرس جهات الاتصال';
 
   @override
   String get transferAssetUnavailable => 'أصل الدفع غير متاح';
 
   @override
   String get transferPaymentRequestUnavailable => 'طلب الدفع غير متاح';
+
+  @override
+  String get chatCatchUp => 'متابعة ما فاتك';
+
+  @override
+  String get chatCatchUpMentions => 'الإشارات';
+
+  @override
+  String get chatCatchUpReplies => 'الردود عليّ';
+
+  @override
+  String get chatCatchUpPinned => 'الرسائل المثبّتة';
+
+  @override
+  String get chatCatchUpScope =>
+      'تُبحث الإشارات والردود ضمن الرسائل المحمّلة، بما فيها الرسائل المقروءة. حمّل رسائل أقدم للعثور على الردود السابقة.';
+
+  @override
+  String get chatCatchUpLoadMore => 'تحميل رسائل أقدم';
+
+  @override
+  String get chatActionPreview => 'مراجعة اقتراح التقويم';
+
+  @override
+  String get chatActionPrivacy =>
+      'لن تُشارَك مع تطبيق التقويم بعد التأكيد إلا العنوان والوقت أدناه. تحقق من المنطقة الزمنية. قد يزامن حساب التقويم هذا الحدث.';
+
+  @override
+  String get chatActionTitle => 'حدث من الدردشة';
+
+  @override
+  String get chatActionSuggestion => 'اقتراح التقويم';
+
+  @override
+  String get chatUnreadAttention => 'الإشارات والردود غير المقروءة';
+
+  @override
+  String get chatScanAgain => 'المسح مجددًا';
+
+  @override
+  String get chatUnreadScope =>
+      'يفحص سجل الخادم حتى علامة القراءة لديك. افتح محادثة لقراءتها؛ وحدّث لإعادة إنشاء النتائج.';
+
+  @override
+  String get chatScanIncomplete =>
+      'غير مكتمل: السجل أو فك التشفير أو علامة القراءة غير متاحة. حاول مجددًا بعد المزامنة.';
+
+  @override
+  String get chatHistoryShare => 'مشاركة السجل المحدد';
+
+  @override
+  String get chatHistoryExplanation =>
+      'للمشرفين فقط. حدد نصًا عاديًا ومحادثة مباشرة مشفّرة موجودة مع عضو انضم إلى المجموعة. تنشئ المشاركة رسائل تدقيق مرئية في المجموعة.';
+
+  @override
+  String get chatHistoryEnable => 'تمكين المشاركة';
+
+  @override
+  String get chatHistoryDisable => 'تعطيل المشاركة';
+
+  @override
+  String get chatHistoryPolicy => 'سياسة مشاركة سجل المجموعة';
+
+  @override
+  String get chatHistoryPolicyDetail =>
+      'يمكن للمشرفين فقط المشاركة. يؤدي التمكين أيضًا إلى حصر ظهور سجل المجموعة في الأحداث بعد الانضمام. اضبط حدود الرسائل النصية أدناه وأكّد.';
+
+  @override
+  String get chatHistoryPolicySaved => 'تم حفظ السياسة';
+
+  @override
+  String get chatHistoryRecipient => 'المحادثة المشفّرة مع المستلم';
+
+  @override
+  String get chatHistoryReview => 'مراجعة الرسائل المحددة';
+
+  @override
+  String get chatHistoryMessages => 'رسائل';
+
+  @override
+  String get chatHistoryConfirmDetail =>
+      'تحقق من هذا المستلم وكل رسالة ووقتها قبل المشاركة. قد يكون المحتوى قد أُرسل بالفعل حتى عند فشل النتيجة أو عدم معرفتها: تحقق من نتيجة الإرسال قبل المتابعة.';
+
+  @override
+  String get chatHistoryCompleted =>
+      'تم إرسال السجل المحدد وتأكيد تدقيق المجموعة';
+
+  @override
+  String get chatHistoryPending =>
+      'قيد الانتظار: تحقق من النتيجة ثم أكّد مجددًا للمتابعة. لا تُعاد مطلقًا عمليات الإرسال ذات النتيجة غير المعروفة.';
+
+  @override
+  String get chatHistoryReconcile => 'التحقق من نتيجة الإرسال';
+
+  @override
+  String get chatHistoryFailed =>
+      'تعذر الإكمال. تحقق من صلاحية المشرف وسياسة المجموعة والتشفير وعضوية المستلم والرسائل المحددة. إذا بدأ الإرسال، فتحقق من نتيجته.';
+
+  @override
+  String get chatDeviceActions => 'إجراءات على الجهاز';
+
+  @override
+  String get chatDeviceActionsReview =>
+      'بعد التأكيد، تُقدَّم هذه الرسالة فقط لاقتراحات إجراءات النظام التي تُعالَج على الجهاز. اختر إجراءً لفتح التقويم أو التذكيرات أو الخرائط.';
+
+  @override
+  String get chatHistoryMaxMessages => 'حد الرسائل (1–50)';
+
+  @override
+  String get chatHistoryMaxHours => 'نطاق السجل بالساعات (1–720)';
+
+  @override
+  String get chatNotifyAll => 'كل الرسائل';
+
+  @override
+  String get chatNotifyAllDescription =>
+      'إرسال إشعار بكل رسالة جديدة في هذه المحادثة';
+
+  @override
+  String get chatNotifyMentions => 'الإشارات فقط';
+
+  @override
+  String get chatNotifyMentionsDescription =>
+      'إرسال إشعار فقط عند الإشارة إليك أو استخدام @room';
+
+  @override
+  String get chatNotifyMutedDescription =>
+      'إيقاف إشعارات هذه المحادثة على جميع الأجهزة';
+
+  @override
+  String get scheduledMessagesTitle => 'الرسائل المجدولة';
+
+  @override
+  String get scheduledMessagesEmpty => 'لا توجد رسائل مجدولة بعد';
+
+  @override
+  String get scheduledMessagesHint =>
+      'اضغط مطولًا على إرسال أو الصور أو الملفات أو صورة GIF أو ملصق لجدولة رسالة.';
+
+  @override
+  String get scheduledMessageCancelled => 'تم إلغاء الرسالة المجدولة';
+
+  @override
+  String scheduledMessageCreatedAt(String time) {
+    return 'أُنشئت في $time';
+  }
+
+  @override
+  String get scheduledDeliveryUnconfirmed => 'لم يتم تأكيد التسليم';
+
+  @override
+  String get scheduledRecoveryCopy => 'حفظ نسخة للاسترداد';
+
+  @override
+  String get scheduledRecoveryCopyHint =>
+      'تُحفظ على هذا الجهاز دون تغيير الرسائل أو إرسالها. تعرض المعاينة حتى 8,000 حرف.';
+
+  @override
+  String get scheduledRecoveryCopies => 'نسخ الاسترداد';
+
+  @override
+  String get scheduledRecoveryReset => 'إعادة ضبط قائمة الانتظار التالفة';
+
+  @override
+  String get scheduledRecoveryResetHint =>
+      'حُفظت نسخة مطابقة على هذا الجهاز. هل تريد إعادة ضبط جميع الرسائل المجدولة لهذا الحساب؟ ربما أُرسلت بعض الرسائل بالفعل. ستُحفظ النسخ والمرفقات، ولن تُعاد إرسال أي رسالة.';
+
+  @override
+  String get scheduledRecoveryExportHint =>
+      'يحتوي هذا الملف على نص مسودة وتفاصيل حساب غير مشفرة. لا يتضمن المرفقات. اختر وجهة موثوقة.';
+
+  @override
+  String get scheduledRecoveryImport => 'استيراد نسخة استرداد';
+
+  @override
+  String get scheduledRecoveryImportHint =>
+      'احفظ هذه المعاينة كنسخة استرداد فقط. لن تتم جدولة أي رسائل أو إرسالها. المرفقات غير مضمنة. لم يتم التحقق من مؤلف الملف.';
+
+  @override
+  String get scheduledRecoveryComposerHint =>
+      'أضف النص إلى المسودة الحالية لمراجعته. لن تُرسل أي رسالة. لن تُستعاد المرفقات أو الإشارات أو المؤقتات. تحقق مما إذا كانت هذه الرسالة قد وصلت بالفعل.';
+
+  @override
+  String get backupRecoverLegacyArchive => 'استعادة السجل المحلي القديم';
+
+  @override
+  String get backupLegacyArchiveWarning =>
+      'لم يتم التحقق من مالك هذا السجل. انسخ غرفك فقط إلى الحساب أدناه. سيُحتفظ بالأصل.';
+
+  @override
+  String get backupOlderFiles => 'ملفات النسخ الاحتياطي القديمة';
+
+  @override
+  String get backupOlderFilesWarning =>
+      'قد تنتمي هذه الملفات إلى حساب آخر. اختر ملفًا للتحقق من محتواه ومالكه قبل الاستعادة.';
+
+  @override
+  String get stickerImportTitle => 'استيراد حزمة ملصقات';
+
+  @override
+  String get stickerImportLinkHint => 'رابط حزمة ملصقات Matrix';
+
+  @override
+  String get stickerImportPreview => 'معاينة';
+
+  @override
+  String get stickerImportUnavailable =>
+      'هذه الحزمة غير متاحة أو ليس لديك إذن للوصول إليها.';
+
+  @override
+  String get stickerImportCopyNotice =>
+      'أضف نسخة خاصة من هذه الحزمة. الصور والبيانات الوصفية فيها غير مشفرة من طرف إلى طرف.';
+
+  @override
+  String get stickerImportFailed => 'تعذرت إضافة هذه الحزمة. حاول مرة أخرى.';
+
+  @override
+  String get stickerImportAccountChanged =>
+      'تم تغيير الحساب أو انتهت الجلسة. أعد فتح استيراد الملصقات.';
+
+  @override
+  String get stickerPackSourceRoom => 'المحادثة المصدر';
+
+  @override
+  String get stickerPackImages => 'الصور';
+
+  @override
+  String get stickerPublishNotice =>
+      'انشر حزمة الملصقات هذه في المجموعة المحددة. صورها وبياناتها الوصفية غير مشفرة من طرف إلى طرف. قد يتمكن من يستطيع قراءة حالة المجموعة من الوصول إليها.';
+
+  @override
+  String get stickerPublishFailed =>
+      'لم يتم تأكيد النشر. تحقق من المجموعة قبل المحاولة مجددًا.';
+
+  @override
+  String get stickerPublishReceiptMissing =>
+      'تم النشر، لكن لم يتم حفظ الرابط. شاركه أو انسخه قبل مغادرة هذه الصفحة.';
+
+  @override
+  String get stickerSubscribe => 'الاشتراك في التحديثات';
+
+  @override
+  String get stickerSubscribeNotice =>
+      'متابعة التغييرات المستقبلية التي يجريها مسؤولو هذه الحزمة. الصور والبيانات الوصفية ليست مشفرة من طرف إلى طرف. يمكنك إلغاء الاشتراك لاحقًا؛ لن تنضم إلى المحادثة المصدر.';
+
+  @override
+  String get stickerSubscriptions => 'اشتراكات الملصقات';
+
+  @override
+  String get stickerUnsubscribe => 'إلغاء الاشتراك';
+
+  @override
+  String get stickerSubscriptionsEmpty => 'لا توجد اشتراكات ملصقات';
+
+  @override
+  String get chatAttachmentEvent => 'حدث';
+
+  @override
+  String get chatRecentMedia => 'الصور ومقاطع الفيديو الحديثة';
+
+  @override
+  String get chatRecentMediaLoadFailed => 'تعذر تحميل الوسائط الحديثة';
+
+  @override
+  String get chatRecentMediaPermission =>
+      'يلزم السماح بالوصول إلى الصور لعرض الوسائط الحديثة';
+
+  @override
+  String get chatRecentMediaEmpty => 'لا توجد صور أو مقاطع فيديو حديثة';
+
+  @override
+  String get chatRecentPhoto => 'صورة حديثة';
+
+  @override
+  String get chatRecentVideo => 'فيديو حديث';
+
+  @override
+  String get chatAttachmentTip => 'إكرامية';
+
+  @override
+  String get chatAttachmentWhiteboard => 'لوحة بيضاء';
+
+  @override
+  String get chatAttachmentVideoNote => 'رسالة فيديو';
+
+  @override
+  String get chatAttachmentCode => 'شفرة برمجية';
+
+  @override
+  String get chatAttachmentShop => 'متجر';
+
+  @override
+  String chatSelectionLimit(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'الحد الأقصى للاختيار: $countString';
+  }
+
+  @override
+  String scheduledSendTonightAt(String time) {
+    return 'الليلة ($time)';
+  }
+
+  @override
+  String scheduledSendTomorrowMorningAt(String time) {
+    return 'صباح الغد ($time)';
+  }
 }

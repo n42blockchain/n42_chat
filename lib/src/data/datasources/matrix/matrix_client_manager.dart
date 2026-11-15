@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
+
+import '../../../domain/entities/chat_sync_phase.dart';
 import '../../../core/encryption/account_session_index.dart';
 import '../../../core/encryption/session_preserving_client.dart';
 import '../../../core/encryption/token_device_session.dart';
@@ -14,6 +16,7 @@ import 'package:path/path.dart' as p;
 import 'package:sqflite/sqflite.dart' as sqflite;
 import 'package:n42_chat/src/core/utils/io_helper.dart' as io_helper;
 import 'package:n42_chat/src/n42_chat_config.dart';
+
 import '../../../core/services/privacy_http_client.dart';
 import '../../../core/utils/debug_log.dart';
 import '../../../domain/entities/user_profile_entity.dart';
@@ -27,6 +30,12 @@ import '../local/preferences_datasource.dart';
 /// - 同步状态管理
 /// - 事件分发
 class MatrixClientManager {
+  /// Keep pins available before the SDK post-loads a room's full state.
+  static const requiredRoomStateEvents = {
+    EventTypes.Encryption,
+    'm.room.pinned_events',
+  };
+
   MatrixClientManager._();
 
   static final MatrixClientManager _instance = MatrixClientManager._();
@@ -109,6 +118,16 @@ class MatrixClientManager {
 
   /// 同步状态流
   Stream<SyncStatusUpdate>? get onSyncStatus => _client?.onSyncStatus.stream;
+
+  Stream<ChatSyncPhase>? get onChatSyncPhase => onSyncStatus?.map(
+    (update) => switch (update.status) {
+      SyncStatus.waitingForResponse => ChatSyncPhase.waiting,
+      SyncStatus.processing => ChatSyncPhase.processing,
+      SyncStatus.cleaningUp => ChatSyncPhase.cleaningUp,
+      SyncStatus.finished => ChatSyncPhase.finished,
+      SyncStatus.error => ChatSyncPhase.error,
+    },
+  );
 
   /// 登录状态变化流
   Stream<LoginState>? get onLoginStateChanged =>
@@ -282,7 +301,7 @@ class MatrixClientManager {
         },
         shareKeysWith: shareKeysWith,
         logLevel: kDebugMode ? Level.debug : Level.warning,
-        importantStateEvents: {EventTypes.Encryption},
+        importantStateEvents: {...requiredRoomStateEvents},
         syncFilter: syncFilter,
       );
 
@@ -817,6 +836,22 @@ class MatrixClientManager {
 
     _ensureInitialized();
     _ensureLoggedIn();
+    final captured = _client!;
+    final userId = captured.userID!;
+    final session = (
+      captured.accessToken,
+      captured.deviceID,
+      captured.homeserver,
+    );
+    void checkSession() {
+      if (!identical(_client, captured) ||
+          captured.userID != userId ||
+          !captured.isLogged() ||
+          (captured.accessToken, captured.deviceID, captured.homeserver) !=
+              session) {
+        throw StateError('Account changed during avatar upload');
+      }
+    }
 
     // 检查文件是否为空
     if (avatarBytes.isEmpty) {
@@ -863,23 +898,28 @@ class MatrixClientManager {
       Uri? mxcUri;
 
       try {
-        mxcUri = await _client!.uploadContent(
+        mxcUri = await captured.uploadContent(
           avatarBytes,
           filename: actualFilename,
           contentType: mimeType,
         );
+        checkSession();
         debugLog('SDK upload successful: $mxcUri');
       } catch (sdkError) {
         debugLog('SDK uploadContent failed: $sdkError');
         // 尝试手动上传
+        checkSession();
         debugLog('Trying manual upload...');
         mxcUri = await _uploadContentAuthenticated(
           avatarBytes,
+          client: captured,
+          checkSession: checkSession,
           filename: actualFilename,
           contentType: mimeType,
         );
       }
 
+      checkSession();
       if (mxcUri == null) {
         throw Exception('上传头像失败');
       }
@@ -888,13 +928,15 @@ class MatrixClientManager {
 
       // 设置头像 URL
       debugLog('Setting avatar URL...');
-      await _client!.setProfileField(_client!.userID!, 'avatar_url', {
+      await captured.setProfileField(userId, 'avatar_url', {
         'avatar_url': mxcUri.toString(),
       });
+      checkSession();
       debugLog('Avatar URL set successfully');
 
       // 验证头像是否设置成功
-      final profile = await _client!.getProfileFromUserId(_client!.userID!);
+      final profile = await captured.getProfileFromUserId(userId);
+      checkSession();
       debugLog('New avatar URL: ${profile.avatarUrl}');
 
       debugLog('=== setAvatar completed successfully ===');
@@ -906,9 +948,9 @@ class MatrixClientManager {
   }
 
   /// 检查服务器是否支持认证媒体上传
-  Future<bool> _supportsAuthenticatedMedia() async {
+  Future<bool> _supportsAuthenticatedMedia(Client client) async {
     try {
-      final versionsResponse = await _client!.getVersions();
+      final versionsResponse = await client.getVersions();
       // 检查 Matrix 版本是否 >= v1.11 (支持认证媒体)
       final supportsV111 = versionsResponse.versions.any(
         (v) => _isVersionGreaterThanOrEqualTo(v, 'v1.11'),
@@ -951,20 +993,21 @@ class MatrixClientManager {
   /// 使用认证端点上传文件
   Future<Uri?> _uploadContentAuthenticated(
     Uint8List content, {
+    required Client client,
+    required void Function() checkSession,
     String? filename,
     String? contentType,
   }) async {
-    if (_client == null) {
-      throw Exception('Matrix client not initialized');
-    }
-    if (_client!.accessToken == null) {
+    checkSession();
+    if (client.accessToken == null) {
       throw Exception('No access token available');
     }
-    if (_client!.homeserver == null) {
+    if (client.homeserver == null) {
       throw Exception('No homeserver configured');
     }
 
-    final supportsAuth = await _supportsAuthenticatedMedia();
+    final supportsAuth = await _supportsAuthenticatedMedia(client);
+    checkSession();
     debugLog('MatrixClientManager: supportsAuthenticatedMedia=$supportsAuth');
 
     // 根据服务器能力选择端点
@@ -972,7 +1015,7 @@ class MatrixClientManager {
         ? '_matrix/client/v1/media/upload' // 认证媒体端点 (MSC3916)
         : '_matrix/media/v3/upload'; // 传统端点
 
-    final uri = Uri.parse('${_client!.homeserver}/$path').replace(
+    final uri = Uri.parse('${client.homeserver}/$path').replace(
       queryParameters: filename != null ? {'filename': filename} : null,
     );
 
@@ -981,7 +1024,7 @@ class MatrixClientManager {
     debugLog('MatrixClientManager: Content type: $contentType');
 
     final request = http.Request('POST', uri);
-    request.headers['Authorization'] = 'Bearer ${_client!.accessToken}';
+    request.headers['Authorization'] = 'Bearer ${client.accessToken}';
     if (contentType != null) {
       request.headers['Content-Type'] = contentType;
     }
@@ -997,6 +1040,7 @@ class MatrixClientManager {
                 throw TimeoutException('HTTP upload timed out after 2 minutes'),
           );
       final response = await http.Response.fromStream(streamedResponse);
+      checkSession();
 
       debugLog(
         'MatrixClientManager: Upload response status: ${response.statusCode}',
@@ -1021,6 +1065,8 @@ class MatrixClientManager {
         );
         return await _uploadContentLegacy(
           content,
+          client: client,
+          checkSession: checkSession,
           filename: filename,
           contentType: contentType,
         );
@@ -1047,12 +1093,14 @@ class MatrixClientManager {
   /// 使用传统端点上传文件（作为 fallback）
   Future<Uri?> _uploadContentLegacy(
     Uint8List content, {
+    required Client client,
+    required void Function() checkSession,
     String? filename,
     String? contentType,
   }) async {
-    if (_client == null) return null;
+    checkSession();
 
-    final uri = Uri.parse('${_client!.homeserver}/_matrix/media/v3/upload')
+    final uri = Uri.parse('${client.homeserver}/_matrix/media/v3/upload')
         .replace(
           queryParameters: filename != null ? {'filename': filename} : null,
         );
@@ -1060,7 +1108,7 @@ class MatrixClientManager {
     debugLog('MatrixClientManager: Uploading (legacy) to: $uri');
 
     final request = http.Request('POST', uri);
-    request.headers['Authorization'] = 'Bearer ${_client!.accessToken}';
+    request.headers['Authorization'] = 'Bearer ${client.accessToken}';
     if (contentType != null) {
       request.headers['Content-Type'] = contentType;
     }
@@ -1081,6 +1129,7 @@ class MatrixClientManager {
       httpClient2.close();
     }
 
+    checkSession();
     if (response.statusCode == 200) {
       final json = jsonDecode(response.body);
       final contentUri = json['content_uri'] as String?;

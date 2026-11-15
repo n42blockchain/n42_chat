@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+
 import '../../../core/utils/debug_log.dart';
 
 /// 社交登录 API 数据源
@@ -12,11 +13,9 @@ class SocialAuthApi {
   final String baseUrl;
   final http.Client _client;
 
-  SocialAuthApi({
-    String? baseUrl,
-    http.Client? client,
-  })  : baseUrl = baseUrl ?? _defaultBaseUrl,
-        _client = client ?? http.Client();
+  SocialAuthApi({String? baseUrl, http.Client? client})
+    : baseUrl = baseUrl ?? _defaultBaseUrl,
+      _client = client ?? http.Client();
 
   /// 使用 Google Token 登录
   ///
@@ -59,10 +58,29 @@ class SocialAuthApi {
   /// [accessToken] Facebook Access Token
   Future<SocialLoginResponse> loginWithFacebook({
     required String accessToken,
+    bool limitedLogin = false,
+    String? nonce,
   }) async {
+    if (limitedLogin) {
+      if (nonce == null || nonce.isEmpty || accessToken.isEmpty) {
+        return SocialLoginResponse.failure(
+          'Missing Facebook nonce or ID token',
+        );
+      }
+      return _loginWithCustomPayload(
+        provider: 'facebook',
+        body: {
+          'provider': 'facebook',
+          'id_token': accessToken,
+          'token_type': 'limited',
+          'nonce': nonce,
+          'source': 'app',
+        },
+      );
+    }
     return _loginWithSocialToken(
       provider: 'facebook',
-      idToken: accessToken,  // Facebook 使用 access token 作为认证凭证
+      idToken: accessToken, // Facebook 使用 access token 作为认证凭证
       accessToken: accessToken,
     );
   }
@@ -85,12 +103,10 @@ class SocialAuthApi {
   /// 使用微信授权码登录
   ///
   /// [code] 微信授权码，需要后端换取 access_token
-  Future<SocialLoginResponse> loginWithWeChat({
-    required String code,
-  }) async {
+  Future<SocialLoginResponse> loginWithWeChat({required String code}) async {
     return _loginWithSocialToken(
       provider: 'wechat',
-      idToken: code,  // 微信使用授权码
+      idToken: code, // 微信使用授权码
     );
   }
 
@@ -138,11 +154,7 @@ class SocialAuthApi {
   }) async {
     return _loginWithCustomPayload(
       provider: 'telegram',
-      body: {
-        'provider': 'telegram',
-        'source': 'app',
-        ...data,
-      },
+      body: {'provider': 'telegram', 'source': 'app', ...data},
     );
   }
 
@@ -278,11 +290,9 @@ class SocialAuthApi {
       final uri = Uri.parse('$baseUrl/v1/lr/user/social/accounts');
 
       final response = await _client.get(
-        uri.replace(queryParameters: {
-          'uuid': uuid,
-          'token': token,
-          'source': 'app',
-        }),
+        uri.replace(
+          queryParameters: {'uuid': uuid, 'token': token, 'source': 'app'},
+        ),
         headers: {'Content-Type': 'application/json'},
       );
 
@@ -360,10 +370,7 @@ class SocialLoginResponse {
   }
 
   factory SocialLoginResponse.failure(String error) {
-    return SocialLoginResponse._(
-      success: false,
-      error: error,
-    );
+    return SocialLoginResponse._(success: false, error: error);
   }
 
   /// 是否包含 Matrix 登录信息

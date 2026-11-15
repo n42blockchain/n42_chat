@@ -7,6 +7,7 @@ import 'package:equatable/equatable.dart';
 import '../../../domain/entities/content_filter_entity.dart';
 import '../../../domain/entities/message_entity.dart';
 import 'message_report_origin.dart';
+import 'scheduled_message_origin.dart';
 
 /// 聊天事件
 abstract class ChatEvent extends Equatable {
@@ -52,8 +53,12 @@ class UnsubscribeMessages extends ChatEvent {
   const UnsubscribeMessages();
 }
 
+/// Local admission only; admitted does not prove network delivery.
+enum TextSendPreflight { admitted, rejected, handled }
+
 /// 发送文本消息
 class SendTextMessage extends ChatEvent {
+  final Completer<TextSendPreflight>? preflightCompletion;
   final String text;
   final int? selfDestructAfter;
   final List<String>? mentionedUserIds;
@@ -62,6 +67,7 @@ class SendTextMessage extends ChatEvent {
   const SendTextMessage(
     this.text, {
     this.selfDestructAfter,
+    this.preflightCompletion,
     this.mentionedUserIds,
     this.mentionsRoom = false,
   });
@@ -72,7 +78,7 @@ class SendTextMessage extends ChatEvent {
     selfDestructAfter,
     mentionedUserIds,
     mentionsRoom,
-  ];
+    if (preflightCompletion != null) preflightCompletion,  ];
 }
 
 /// 发送图片消息
@@ -323,10 +329,13 @@ class SendTypingNotification extends ChatEvent {
 class MessagesUpdated extends ChatEvent {
   final List<MessageEntity> messages;
 
-  const MessagesUpdated(this.messages);
+  /// Internal subscription guard, rechecked when the queued event is handled.
+  final bool Function()? isCurrent;
+
+  const MessagesUpdated(this.messages, {this.isCurrent});
 
   @override
-  List<Object?> get props => [messages];
+  List<Object?> get props => [messages, if (isCurrent != null) isCurrent];
 }
 
 /// 正在输入的用户列表更新（内部事件）
@@ -426,12 +435,14 @@ class PollResponseReceived extends ChatEvent {
   final List<String> selectedOptionIds;
   final String senderId;
   final bool isCurrentUser;
+  final bool Function()? isCurrent;
 
   const PollResponseReceived({
     required this.pollEventId,
     required this.selectedOptionIds,
     required this.senderId,
     required this.isCurrentUser,
+    this.isCurrent,
   });
 
   @override
@@ -440,6 +451,7 @@ class PollResponseReceived extends ChatEvent {
     selectedOptionIds,
     senderId,
     isCurrentUser,
+    if (isCurrent != null) isCurrent,
   ];
 }
 
@@ -456,11 +468,12 @@ class EndPoll extends ChatEvent {
 /// 投票已结束事件（从服务器接收）
 class PollEnded extends ChatEvent {
   final String pollEventId;
+  final bool Function()? isCurrent;
 
-  const PollEnded({required this.pollEventId});
+  const PollEnded({required this.pollEventId, this.isCurrent});
 
   @override
-  List<Object?> get props => [pollEventId];
+  List<Object?> get props => [pollEventId, if (isCurrent != null) isCurrent];
 }
 
 /// 发送自定义消息（红包、转账等）
@@ -481,7 +494,18 @@ class SendCustomMessage extends ChatEvent {
 
 /// 清空聊天记录（本地）
 class ClearChatHistory extends ChatEvent {
-  const ClearChatHistory();
+  final String? roomId;
+  final Completer<bool>? completion;
+  final bool Function()? isCurrent;
+
+  const ClearChatHistory({this.roomId, this.isCurrent, this.completion});
+
+  @override
+  List<Object?> get props => [
+    if (roomId != null) roomId,
+    if (completion != null) completion,
+    if (isCurrent != null) isCurrent,
+  ];
 }
 
 /// 开始消息的自毁倒计时（消息被阅读时触发）
@@ -515,6 +539,10 @@ class UpdateDestructionCountdown extends ChatEvent {
 
 /// 发送定时消息
 class SendScheduledMessage extends ChatEvent {
+  final ScheduledMessageOrigin? origin;
+  final Completer<bool>? completion;
+  final String? ownerUserId;
+  final String? roomId;
   final String text;
   final MessageType type;
   final Map<String, dynamic>? payload;
@@ -524,6 +552,10 @@ class SendScheduledMessage extends ChatEvent {
   final bool mentionsRoom;
 
   const SendScheduledMessage({
+    this.origin,
+    this.completion,
+    this.ownerUserId,
+    this.roomId,
     required this.text,
     this.type = MessageType.text,
     this.payload,
@@ -535,6 +567,10 @@ class SendScheduledMessage extends ChatEvent {
 
   @override
   List<Object?> get props => [
+    origin,
+    completion,
+    ownerUserId,
+    roomId,
     text,
     type,
     payload == null ? null : jsonEncode(payload),
@@ -549,10 +585,27 @@ class SendScheduledMessage extends ChatEvent {
 class CancelScheduledMessage extends ChatEvent {
   final String messageId;
 
-  const CancelScheduledMessage(this.messageId);
+  final String? roomId;
+  final ScheduledMessageOrigin? origin;
+  final String? ownerUserId;
+  final Completer<bool>? completion;
+
+  const CancelScheduledMessage(
+    this.messageId, {
+    this.roomId,
+    this.origin,
+    this.ownerUserId,
+    this.completion,
+  });
 
   @override
-  List<Object?> get props => [messageId];
+  List<Object?> get props => [
+    messageId,
+    roomId,
+    ownerUserId,
+    origin,
+    completion,
+  ];
 }
 
 /// 发送到期的定时消息（内部事件，由定时器触发）
@@ -698,20 +751,23 @@ class NavigatePinnedMessage extends ChatEvent {
 
 /// 翻译消息
 class TranslateMessage extends ChatEvent {
+  final bool Function()? isCurrent;
   final String messageId;
   final String targetLanguage;
 
   const TranslateMessage({
+    this.isCurrent,
     required this.messageId,
     required this.targetLanguage,
   });
 
   @override
-  List<Object?> get props => [messageId, targetLanguage];
+  List<Object?> get props => [if (isCurrent != null) isCurrent, messageId, targetLanguage];
 }
 
 /// 翻译完成（内部事件）
 class TranslationCompleted extends ChatEvent {
+  final bool Function()? isCurrent;
   final String messageId;
   final String? translatedText;
   final String? detectedSourceLanguage;
@@ -719,6 +775,7 @@ class TranslationCompleted extends ChatEvent {
   final String? error;
 
   const TranslationCompleted({
+    this.isCurrent,
     required this.messageId,
     this.translatedText,
     this.detectedSourceLanguage,
@@ -727,7 +784,7 @@ class TranslationCompleted extends ChatEvent {
   });
 
   @override
-  List<Object?> get props => [
+  List<Object?> get props => [if (isCurrent != null) isCurrent,
     messageId,
     translatedText,
     detectedSourceLanguage,
@@ -768,11 +825,13 @@ class UpdateTranslationSettings extends ChatEvent {
 
 /// 翻译设置加载完成（内部事件）
 class TranslationSettingsLoaded extends ChatEvent {
+  final bool Function()? isCurrent;
   final bool autoTranslate;
   final String defaultTargetLanguage;
   final bool smartReplyTranslate;
 
   const TranslationSettingsLoaded({
+    this.isCurrent,
     required this.autoTranslate,
     required this.defaultTargetLanguage,
     this.smartReplyTranslate = false,
@@ -780,6 +839,7 @@ class TranslationSettingsLoaded extends ChatEvent {
 
   @override
   List<Object?> get props => [
+    if (isCurrent != null) isCurrent,
     autoTranslate,
     defaultTargetLanguage,
     smartReplyTranslate,
@@ -807,12 +867,13 @@ class ConnectionStatusChanged extends ChatEvent {
 
 /// 销毁时间加载完成（内部事件，替代 Future.microtask + 直接 emit）
 class DestructionTimesLoaded extends ChatEvent {
+  final bool Function()? isCurrent;
   final Map<String, DateTime> destructionTimes;
 
-  const DestructionTimesLoaded(this.destructionTimes);
+  const DestructionTimesLoaded(this.destructionTimes, {this.isCurrent});
 
   @override
-  List<Object?> get props => [destructionTimes];
+  List<Object?> get props => [if (isCurrent != null) isCurrent, destructionTimes];
 }
 
 /// 发送联系人名片消息
@@ -844,18 +905,20 @@ class ExecuteSlashCommand extends ChatEvent {
 
 /// 房间信息加载完成（频道判断、发言权限等）
 class RoomInfoLoaded extends ChatEvent {
+  final bool Function()? isCurrent;
   final bool isChannel;
   final bool canSendMessages;
   final int slowModeInterval;
 
   const RoomInfoLoaded({
+    this.isCurrent,
     required this.isChannel,
     required this.canSendMessages,
     this.slowModeInterval = 0,
   });
 
   @override
-  List<Object?> get props => [isChannel, canSendMessages, slowModeInterval];
+  List<Object?> get props => [if (isCurrent != null) isCurrent, isChannel, canSendMessages, slowModeInterval];
 }
 
 /// 清除待处理的斜杠命令信号
@@ -881,30 +944,38 @@ class ReportMessage extends ChatEvent {
 
 /// 关键词过滤配置加载完成（内部事件）
 class ContentFilterLoaded extends ChatEvent {
+  final bool Function()? isCurrent;
   final ContentFilterConfig? config;
 
-  const ContentFilterLoaded(this.config);
+  const ContentFilterLoaded(this.config, {this.isCurrent});
 
   @override
-  List<Object?> get props => [config];
+  List<Object?> get props => [if (isCurrent != null) isCurrent, config];
 }
 
 /// 定时消息预览加载完成（内部事件）
 class ScheduledMessagesPreviewLoaded extends ChatEvent {
   final List<MessageEntity> previewMessages;
 
-  const ScheduledMessagesPreviewLoaded(this.previewMessages);
+  final String? ownerUserId;
+  final bool Function()? isCurrent;
+  const ScheduledMessagesPreviewLoaded(
+    this.previewMessages, {
+    this.ownerUserId,
+    this.isCurrent,
+  });
 
   @override
-  List<Object?> get props => [previewMessages];
+  List<Object?> get props => [previewMessages, ownerUserId, isCurrent];
 }
 
 /// 对方语言检测完成（内部事件）
 class RecipientLanguageDetected extends ChatEvent {
+  final bool Function()? isCurrent;
   final String language;
 
-  const RecipientLanguageDetected(this.language);
+  const RecipientLanguageDetected(this.language, {this.isCurrent});
 
   @override
-  List<Object?> get props => [language];
+  List<Object?> get props => [if (isCurrent != null) isCurrent, language];
 }

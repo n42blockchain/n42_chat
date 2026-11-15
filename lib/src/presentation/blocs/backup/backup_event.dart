@@ -4,6 +4,10 @@ import 'package:equatable/equatable.dart';
 abstract class BackupEvent extends Equatable {
   const BackupEvent();
 
+  // Event equality needs the password, but debug output must never print it.
+  @override
+  bool get stringify => false;
+
   @override
   List<Object?> get props => [];
 }
@@ -34,11 +38,12 @@ class CreateBackup extends BackupEvent {
 /// 删除备份
 class DeleteBackup extends BackupEvent {
   final String backupId;
+  final bool Function()? isCurrent;
 
-  const DeleteBackup(this.backupId);
+  const DeleteBackup(this.backupId, {this.isCurrent});
 
   @override
-  List<Object?> get props => [backupId];
+  List<Object?> get props => [backupId, isCurrent];
 }
 
 /// 预览备份
@@ -59,6 +64,8 @@ class RestoreFromBackup extends BackupEvent {
   final List<String>? roomIds;
   final bool restoreSettings;
   final bool restoreKeys;
+  final bool restoreMessages;
+  final bool Function()? isCurrent;
 
   const RestoreFromBackup({
     required this.backupFilePath,
@@ -66,11 +73,13 @@ class RestoreFromBackup extends BackupEvent {
     this.roomIds,
     this.restoreSettings = true,
     this.restoreKeys = false,
+    this.restoreMessages = false,
+    this.isCurrent,
   });
 
   @override
   List<Object?> get props =>
-      [backupFilePath, password, roomIds, restoreSettings, restoreKeys];
+      [backupFilePath, password, roomIds, restoreSettings, restoreKeys, restoreMessages, isCurrent];
 }
 
 /// 估算备份大小

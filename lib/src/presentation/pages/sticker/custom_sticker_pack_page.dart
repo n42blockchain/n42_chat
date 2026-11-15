@@ -1,3 +1,6 @@
+import '../../../../l10n/app_localizations.dart';
+import 'sticker_publish_page.dart';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -192,6 +195,19 @@ class _CustomStickerPackPageState extends State<CustomStickerPackPage> {
           title: Text(pack?.name ?? 'Sticker Pack'),
           actions: [
             IconButton(
+              key: const ValueKey('sticker_pack_publish'),
+              tooltip: S.of(context)?.commonShare ?? 'Share',
+              icon: const Icon(Icons.share_outlined),
+              onPressed: pack == null || _busy
+                  ? null
+                  : () => Navigator.of(context).push<void>(
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            StickerPublishPage(packId: widget.packId),
+                      ),
+                    ),
+            ),
+            IconButton(
               tooltip: 'Rename',
               icon: const Icon(Icons.edit_outlined),
               onPressed: pack == null ? null : _rename,
@@ -240,9 +256,8 @@ class _CustomStickerPackPageState extends State<CustomStickerPackPage> {
       );
     }
     return GridView.builder(
-      padding: const EdgeInsets.all(
-        AppDimensions.spacingM,
-      ).copyWith(bottom: 88),
+      padding: const EdgeInsets.all(AppDimensions.spacingM)
+          .copyWith(bottom: 88),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 4,
         crossAxisSpacing: 8,

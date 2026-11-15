@@ -153,71 +153,101 @@ extension ChatBlocFeatureHandlers on ChatBloc {
     SendScheduledMessage event,
     Emitter<ChatState> emit,
   ) async {
-    if (_currentRoomId == null) return;
-
+    var saved = false;
     try {
-      final normalizedText = event.text.trim();
-      final payload = Map<String, dynamic>.from(event.payload ?? const {});
-      if (!_isValidScheduledDraft(
-        type: event.type,
-        text: normalizedText,
-        payload: payload,
-      )) {
+      final roomId = _currentRoomId;
+      if (roomId == null) return;
+      if (event.origin == null
+          ? _authRepository != null
+          : !event.origin!.isCurrent ||
+                !identical(event.origin!.manager, _clientManager)) {
         return;
       }
-
-      final selfDestructAfter = await _resolveSelfDestructAfter(
-        event.selfDestructAfter,
-      );
-      // 生成临时消息ID
-      final tempId = 'scheduled_${DateTime.now().millisecondsSinceEpoch}';
-
-      // 获取当前用户ID
-      final currentUserId = await _messageRepository.getCurrentUserId() ?? '';
-
-      final draft = ScheduledMessageDraft(
-        messageId: tempId,
-        text: normalizedText,
-        type: event.type,
-        scheduledAt: event.scheduledAt,
-        createdAt: DateTime.now(),
-        selfDestructAfter: selfDestructAfter,
-        mentionedUserIds: event.mentionedUserIds ?? const [],
-        mentionsRoom: event.mentionsRoom,
-        payload: payload,
-      );
-
-      // 保存定时消息到本地存储
-      await _secureStorage.saveScheduledMessage(
-        roomId: _currentRoomId!,
-        messageId: tempId,
-        text: draft.text,
-        type: draft.type,
-        payload: draft.payload,
-        scheduledAt: draft.scheduledAt,
-        selfDestructAfter: selfDestructAfter,
-        mentionedUserIds: draft.mentionedUserIds,
-        mentionsRoom: draft.mentionsRoom,
-      );
-
-      // 创建临时消息显示在UI中
-      final tempMessage = draft.toPreviewMessage(
-        roomId: _currentRoomId!,
-        senderId: currentUserId,
-      );
-
-      // 添加到消息列表
-      if (!isClosed) {
-        emit(state.copyWith(messages: [tempMessage, ...state.messages]));
+      final account = await _captureScheduledAccount();
+      if (account == null || _currentRoomId != roomId) return;
+      if (event.ownerUserId != null && event.ownerUserId != account.userId) {
+        return;
       }
+      if (event.roomId != null && event.roomId != roomId) return;
+      try {
+        final normalizedText = event.text.trim();
+        final payload = Map<String, dynamic>.from(event.payload ?? const {});
+        if (!_isValidScheduledDraft(
+          type: event.type,
+          text: normalizedText,
+          payload: payload,
+        )) {
+          return;
+        }
 
-      debugLog(
-        'ChatBloc: Scheduled message saved - $tempId for ${event.scheduledAt}',
-      );
-    } catch (e) {
-      debugLog('ChatBloc: Failed to schedule message: $e');
-      if (!isClosed) {
-        emit(state.copyWith(error: 'Failed to schedule message'));
+        final selfDestructAfter = await _resolveSelfDestructAfter(
+          event.selfDestructAfter,
+        );
+        // 生成临时消息ID
+        final tempId = 'scheduled_${const Uuid().v4()}';
+
+        // 获取当前用户ID
+        if (!await _scheduledAccountIsCurrent(account) ||
+            _currentRoomId != roomId) {
+          return;
+        }
+        final currentUserId = account.userId;
+
+        final draft = ScheduledMessageDraft(
+          messageId: tempId,
+          text: normalizedText,
+          type: event.type,
+          scheduledAt: event.scheduledAt,
+          createdAt: DateTime.now(),
+          selfDestructAfter: selfDestructAfter,
+          mentionedUserIds: event.mentionedUserIds ?? const [],
+          mentionsRoom: event.mentionsRoom,
+          payload: payload,
+        );
+
+        // 保存定时消息到本地存储
+        await _secureStorage.saveScheduledMessage(
+          ownerUserId: account.userId,
+          roomId: roomId,
+          messageId: tempId,
+          text: draft.text,
+          type: draft.type,
+          payload: draft.payload,
+          scheduledAt: draft.scheduledAt,
+          selfDestructAfter: selfDestructAfter,
+          mentionedUserIds: draft.mentionedUserIds,
+          mentionsRoom: draft.mentionsRoom,
+        );
+
+        saved = true;
+
+        if (!await _scheduledAccountIsCurrent(account) ||
+            _currentRoomId != roomId) {
+          return;
+        }
+        // 创建临时消息显示在UI中
+        final tempMessage = draft.toPreviewMessage(
+          roomId: roomId,
+          senderId: currentUserId,
+        );
+
+        // 添加到消息列表
+        if (!isClosed && account.isCurrent() && _currentRoomId == roomId) {
+          emit(state.copyWith(messages: [tempMessage, ...state.messages]));
+        }
+
+        debugLog(
+          'ChatBloc: Scheduled message saved - $tempId for ${event.scheduledAt}',
+        );
+      } catch (e) {
+        debugLog('ChatBloc: Failed to schedule message: $e');
+        if (!isClosed && account.isCurrent() && _currentRoomId == roomId) {
+          emit(state.copyWith(error: 'Failed to schedule message'));
+        }
+      }
+    } finally {
+      if (event.completion?.isCompleted == false) {
+        event.completion!.complete(saved);
       }
     }
   }
@@ -227,23 +257,49 @@ extension ChatBlocFeatureHandlers on ChatBloc {
     CancelScheduledMessage event,
     Emitter<ChatState> emit,
   ) async {
-    if (_currentRoomId == null) return;
-
+    final roomId = event.roomId ?? _currentRoomId;
+    var cancelled = false;
+    ScheduledDraftOperation? operation;
     try {
-      final draft = await _findScheduledDraft(_currentRoomId!, event.messageId);
-      if (draft != null) {
-        await _removeScheduledDraftRecord(draft, emit);
-      } else {
-        await _secureStorage.removeScheduledMessage(
-          _currentRoomId!,
-          event.messageId,
-        );
-        _emitWithoutScheduledPreview(event.messageId, emit);
+      if (roomId == null || roomId.isEmpty) return;
+      if (event.origin == null
+          ? _authRepository != null
+          : !event.origin!.isCurrent ||
+                !identical(event.origin!.manager, _clientManager)) {
+        return;
       }
-
+      final account = await _captureScheduledAccount();
+      if (account == null ||
+          (event.ownerUserId != null && event.ownerUserId != account.userId)) {
+        return;
+      }
+      operation = ScheduledDraftOperation.tryAcquire(
+        ownerUserId: account.userId,
+        roomId: roomId,
+        messageId: event.messageId,
+      );
+      if (operation == null) return;
+      final draft = await _findScheduledDraft(roomId, event.messageId, account);
+      if (!await _scheduledAccountIsCurrent(account)) return;
+      if (draft == null) {
+        // Absence can mean it was already sent, not that this request cancelled it.
+        if (account.isCurrent() && roomId == _currentRoomId) {
+          _emitWithoutScheduledPreview(event.messageId, emit);
+        }
+        return;
+      }
+      if (draft.acceptedEventId != null || operation.receipt != null) return;
+      await _removeScheduledDraftRecord(draft, emit, account);
+      cancelled = await _scheduledAccountIsCurrent(account);
       debugLog('ChatBloc: Scheduled message cancelled - ${event.messageId}');
     } catch (e) {
       debugLog('ChatBloc: Failed to cancel scheduled message: $e');
+    } finally {
+      operation?.release();
+      final completion = event.completion;
+      if (completion != null && !completion.isCompleted) {
+        completion.complete(cancelled);
+      }
     }
   }
 
@@ -253,13 +309,18 @@ extension ChatBlocFeatureHandlers on ChatBloc {
     Emitter<ChatState> emit,
   ) async {
     try {
+      final account = await _captureScheduledAccount();
+      if (account == null) return;
       // 获取所有到期的定时消息
-      final dueMessages = await _secureStorage.getDueScheduledMessages();
+      final dueMessages = await _secureStorage.getDueScheduledMessages(
+        ownerUserId: account.userId,
+      );
       if (dueMessages.isEmpty) return;
 
       debugLog('ChatBloc: Found ${dueMessages.length} due scheduled messages');
 
       for (final draft in dueMessages) {
+        if (!await _scheduledAccountIsCurrent(account)) return;
         final roomId = draft.roomId;
         if (roomId == null || roomId.isEmpty) {
           debugLog(
@@ -268,10 +329,42 @@ extension ChatBlocFeatureHandlers on ChatBloc {
           continue;
         }
 
+        final operation = ScheduledDraftOperation.tryAcquire(
+          ownerUserId: account.userId,
+          roomId: roomId,
+          messageId: draft.messageId,
+        );
+        if (operation == null) continue;
+        var accepted = false;
         try {
-          await _sendScheduledDraft(draft);
-
-          await _removeScheduledDraftRecord(draft, emit);
+          // The due list may predate a completed cancellation.
+          final current = await _findScheduledDraft(
+            roomId,
+            draft.messageId,
+            account,
+          );
+          if (current == null) continue;
+          var eventId = current.acceptedEventId ?? operation.receipt;
+          if (eventId == null && !current.isDue(DateTime.now())) continue;
+          eventId ??= await _sendScheduledDraft(current, account);
+          accepted = true;
+          operation.rememberAcceptance(eventId);
+          try {
+            await _secureStorage.markScheduledDeliveryAccepted(
+              ownerUserId: account.userId,
+              roomId: roomId,
+              messageId: draft.messageId,
+              eventId: eventId,
+            );
+          } catch (storageError) {
+            debugLog(
+              'ChatBloc: Could not persist scheduled receipt: ${storageError.runtimeType}',
+            );
+          }
+          await _removeScheduledDraftRecord(current, emit, account);
+          if (await _scheduledAccountIsCurrent(account)) {
+            operation.confirmCleanup();
+          }
 
           debugLog('ChatBloc: Sent scheduled message - ${draft.messageId}');
         } catch (e) {
@@ -279,16 +372,29 @@ extension ChatBlocFeatureHandlers on ChatBloc {
             'ChatBloc: Failed to send scheduled message ${draft.messageId}: $e',
           );
 
-          if (await _shouldDiscardFailedScheduledDraft(draft)) {
-            await _removeScheduledDraftRecord(draft, emit);
-            debugLog(
-              'ChatBloc: Discarded scheduled draft with unreadable local attachment - ${draft.messageId}',
-            );
+          if (!accepted && await _scheduledAccountIsCurrent(account)) {
+            try {
+              await _secureStorage.markScheduledDeliveryUnconfirmed(
+                ownerUserId: account.userId,
+                roomId: roomId,
+                messageId: draft.messageId,
+              );
+            } catch (storageError) {
+              debugLog(
+                'ChatBloc: Could not persist scheduled attempt status: ${storageError.runtimeType}',
+              );
+            }
           }
+
+          // Unreadable local files can be temporary (permissions, storage or
+          // restoration). A failed send is never authorization to discard the
+          // draft; retain it for retry or explicit user cancellation.
+        } finally {
+          operation.release();
         }
       }
     } catch (e) {
-      debugLog('ChatBloc: Failed to process due scheduled messages: $e');
+      debugLog('ChatBloc: Failed to process due scheduled messages: ${e.runtimeType}');
     }
   }
 
@@ -323,7 +429,24 @@ extension ChatBlocFeatureHandlers on ChatBloc {
       (payload['localPath'] as String?)?.isNotEmpty == true &&
       (payload['filename'] as String?)?.trim().isNotEmpty == true;
 
-  Future<void> _sendScheduledDraft(ScheduledMessageDraft draft) async {
+  Future<String> _requireScheduledSend(
+    _ScheduledAccount account,
+    Future<MessageEntity?> Function() operation,
+  ) async {
+    if (!await _scheduledAccountIsCurrent(account)) {
+      throw StateError('Scheduled account changed');
+    }
+    final receipt = await operation();
+    if (receipt == null || receipt.id.isEmpty) {
+      throw StateError('Scheduled message delivery is not confirmed');
+    }
+    return receipt.id;
+  }
+
+  Future<String> _sendScheduledDraft(
+    ScheduledMessageDraft draft,
+    _ScheduledAccount account,
+  ) async {
     final roomId = draft.roomId;
     if (roomId == null || roomId.isEmpty) {
       throw StateError('Scheduled draft missing roomId');
@@ -331,81 +454,108 @@ extension ChatBlocFeatureHandlers on ChatBloc {
 
     switch (draft.type) {
       case MessageType.poll:
-        await _messageRepository.sendPollMessage(
-          roomId,
-          question: draft.text,
-          options: draft.pollOptions,
-          maxSelections: draft.pollMaxSelections,
-          isAnonymous: draft.payload['isAnonymous'] as bool? ?? false,
+        return _requireScheduledSend(
+          account,
+          () => _messageRepository.sendPollMessage(
+            roomId,
+            transactionId: draft.transactionId,
+            question: draft.text,
+            options: draft.pollOptions,
+            maxSelections: draft.pollMaxSelections,
+            isAnonymous: draft.payload['isAnonymous'] as bool? ?? false,
+            quizCorrectIndex: draft.payload['quizCorrectIndex'] as int?,
+            quizExplanation: draft.payload['quizExplanation'] as String?,
+          ),
         );
-        return;
+
       case MessageType.image:
         if (draft.isGif) {
-          await _messageRepository.sendGifMessage(
-            roomId,
-            gifUrl: draft.payload['gifUrl'] as String,
-            previewUrl: draft.payload['previewUrl'] as String?,
-            width: draft.payload['width'] as int?,
-            height: draft.payload['height'] as int?,
-            title: draft.text.isEmpty ? null : draft.text,
+          return _requireScheduledSend(
+            account,
+            () => _messageRepository.sendGifMessage(
+              roomId,
+              transactionId: draft.transactionId,
+              gifUrl: draft.payload['gifUrl'] as String,
+              previewUrl: draft.payload['previewUrl'] as String?,
+              width: draft.payload['width'] as int?,
+              height: draft.payload['height'] as int?,
+              title: draft.text.isEmpty ? null : draft.text,
+            ),
           );
-          return;
         }
 
-        await _sendScheduledLocalImage(draft);
-        return;
+        return _sendScheduledLocalImage(draft, account);
+
       case MessageType.video:
-        await _sendScheduledLocalVideo(draft);
-        return;
+        return _sendScheduledLocalVideo(draft, account);
+
       case MessageType.file:
-        await _sendScheduledLocalFile(draft);
-        return;
+        return _sendScheduledLocalFile(draft, account);
+
       case MessageType.sticker:
-        await _messageRepository.sendStickerMessage(
-          roomId,
-          stickerId: draft.payload['stickerId'] as String,
-          packId: draft.payload['packId'] as String,
-          url: draft.payload['url'] as String,
-          httpUrl: draft.payload['httpUrl'] as String?,
-          name: draft.payload['name'] as String?,
-          emoji: draft.payload['emoji'] as String?,
-          width: draft.payload['width'] as int?,
-          height: draft.payload['height'] as int?,
-          mimeType: draft.payload['mimeType'] as String?,
-          size: draft.payload['size'] as int?,
+        return _requireScheduledSend(
+          account,
+          () => _messageRepository.sendStickerMessage(
+            roomId,
+            transactionId: draft.transactionId,
+            stickerId: draft.payload['stickerId'] as String,
+            packId: draft.payload['packId'] as String,
+            url: draft.payload['url'] as String,
+            httpUrl: draft.payload['httpUrl'] as String?,
+            name: draft.payload['name'] as String?,
+            emoji: draft.payload['emoji'] as String?,
+            width: draft.payload['width'] as int?,
+            height: draft.payload['height'] as int?,
+            mimeType: draft.payload['mimeType'] as String?,
+            size: draft.payload['size'] as int?,
+          ),
         );
-        return;
+
       default:
-        await _messageRepository.sendTextMessage(
-          roomId,
-          draft.text,
-          selfDestructAfter: draft.selfDestructAfter,
-          mentionedUserIds: draft.mentionedUserIds,
-          mentionsRoom: draft.mentionsRoom,
+        return _requireScheduledSend(
+          account,
+          () => _messageRepository.sendTextMessage(
+            roomId,
+            draft.text,
+            transactionId: draft.transactionId,
+            selfDestructAfter: draft.selfDestructAfter,
+            mentionedUserIds: draft.mentionedUserIds,
+            mentionsRoom: draft.mentionsRoom,
+          ),
         );
     }
   }
 
-  Future<void> _sendScheduledLocalImage(ScheduledMessageDraft draft) async {
+  Future<String> _sendScheduledLocalImage(
+    ScheduledMessageDraft draft,
+    _ScheduledAccount account,
+  ) async {
     final file = await _requireScheduledAttachmentFile(draft);
     final bytes = await file.readAsBytes();
     if (bytes.isEmpty) {
       throw StateError('Scheduled image attachment is empty');
     }
 
-    await _messageRepository.sendImageMessage(
-      draft.roomId!,
-      imageBytes: bytes,
-      filename: draft.attachmentFilename,
-      mimeType:
-          draft.attachmentMimeType ??
-          lookupMimeType(file.path, headerBytes: bytes) ??
-          'image/jpeg',
-      selfDestructAfter: draft.selfDestructAfter,
+    return _requireScheduledSend(
+      account,
+      () => _messageRepository.sendImageMessage(
+        draft.roomId!,
+        transactionId: draft.transactionId,
+        imageBytes: bytes,
+        filename: draft.attachmentFilename,
+        mimeType:
+            draft.attachmentMimeType ??
+            lookupMimeType(file.path, headerBytes: bytes) ??
+            'image/jpeg',
+        selfDestructAfter: draft.selfDestructAfter,
+      ),
     );
   }
 
-  Future<void> _sendScheduledLocalVideo(ScheduledMessageDraft draft) async {
+  Future<String> _sendScheduledLocalVideo(
+    ScheduledMessageDraft draft,
+    _ScheduledAccount account,
+  ) async {
     final file = await _requireScheduledAttachmentFile(draft);
     final bytes = await file.readAsBytes();
     if (bytes.isEmpty) {
@@ -426,18 +576,27 @@ extension ChatBlocFeatureHandlers on ChatBloc {
       );
     }
 
-    await _messageRepository.sendVideoMessage(
-      draft.roomId!,
-      videoBytes: bytes,
-      filename: draft.attachmentFilename,
-      mimeType:
-          draft.attachmentMimeType ?? lookupMimeType(file.path) ?? 'video/mp4',
-      thumbnailBytes: thumbnailBytes,
-      selfDestructAfter: draft.selfDestructAfter,
+    return _requireScheduledSend(
+      account,
+      () => _messageRepository.sendVideoMessage(
+        draft.roomId!,
+        transactionId: draft.transactionId,
+        videoBytes: bytes,
+        filename: draft.attachmentFilename,
+        mimeType:
+            draft.attachmentMimeType ??
+            lookupMimeType(file.path) ??
+            'video/mp4',
+        thumbnailBytes: thumbnailBytes,
+        selfDestructAfter: draft.selfDestructAfter,
+      ),
     );
   }
 
-  Future<void> _sendScheduledLocalFile(ScheduledMessageDraft draft) async {
+  Future<String> _sendScheduledLocalFile(
+    ScheduledMessageDraft draft,
+    _ScheduledAccount account,
+  ) async {
     final file = await _requireScheduledAttachmentFile(draft);
     final fileSize = draft.attachmentFileSize ?? await file.length();
 
@@ -447,30 +606,37 @@ extension ChatBlocFeatureHandlers on ChatBloc {
         throw StateError('Scheduled file attachment is empty');
       }
 
-      await _messageRepository.sendFileMessage(
+      return _requireScheduledSend(
+        account,
+        () => _messageRepository.sendFileMessage(
+          draft.roomId!,
+          transactionId: draft.transactionId,
+          fileBytes: bytes,
+          filename: draft.attachmentFilename,
+          mimeType:
+              draft.attachmentMimeType ??
+              lookupMimeType(file.path) ??
+              'application/octet-stream',
+          selfDestructAfter: draft.selfDestructAfter,
+          fileSize: fileSize,
+        ),
+      );
+    }
+
+    return _requireScheduledSend(
+      account,
+      () => _messageRepository.sendFileMessage(
         draft.roomId!,
-        fileBytes: bytes,
+        transactionId: draft.transactionId,
         filename: draft.attachmentFilename,
         mimeType:
             draft.attachmentMimeType ??
             lookupMimeType(file.path) ??
             'application/octet-stream',
         selfDestructAfter: draft.selfDestructAfter,
+        filePath: file.path,
         fileSize: fileSize,
-      );
-      return;
-    }
-
-    await _messageRepository.sendFileMessage(
-      draft.roomId!,
-      filename: draft.attachmentFilename,
-      mimeType:
-          draft.attachmentMimeType ??
-          lookupMimeType(file.path) ??
-          'application/octet-stream',
-      selfDestructAfter: draft.selfDestructAfter,
-      filePath: file.path,
-      fileSize: fileSize,
+      ),
     );
   }
 
@@ -496,39 +662,22 @@ extension ChatBlocFeatureHandlers on ChatBloc {
     if (!await file.exists()) {
       throw FileSystemException('Scheduled attachment file not found', path);
     }
+    if (await file.length() == 0) {
+      throw FileSystemException('Scheduled attachment file is empty', path);
+    }
 
     return file;
-  }
-
-  Future<bool> _shouldDiscardFailedScheduledDraft(
-    ScheduledMessageDraft draft,
-  ) async {
-    if (!draft.hasLocalAttachment) {
-      return false;
-    }
-
-    final path = draft.localAttachmentPath;
-    if (path == null || path.isEmpty) {
-      return true;
-    }
-
-    try {
-      final file = File(path);
-      if (!await file.exists()) {
-        return true;
-      }
-
-      return await file.length() <= 0;
-    } catch (_) {
-      return true;
-    }
   }
 
   Future<ScheduledMessageDraft?> _findScheduledDraft(
     String roomId,
     String messageId,
+    _ScheduledAccount account,
   ) async {
-    final drafts = await _secureStorage.getScheduledMessages(roomId);
+    final drafts = await _secureStorage.getScheduledMessages(
+      roomId,
+      ownerUserId: account.userId,
+    );
     for (final draft in drafts) {
       if (draft.messageId == messageId) {
         return draft.copyWith(roomId: roomId);
@@ -540,36 +689,21 @@ extension ChatBlocFeatureHandlers on ChatBloc {
   Future<void> _removeScheduledDraftRecord(
     ScheduledMessageDraft draft,
     Emitter<ChatState> emit,
+    _ScheduledAccount account,
   ) async {
     final roomId = draft.roomId;
     if (roomId == null || roomId.isEmpty) {
       return;
     }
 
-    await _secureStorage.removeScheduledMessage(roomId, draft.messageId);
-    await _deleteScheduledDraftArtifacts(draft);
-    if (roomId == _currentRoomId) {
+    if (!await _scheduledAccountIsCurrent(account)) return;
+    await _secureStorage.removeScheduledMessage(
+      roomId,
+      draft.messageId,
+      ownerUserId: account.userId,
+    );
+    if (account.isCurrent() && roomId == _currentRoomId) {
       _emitWithoutScheduledPreview(draft.messageId, emit);
-    }
-  }
-
-  Future<void> _deleteScheduledDraftArtifacts(
-    ScheduledMessageDraft draft,
-  ) async {
-    final path = draft.localAttachmentPath;
-    if (path == null || path.isEmpty) {
-      return;
-    }
-
-    try {
-      final file = File(path);
-      if (await file.exists()) {
-        await file.delete();
-      }
-    } catch (e) {
-      debugLog(
-        'ChatBloc: Failed to delete scheduled attachment artifact ${draft.messageId}: $e',
-      );
     }
   }
 
@@ -856,10 +990,14 @@ extension ChatBlocFeatureHandlers on ChatBloc {
     TranslateMessage event,
     Emitter<ChatState> emit,
   ) async {
+    if (event.isCurrent != null && !event.isCurrent!()) return;
+    final initialContext = _captureChatContext(null, _currentRoomId);
+    if (!initialContext()) return;
     if (_translationService == null) {
       debugLog('ChatBloc: Translation service not available');
       add(
         TranslationCompleted(
+          isCurrent: initialContext,
           messageId: event.messageId,
           success: false,
           error: 'Translation service not configured',
@@ -904,6 +1042,13 @@ extension ChatBlocFeatureHandlers on ChatBloc {
       return;
     }
 
+    final contextCurrent = _captureChatContext(null, _currentRoomId);
+    final request = Object();
+    _translationRequests[event.messageId] = request;
+    bool current() => contextCurrent() &&
+        identical(_translationRequests[event.messageId], request);
+    if (!current()) return;
+
     // 更新状态为正在翻译
     final newTranslatingIds = Set<String>.from(state.translatingMessageIds)
       ..add(event.messageId);
@@ -919,8 +1064,10 @@ extension ChatBlocFeatureHandlers on ChatBloc {
         targetLanguage: event.targetLanguage,
       );
 
+      if (!current()) return;
       add(
         TranslationCompleted(
+          isCurrent: current,
           messageId: event.messageId,
           translatedText: result.translatedText,
           detectedSourceLanguage: result.detectedSourceLanguage,
@@ -930,8 +1077,10 @@ extension ChatBlocFeatureHandlers on ChatBloc {
       );
     } catch (e) {
       debugLog('ChatBloc: Translation error: $e');
+      if (!current()) return;
       add(
         TranslationCompleted(
+          isCurrent: current,
           messageId: event.messageId,
           success: false,
           error: e.toString(),
@@ -945,6 +1094,8 @@ extension ChatBlocFeatureHandlers on ChatBloc {
     TranslationCompleted event,
     Emitter<ChatState> emit,
   ) {
+    if (event.isCurrent != null && !event.isCurrent!()) return;
+    _translationRequests.remove(event.messageId);
     // 移除正在翻译状态
     final newTranslatingIds = Set<String>.from(state.translatingMessageIds)
       ..remove(event.messageId);
@@ -991,6 +1142,8 @@ extension ChatBlocFeatureHandlers on ChatBloc {
 
   /// 清除消息翻译
   void onClearTranslation(ClearTranslation event, Emitter<ChatState> emit) {
+    _translationRequests.remove(event.messageId);
+    final translating = Set<String>.from(state.translatingMessageIds)..remove(event.messageId);
     final newTranslatedMessages = Map<String, String>.from(
       state.translatedMessages,
     )..remove(event.messageId);
@@ -1000,6 +1153,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
 
     emit(
       state.copyWith(
+        translatingMessageIds: translating,
         translatedMessages: newTranslatedMessages,
         detectedSourceLanguages: newDetectedLanguages,
       ),
@@ -1013,6 +1167,8 @@ extension ChatBlocFeatureHandlers on ChatBloc {
     UpdateTranslationSettings event,
     Emitter<ChatState> emit,
   ) async {
+    final current = _captureChatContext(emit, _currentRoomId);
+    if (!current()) return;
     final newAutoTranslate = event.autoTranslate ?? state.autoTranslate;
     final newTargetLang =
         event.defaultTargetLanguage ?? state.defaultTargetLanguage;
@@ -1038,13 +1194,15 @@ extension ChatBlocFeatureHandlers on ChatBloc {
       debugLog('ChatBloc: Failed to save translation settings: $e');
     }
 
+    if (!current()) return;
+
     // 如果刚开启自动翻译，对当前可见的未翻译消息触发翻译
-    if (newAutoTranslate) {
+    if (state.autoTranslate) {
       _autoTranslateMessages(emit);
     }
 
     // 如果刚开启智能回复翻译，立即检测对方语言
-    if (newSmartReply && _translationService != null) {
+    if (state.smartReplyTranslate && _translationService != null) {
       _detectRecipientLanguage(emit);
     }
   }
@@ -1054,6 +1212,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
     TranslationSettingsLoaded event,
     Emitter<ChatState> emit,
   ) {
+    if (event.isCurrent != null && !event.isCurrent!()) return;
     emit(
       state.copyWith(
         autoTranslate: event.autoTranslate,
@@ -1076,6 +1235,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
   void _autoTranslateMessages(Emitter<ChatState> emit) {
     if (_translationService == null) return;
 
+    final contextCurrent = _captureChatContext(null, _currentRoomId);
     final targetLang = state.defaultTargetLanguage;
     final messagesToTranslate = state.messages
         .where(
@@ -1091,10 +1251,14 @@ extension ChatBlocFeatureHandlers on ChatBloc {
 
     for (final msg in messagesToTranslate) {
       // 检测消息语言，与目标语言相同则跳过
+      bool current() => contextCurrent() && state.autoTranslate &&
+          state.defaultTargetLanguage == targetLang;
       _translationService.detectLanguage(msg.content).then((detected) {
-        if (detected != targetLang && !isClosed) {
-          add(TranslateMessage(messageId: msg.id, targetLanguage: targetLang));
+        if (detected != targetLang && current()) {
+          add(TranslateMessage(messageId: msg.id, targetLanguage: targetLang, isCurrent: current));
         }
+      }).catchError((Object error) {
+        debugLog('ChatBloc: Auto translation detection failed: $error');
       });
     }
   }
@@ -1122,14 +1286,17 @@ extension ChatBlocFeatureHandlers on ChatBloc {
 
     if (recipientMsg == null) return;
 
+    final contextCurrent = _captureChatContext(null, _currentRoomId);
+    bool current() => contextCurrent() && state.smartReplyTranslate;
+
     // detectLanguage 基于字符集正则，几乎即时完成
     _translationService
         .detectLanguage(recipientMsg.content)
         .then((detected) {
           if (detected != null &&
-              !isClosed &&
+              current() &&
               state.detectedRecipientLanguage != detected) {
-            add(RecipientLanguageDetected(detected));
+            add(RecipientLanguageDetected(detected, isCurrent: current));
           }
         })
         .catchError((Object e) {
@@ -1142,6 +1309,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
     RecipientLanguageDetected event,
     Emitter<ChatState> emit,
   ) {
+    if (event.isCurrent != null && !event.isCurrent!()) return;
     emit(state.copyWith(detectedRecipientLanguage: event.language));
     debugLog('ChatBloc: Detected recipient language: ${event.language}');
   }
@@ -1152,11 +1320,12 @@ extension ChatBlocFeatureHandlers on ChatBloc {
 
   /// 加载房间信息以判断频道类型和发言权限
   void _loadRoomInfo(String roomId) {
+    final current = _captureChatContext(null, roomId);
     Future.microtask(() async {
-      if (_groupRepository == null) return;
+      if (_groupRepository == null || !current()) return;
       try {
         final group = await _groupRepository.getGroup(roomId);
-        if (group == null || isClosed) return;
+        if (group == null || !current()) return;
 
         final isChannel = group.isChannel;
         // 频道中：如果 membersCanSpeak == false 且当前用户不是管理员，则不能发言
@@ -1164,6 +1333,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
 
         add(
           RoomInfoLoaded(
+            isCurrent: current,
             isChannel: isChannel,
             canSendMessages: canSend,
             slowModeInterval: group.slowModeInterval,
@@ -1177,6 +1347,7 @@ extension ChatBlocFeatureHandlers on ChatBloc {
 
   /// 处理房间信息加载完成
   void _onRoomInfoLoaded(RoomInfoLoaded event, Emitter<ChatState> emit) {
+    if (event.isCurrent != null && !event.isCurrent!()) return;
     emit(
       state.copyWith(
         isChannel: event.isChannel,

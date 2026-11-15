@@ -8,6 +8,8 @@ import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/repositories/auth_repository.dart';
 import '../../../domain/repositories/content_report_repository.dart';
+import '../../../domain/repositories/moment_repository.dart';
+import '../../../domain/entities/moment_entity.dart';
 
 /// Opens a user report bound to the account generation that opened the dialog.
 Future<void> showUserReportDialog(
@@ -20,6 +22,36 @@ Future<void> showRoomReportDialog(
   BuildContext context, {
   required String roomId,
 }) => _showReportDialog(context, roomId: roomId);
+
+/// Reports the canonical post/comment event through the optional capability.
+Future<void> showMomentReportDialog(
+  BuildContext context, {
+  required MomentEntity moment,
+  MomentComment? comment,
+}) {
+  final repository = getIt.isRegistered<IMomentRepository>()
+      ? getIt<IMomentRepository>()
+      : null;
+  final reporter = repository is IMomentReportRepository
+      ? repository as IMomentReportRepository
+      : null;
+  final origin = _ReportOrigin.capture();
+  return showDialog<void>(
+    context: context,
+    barrierDismissible: false,
+    builder: (_) => _ContentReportDialog(
+      userId: null,
+      roomId: null,
+      repository: null,
+      origin: origin,
+      reportEvent: reporter == null
+          ? null
+          : (reason) => comment == null
+                ? reporter.reportMoment(moment, reason)
+                : reporter.reportComment(moment, comment, reason),
+    ),
+  );
+}
 
 Future<void> _showReportDialog(
   BuildContext context, {
@@ -117,12 +149,14 @@ class _ContentReportDialog extends StatefulWidget {
     required this.roomId,
     required this.repository,
     required this.origin,
+    this.reportEvent,
   });
 
   final String? userId;
   final String? roomId;
   final IContentReportRepository? repository;
   final _ReportOrigin? origin;
+  final Future<void> Function(String reason)? reportEvent;
 
   @override
   State<_ContentReportDialog> createState() => _ContentReportDialogState();
@@ -152,7 +186,7 @@ class _ContentReportDialogState extends State<_ContentReportDialog> {
     }
     final origin = widget.origin;
     final repository = widget.repository;
-    if (origin == null || repository == null) {
+    if (origin == null || (repository == null && widget.reportEvent == null)) {
       setState(
         () => _error = l10n?.reportUnavailable ?? 'Sign in to send a report.',
       );
@@ -174,10 +208,12 @@ class _ContentReportDialogState extends State<_ContentReportDialog> {
       _error = null;
     });
     try {
-      if (widget.roomId case final roomId?) {
-        await repository.reportRoom(roomId: roomId, reason: details);
+      if (widget.reportEvent case final reportEvent?) {
+        await reportEvent(details);
+      } else if (widget.roomId case final roomId?) {
+        await repository!.reportRoom(roomId: roomId, reason: details);
       } else {
-        await repository.reportUser(userId: widget.userId!, reason: details);
+        await repository!.reportUser(userId: widget.userId!, reason: details);
       }
     } on ContentReportException catch (error) {
       if (!mounted) return;
@@ -230,6 +266,8 @@ class _ContentReportDialogState extends State<_ContentReportDialog> {
           'Account changed. Open this report again to send it.',
     ContentReportFailure.unavailable || ContentReportFailure.unauthorized =>
       l10n?.reportUnavailable ?? 'Sign in to send a report.',
+    ContentReportFailure.unsupported when widget.reportEvent != null =>
+      l10n?.reportCouldNotSend ?? 'Could not send report. Please try again.',
     ContentReportFailure.unsupported =>
       widget.roomId == null
           ? (l10n?.reportUnsupported ??

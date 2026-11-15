@@ -1,8 +1,26 @@
+import 'dart:convert';
+
+import 'package:crypto/crypto.dart';
 import 'package:equatable/equatable.dart';
 
 import 'message_entity.dart';
 
 class ScheduledMessageDraft extends Equatable {
+  /// Stable across storage reloads and retries; Matrix scopes it to a device.
+  String get transactionId =>
+      'n42_scheduled_${sha256.convert(utf8.encode(jsonEncode([roomId, messageId])))}';
+
+  static bool isValidAcceptedEventId(String value) =>
+      value.isNotEmpty && !RegExp(r'[\s\x00-\x1f\x7f]').hasMatch(value);
+
+  final String? acceptedEventId;
+  final int failedAttempts;
+  final DateTime? retryAt;
+  bool isDue(DateTime now) =>
+      !now.isBefore(scheduledAt) &&
+      (acceptedEventId != null || retryAt == null || !now.isBefore(retryAt!));
+
+  final bool deliveryUnconfirmed;
   final String messageId;
   final String? roomId;
   final String text;
@@ -15,6 +33,10 @@ class ScheduledMessageDraft extends Equatable {
   final Map<String, dynamic> payload;
 
   const ScheduledMessageDraft({
+    this.acceptedEventId,
+    this.failedAttempts = 0,
+    this.retryAt,
+    this.deliveryUnconfirmed = false,
     required this.messageId,
     required this.text,
     required this.type,
@@ -28,16 +50,46 @@ class ScheduledMessageDraft extends Equatable {
   });
 
   factory ScheduledMessageDraft.fromJson(Map<String, dynamic> json) {
+    final messageId = json['messageId'] as String?;
+    if (messageId == null || messageId.trim().isEmpty) {
+      throw const FormatException('Missing scheduled message identity');
+    }
+    final scheduledAt = DateTime.parse(json['scheduledAt'] as String);
+    final createdAt = DateTime.parse(json['createdAt'] as String);
     final rawPayload = json['payload'];
+    if (rawPayload != null && rawPayload is! Map) {
+      throw const FormatException('Invalid scheduled message payload');
+    }
     final rawType = json['type'] as String?;
+    final failedAttempts = json['failedAttempts'] as int? ?? 0;
+    if (failedAttempts < 0) {
+      throw const FormatException('Invalid scheduled retry count');
+    }
+    final retryAt = json['retryAt'] == null
+        ? null
+        : DateTime.parse(json['retryAt'] as String);
+
+    final rawUnconfirmed = json['deliveryUnconfirmed'];
+    if (rawUnconfirmed != null && rawUnconfirmed is! bool) {
+      throw const FormatException('Invalid scheduled delivery state');
+    }
+    final eventId = json['acceptedEventId'];
+    if (eventId != null &&
+        (eventId is! String || !isValidAcceptedEventId(eventId))) {
+      throw const FormatException('Invalid scheduled delivery receipt');
+    }
 
     return ScheduledMessageDraft(
-      messageId: json['messageId'] as String? ?? '',
+      acceptedEventId: eventId as String?,
+      failedAttempts: failedAttempts,
+      retryAt: retryAt,
+      deliveryUnconfirmed: json['deliveryUnconfirmed'] == true,
+      messageId: messageId,
       roomId: json['roomId'] as String?,
       text: json['text'] as String? ?? '',
       type: _parseMessageType(rawType),
-      scheduledAt: DateTime.tryParse(json['scheduledAt'] as String? ?? '') ?? DateTime.now(),
-      createdAt: DateTime.tryParse(json['createdAt'] as String? ?? '') ?? DateTime.now(),
+      scheduledAt: scheduledAt,
+      createdAt: createdAt,
       mentionedUserIds:
           (json['mentionedUserIds'] as List<dynamic>?)
               ?.map((item) => item.toString())
@@ -54,6 +106,10 @@ class ScheduledMessageDraft extends Equatable {
   }
 
   Map<String, dynamic> toJson() => {
+    if (acceptedEventId != null) 'acceptedEventId': acceptedEventId,
+    'failedAttempts': failedAttempts,
+    if (retryAt != null) 'retryAt': retryAt!.toIso8601String(),
+    'deliveryUnconfirmed': deliveryUnconfirmed,
     'messageId': messageId,
     'text': text,
     'type': type.name,
@@ -68,9 +124,14 @@ class ScheduledMessageDraft extends Equatable {
 
   ScheduledMessageDraft copyWith({
     String? roomId,
+    bool? deliveryUnconfirmed,
     Map<String, dynamic>? payload,
   }) {
     return ScheduledMessageDraft(
+      acceptedEventId: acceptedEventId,
+      failedAttempts: failedAttempts,
+      retryAt: retryAt,
+      deliveryUnconfirmed: deliveryUnconfirmed ?? this.deliveryUnconfirmed,
       messageId: messageId,
       roomId: roomId ?? this.roomId,
       text: text,
@@ -178,6 +239,10 @@ class ScheduledMessageDraft extends Equatable {
 
   @override
   List<Object?> get props => [
+    acceptedEventId,
+    failedAttempts,
+    retryAt,
+    deliveryUnconfirmed,
     messageId,
     roomId,
     text,
@@ -201,6 +266,6 @@ class ScheduledMessageDraft extends Equatable {
       }
     }
 
-    return MessageType.text;
+    throw const FormatException('Unknown scheduled message type');
   }
 }

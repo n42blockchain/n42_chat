@@ -3,6 +3,62 @@ import 'package:n42_chat/src/domain/entities/message_entity.dart';
 import 'package:n42_chat/src/domain/entities/scheduled_message_draft.dart';
 
 void main() {
+  test('transaction identity survives persistence and scopes the room', () {
+    final original = ScheduledMessageDraft(
+      messageId: 'same/id',
+      roomId: '!one:test',
+      text: 'message',
+      type: MessageType.text,
+      scheduledAt: DateTime(2030),
+      createdAt: DateTime(2026),
+    );
+    final restored = ScheduledMessageDraft.fromJson(original.toJson());
+    expect(restored.transactionId, original.transactionId);
+    expect(
+      original.transactionId,
+      matches(RegExp(r'^n42_scheduled_[0-9a-f]{64}$')),
+    );
+    expect(
+      original.copyWith(roomId: '!two:test').transactionId,
+      isNot(original.transactionId),
+    );
+  });
+
+  test('rejects damaged identity, dates, payload and unknown types', () {
+    final original = ScheduledMessageDraft(
+      messageId: 'draft',
+      text: 'keep',
+      type: MessageType.text,
+      scheduledAt: DateTime.utc(2030),
+      createdAt: DateTime.utc(2026),
+    ).toJson();
+    for (final change in <Map<String, dynamic>>[
+      {'messageId': null},
+      {'messageId': ' '},
+      {'scheduledAt': null},
+      {'scheduledAt': 'broken'},
+      {'createdAt': 'broken'},
+      {'type': 'futureType'},
+      {'payload': 'broken'},
+      for (final value in ['true', 'false', 0, 1, <String, dynamic>{}]) {'deliveryUnconfirmed': value},
+      for (final value in ['', ' ', ' event', 'event\n', 'ev\u0000ent', 42]) {'acceptedEventId': value},
+    ]) {
+      expect(
+        () => ScheduledMessageDraft.fromJson({...original, ...change}),
+        throwsA(anything),
+        reason: change.keys.single,
+      );
+    }
+    // Older text-only drafts had no type or payload field.
+    final legacy = {...original}
+      ..remove('type')
+      ..remove('payload');
+    final restored = ScheduledMessageDraft.fromJson(legacy);
+    expect(restored.type, MessageType.text);
+    expect(restored.payload, isEmpty);
+    expect(restored.scheduledAt, DateTime.utc(2030));
+  });
+
   group('ScheduledMessageDraft', () {
     test('parses poll payload and builds preview text', () {
       final draft = ScheduledMessageDraft.fromJson({

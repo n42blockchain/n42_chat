@@ -1,5 +1,8 @@
 import 'package:equatable/equatable.dart';
 
+import 'sticker_pack_origin.dart';
+import 'sticker_pack_subscription.dart';
+
 /// 单个贴纸
 class Sticker extends Equatable {
   /// 贴纸 ID
@@ -86,17 +89,17 @@ class Sticker extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        url,
-        httpUrl,
-        name,
-        emoji,
-        width,
-        height,
-        mimeType,
-        size,
-        usageCount,
-      ];
+    id,
+    url,
+    httpUrl,
+    name,
+    emoji,
+    width,
+    height,
+    mimeType,
+    size,
+    usageCount,
+  ];
 }
 
 /// 贴纸包
@@ -125,6 +128,12 @@ class StickerPack extends Equatable {
   /// 贴纸列表
   final List<Sticker> stickers;
 
+  /// Immutable shared-event provenance; absent for legacy/private packs.
+  final StickerPackOrigin? origin;
+
+  /// Live reference; never grant custom-pack ownership from remote metadata.
+  final StickerPackSubscription? subscription;
+
   /// 是否已安装/添加
   final bool isInstalled;
 
@@ -150,6 +159,8 @@ class StickerPack extends Equatable {
     this.source = StickerPackSource.custom,
     this.stickers = const [],
     this.isInstalled = false,
+    this.origin,
+    this.subscription,
     this.isOfficial = false,
     this.downloadCount = 0,
     this.createdAt,
@@ -178,6 +189,8 @@ class StickerPack extends Equatable {
     StickerPackSource? source,
     List<Sticker>? stickers,
     bool? isInstalled,
+    StickerPackOrigin? origin,
+    StickerPackSubscription? subscription,
     bool? isOfficial,
     int? downloadCount,
     DateTime? createdAt,
@@ -193,6 +206,8 @@ class StickerPack extends Equatable {
       source: source ?? this.source,
       stickers: stickers ?? this.stickers,
       isInstalled: isInstalled ?? this.isInstalled,
+      origin: origin ?? this.origin,
+      subscription: subscription ?? this.subscription,
       isOfficial: isOfficial ?? this.isOfficial,
       downloadCount: downloadCount ?? this.downloadCount,
       createdAt: createdAt ?? this.createdAt,
@@ -202,20 +217,22 @@ class StickerPack extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        name,
-        description,
-        avatarUrl,
-        avatarHttpUrl,
-        author,
-        source,
-        stickers,
-        isInstalled,
-        isOfficial,
-        downloadCount,
-        createdAt,
-        updatedAt,
-      ];
+    id,
+    name,
+    description,
+    avatarUrl,
+    avatarHttpUrl,
+    author,
+    source,
+    stickers,
+    isInstalled,
+    origin,
+    subscription,
+    isOfficial,
+    downloadCount,
+    createdAt,
+    updatedAt,
+  ];
 }
 
 /// 贴纸包来源
@@ -272,10 +289,7 @@ class StickerHit extends Equatable {
   final Sticker sticker;
   final String packId;
 
-  const StickerHit({
-    required this.sticker,
-    required this.packId,
-  });
+  const StickerHit({required this.sticker, required this.packId});
 
   @override
   List<Object?> get props => [sticker, packId];

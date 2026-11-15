@@ -1,4 +1,6 @@
+import '../../widgets/common/user_report_dialog.dart';
 import 'moment_author_navigation.dart';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -780,6 +782,14 @@ class _MomentTile extends StatelessWidget {
         },
       ),
     ];
+
+    items.add(
+      _MomentActionItem(
+        icon: Icons.flag_outlined,
+        label: S.of(context)?.reportTitle ?? 'Report',
+        onTap: () => showMomentReportDialog(context, moment: moment),
+      ),
+    );
 
     if (moment.isFromMe) {
       items.add(

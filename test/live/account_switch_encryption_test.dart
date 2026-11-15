@@ -1,7 +1,9 @@
 import 'package:n42_chat/src/data/repositories/auth_repository_impl.dart';
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -27,6 +29,17 @@ void main() {
   test(
     'sequential accounts retain independent device identities and decrypt offline messages',
     () async {
+      final homeserver =
+          Platform.environment['N42_QA_HOMESERVER'] ?? 'https://m.si46.world';
+      final endpoint = Uri.parse(homeserver);
+      if (endpoint.userInfo.isNotEmpty ||
+          endpoint.hasQuery ||
+          endpoint.hasFragment ||
+          !(endpoint.scheme == 'https' ||
+              (endpoint.scheme == 'http' &&
+                  {'localhost', '127.0.0.1', '::1'}.contains(endpoint.host)))) {
+        throw StateError('QA requires HTTPS or an explicit loopback endpoint.');
+      }
       HttpOverrides.global = null;
       FlutterSecureStorage.setMockInitialValues({});
       SharedPreferences.setMockInitialValues({});
@@ -84,7 +97,7 @@ void main() {
 
       Future<void> signIn(int i) async {
         final result = await authRepository.login(
-          homeserver: 'https://m.si46.world',
+          homeserver: homeserver,
           username: accounts[i]['user_id'] as String,
           password: accounts[i]['password'] as String,
         );
@@ -136,7 +149,7 @@ void main() {
 
       try {
         final initial = await authRepository.loginWithToken(
-          homeserver: 'https://m.si46.world',
+          homeserver: homeserver,
           accessToken: accounts[0]['access_token'] as String,
           userId: accounts[0]['user_id'] as String,
           deviceId: accounts[0]['device_id'] as String,
@@ -184,9 +197,8 @@ void main() {
         expect(manager.client!.fingerprintKey, bFingerprint);
         await expectReadable(roomId, first, 'N42 sequential retained A to B');
         expect(
-          MatrixRoomDataSource(
-            manager,
-          ).getLastMessagePreview(manager.client!.getRoomById(roomId)!),
+          MatrixRoomDataSource(manager)
+              .getLastMessagePreview(manager.client!.getRoomById(roomId)!),
           'N42 sequential retained A to B',
         );
         print(
@@ -231,7 +243,7 @@ void main() {
         );
         try {
           await auth.loginWithPassword(
-            homeserver: 'https://m.si46.world',
+            homeserver: homeserver,
             username: accounts[0]['user_id'] as String,
             password: 'deliberately-invalid-fixture',
           );

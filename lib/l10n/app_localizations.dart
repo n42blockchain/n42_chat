@@ -11170,6 +11170,540 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Payment request is unavailable'**
   String get transferPaymentRequestUnavailable;
+
+  /// No description provided for @chatCatchUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Catch up'**
+  String get chatCatchUp;
+
+  /// No description provided for @chatCatchUpMentions.
+  ///
+  /// In en, this message translates to:
+  /// **'Mentions'**
+  String get chatCatchUpMentions;
+
+  /// No description provided for @chatCatchUpReplies.
+  ///
+  /// In en, this message translates to:
+  /// **'Replies to me'**
+  String get chatCatchUpReplies;
+
+  /// No description provided for @chatCatchUpPinned.
+  ///
+  /// In en, this message translates to:
+  /// **'Pinned messages'**
+  String get chatCatchUpPinned;
+
+  /// No description provided for @chatCatchUpScope.
+  ///
+  /// In en, this message translates to:
+  /// **'Mentions and replies use loaded messages, including read messages. Load older messages to find earlier replies.'**
+  String get chatCatchUpScope;
+
+  /// No description provided for @chatCatchUpLoadMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Load older messages'**
+  String get chatCatchUpLoadMore;
+
+  /// No description provided for @chatActionPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Review calendar suggestion'**
+  String get chatActionPreview;
+
+  /// No description provided for @chatActionPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Only the title and time below will be shared with your calendar app after confirmation. Check the time zone. Your calendar account may sync this event.'**
+  String get chatActionPrivacy;
+
+  /// No description provided for @chatActionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat event'**
+  String get chatActionTitle;
+
+  /// No description provided for @chatActionSuggestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Calendar suggestion'**
+  String get chatActionSuggestion;
+
+  /// No description provided for @chatUnreadAttention.
+  ///
+  /// In en, this message translates to:
+  /// **'Unread mentions and replies'**
+  String get chatUnreadAttention;
+
+  /// No description provided for @chatScanAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan again'**
+  String get chatScanAgain;
+
+  /// No description provided for @chatUnreadScope.
+  ///
+  /// In en, this message translates to:
+  /// **'Scans server history to your read marker. Open a conversation to read it; refresh to rebuild the results.'**
+  String get chatUnreadScope;
+
+  /// No description provided for @chatScanIncomplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Incomplete: history, decryption or read marker unavailable. Try again after sync.'**
+  String get chatScanIncomplete;
+
+  /// No description provided for @chatHistoryShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Share selected history'**
+  String get chatHistoryShare;
+
+  /// No description provided for @chatHistoryExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'Administrators only. Select plain text and an existing encrypted direct chat with a joined group member. Sharing creates visible audit messages in the group.'**
+  String get chatHistoryExplanation;
+
+  /// No description provided for @chatHistoryEnable.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable sharing'**
+  String get chatHistoryEnable;
+
+  /// No description provided for @chatHistoryDisable.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable sharing'**
+  String get chatHistoryDisable;
+
+  /// No description provided for @chatHistoryPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Group history sharing policy'**
+  String get chatHistoryPolicy;
+
+  /// No description provided for @chatHistoryPolicyDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Only administrators can share. Enabling also restricts group history visibility to events after joining. Set the text-message limits below and confirm.'**
+  String get chatHistoryPolicyDetail;
+
+  /// No description provided for @chatHistoryPolicySaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Policy saved'**
+  String get chatHistoryPolicySaved;
+
+  /// No description provided for @chatHistoryRecipient.
+  ///
+  /// In en, this message translates to:
+  /// **'Encrypted recipient conversation'**
+  String get chatHistoryRecipient;
+
+  /// No description provided for @chatHistoryReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Review selected messages'**
+  String get chatHistoryReview;
+
+  /// No description provided for @chatHistoryMessages.
+  ///
+  /// In en, this message translates to:
+  /// **'messages'**
+  String get chatHistoryMessages;
+
+  /// No description provided for @chatHistoryConfirmDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm this recipient, each message and its time before sharing. A failed or unknown result may already have sent content: reconcile before continuing.'**
+  String get chatHistoryConfirmDetail;
+
+  /// No description provided for @chatHistoryCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected history sent and group audit confirmed'**
+  String get chatHistoryCompleted;
+
+  /// No description provided for @chatHistoryPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending: reconcile, then confirm again to continue. Unknown sends are never resent.'**
+  String get chatHistoryPending;
+
+  /// No description provided for @chatHistoryReconcile.
+  ///
+  /// In en, this message translates to:
+  /// **'Reconcile send result'**
+  String get chatHistoryReconcile;
+
+  /// No description provided for @chatHistoryFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to complete. Check administrator access, group policy, encryption, recipient membership and selection. If sending started, reconcile its result.'**
+  String get chatHistoryFailed;
+
+  /// No description provided for @chatDeviceActions.
+  ///
+  /// In en, this message translates to:
+  /// **'On-device actions'**
+  String get chatDeviceActions;
+
+  /// No description provided for @chatDeviceActionsReview.
+  ///
+  /// In en, this message translates to:
+  /// **'After confirmation, only this message is provided to the system on-device action suggestions. Choose an action to open Calendar, Reminders or Maps.'**
+  String get chatDeviceActionsReview;
+
+  /// No description provided for @chatHistoryMaxMessages.
+  ///
+  /// In en, this message translates to:
+  /// **'Message limit (1–50)'**
+  String get chatHistoryMaxMessages;
+
+  /// No description provided for @chatHistoryMaxHours.
+  ///
+  /// In en, this message translates to:
+  /// **'History window in hours (1–720)'**
+  String get chatHistoryMaxHours;
+
+  /// No description provided for @chatNotifyAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All Messages'**
+  String get chatNotifyAll;
+
+  /// No description provided for @chatNotifyAllDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Notify for every new message in this chat'**
+  String get chatNotifyAllDescription;
+
+  /// No description provided for @chatNotifyMentions.
+  ///
+  /// In en, this message translates to:
+  /// **'Mentions Only'**
+  String get chatNotifyMentions;
+
+  /// No description provided for @chatNotifyMentionsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Only notify when you are mentioned or @room is used'**
+  String get chatNotifyMentionsDescription;
+
+  /// No description provided for @chatNotifyMutedDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable notifications for this chat on all devices'**
+  String get chatNotifyMutedDescription;
+
+  /// No description provided for @scheduledMessagesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled messages'**
+  String get scheduledMessagesTitle;
+
+  /// No description provided for @scheduledMessagesEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No scheduled messages yet'**
+  String get scheduledMessagesEmpty;
+
+  /// No description provided for @scheduledMessagesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Long press Send, Photos, Files, a GIF or a sticker to schedule a message.'**
+  String get scheduledMessagesHint;
+
+  /// No description provided for @scheduledMessageCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled message cancelled'**
+  String get scheduledMessageCancelled;
+
+  /// No description provided for @scheduledMessageCreatedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Created {time}'**
+  String scheduledMessageCreatedAt(String time);
+
+  /// No description provided for @scheduledDeliveryUnconfirmed.
+  ///
+  /// In en, this message translates to:
+  /// **'Delivery not confirmed'**
+  String get scheduledDeliveryUnconfirmed;
+
+  /// No description provided for @scheduledRecoveryCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Save recovery copy'**
+  String get scheduledRecoveryCopy;
+
+  /// No description provided for @scheduledRecoveryCopyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved on this device without changing or sending messages. Preview shows up to 8,000 characters.'**
+  String get scheduledRecoveryCopyHint;
+
+  /// No description provided for @scheduledRecoveryCopies.
+  ///
+  /// In en, this message translates to:
+  /// **'Recovery copies'**
+  String get scheduledRecoveryCopies;
+
+  /// No description provided for @scheduledRecoveryReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset damaged queue'**
+  String get scheduledRecoveryReset;
+
+  /// No description provided for @scheduledRecoveryResetHint.
+  ///
+  /// In en, this message translates to:
+  /// **'An exact copy is saved on this device. Reset all scheduled messages for this account? Some may already have been sent. Copies and attachments are kept. Nothing is resent.'**
+  String get scheduledRecoveryResetHint;
+
+  /// No description provided for @scheduledRecoveryExportHint.
+  ///
+  /// In en, this message translates to:
+  /// **'This file contains unencrypted draft text and account details. Attachments are not included. Choose a trusted destination.'**
+  String get scheduledRecoveryExportHint;
+
+  /// No description provided for @scheduledRecoveryImport.
+  ///
+  /// In en, this message translates to:
+  /// **'Import recovery copy'**
+  String get scheduledRecoveryImport;
+
+  /// No description provided for @scheduledRecoveryImportHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Save this preview as a recovery copy only. No messages will be scheduled or sent. Attachments are not included. The file author is not verified.'**
+  String get scheduledRecoveryImportHint;
+
+  /// No description provided for @scheduledRecoveryComposerHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Append text to the current draft for review. Nothing is sent. Attachments, mentions and timers are not restored. Check whether this message was already delivered.'**
+  String get scheduledRecoveryComposerHint;
+
+  /// No description provided for @backupRecoverLegacyArchive.
+  ///
+  /// In en, this message translates to:
+  /// **'Recover older local history'**
+  String get backupRecoverLegacyArchive;
+
+  /// No description provided for @backupLegacyArchiveWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'This history has no verified owner. Copy only your rooms to the account below. The original is kept.'**
+  String get backupLegacyArchiveWarning;
+
+  /// No description provided for @backupOlderFiles.
+  ///
+  /// In en, this message translates to:
+  /// **'Older backup files'**
+  String get backupOlderFiles;
+
+  /// No description provided for @backupOlderFilesWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'These files may belong to another account. Select a file to check its contents and ownership before restoring.'**
+  String get backupOlderFilesWarning;
+
+  /// No description provided for @stickerImportTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Import sticker pack'**
+  String get stickerImportTitle;
+
+  /// No description provided for @stickerImportLinkHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Matrix sticker pack link'**
+  String get stickerImportLinkHint;
+
+  /// No description provided for @stickerImportPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview'**
+  String get stickerImportPreview;
+
+  /// No description provided for @stickerImportUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'This pack is unavailable or you do not have access.'**
+  String get stickerImportUnavailable;
+
+  /// Explains the unencrypted Matrix image-pack boundary before confirmed private-copy installation.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a private copy of this pack. Its images and metadata are not end-to-end encrypted.'**
+  String get stickerImportCopyNotice;
+
+  /// No description provided for @stickerImportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not add this pack. Try again.'**
+  String get stickerImportFailed;
+
+  /// No description provided for @stickerImportAccountChanged.
+  ///
+  /// In en, this message translates to:
+  /// **'Account changed or session expired. Reopen sticker import.'**
+  String get stickerImportAccountChanged;
+
+  /// No description provided for @stickerPackSourceRoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Source chat'**
+  String get stickerPackSourceRoom;
+
+  /// No description provided for @stickerPackImages.
+  ///
+  /// In en, this message translates to:
+  /// **'Images'**
+  String get stickerPackImages;
+
+  /// No description provided for @stickerPublishNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Publish this pack to the selected group. Its images and metadata are not end-to-end encrypted. People who can read the group state may access them.'**
+  String get stickerPublishNotice;
+
+  /// No description provided for @stickerPublishFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Publication was not confirmed. Check the group before trying again.'**
+  String get stickerPublishFailed;
+
+  /// No description provided for @stickerPublishReceiptMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Published, but the link was not saved. Share or copy it before leaving this page.'**
+  String get stickerPublishReceiptMissing;
+
+  /// No description provided for @stickerSubscribe.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscribe to updates'**
+  String get stickerSubscribe;
+
+  /// No description provided for @stickerSubscribeNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow future changes made by this pack’s administrators. Images and metadata are not end-to-end encrypted. You can unsubscribe later; this does not join the source chat.'**
+  String get stickerSubscribeNotice;
+
+  /// No description provided for @stickerSubscriptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Sticker subscriptions'**
+  String get stickerSubscriptions;
+
+  /// No description provided for @stickerUnsubscribe.
+  ///
+  /// In en, this message translates to:
+  /// **'Unsubscribe'**
+  String get stickerUnsubscribe;
+
+  /// No description provided for @stickerSubscriptionsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No sticker subscriptions'**
+  String get stickerSubscriptionsEmpty;
+
+  /// No description provided for @chatAttachmentEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'Event'**
+  String get chatAttachmentEvent;
+
+  /// No description provided for @chatRecentMedia.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent photos and videos'**
+  String get chatRecentMedia;
+
+  /// No description provided for @chatRecentMediaLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load recent media'**
+  String get chatRecentMediaLoadFailed;
+
+  /// No description provided for @chatRecentMediaPermission.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo access is needed to show recent media'**
+  String get chatRecentMediaPermission;
+
+  /// No description provided for @chatRecentMediaEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No recent photos or videos'**
+  String get chatRecentMediaEmpty;
+
+  /// No description provided for @chatRecentPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent photo'**
+  String get chatRecentPhoto;
+
+  /// No description provided for @chatRecentVideo.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent video'**
+  String get chatRecentVideo;
+
+  /// No description provided for @chatAttachmentTip.
+  ///
+  /// In en, this message translates to:
+  /// **'Tip'**
+  String get chatAttachmentTip;
+
+  /// No description provided for @chatAttachmentWhiteboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Whiteboard'**
+  String get chatAttachmentWhiteboard;
+
+  /// No description provided for @chatAttachmentVideoNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Video note'**
+  String get chatAttachmentVideoNote;
+
+  /// No description provided for @chatAttachmentCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Code'**
+  String get chatAttachmentCode;
+
+  /// No description provided for @chatAttachmentShop.
+  ///
+  /// In en, this message translates to:
+  /// **'Shop'**
+  String get chatAttachmentShop;
+
+  /// Maximum number of recent media items that may be selected.
+  ///
+  /// In en, this message translates to:
+  /// **'Selection limit: {count}'**
+  String chatSelectionLimit(int count);
+
+  /// Scheduled quick option with the local system-formatted time.
+  ///
+  /// In en, this message translates to:
+  /// **'Tonight ({time})'**
+  String scheduledSendTonightAt(String time);
+
+  /// Scheduled quick option with the local system-formatted time.
+  ///
+  /// In en, this message translates to:
+  /// **'Tomorrow morning ({time})'**
+  String scheduledSendTomorrowMorningAt(String time);
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

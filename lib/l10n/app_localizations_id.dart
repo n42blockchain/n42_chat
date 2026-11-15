@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -1849,7 +1850,7 @@ class SId extends S {
   String get chatSingleChoice => 'Tunggal';
 
   @override
-  String get chatMultiChoice => 'Multi';
+  String get chatMultiChoice => 'Pilih beberapa';
 
   @override
   String get chatEnded => 'Berakhir';
@@ -1995,70 +1996,71 @@ class SId extends S {
   String get settingsSecurityTitle => 'Keamanan';
 
   @override
-  String get settingsDeleteAccountTitle => 'Delete account';
+  String get settingsDeleteAccountTitle => 'Hapus akun';
 
   @override
   String get settingsDeleteAccountSubtitle =>
-      'Deactivate this Matrix account and clean up its local chat data';
+      'Nonaktifkan akun Matrix ini dan bersihkan data obrolan lokalnya';
 
   @override
   String get settingsDeleteAccountExplanation =>
-      'This requests permanent Matrix account deactivation. After server confirmation, this app removes this account\'s local chat session and encryption keys when safe. Other accounts and your wallet are kept. Federation and server retention may limit data erasure.';
+      'Tindakan ini meminta penonaktifan akun Matrix secara permanen. Setelah dikonfirmasi server, aplikasi menghapus sesi obrolan lokal dan kunci enkripsi akun ini saat aman dilakukan. Akun lain dan dompet Anda tetap disimpan. Federasi dan retensi server dapat membatasi penghapusan data.';
 
   @override
   String get settingsDeleteAccountPasswordOptional =>
-      'Matrix password, if requested';
+      'Kata sandi Matrix, jika diminta';
 
   @override
-  String get settingsDeleteAccountServerErase => 'Request server data erasure';
+  String get settingsDeleteAccountServerErase =>
+      'Minta penghapusan data server';
 
   @override
   String get settingsDeleteAccountServerEraseDetail =>
-      'Ask this homeserver to erase account data where supported. Copies held by other servers or required by retention may remain.';
+      'Minta homeserver ini menghapus data akun jika didukung. Salinan yang disimpan server lain atau wajib dipertahankan dapat tetap ada.';
 
   @override
-  String get settingsDeleteAccountChooseStage => 'Verify this Matrix account';
+  String get settingsDeleteAccountChooseStage => 'Verifikasi akun Matrix ini';
 
   @override
-  String get settingsDeleteAccountUsePassword => 'Use Matrix password';
+  String get settingsDeleteAccountUsePassword => 'Gunakan kata sandi Matrix';
 
   @override
-  String get settingsDeleteAccountUseBrowser => 'Continue in browser';
+  String get settingsDeleteAccountUseBrowser => 'Lanjutkan di browser';
 
   @override
   String get settingsDeleteAccountFallbackTitle =>
-      'Return from Matrix verification';
+      'Kembali dari verifikasi Matrix';
 
   @override
   String get settingsDeleteAccountFallbackExplanation =>
-      'Returning from the browser does not confirm deletion. Check the original request with the Matrix server.';
+      'Kembali dari browser tidak mengonfirmasi penghapusan. Periksa permintaan awal pada server Matrix.';
 
   @override
-  String get settingsDeleteAccountCheckServer => 'Check with server';
+  String get settingsDeleteAccountCheckServer => 'Periksa dengan server';
 
   @override
   String get settingsDeleteAccountRequestFailed =>
-      'The Matrix server did not confirm account deletion.';
+      'Server Matrix belum mengonfirmasi penghapusan akun.';
 
   @override
   String get settingsDeleteAccountPendingTitle =>
-      'Pending local account cleanup';
+      'Pembersihan akun lokal tertunda';
 
   @override
   String get settingsDeleteAccountPendingSubtitle =>
-      'Review cleanup for a previously deactivated Matrix account';
+      'Tinjau pembersihan akun Matrix yang telah dinonaktifkan';
 
   @override
   String get settingsDeleteAccountPendingReadError =>
-      'Unable to read pending cleanup records. Tap to retry.';
+      'Tidak dapat membaca catatan pembersihan tertunda. Ketuk untuk mencoba lagi.';
 
   @override
   String get settingsDeleteAccountPendingDetail =>
-      'The Matrix account was deactivated, but local cleanup is still pending. Other accounts remain available.';
+      'Akun Matrix telah dinonaktifkan, tetapi pembersihan lokal masih tertunda. Akun lain tetap dapat digunakan.';
 
   @override
   String get settingsDeleteAccountManagementNotConfirmed =>
-      'Account management opened in your browser. Deletion has not been confirmed in this app, so your chat session remains available.';
+      'Pengelolaan akun dibuka di browser. Penghapusan belum dikonfirmasi di aplikasi ini, sehingga sesi obrolan Anda tetap tersedia.';
 
   @override
   String get settingsKeyBackup => 'Cadangan Kunci';
@@ -2528,7 +2530,7 @@ class SId extends S {
   String get chatSingleChoiceLabel => 'Tunggal';
 
   @override
-  String get chatMultiChoiceLabel => 'Multi';
+  String get chatMultiChoiceLabel => 'Pilih beberapa';
 
   @override
   String get chatAnonymousPollSwitch => 'Polling Anonim';
@@ -3644,7 +3646,7 @@ class SId extends S {
   String get profileStatusSavingWorld => 'Menyelamatkan Dunia';
 
   @override
-  String get profileStatusSelfie => 'Selfie';
+  String get profileStatusSelfie => 'Swafoto';
 
   @override
   String get profileRest => 'Istirahat';
@@ -5020,25 +5022,27 @@ class SId extends S {
   String get reportSelectReason => 'Silakan pilih alasannya';
 
   @override
-  String get reportUnavailable => 'Sign in to send a report.';
+  String get reportUnavailable => 'Masuk untuk mengirim laporan.';
 
   @override
   String get reportAccountChanged =>
-      'Account changed. Open this report again to send it.';
+      'Akun berubah. Buka kembali laporan ini untuk mengirimnya.';
 
   @override
   String get reportUnsupported =>
-      'This homeserver does not support user reports.';
+      'Homeserver ini tidak mendukung laporan pengguna.';
 
   @override
   String get reportRoomUnsupported =>
-      'This homeserver does not support room reports.';
+      'Homeserver ini tidak mendukung laporan ruang.';
 
   @override
-  String get reportRateLimited => 'Too many reports. Please try again later.';
+  String get reportRateLimited =>
+      'Terlalu banyak laporan. Silakan coba lagi nanti.';
 
   @override
-  String get reportCouldNotSend => 'Could not send report. Please try again.';
+  String get reportCouldNotSend =>
+      'Tidak dapat mengirim laporan. Silakan coba lagi.';
 
   @override
   String get gameCenter => 'Permainan';
@@ -5933,31 +5937,31 @@ class SId extends S {
 
   @override
   String get chatEncryptionNotReady =>
-      'Secure connection is not ready. Message not sent. Check connection and device verification on both accounts, then retry.';
+      'Koneksi aman belum siap. Pesan tidak dikirim. Periksa koneksi dan verifikasi perangkat pada kedua akun, lalu coba lagi.';
 
   @override
-  String get contactRequestPending => 'Awaiting acceptance';
+  String get contactRequestPending => 'Menunggu persetujuan';
 
   @override
   String get chatFriendRequestPending =>
-      'Friendship is not confirmed. Check Contacts > New Friends before sending.';
+      'Pertemanan belum dikonfirmasi. Periksa Kontak > Teman Baru sebelum mengirim.';
 
   @override
   String contactPhotoCount(int count) {
-    return '$count photos';
+    return '$count foto';
   }
 
   @override
-  String get videoPublish => 'Publish video';
+  String get videoPublish => 'Terbitkan video';
 
   @override
-  String get videoGoLive => 'Go live';
+  String get videoGoLive => 'Mulai siaran langsung';
 
   @override
-  String get videoSelect => 'Select video';
+  String get videoSelect => 'Pilih video';
 
   @override
-  String get videoLiveUnavailable => 'Live broadcasting is unavailable';
+  String get videoLiveUnavailable => 'Siaran langsung tidak tersedia';
 
   @override
   String get qrcodeAlbum => 'Album';
@@ -5966,101 +5970,101 @@ class SId extends S {
   String get settingsSwitchAccount => 'Ganti Akun';
 
   @override
-  String get chatFilterUnread => 'Unread';
+  String get chatFilterUnread => 'Belum dibaca';
 
   @override
-  String get chatFilterEmpty => 'No conversations in this filter';
+  String get chatFilterEmpty => 'Tidak ada percakapan dalam filter ini';
 
   @override
-  String get accountAdd => 'Add account';
+  String get accountAdd => 'Tambah akun';
 
   @override
-  String get accountCurrent => 'Current account';
+  String get accountCurrent => 'Akun saat ini';
 
   @override
-  String get accountSwitching => 'Switching account…';
+  String get accountSwitching => 'Mengganti akun…';
 
   @override
   String get accountSwitchFailed =>
-      'Could not switch accounts. Try again, or add the account to sign in again.';
+      'Tidak dapat mengganti akun. Coba lagi, atau tambahkan akun untuk masuk kembali.';
 
   @override
   String get accountSessionsHint =>
-      'Switch accounts here to keep each account’s messages and secure session separate.';
+      'Ganti akun di sini agar pesan dan sesi aman setiap akun tetap terpisah.';
 
   @override
-  String get accountNoSaved => 'No saved accounts yet';
+  String get accountNoSaved => 'Belum ada akun tersimpan';
 
   @override
-  String get contactRequestSent => 'Request sent';
+  String get contactRequestSent => 'Permintaan terkirim';
 
   @override
-  String get contactRequestsIncoming => 'Received requests';
+  String get contactRequestsIncoming => 'Permintaan diterima';
 
   @override
-  String get contactRequestsOutgoing => 'Sent requests';
+  String get contactRequestsOutgoing => 'Permintaan dikirim';
 
   @override
   String get contactRequestHint =>
-      'You can chat and call after the request is accepted.';
+      'Anda dapat mengobrol dan menelepon setelah permintaan diterima.';
 
   @override
-  String get callReturnToCall => 'Return to call';
+  String get callReturnToCall => 'Kembali ke panggilan';
 
   @override
-  String get chatMessageSending => 'Sending';
+  String get chatMessageSending => 'Mengirim';
 
   @override
-  String get chatMessageSent => 'Sent';
+  String get chatMessageSent => 'Terkirim';
 
   @override
-  String get chatMessageDelivered => 'Delivered';
+  String get chatMessageDelivered => 'Tersampaikan';
 
   @override
-  String get chatMessageRead => 'Read';
+  String get chatMessageRead => 'Dibaca';
 
   @override
-  String get chatMessageFailed => 'Not sent. Tap to retry.';
+  String get chatMessageFailed => 'Tidak terkirim. Ketuk untuk mencoba lagi.';
 
   @override
   String get chatMessageUnavailable =>
-      'Message unavailable on this device. Tap to check recovery options.';
+      'Pesan tidak tersedia di perangkat ini. Ketuk untuk melihat opsi pemulihan.';
 
   @override
-  String get contactStarredFriends => 'Starred friends';
+  String get contactStarredFriends => 'Teman berbintang';
 
   @override
   String get chatRecipientKeysMissing =>
-      'This friend has no available encrypted session. Ask them to sign in and open the app, then retry. Use Switch Account instead of logging out when changing accounts.';
+      'Teman ini tidak memiliki sesi terenkripsi yang tersedia. Minta mereka masuk dan membuka aplikasi, lalu coba lagi. Gunakan Ganti Akun, bukan keluar, saat mengganti akun.';
 
   @override
   String get chatSwitchForMessaging =>
-      'Changing accounts? Use Switch Account to keep your messages and secure sessions. Logging out revokes this device and can make incoming encrypted messages unavailable.';
+      'Mengganti akun? Gunakan Ganti Akun untuk mempertahankan pesan dan sesi aman Anda. Keluar akan mencabut izin perangkat ini dan dapat membuat pesan terenkripsi masuk tidak tersedia.';
 
   @override
   String get aiServiceUnavailable =>
-      'AI summaries are currently unavailable. Please try again after service access is restored.';
+      'Ringkasan AI saat ini tidak tersedia. Coba lagi setelah akses layanan dipulihkan.';
 
   @override
   String aiSummarizeMessages(int count) {
-    return 'Summarize $count recent messages';
+    return 'Ringkas $count pesan terbaru';
   }
 
   @override
   String groupMembershipSummary(int joined, int invited) {
-    return '$joined joined · $invited invited';
+    return '$joined bergabung · $invited diundang';
   }
 
   @override
   String contactPendingCount(int count) {
-    return '$count pending requests';
+    return '$count permintaan tertunda';
   }
 
   @override
-  String get chatDraftLabel => 'Draft';
+  String get chatDraftLabel => 'Draf';
 
   @override
-  String get contactIndexLabel => 'Contact index';
+  String get contactIndexLabel => 'Indeks kontak';
 
   @override
   String get transferAssetUnavailable => 'Aset pembayaran tidak tersedia';
@@ -6068,4 +6072,314 @@ class SId extends S {
   @override
   String get transferPaymentRequestUnavailable =>
       'Permintaan pembayaran tidak tersedia';
+
+  @override
+  String get chatCatchUp => 'Kejar percakapan';
+
+  @override
+  String get chatCatchUpMentions => 'Sebutan';
+
+  @override
+  String get chatCatchUpReplies => 'Balasan untuk saya';
+
+  @override
+  String get chatCatchUpPinned => 'Pesan yang disematkan';
+
+  @override
+  String get chatCatchUpScope =>
+      'Sebutan dan balasan menggunakan pesan yang sudah dimuat, termasuk pesan yang sudah dibaca. Muat pesan lama untuk menemukan balasan sebelumnya.';
+
+  @override
+  String get chatCatchUpLoadMore => 'Muat pesan lama';
+
+  @override
+  String get chatActionPreview => 'Tinjau saran kalender';
+
+  @override
+  String get chatActionPrivacy =>
+      'Setelah dikonfirmasi, hanya judul dan waktu di bawah yang dibagikan ke aplikasi kalender Anda. Periksa zona waktu. Akun kalender Anda mungkin menyinkronkan acara ini.';
+
+  @override
+  String get chatActionTitle => 'Acara obrolan';
+
+  @override
+  String get chatActionSuggestion => 'Saran kalender';
+
+  @override
+  String get chatUnreadAttention => 'Sebutan dan balasan belum dibaca';
+
+  @override
+  String get chatScanAgain => 'Pindai lagi';
+
+  @override
+  String get chatUnreadScope =>
+      'Memindai riwayat server hingga penanda baca Anda. Buka percakapan untuk membacanya; segarkan untuk menyusun ulang hasil.';
+
+  @override
+  String get chatScanIncomplete =>
+      'Belum lengkap: riwayat, dekripsi, atau penanda baca tidak tersedia. Coba lagi setelah sinkronisasi.';
+
+  @override
+  String get chatHistoryShare => 'Bagikan riwayat terpilih';
+
+  @override
+  String get chatHistoryExplanation =>
+      'Khusus administrator. Pilih teks biasa dan obrolan langsung terenkripsi yang sudah ada dengan anggota yang telah bergabung di grup. Berbagi akan membuat pesan audit yang terlihat di grup.';
+
+  @override
+  String get chatHistoryEnable => 'Aktifkan berbagi';
+
+  @override
+  String get chatHistoryDisable => 'Nonaktifkan berbagi';
+
+  @override
+  String get chatHistoryPolicy => 'Kebijakan berbagi riwayat grup';
+
+  @override
+  String get chatHistoryPolicyDetail =>
+      'Hanya administrator yang dapat berbagi. Mengaktifkannya juga membatasi riwayat grup agar hanya peristiwa setelah bergabung yang terlihat. Tetapkan batas pesan teks di bawah, lalu konfirmasi.';
+
+  @override
+  String get chatHistoryPolicySaved => 'Kebijakan disimpan';
+
+  @override
+  String get chatHistoryRecipient => 'Percakapan penerima terenkripsi';
+
+  @override
+  String get chatHistoryReview => 'Tinjau pesan terpilih';
+
+  @override
+  String get chatHistoryMessages => 'pesan';
+
+  @override
+  String get chatHistoryConfirmDetail =>
+      'Konfirmasikan penerima, setiap pesan, dan waktunya sebelum berbagi. Hasil gagal atau tidak diketahui mungkin sudah mengirim konten: cocokkan hasilnya sebelum melanjutkan.';
+
+  @override
+  String get chatHistoryCompleted =>
+      'Riwayat terpilih terkirim dan audit grup dikonfirmasi';
+
+  @override
+  String get chatHistoryPending =>
+      'Tertunda: cocokkan hasilnya, lalu konfirmasi lagi untuk melanjutkan. Pengiriman dengan hasil tidak diketahui tidak pernah dikirim ulang.';
+
+  @override
+  String get chatHistoryReconcile => 'Cocokkan hasil pengiriman';
+
+  @override
+  String get chatHistoryFailed =>
+      'Tidak dapat menyelesaikan. Periksa akses administrator, kebijakan grup, enkripsi, keanggotaan penerima, dan pilihan pesan. Jika pengiriman sudah dimulai, cocokkan hasilnya.';
+
+  @override
+  String get chatDeviceActions => 'Tindakan di perangkat';
+
+  @override
+  String get chatDeviceActionsReview =>
+      'Setelah dikonfirmasi, hanya pesan ini yang diberikan ke saran tindakan sistem di perangkat. Pilih tindakan untuk membuka Kalender, Pengingat, atau Peta.';
+
+  @override
+  String get chatHistoryMaxMessages => 'Batas pesan (1–50)';
+
+  @override
+  String get chatHistoryMaxHours => 'Rentang riwayat dalam jam (1–720)';
+
+  @override
+  String get chatNotifyAll => 'Semua Pesan';
+
+  @override
+  String get chatNotifyAllDescription =>
+      'Beri notifikasi untuk setiap pesan baru dalam obrolan ini';
+
+  @override
+  String get chatNotifyMentions => 'Hanya Sebutan';
+
+  @override
+  String get chatNotifyMentionsDescription =>
+      'Beri notifikasi hanya saat Anda disebut atau @room digunakan';
+
+  @override
+  String get chatNotifyMutedDescription =>
+      'Nonaktifkan notifikasi obrolan ini di semua perangkat';
+
+  @override
+  String get scheduledMessagesTitle => 'Pesan terjadwal';
+
+  @override
+  String get scheduledMessagesEmpty => 'Belum ada pesan terjadwal';
+
+  @override
+  String get scheduledMessagesHint =>
+      'Tekan lama Kirim, Foto, File, GIF, atau stiker untuk menjadwalkan pesan.';
+
+  @override
+  String get scheduledMessageCancelled => 'Pesan terjadwal dibatalkan';
+
+  @override
+  String scheduledMessageCreatedAt(String time) {
+    return 'Dibuat $time';
+  }
+
+  @override
+  String get scheduledDeliveryUnconfirmed => 'Pengiriman belum dikonfirmasi';
+
+  @override
+  String get scheduledRecoveryCopy => 'Simpan salinan pemulihan';
+
+  @override
+  String get scheduledRecoveryCopyHint =>
+      'Disimpan di perangkat ini tanpa mengubah atau mengirim pesan. Pratinjau menampilkan hingga 8.000 karakter.';
+
+  @override
+  String get scheduledRecoveryCopies => 'Salinan pemulihan';
+
+  @override
+  String get scheduledRecoveryReset => 'Reset antrean yang rusak';
+
+  @override
+  String get scheduledRecoveryResetHint =>
+      'Salinan persis telah disimpan di perangkat ini. Reset semua pesan terjadwal untuk akun ini? Sebagian mungkin sudah terkirim. Salinan dan lampiran tetap disimpan. Tidak ada yang dikirim ulang.';
+
+  @override
+  String get scheduledRecoveryExportHint =>
+      'File ini berisi teks draf dan detail akun yang tidak dienkripsi. Lampiran tidak disertakan. Pilih tujuan yang tepercaya.';
+
+  @override
+  String get scheduledRecoveryImport => 'Impor salinan pemulihan';
+
+  @override
+  String get scheduledRecoveryImportHint =>
+      'Simpan pratinjau ini hanya sebagai salinan pemulihan. Tidak ada pesan yang dijadwalkan atau dikirim. Lampiran tidak disertakan. Penulis berkas belum diverifikasi.';
+
+  @override
+  String get scheduledRecoveryComposerHint =>
+      'Tambahkan teks ke draf saat ini untuk ditinjau. Tidak ada yang dikirim. Lampiran, sebutan, dan pengatur waktu tidak dipulihkan. Periksa apakah pesan ini sudah terkirim.';
+
+  @override
+  String get backupRecoverLegacyArchive => 'Pulihkan riwayat lokal lama';
+
+  @override
+  String get backupLegacyArchiveWarning =>
+      'Pemilik riwayat ini belum diverifikasi. Salin hanya ruang milik Anda ke akun di bawah. Riwayat asli tetap disimpan.';
+
+  @override
+  String get backupOlderFiles => 'File cadangan lama';
+
+  @override
+  String get backupOlderFilesWarning =>
+      'File ini mungkin milik akun lain. Pilih file untuk memeriksa isi dan pemiliknya sebelum memulihkan.';
+
+  @override
+  String get stickerImportTitle => 'Impor paket stiker';
+
+  @override
+  String get stickerImportLinkHint => 'Tautan paket stiker Matrix';
+
+  @override
+  String get stickerImportPreview => 'Pratinjau';
+
+  @override
+  String get stickerImportUnavailable =>
+      'Paket ini tidak tersedia atau Anda tidak memiliki akses.';
+
+  @override
+  String get stickerImportCopyNotice =>
+      'Tambahkan salinan pribadi paket ini. Gambar dan metadatanya tidak dienkripsi end-to-end.';
+
+  @override
+  String get stickerImportFailed =>
+      'Paket ini tidak dapat ditambahkan. Coba lagi.';
+
+  @override
+  String get stickerImportAccountChanged =>
+      'Akun berubah atau sesi berakhir. Buka kembali impor stiker.';
+
+  @override
+  String get stickerPackSourceRoom => 'Chat sumber';
+
+  @override
+  String get stickerPackImages => 'Gambar';
+
+  @override
+  String get stickerPublishNotice =>
+      'Publikasikan paket ini ke grup yang dipilih. Gambar dan metadatanya tidak dienkripsi dari ujung ke ujung. Orang yang dapat membaca status grup mungkin dapat mengaksesnya.';
+
+  @override
+  String get stickerPublishFailed =>
+      'Publikasi belum dikonfirmasi. Periksa grup sebelum mencoba lagi.';
+
+  @override
+  String get stickerPublishReceiptMissing =>
+      'Sudah dipublikasikan, tetapi tautan tidak tersimpan. Bagikan atau salin tautan sebelum meninggalkan halaman ini.';
+
+  @override
+  String get stickerSubscribe => 'Berlangganan pembaruan';
+
+  @override
+  String get stickerSubscribeNotice =>
+      'Ikuti perubahan berikutnya dari administrator paket ini. Gambar dan metadata tidak dienkripsi ujung ke ujung. Anda dapat berhenti berlangganan nanti; tindakan ini tidak membuat Anda bergabung ke chat sumber.';
+
+  @override
+  String get stickerSubscriptions => 'Langganan stiker';
+
+  @override
+  String get stickerUnsubscribe => 'Berhenti berlangganan';
+
+  @override
+  String get stickerSubscriptionsEmpty => 'Tidak ada langganan stiker';
+
+  @override
+  String get chatAttachmentEvent => 'Acara';
+
+  @override
+  String get chatRecentMedia => 'Foto dan video terbaru';
+
+  @override
+  String get chatRecentMediaLoadFailed => 'Tidak dapat memuat media terbaru';
+
+  @override
+  String get chatRecentMediaPermission =>
+      'Akses foto diperlukan untuk menampilkan media terbaru';
+
+  @override
+  String get chatRecentMediaEmpty => 'Tidak ada foto atau video terbaru';
+
+  @override
+  String get chatRecentPhoto => 'Foto terbaru';
+
+  @override
+  String get chatRecentVideo => 'Video terbaru';
+
+  @override
+  String get chatAttachmentTip => 'Tip';
+
+  @override
+  String get chatAttachmentWhiteboard => 'Papan tulis';
+
+  @override
+  String get chatAttachmentVideoNote => 'Pesan video';
+
+  @override
+  String get chatAttachmentCode => 'Kode';
+
+  @override
+  String get chatAttachmentShop => 'Toko';
+
+  @override
+  String chatSelectionLimit(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Batas pilihan: $countString';
+  }
+
+  @override
+  String scheduledSendTonightAt(String time) {
+    return 'Malam ini ($time)';
+  }
+
+  @override
+  String scheduledSendTomorrowMorningAt(String time) {
+    return 'Besok pagi ($time)';
+  }
 }

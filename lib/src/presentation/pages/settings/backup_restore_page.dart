@@ -1,3 +1,6 @@
+import '../../../data/datasources/matrix/matrix_client_manager.dart';
+import '../../../data/services/account_action_capture.dart';
+import '../../../domain/repositories/auth_repository.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -6,6 +9,8 @@ import 'package:get_it/get_it.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/chat_backup_service.dart';
+import '../../../core/services/legacy_archive_recovery_service.dart';
+import 'legacy_archive_recovery_section.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../blocs/backup/backup_bloc.dart';
 import '../../blocs/backup/backup_event.dart';
@@ -20,9 +25,20 @@ class BackupRestorePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) =>
-          BackupBloc(backupService: GetIt.instance<ChatBackupService>())
-            ..add(const LoadBackupList()),
+      create: (_) {
+        final dependencies = GetIt.instance;
+        final auth = dependencies.isRegistered<IAuthRepository>()
+            ? dependencies<IAuthRepository>() : null;
+        final bound = auth is IAccountBoundDeletionLifecycle &&
+            dependencies.isRegistered<MatrixClientManager>();
+        final origin = bound ? captureAccountAction(
+          dependencies<MatrixClientManager>(), auth!,
+        ) : null;
+        return BackupBloc(backupService: dependencies<ChatBackupService>(),
+          isAccountCurrent: bound ? () => origin?.isCurrent ?? false : null,
+          accountChanges: bound ? auth!.loginStateStream : null,
+        )..add(const LoadBackupList());
+      },
       child: const _BackupRestoreView(),
     );
   }
@@ -67,6 +83,11 @@ class _BackupRestoreView extends StatelessWidget {
               _BackupHistorySection(state: state),
               const SizedBox(height: AppDimensions.spacing),
               _RestoreSection(state: state),
+              if (GetIt.instance.isRegistered<LegacyArchiveRecoveryService>())
+                LegacyArchiveRecoverySection(service: GetIt.instance<LegacyArchiveRecoveryService>(),
+                  tryBegin: context.read<BackupBloc>().tryBeginRestoreSelection,
+                  isAccountCurrent: () => context.read<BackupBloc>().isAccountCurrent,
+                  onEnd: context.read<BackupBloc>().endRestoreSelection),
               const SizedBox(height: AppDimensions.spacingXXL),
             ],
           );
@@ -102,7 +123,7 @@ class _BackupSectionState extends State<_BackupSection> {
     final textColor = context.textPrimary;
     final secondaryColor = context.textSecondary;
 
-    return Container(
+    return Material(
       color: cardColor,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -200,6 +221,7 @@ class _BackupSectionState extends State<_BackupSection> {
                 onPressed: widget.state.isCreating
                     ? null
                     : () {
+                        if (context.read<BackupBloc>().isBackupOperationBusy) return;
                         context.read<BackupBloc>().add(
                           CreateBackup(
                             password: _usePassword
@@ -249,7 +271,7 @@ class _BackupHistorySection extends StatelessWidget {
     final textColor = context.textPrimary;
     final secondaryColor = context.textSecondary;
 
-    return Container(
+    return Material(
       color: cardColor,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -317,15 +339,16 @@ class _BackupHistorySection extends StatelessWidget {
                     if (action == 'delete') {
                       _confirmDelete(context, backup);
                     } else if (action == 'restore') {
-                      context.read<BackupBloc>().add(
-                        RestoreFromBackup(backupFilePath: backup.filePath),
+                      _RestoreSection._pickAndRestore(
+                        context, selectedPath: backup.filePath,
                       );
                     }
                   },
                   itemBuilder: (_) => [
-                    const PopupMenuItem(
+                    PopupMenuItem(
+                      enabled: !state.isRestoring,
                       value: 'restore',
-                      child: Row(
+                      child: const Row(
                         children: [
                           Icon(Icons.restore, size: 18),
                           SizedBox(width: AppDimensions.spacingS),
@@ -357,12 +380,22 @@ class _BackupHistorySection extends StatelessWidget {
   }
 
   void _confirmDelete(BuildContext context, BackupInfo backup) {
+    if (context.read<BackupBloc>().isBackupOperationBusy) return;
+    final dependencies = GetIt.instance;
+    if (!dependencies.isRegistered<MatrixClientManager>() ||
+        !dependencies.isRegistered<IAuthRepository>()) return;
+    final origin = captureAccountAction(
+      dependencies<MatrixClientManager>(), dependencies<IAuthRepository>(),
+    );
+    if (origin == null) return;
+    bool current() => context.mounted && origin.isCurrent;
+    final labels = S.of(context);
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Delete Backup'),
-        content: const Text(
-          'Are you sure you want to delete this backup? This cannot be undone.',
+        title: Text(labels?.backupDelete ?? 'Delete Backup'),
+        content: Text(
+          labels?.backupDeleteConfirm ?? 'Are you sure you want to delete this backup? This cannot be undone.',
         ),
         actions: [
           TextButton(
@@ -372,11 +405,12 @@ class _BackupHistorySection extends StatelessWidget {
           TextButton(
             onPressed: () {
               Navigator.pop(dialogContext);
-              context.read<BackupBloc>().add(DeleteBackup(backup.backupId));
+              if (!current() || context.read<BackupBloc>().isBackupOperationBusy) return;
+              context.read<BackupBloc>().add(DeleteBackup(backup.backupId, isCurrent: current));
             },
-            child: const Text(
-              'Delete',
-              style: TextStyle(color: AppColors.error),
+            child: Text(
+              labels?.backupDelete ?? 'Delete',
+              style: const TextStyle(color: AppColors.error),
             ),
           ),
         ],
@@ -397,7 +431,7 @@ class _RestoreSection extends StatelessWidget {
     final textColor = context.textPrimary;
     final secondaryColor = context.textSecondary;
 
-    return Container(
+    return Material(
       color: cardColor,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -465,25 +499,132 @@ class _RestoreSection extends StatelessWidget {
               ),
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.all(AppDimensions.spacing),
+            child: OutlinedButton.icon(
+              onPressed: state.isRestoring ? null : () => _pickAndRestore(context, legacyFiles: true),
+              icon: const Icon(Icons.history),
+              label: Text(S.of(context)!.backupOlderFiles),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Future<void> _pickAndRestore(BuildContext context) async {
+  static Future<void> _pickAndRestore(BuildContext context, {String? selectedPath, bool legacyFiles = false}) async {
+    final dependencies = GetIt.instance;
+    if (!dependencies.isRegistered<MatrixClientManager>() ||
+        !dependencies.isRegistered<IAuthRepository>()) {
+      return;
+    }
+    final origin = captureAccountAction(
+      dependencies<MatrixClientManager>(), dependencies<IAuthRepository>(),
+    );
+    if (origin == null) return;
+    final bloc = context.read<BackupBloc>();
+    if (!bloc.tryBeginRestoreSelection()) return;
+    var dispatched = false;
+    bool current() => context.mounted && origin.isCurrent;
     try {
-      final file = await FilePicker.pickFile(type: FileType.any);
+      var filePath = selectedPath;
+      if (legacyFiles) {
+        final files = await dependencies<ChatBackupService>().listLegacyBackupFiles();
+        if (!context.mounted || !current()) return;
+        final labels = S.of(context)!;
+        filePath = await showDialog<String>(
+          context: context,
+          builder: (dialogContext) => AlertDialog(
+            title: Text(labels.backupOlderFiles),
+            content: SizedBox(width: 480, child: Column(mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(labels.backupOlderFilesWarning),
+                if (files.isEmpty) Text(labels.backupNoBackups)
+                else SizedBox(height: MediaQuery.sizeOf(dialogContext).height * 0.35,
+                  child: ListView.builder(itemCount: files.length, itemBuilder: (_, index) {
+                    final file = files[index];
+                    return ListTile(title: Text(file.uri.pathSegments.last),
+                      onTap: () => Navigator.pop(dialogContext, file.path));
+                  })),
+              ])),
+            actions: [TextButton(onPressed: () => Navigator.pop(dialogContext), child: Text(labels.commonCancel))],
+          ),
+        );
+      } else {
+        filePath ??= (await FilePicker.pickFile(type: FileType.any))?.path;
+      }
 
-      if (file != null) {
-        final filePath = file.path;
-        if (filePath != null && context.mounted) {
-          context.read<BackupBloc>().add(
-            RestoreFromBackup(backupFilePath: filePath),
+      if (filePath != null) {
+        if (context.mounted && current()) {
+          final service = GetIt.instance<ChatBackupService>();
+          BackupPreview preview;
+          String? password;
+          try {
+            preview = await service.previewBackup(filePath);
+          } on BackupPasswordRequired {
+            if (!context.mounted || !current()) return;
+            var input = '';
+            final labels = S.of(context);
+            password = await showDialog<String>(
+              context: context,
+              builder: (dialogContext) => AlertDialog(
+                title: Text(labels?.authPassword ?? 'Password'),
+                content: TextField(
+                  autofocus: true,
+                  obscureText: true,
+                  autocorrect: false,
+                  enableSuggestions: false,
+                  onChanged: (value) => input = value,
+                ),
+                actions: [
+                  TextButton(onPressed: () => Navigator.pop(dialogContext),
+                    child: Text(labels?.commonCancel ?? 'Cancel')),
+                  FilledButton(onPressed: () => Navigator.pop(dialogContext, input),
+                    child: Text(labels?.commonConfirm ?? 'Confirm')),
+                ],
+              ),
+            );
+            if (!context.mounted || !current() || password == null || password.isEmpty) return;
+            preview = await service.previewBackup(filePath, password: password);
+          }
+          if (!context.mounted || !current()) return;
+          final l10n = S.of(context);
+          final confirmed = await showDialog<bool>(
+            context: context,
+            builder: (dialogContext) => AlertDialog(
+              title: Text(l10n?.commonConfirm ?? 'Confirm'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(preview.createdAt.toLocal().toString()),
+                    for (final name in preview.roomNames) Text(name),
+                    for (final warning in preview.warnings)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 12),
+                        child: Text(warning, style: const TextStyle(color: AppColors.warning)),
+                      ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(onPressed: () => Navigator.pop(dialogContext, false),
+                  child: Text(l10n?.commonCancel ?? 'Cancel')),
+                FilledButton(onPressed: () => Navigator.pop(dialogContext, true),
+                  child: Text(l10n?.commonConfirm ?? 'Confirm')),
+              ],
+            ),
           );
+          if (confirmed != true || !context.mounted || !current()) return;
+          bloc.restoreFromSelection(
+            RestoreFromBackup(backupFilePath: filePath, password: password, restoreMessages: true, isCurrent: current),
+          );
+          dispatched = true;
         }
       }
     } catch (e) {
-      if (context.mounted) {
+      if (context.mounted && current()) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to pick file: $e'),
@@ -491,6 +632,8 @@ class _RestoreSection extends StatelessWidget {
           ),
         );
       }
+    } finally {
+      if (!dispatched) bloc.endRestoreSelection();
     }
   }
 }

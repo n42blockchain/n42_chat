@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:convert';
 import 'dart:io';
 
@@ -5,6 +6,9 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+
+import 'social_sign_in_row.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
@@ -144,6 +148,16 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
       });
     }
 
+    final nativeAuthConfig = getIt.isRegistered<N42ChatConfig>()
+        ? getIt<N42ChatConfig>()
+        : null;
+    if (!kIsWeb &&
+        Platform.isAndroid &&
+        (nativeAuthConfig?.n42NativeAuthUrl?.isNotEmpty ?? false) &&
+        mounted) {
+      setState(() => _isAppleAvailable = true);
+    }
+
     // 检查 Apple 登录可用性
     if (!kIsWeb && (Platform.isIOS || Platform.isMacOS)) {
       try {
@@ -190,25 +204,15 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
     final textColor = context.textSecondary;
     final config = N42Chat.config;
     final isAnyLoading = _isAnyLoading;
+    final appleAvailable =
+        (config?.enableAppleLogin ?? true) && _isAppleAvailable;
+    final googleAvailable =
+        (config?.enableGoogleLogin ?? true) && _isGoogleAvailable;
+    final facebookAvailable =
+        (config?.enableFacebookLogin ?? false) && _isFacebookAvailable;
+    final primaryAvailable =
+        appleAvailable || googleAvailable || facebookAvailable;
     final buttons = <Widget>[
-      if ((config?.enableGoogleLogin ?? true) && _isGoogleAvailable)
-        _buildSocialButton(
-          onTap: isAnyLoading ? null : _handleGoogleSignIn,
-          icon: Icons.g_mobiledata,
-          isLoading: _isGoogleLoading,
-          tooltip: S.of(context)?.authGoogleLabel ?? 'Google',
-          backgroundColor: Colors.white,
-          iconColor: Colors.red,
-        ),
-      if ((config?.enableAppleLogin ?? true) && _isAppleAvailable)
-        _buildSocialButton(
-          onTap: isAnyLoading ? null : _handleAppleSignIn,
-          icon: Icons.apple,
-          isLoading: _isAppleLoading,
-          tooltip: S.of(context)?.authAppleLabel ?? 'Apple',
-          backgroundColor: isDark ? Colors.white : Colors.black,
-          iconColor: isDark ? Colors.black : Colors.white,
-        ),
       if ((config?.enableSsoLogin ?? false) && _isSsoAvailable)
         _buildSocialButton(
           onTap: isAnyLoading ? null : _handleSsoSignIn,
@@ -216,15 +220,6 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
           isLoading: _isSsoLoading,
           tooltip: S.of(context)?.authSsoLabel ?? 'SSO',
           backgroundColor: Colors.blue,
-          iconColor: Colors.white,
-        ),
-      if ((config?.enableFacebookLogin ?? false) && _isFacebookAvailable)
-        _buildSocialButton(
-          onTap: isAnyLoading ? null : _handleFacebookSignIn,
-          icon: Icons.facebook,
-          isLoading: _isFacebookLoading,
-          tooltip: 'Facebook',
-          backgroundColor: const Color(0xFF1A73E8),
           iconColor: Colors.white,
         ),
       if ((config?.enableTwitterLogin ?? false) &&
@@ -285,7 +280,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
         ),
     ];
 
-    if (buttons.isEmpty) {
+    if (buttons.isEmpty && !primaryAvailable) {
       return const SizedBox.shrink();
     }
 
@@ -334,7 +329,59 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
             ),
           ),
 
-          // 社交登录按钮
+          if (primaryAvailable)
+            SocialSignInRow(
+              google: googleAvailable
+                  ? CompactSocialSignInButton(
+                      label: 'Google',
+                      icon: Image.asset(
+                        'assets/icons/google_sign_in.png',
+                        package: 'n42_chat',
+                        width: 18,
+                        height: 18,
+                      ),
+                      loading: _isGoogleLoading,
+                      onPressed: isAnyLoading ? null : _handleGoogleSignIn,
+                    )
+                  : null,
+              facebook: facebookAvailable
+                  ? CompactSocialSignInButton(
+                      label: 'Facebook',
+                      icon: const Icon(
+                        Icons.facebook,
+                        size: 20,
+                        color: Color(0xFF1877F2),
+                      ),
+                      loading: _isFacebookLoading,
+                      onPressed: isAnyLoading ? null : _handleFacebookSignIn,
+                    )
+                  : null,
+              apple: appleAvailable
+                  ? (config?.appleSignInButtonBuilder?.call(
+                          context,
+                          isAnyLoading ? null : _handleAppleSignIn,
+                        ) ??
+                        IgnorePointer(
+                          ignoring: isAnyLoading,
+                          child: Opacity(
+                            opacity: isAnyLoading ? 0.5 : 1,
+                            child: SignInWithAppleButton(
+                              onPressed: _handleAppleSignIn,
+                              text:
+                                  S.of(context)?.commonAppleLogin ??
+                                  'Sign in with Apple',
+                              height: 44,
+                              style: isDark
+                                  ? SignInWithAppleButtonStyle.white
+                                  : SignInWithAppleButtonStyle.black,
+                            ),
+                          ),
+                        ))
+                  : null,
+            ),
+          if (primaryAvailable && buttons.isNotEmpty)
+            const SizedBox(height: 12),
+          // Preserve other configured login providers below the primary row.
           Wrap(
             alignment: WrapAlignment.center,
             spacing: 16,
@@ -729,8 +776,12 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
 
     setLoading(true);
     try {
-      // state 用于抗 CSRF（当前仅本地校验形态占位，后端换 token 不依赖它）。
-      final state = DateTime.now().microsecondsSinceEpoch.toRadixString(16);
+      // Bind the callback to this authorization attempt with 256 random bits.
+      final random = Random.secure();
+      final state = List.generate(
+        32,
+        (_) => random.nextInt(256).toRadixString(16).padLeft(2, '0'),
+      ).join();
       final authorizeUrl = Uri.parse(authorizeBase)
           .replace(
             queryParameters: {
@@ -751,6 +802,9 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
         title: title,
       );
 
+      if (result != null && result.queryParameters['state'] != state) {
+        throw const FormatException('Invalid OAuth state. Please try again.');
+      }
       final code = result?.queryParameters['code'];
       if (code == null || code.isEmpty) {
         // 用户取消或未拿到 code

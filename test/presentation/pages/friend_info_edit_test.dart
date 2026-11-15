@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:flutter/services.dart';
 import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';
 import 'package:flutter/material.dart';
@@ -227,15 +228,14 @@ void main() {
       final prefs = await SharedPreferences.getInstance();
       expect(
         jsonDecode(
-              prefs.getString(
-                FriendDetailsStore(
-                  'https://hs.test',
-                  '@me:hs.test',
-                  '__tag_catalog__',
-                ).key,
-              )!,
-            )
-            as List,
+          prefs.getString(
+            FriendDetailsStore(
+              'https://hs.test',
+              '@me:hs.test',
+              '__tag_catalog__',
+            ).key,
+          )!,
+        ) as List,
         hasLength(1),
       );
     },
@@ -339,11 +339,14 @@ void main() {
       await tester.runAsync(() async {
         await tester.tap(find.text('Add'));
         final deadline = DateTime.now().add(const Duration(seconds: 5));
-        while (((await store.load())['photos'] as List?)?.length != 2) {
+        await tester.pump();
+        while (((await store.load())['photos'] as List?)?.length != 2 ||
+            find.byType(LinearProgressIndicator).evaluate().isNotEmpty) {
           if (DateTime.now().isAfter(deadline)) {
             fail('Photo imports did not finish before the deadline');
           }
           await Future<void>.delayed(const Duration(milliseconds: 20));
+          await tester.pump();
         }
       });
       await tester.pumpAndSettle();
@@ -371,7 +374,17 @@ void main() {
       await tester.pumpAndSettle();
       await tester.runAsync(() async {
         await tester.tap(find.byIcon(Icons.delete_outline).first);
-        await Future<void>.delayed(const Duration(milliseconds: 100));
+        final deadline = DateTime.now().add(const Duration(seconds: 5));
+        await tester.pump();
+        while (((await store.load())['photos'] as List?)?.length != 1 ||
+            saved.existsSync() ||
+            find.byType(LinearProgressIndicator).evaluate().isNotEmpty) {
+          if (DateTime.now().isAfter(deadline)) {
+            fail('Photo deletion did not finish before the deadline');
+          }
+          await Future<void>.delayed(const Duration(milliseconds: 20));
+          await tester.pump();
+        }
       });
       await tester.pumpAndSettle();
       expect((await store.load())['photos'], hasLength(1));

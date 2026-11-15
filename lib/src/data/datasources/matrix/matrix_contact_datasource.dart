@@ -28,6 +28,23 @@ class MatrixContactDataSource {
   /// 获取当前用户ID
   String? get currentUserId => _client?.userID;
 
+  /// Bind a multi-step friendship operation to its initiating login.
+  bool Function() captureSession() {
+    final client = _client;
+    final account = client?.userID;
+    final device = client?.deviceID;
+    final token = client?.accessToken;
+    final homeserver = client?.homeserver;
+    return () =>
+        client != null &&
+        account != null &&
+        identical(client, _client) &&
+        account == client.userID &&
+        device == client.deviceID &&
+        token == client.accessToken &&
+        homeserver == client.homeserver;
+  }
+
   // ============================================
   // 联系人获取
   // ============================================
@@ -37,6 +54,7 @@ class MatrixContactDataSource {
   Future<void> refreshDirectChatMembers() async {
     final client = _client;
     if (client == null) return;
+    final current = captureSession();
     final accountId = client.userID;
     final rooms = client.rooms
         .where(
@@ -62,8 +80,7 @@ class MatrixContactDataSource {
           }
         }),
       );
-      if (!identical(client, _client) || accountId != client.userID)
-        throw StateError('Account changed');
+      if (!current()) throw StateError('Account changed');
     }
     if (failures > 0 && getDirectChatContacts().isEmpty) {
       throw ContactMembershipUnavailable();
@@ -521,6 +538,7 @@ class MatrixContactDataSource {
 
   /// 接受邀请
   Future<void> acceptInvite(String roomId) async {
+    final current = captureSession();
     final client = _client;
     final account = client?.userID;
     final room = client?.getRoomById(roomId);
@@ -528,7 +546,7 @@ class MatrixContactDataSource {
       throw StateError('Friend request is no longer available');
     }
     void checkSession() {
-      if (!identical(client, _client) || account != client.userID) {
+      if (!current()) {
         throw StateError('Account changed');
       }
     }
@@ -556,6 +574,7 @@ class MatrixContactDataSource {
       checkSession();
     }
     await refreshDirectChatMembers();
+    checkSession();
   }
 
   /// 拒绝邀请

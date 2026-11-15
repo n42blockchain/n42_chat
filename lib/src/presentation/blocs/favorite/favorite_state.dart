@@ -1,12 +1,14 @@
 import 'package:equatable/equatable.dart';
 
 import '../../../domain/entities/message_entity.dart';
+import '../../../domain/entities/saved_message_favorite.dart';
 
 class FavoriteState extends Equatable {
   static const _sentinel = Object();
   static final _linkRegExp = RegExp(r'https?://');
 
   final List<MessageEntity> favorites;
+  final Map<String, SavedMessageFavorite> details;
   final String? filterType;
   final String? searchQuery;
   final bool isLoading;
@@ -14,6 +16,7 @@ class FavoriteState extends Equatable {
 
   const FavoriteState({
     this.favorites = const [],
+    this.details = const {},
     this.filterType,
     this.searchQuery,
     this.isLoading = false,
@@ -35,9 +38,11 @@ class FavoriteState extends Equatable {
           break;
         case 'link':
           result = result
-              .where((f) =>
-                  f.type == MessageType.text &&
-                  f.content.contains(_linkRegExp))
+              .where(
+                (f) =>
+                    f.type == MessageType.text &&
+                    f.content.contains(_linkRegExp),
+              )
               .toList();
           break;
         case 'file':
@@ -53,9 +58,17 @@ class FavoriteState extends Equatable {
     if (searchQuery != null && searchQuery!.isNotEmpty) {
       final query = searchQuery!.toLowerCase();
       result = result
-          .where((f) =>
-              f.content.toLowerCase().contains(query) ||
-              f.senderName.toLowerCase().contains(query))
+          .where(
+            (f) =>
+                f.content.toLowerCase().contains(query) ||
+                f.senderName.toLowerCase().contains(query) ||
+                (details[f.id]?.remark.toLowerCase().contains(query) ??
+                    false) ||
+                (details[f.id]?.tags.any(
+                      (tag) => tag.toLowerCase().contains(query),
+                    ) ??
+                    false),
+          )
           .toList();
     }
 
@@ -64,6 +77,7 @@ class FavoriteState extends Equatable {
 
   FavoriteState copyWith({
     List<MessageEntity>? favorites,
+    Map<String, SavedMessageFavorite>? details,
     Object? filterType = _sentinel,
     String? searchQuery,
     bool? isLoading,
@@ -71,7 +85,10 @@ class FavoriteState extends Equatable {
   }) {
     return FavoriteState(
       favorites: favorites ?? this.favorites,
-      filterType: filterType == _sentinel ? this.filterType : filterType as String?,
+      details: details ?? this.details,
+      filterType: filterType == _sentinel
+          ? this.filterType
+          : filterType as String?,
       searchQuery: searchQuery ?? this.searchQuery,
       isLoading: isLoading ?? this.isLoading,
       error: error,
@@ -79,5 +96,12 @@ class FavoriteState extends Equatable {
   }
 
   @override
-  List<Object?> get props => [favorites, filterType, searchQuery, isLoading, error];
+  List<Object?> get props => [
+    favorites,
+    details,
+    filterType,
+    searchQuery,
+    isLoading,
+    error,
+  ];
 }

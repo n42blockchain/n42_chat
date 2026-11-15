@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -718,7 +719,7 @@ class SZh extends S {
   String get groupEnterGroupDescription => '請輸入羣簡介';
 
   @override
-  String get groupPublish => '發佈';
+  String get groupPublish => '发布';
 
   @override
   String get chatClearHistoryConfirm => '確定要清空聊天記錄嗎？此操作不可恢復。';
@@ -1072,7 +1073,7 @@ class SZh extends S {
   String get chatPrivateChat => '私聊';
 
   @override
-  String get chatNoMessages => '暫無消息';
+  String get chatNoMessages => '暂无消息';
 
   @override
   String get chatSendFirstMessage => '發送第一條消息開始聊天';
@@ -1946,70 +1947,63 @@ class SZh extends S {
   String get settingsSecurityTitle => '安全';
 
   @override
-  String get settingsDeleteAccountTitle => 'Delete account';
+  String get settingsDeleteAccountTitle => '删除账户';
 
   @override
-  String get settingsDeleteAccountSubtitle =>
-      'Deactivate this Matrix account and clean up its local chat data';
+  String get settingsDeleteAccountSubtitle => '停用此 Matrix 账户并清理其本地聊天数据';
 
   @override
   String get settingsDeleteAccountExplanation =>
-      'This requests permanent Matrix account deactivation. After server confirmation, this app removes this account\'s local chat session and encryption keys when safe. Other accounts and your wallet are kept. Federation and server retention may limit data erasure.';
+      '此操作会请求永久停用 Matrix 账户。服务器确认后，本应用会在安全的情况下移除此账户的本地聊天会话和加密密钥。其他账户及钱包将保留。联邦网络和服务器保留规则可能限制数据擦除。';
 
   @override
-  String get settingsDeleteAccountPasswordOptional =>
-      'Matrix password, if requested';
+  String get settingsDeleteAccountPasswordOptional => 'Matrix 密码（如有要求）';
 
   @override
-  String get settingsDeleteAccountServerErase => 'Request server data erasure';
+  String get settingsDeleteAccountServerErase => '请求擦除服务器数据';
 
   @override
   String get settingsDeleteAccountServerEraseDetail =>
-      'Ask this homeserver to erase account data where supported. Copies held by other servers or required by retention may remain.';
+      '请求此主服务器在支持的情况下擦除账户数据。其他服务器持有的副本或按保留规则保存的数据可能仍然存在。';
 
   @override
-  String get settingsDeleteAccountChooseStage => 'Verify this Matrix account';
+  String get settingsDeleteAccountChooseStage => '验证此 Matrix 账户';
 
   @override
-  String get settingsDeleteAccountUsePassword => 'Use Matrix password';
+  String get settingsDeleteAccountUsePassword => '使用 Matrix 密码';
 
   @override
-  String get settingsDeleteAccountUseBrowser => 'Continue in browser';
+  String get settingsDeleteAccountUseBrowser => '在浏览器中继续';
 
   @override
-  String get settingsDeleteAccountFallbackTitle =>
-      'Return from Matrix verification';
+  String get settingsDeleteAccountFallbackTitle => '从 Matrix 验证返回';
 
   @override
   String get settingsDeleteAccountFallbackExplanation =>
-      'Returning from the browser does not confirm deletion. Check the original request with the Matrix server.';
+      '从浏览器返回不代表删除已确认。请向 Matrix 服务器核对此次原始请求。';
 
   @override
-  String get settingsDeleteAccountCheckServer => 'Check with server';
+  String get settingsDeleteAccountCheckServer => '向服务器核对';
 
   @override
-  String get settingsDeleteAccountRequestFailed =>
-      'The Matrix server did not confirm account deletion.';
+  String get settingsDeleteAccountRequestFailed => 'Matrix 服务器未确认账户删除。';
 
   @override
-  String get settingsDeleteAccountPendingTitle =>
-      'Pending local account cleanup';
+  String get settingsDeleteAccountPendingTitle => '本地账户数据待清理';
 
   @override
-  String get settingsDeleteAccountPendingSubtitle =>
-      'Review cleanup for a previously deactivated Matrix account';
+  String get settingsDeleteAccountPendingSubtitle => '查看先前已停用 Matrix 账户的清理情况';
 
   @override
-  String get settingsDeleteAccountPendingReadError =>
-      'Unable to read pending cleanup records. Tap to retry.';
+  String get settingsDeleteAccountPendingReadError => '无法读取待清理记录。点击重试。';
 
   @override
   String get settingsDeleteAccountPendingDetail =>
-      'The Matrix account was deactivated, but local cleanup is still pending. Other accounts remain available.';
+      'Matrix 账户已停用，但本地数据仍待清理。其他账户仍可使用。';
 
   @override
   String get settingsDeleteAccountManagementNotConfirmed =>
-      'Account management opened in your browser. Deletion has not been confirmed in this app, so your chat session remains available.';
+      '已在浏览器中打开账户管理。本应用尚未确认删除，因此聊天会话仍可使用。';
 
   @override
   String get settingsKeyBackup => '密鑰備份';
@@ -2865,7 +2859,7 @@ class SZh extends S {
   String get qrcodeCameraPermissionRestricted => '此設備上的相機訪問受限';
 
   @override
-  String get authPasskeyLabel => 'Passkey';
+  String get authPasskeyLabel => '通行密钥';
 
   @override
   String get authGoogleLabel => 'Google';
@@ -2874,7 +2868,7 @@ class SZh extends S {
   String get authAppleLabel => 'Apple';
 
   @override
-  String get authSsoLabel => 'SSO';
+  String get authSsoLabel => '单点登录';
 
   @override
   String get authSsoNotConfigured => '该服务器未配置SSO登录提供商';
@@ -4178,7 +4172,7 @@ class SZh extends S {
   String get tokenGateMinBalance => '最低餘額';
 
   @override
-  String get tokenGateTokenId => 'Token ID (ERC-1155)';
+  String get tokenGateTokenId => '代币 ID（ERC-1155）';
 
   @override
   String get tokenGateChainId => '鏈 ID';
@@ -4897,25 +4891,22 @@ class SZh extends S {
   String get reportSelectReason => '請選擇投訴原因';
 
   @override
-  String get reportUnavailable => 'Sign in to send a report.';
+  String get reportUnavailable => '登录后即可举报。';
 
   @override
-  String get reportAccountChanged =>
-      'Account changed. Open this report again to send it.';
+  String get reportAccountChanged => '账户已切换。请重新打开此举报页面后发送。';
 
   @override
-  String get reportUnsupported =>
-      'This homeserver does not support user reports.';
+  String get reportUnsupported => '此主服务器不支持举报用户。';
 
   @override
-  String get reportRoomUnsupported =>
-      'This homeserver does not support room reports.';
+  String get reportRoomUnsupported => '此主服务器不支持举报房间。';
 
   @override
-  String get reportRateLimited => 'Too many reports. Please try again later.';
+  String get reportRateLimited => '举报过于频繁，请稍后重试。';
 
   @override
-  String get reportCouldNotSend => 'Could not send report. Please try again.';
+  String get reportCouldNotSend => '无法发送举报，请重试。';
 
   @override
   String get gameCenter => '遊戲中心';
@@ -5533,7 +5524,7 @@ class SZh extends S {
   String get nftPickerContract => '合約地址';
 
   @override
-  String get nftPickerTokenId => 'Token ID';
+  String get nftPickerTokenId => '代币 ID';
 
   @override
   String get nftPickerVerifyOwnership => '驗證所有權並預覽';
@@ -5905,6 +5896,298 @@ class SZh extends S {
 
   @override
   String get transferPaymentRequestUnavailable => '收款请求不可用';
+
+  @override
+  String get chatCatchUp => '群聊追赶';
+
+  @override
+  String get chatCatchUpMentions => '提及我的';
+
+  @override
+  String get chatCatchUpReplies => '回复我的';
+
+  @override
+  String get chatCatchUpPinned => '置顶消息';
+
+  @override
+  String get chatCatchUpScope => '提及和回复仅筛选已加载消息，包含已读消息。加载更早消息可查找更早的回复。';
+
+  @override
+  String get chatCatchUpLoadMore => '加载更早消息';
+
+  @override
+  String get chatActionPreview => '确认日历建议';
+
+  @override
+  String get chatActionPrivacy => '确认后，仅将下方标题和时间交给日历应用。请核对时区。日历账户可能同步此日程。';
+
+  @override
+  String get chatActionTitle => '聊天日程';
+
+  @override
+  String get chatActionSuggestion => '日历建议';
+
+  @override
+  String get chatUnreadAttention => '未读提及与回复';
+
+  @override
+  String get chatScanAgain => '重新扫描';
+
+  @override
+  String get chatUnreadScope => '按服务器顺序扫描至已读标记。打开会话即可阅读，刷新可重新扫描。';
+
+  @override
+  String get chatScanIncomplete => '尚未完整：历史、解密或已读标记不可用，请同步后重试。';
+
+  @override
+  String get chatHistoryShare => '补发选定历史';
+
+  @override
+  String get chatHistoryExplanation =>
+      '仅管理员可用。选择普通文本和已入群成员的现有加密私聊。补发会在群内留下可见审计消息。';
+
+  @override
+  String get chatHistoryEnable => '启用补发';
+
+  @override
+  String get chatHistoryDisable => '停用补发';
+
+  @override
+  String get chatHistoryPolicy => '群历史补发策略';
+
+  @override
+  String get chatHistoryPolicyDetail =>
+      '仅管理员可补发。启用时也将群历史可见性限制为入群之后。请设置下方文本消息限制并确认。';
+
+  @override
+  String get chatHistoryPolicySaved => '策略已保存';
+
+  @override
+  String get chatHistoryRecipient => '接收人的加密私聊';
+
+  @override
+  String get chatHistoryReview => '预览选定消息';
+
+  @override
+  String get chatHistoryMessages => '条消息';
+
+  @override
+  String get chatHistoryConfirmDetail =>
+      '请确认接收人、每条正文和时间再补发。失败或结果未知时内容可能已发出，请先核对结果。';
+
+  @override
+  String get chatHistoryCompleted => '选定历史已发送，群内审计已确认';
+
+  @override
+  String get chatHistoryPending => '待核对：请先核对，再确认继续。发送结果未知的内容不会重发。';
+
+  @override
+  String get chatHistoryReconcile => '核对发送结果';
+
+  @override
+  String get chatHistoryFailed =>
+      '未能完成。请检查管理员权限、群策略、加密、接收人成员身份和选定内容。若已开始发送，请核对结果。';
+
+  @override
+  String get chatDeviceActions => '设备端操作';
+
+  @override
+  String get chatDeviceActionsReview =>
+      '确认后，仅将此消息交给系统的设备端操作建议。选择建议可打开日历、提醒事项或地图。';
+
+  @override
+  String get chatHistoryMaxMessages => '消息上限（1–50）';
+
+  @override
+  String get chatHistoryMaxHours => '回溯小时数（1–720）';
+
+  @override
+  String get chatNotifyAll => '所有消息';
+
+  @override
+  String get chatNotifyAllDescription => '此聊天中每条新消息都通知';
+
+  @override
+  String get chatNotifyMentions => '仅提及我';
+
+  @override
+  String get chatNotifyMentionsDescription => '仅在有人提及你或使用 @room 时通知';
+
+  @override
+  String get chatNotifyMutedDescription => '在所有设备上关闭此聊天的通知';
+
+  @override
+  String get scheduledMessagesTitle => '定时消息';
+
+  @override
+  String get scheduledMessagesEmpty => '暂无定时消息';
+
+  @override
+  String get scheduledMessagesHint => '长按发送、照片、文件、GIF 或贴纸，即可设置定时发送。';
+
+  @override
+  String get scheduledMessageCancelled => '已取消定时消息';
+
+  @override
+  String scheduledMessageCreatedAt(String time) {
+    return '创建于 $time';
+  }
+
+  @override
+  String get scheduledDeliveryUnconfirmed => '发送结果未确认';
+
+  @override
+  String get scheduledRecoveryCopy => '保存恢复副本';
+
+  @override
+  String get scheduledRecoveryCopyHint =>
+      '副本保存在此设备，不会更改或发送消息。预览最多显示 8,000 个字符。';
+
+  @override
+  String get scheduledRecoveryCopies => '恢复副本';
+
+  @override
+  String get scheduledRecoveryReset => '重置损坏队列';
+
+  @override
+  String get scheduledRecoveryResetHint =>
+      '完整副本已保存在此设备。要重置此账号的所有定时消息吗？部分消息可能已发送。副本和附件将保留，不会重新发送任何消息。';
+
+  @override
+  String get scheduledRecoveryExportHint =>
+      '此文件包含未加密的草稿文本和账号信息，不包含附件。请选择可信的保存或分享位置。';
+
+  @override
+  String get scheduledRecoveryImport => '导入恢复副本';
+
+  @override
+  String get scheduledRecoveryImportHint =>
+      '仅将预览内容保存为恢复副本，不会安排或发送消息。文件不含附件，文件作者未经验证。';
+
+  @override
+  String get scheduledRecoveryComposerHint =>
+      '将文本追加到当前草稿以供检查，不会发送消息。附件、提及和定时设置不会恢复。请确认此消息是否已送达。';
+
+  @override
+  String get backupRecoverLegacyArchive => '恢复旧的本地历史';
+
+  @override
+  String get backupLegacyArchiveWarning =>
+      '这些历史记录的账号归属未经验证。请仅将属于你的房间复制到下方账号，原始记录会保留。';
+
+  @override
+  String get backupOlderFiles => '旧备份文件';
+
+  @override
+  String get backupOlderFilesWarning => '这些文件可能属于其他账号。请选择文件，核对内容和账号归属后再恢复。';
+
+  @override
+  String get stickerImportTitle => '导入贴纸包';
+
+  @override
+  String get stickerImportLinkHint => 'Matrix 贴纸包链接';
+
+  @override
+  String get stickerImportPreview => '预览';
+
+  @override
+  String get stickerImportUnavailable => '此贴纸包不可用，或你没有访问权限。';
+
+  @override
+  String get stickerImportCopyNotice => '添加此贴纸包的私人副本。图片和元数据不受端到端加密保护。';
+
+  @override
+  String get stickerImportFailed => '无法添加此贴纸包，请重试。';
+
+  @override
+  String get stickerImportAccountChanged => '账号已变更或登录已失效，请重新打开贴纸导入。';
+
+  @override
+  String get stickerPackSourceRoom => '来源会话';
+
+  @override
+  String get stickerPackImages => '图片';
+
+  @override
+  String get stickerPublishNotice =>
+      '将此贴纸包发布到所选群聊。图片和元数据不受端到端加密保护。可读取群状态的人可能访问这些内容。';
+
+  @override
+  String get stickerPublishFailed => '未能确认发布结果。请先检查群聊，再决定是否重试。';
+
+  @override
+  String get stickerPublishReceiptMissing => '已发布，但链接未能保存。离开此页面前，请先分享或复制链接。';
+
+  @override
+  String get stickerSubscribe => '订阅更新';
+
+  @override
+  String get stickerSubscribeNotice =>
+      '持续接收贴纸包管理员后续的修改。图片和元数据不受端到端加密保护。你可以稍后取消订阅；此操作不会加入来源群聊。';
+
+  @override
+  String get stickerSubscriptions => '贴纸订阅';
+
+  @override
+  String get stickerUnsubscribe => '取消订阅';
+
+  @override
+  String get stickerSubscriptionsEmpty => '暂无贴纸订阅';
+
+  @override
+  String get chatAttachmentEvent => '活动';
+
+  @override
+  String get chatRecentMedia => '最近的照片和视频';
+
+  @override
+  String get chatRecentMediaLoadFailed => '无法加载最近的照片和视频';
+
+  @override
+  String get chatRecentMediaPermission => '需要照片访问权限才能显示最近的照片和视频';
+
+  @override
+  String get chatRecentMediaEmpty => '暂无最近的照片或视频';
+
+  @override
+  String get chatRecentPhoto => '最近的照片';
+
+  @override
+  String get chatRecentVideo => '最近的视频';
+
+  @override
+  String get chatAttachmentTip => '打赏';
+
+  @override
+  String get chatAttachmentWhiteboard => '白板';
+
+  @override
+  String get chatAttachmentVideoNote => '视频留言';
+
+  @override
+  String get chatAttachmentCode => '代码';
+
+  @override
+  String get chatAttachmentShop => '商店';
+
+  @override
+  String chatSelectionLimit(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '最多选择 $countString 项';
+  }
+
+  @override
+  String scheduledSendTonightAt(String time) {
+    return '今晚 ($time)';
+  }
+
+  @override
+  String scheduledSendTomorrowMorningAt(String time) {
+    return '明早 ($time)';
+  }
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -7849,6 +8132,65 @@ class SZhTw extends SZh {
   String get settingsSecurityTitle => '安全';
 
   @override
+  String get settingsDeleteAccountTitle => '刪除帳戶';
+
+  @override
+  String get settingsDeleteAccountSubtitle => '停用此 Matrix 帳戶並清理其本機聊天資料';
+
+  @override
+  String get settingsDeleteAccountExplanation =>
+      '此操作會要求永久停用 Matrix 帳戶。伺服器確認後，本應用程式會在安全的情況下移除此帳戶的本機聊天工作階段與加密金鑰。其他帳戶及錢包將保留。聯邦網路與伺服器保留規則可能限制資料清除。';
+
+  @override
+  String get settingsDeleteAccountPasswordOptional => 'Matrix 密碼（如有要求）';
+
+  @override
+  String get settingsDeleteAccountServerErase => '要求清除伺服器資料';
+
+  @override
+  String get settingsDeleteAccountServerEraseDetail =>
+      '要求此主伺服器在支援的情況下清除帳戶資料。其他伺服器持有的副本或依保留規則儲存的資料可能仍然存在。';
+
+  @override
+  String get settingsDeleteAccountChooseStage => '驗證此 Matrix 帳戶';
+
+  @override
+  String get settingsDeleteAccountUsePassword => '使用 Matrix 密碼';
+
+  @override
+  String get settingsDeleteAccountUseBrowser => '在瀏覽器中繼續';
+
+  @override
+  String get settingsDeleteAccountFallbackTitle => '從 Matrix 驗證返回';
+
+  @override
+  String get settingsDeleteAccountFallbackExplanation =>
+      '從瀏覽器返回不代表刪除已確認。請向 Matrix 伺服器核對此次原始要求。';
+
+  @override
+  String get settingsDeleteAccountCheckServer => '向伺服器核對';
+
+  @override
+  String get settingsDeleteAccountRequestFailed => 'Matrix 伺服器未確認帳戶刪除。';
+
+  @override
+  String get settingsDeleteAccountPendingTitle => '本機帳戶資料待清理';
+
+  @override
+  String get settingsDeleteAccountPendingSubtitle => '查看先前已停用 Matrix 帳戶的清理情況';
+
+  @override
+  String get settingsDeleteAccountPendingReadError => '無法讀取待清理紀錄。點一下重試。';
+
+  @override
+  String get settingsDeleteAccountPendingDetail =>
+      'Matrix 帳戶已停用，但本機資料仍待清理。其他帳戶仍可使用。';
+
+  @override
+  String get settingsDeleteAccountManagementNotConfirmed =>
+      '已在瀏覽器中開啟帳戶管理。本應用程式尚未確認刪除，因此聊天工作階段仍可使用。';
+
+  @override
   String get settingsKeyBackup => '密鑰備份';
 
   @override
@@ -8702,7 +9044,7 @@ class SZhTw extends SZh {
   String get qrcodeCameraPermissionRestricted => '此設備上的相機訪問受限';
 
   @override
-  String get authPasskeyLabel => 'Passkey';
+  String get authPasskeyLabel => '通行金鑰';
 
   @override
   String get authGoogleLabel => 'Google';
@@ -8711,7 +9053,7 @@ class SZhTw extends SZh {
   String get authAppleLabel => 'Apple';
 
   @override
-  String get authSsoLabel => 'SSO';
+  String get authSsoLabel => '單一登入';
 
   @override
   String get authSsoNotConfigured => '該服務器未配置SSO登錄提供商';
@@ -10015,7 +10357,7 @@ class SZhTw extends SZh {
   String get tokenGateMinBalance => '最低餘額';
 
   @override
-  String get tokenGateTokenId => 'Token ID (ERC-1155)';
+  String get tokenGateTokenId => '代幣 ID（ERC-1155）';
 
   @override
   String get tokenGateChainId => '鏈 ID';
@@ -10734,6 +11076,24 @@ class SZhTw extends SZh {
   String get reportSelectReason => '請選擇投訴原因';
 
   @override
+  String get reportUnavailable => '登入後即可檢舉。';
+
+  @override
+  String get reportAccountChanged => '帳戶已切換。請重新開啟此檢舉頁面後傳送。';
+
+  @override
+  String get reportUnsupported => '此主伺服器不支援檢舉使用者。';
+
+  @override
+  String get reportRoomUnsupported => '此主伺服器不支援檢舉聊天室。';
+
+  @override
+  String get reportRateLimited => '檢舉過於頻繁，請稍後重試。';
+
+  @override
+  String get reportCouldNotSend => '無法傳送檢舉，請重試。';
+
+  @override
   String get gameCenter => '遊戲中心';
 
   @override
@@ -11349,7 +11709,7 @@ class SZhTw extends SZh {
   String get nftPickerContract => '合約地址';
 
   @override
-  String get nftPickerTokenId => 'Token ID';
+  String get nftPickerTokenId => '代幣 ID';
 
   @override
   String get nftPickerVerifyOwnership => '驗證所有權並預覽';
@@ -11722,4 +12082,296 @@ class SZhTw extends SZh {
 
   @override
   String get transferPaymentRequestUnavailable => '收款請求無法使用';
+
+  @override
+  String get chatCatchUp => '群聊追趕';
+
+  @override
+  String get chatCatchUpMentions => '提及我的';
+
+  @override
+  String get chatCatchUpReplies => '回覆我的';
+
+  @override
+  String get chatCatchUpPinned => '置頂訊息';
+
+  @override
+  String get chatCatchUpScope => '提及和回覆僅篩選已載入訊息，包含已讀訊息。載入更早訊息可尋找更早的回覆。';
+
+  @override
+  String get chatCatchUpLoadMore => '載入更早訊息';
+
+  @override
+  String get chatActionPreview => '確認日曆建議';
+
+  @override
+  String get chatActionPrivacy => '確認後，僅將下方標題和時間交給日曆應用程式。請核對時區。日曆帳戶可能同步此行程。';
+
+  @override
+  String get chatActionTitle => '聊天行程';
+
+  @override
+  String get chatActionSuggestion => '日曆建議';
+
+  @override
+  String get chatUnreadAttention => '未讀提及與回覆';
+
+  @override
+  String get chatScanAgain => '重新掃描';
+
+  @override
+  String get chatUnreadScope => '依伺服器順序掃描至已讀標記。開啟會話即可閱讀，重新整理可再次掃描。';
+
+  @override
+  String get chatScanIncomplete => '尚未完整：歷史、解密或已讀標記無法使用，請同步後重試。';
+
+  @override
+  String get chatHistoryShare => '補發選定歷史';
+
+  @override
+  String get chatHistoryExplanation =>
+      '僅管理員可用。選擇一般文字與已入群成員的現有加密私聊。補發會在群內留下可見稽核訊息。';
+
+  @override
+  String get chatHistoryEnable => '啟用補發';
+
+  @override
+  String get chatHistoryDisable => '停用補發';
+
+  @override
+  String get chatHistoryPolicy => '群歷史補發原則';
+
+  @override
+  String get chatHistoryPolicyDetail =>
+      '僅管理員可補發。啟用時也將群歷史可見性限制為入群之後。請設定下方文字訊息限制並確認。';
+
+  @override
+  String get chatHistoryPolicySaved => '原則已儲存';
+
+  @override
+  String get chatHistoryRecipient => '接收人的加密私聊';
+
+  @override
+  String get chatHistoryReview => '預覽選定訊息';
+
+  @override
+  String get chatHistoryMessages => '則訊息';
+
+  @override
+  String get chatHistoryConfirmDetail =>
+      '請確認接收人、每則文字與時間後再補發。失敗或結果未知時內容可能已送出，請先核對結果。';
+
+  @override
+  String get chatHistoryCompleted => '選定歷史已送出，群內稽核已確認';
+
+  @override
+  String get chatHistoryPending => '待核對：請先核對，再確認繼續。傳送結果未知的內容不會重發。';
+
+  @override
+  String get chatHistoryReconcile => '核對傳送結果';
+
+  @override
+  String get chatHistoryFailed =>
+      '無法完成。請檢查管理員權限、群原則、加密、接收人成員身分及選定內容。若已開始傳送，請核對結果。';
+
+  @override
+  String get chatDeviceActions => '裝置端操作';
+
+  @override
+  String get chatDeviceActionsReview =>
+      '確認後，僅將此訊息交給系統的裝置端操作建議。選擇建議可開啟日曆、提醒事項或地圖。';
+
+  @override
+  String get chatHistoryMaxMessages => '訊息上限（1–50）';
+
+  @override
+  String get chatHistoryMaxHours => '回溯小時數（1–720）';
+
+  @override
+  String get chatNotifyAll => '所有訊息';
+
+  @override
+  String get chatNotifyAllDescription => '此聊天中的每則新訊息都通知';
+
+  @override
+  String get chatNotifyMentions => '僅提及我';
+
+  @override
+  String get chatNotifyMentionsDescription => '僅在有人提及你或使用 @room 時通知';
+
+  @override
+  String get chatNotifyMutedDescription => '在所有裝置上關閉此聊天的通知';
+
+  @override
+  String get scheduledMessagesTitle => '排程訊息';
+
+  @override
+  String get scheduledMessagesEmpty => '尚無排程訊息';
+
+  @override
+  String get scheduledMessagesHint => '長按傳送、照片、檔案、GIF 或貼圖，即可設定排程傳送。';
+
+  @override
+  String get scheduledMessageCancelled => '已取消排程訊息';
+
+  @override
+  String scheduledMessageCreatedAt(String time) {
+    return '建立於 $time';
+  }
+
+  @override
+  String get scheduledDeliveryUnconfirmed => '傳送結果尚未確認';
+
+  @override
+  String get scheduledRecoveryCopy => '儲存復原副本';
+
+  @override
+  String get scheduledRecoveryCopyHint =>
+      '副本儲存在此裝置，不會變更或傳送訊息。預覽最多顯示 8,000 個字元。';
+
+  @override
+  String get scheduledRecoveryCopies => '復原副本';
+
+  @override
+  String get scheduledRecoveryReset => '重設損壞佇列';
+
+  @override
+  String get scheduledRecoveryResetHint =>
+      '完整副本已儲存在此裝置。要重設此帳號的所有排程訊息嗎？部分訊息可能已傳送。副本和附件將保留，不會重新傳送任何訊息。';
+
+  @override
+  String get scheduledRecoveryExportHint =>
+      '此檔案包含未加密的草稿文字和帳號資訊，不包含附件。請選擇可信任的儲存或分享位置。';
+
+  @override
+  String get scheduledRecoveryImport => '匯入復原副本';
+
+  @override
+  String get scheduledRecoveryImportHint =>
+      '僅將預覽內容儲存為復原副本，不會排程或傳送訊息。檔案不含附件，檔案作者未經驗證。';
+
+  @override
+  String get scheduledRecoveryComposerHint =>
+      '將文字附加到目前草稿以供檢查，不會傳送訊息。附件、提及和定時設定不會還原。請確認此訊息是否已送達。';
+
+  @override
+  String get backupRecoverLegacyArchive => '復原舊的本機歷史';
+
+  @override
+  String get backupLegacyArchiveWarning =>
+      '這些歷史記錄的帳號歸屬未經驗證。請僅將屬於你的聊天室複製到下方帳號，原始記錄會保留。';
+
+  @override
+  String get backupOlderFiles => '舊備份檔案';
+
+  @override
+  String get backupOlderFilesWarning => '這些檔案可能屬於其他帳號。請選擇檔案，核對內容和帳號歸屬後再復原。';
+
+  @override
+  String get stickerImportTitle => '匯入貼圖包';
+
+  @override
+  String get stickerImportLinkHint => 'Matrix 貼圖包連結';
+
+  @override
+  String get stickerImportPreview => '預覽';
+
+  @override
+  String get stickerImportUnavailable => '此貼圖包無法使用，或你沒有存取權限。';
+
+  @override
+  String get stickerImportCopyNotice => '新增此貼圖包的私人副本。圖片和中繼資料不受端對端加密保護。';
+
+  @override
+  String get stickerImportFailed => '無法新增此貼圖包，請重試。';
+
+  @override
+  String get stickerImportAccountChanged => '帳號已變更或登入已失效，請重新開啟貼圖匯入。';
+
+  @override
+  String get stickerPackSourceRoom => '來源對話';
+
+  @override
+  String get stickerPackImages => '圖片';
+
+  @override
+  String get stickerPublishNotice =>
+      '將此貼圖包發佈到所選群組。圖片和中繼資料不受端對端加密保護。可讀取群組狀態的人可能存取這些內容。';
+
+  @override
+  String get stickerPublishFailed => '無法確認發佈結果。請先檢查群組，再決定是否重試。';
+
+  @override
+  String get stickerPublishReceiptMissing => '已發佈，但連結未能儲存。離開此頁面前，請先分享或複製連結。';
+
+  @override
+  String get stickerSubscribe => '訂閱更新';
+
+  @override
+  String get stickerSubscribeNotice =>
+      '持續接收貼圖包管理員後續的修改。圖片和中繼資料不受端對端加密保護。你可以稍後取消訂閱；此操作不會加入來源群組。';
+
+  @override
+  String get stickerSubscriptions => '貼圖訂閱';
+
+  @override
+  String get stickerUnsubscribe => '取消訂閱';
+
+  @override
+  String get stickerSubscriptionsEmpty => '尚無貼圖訂閱';
+
+  @override
+  String get chatAttachmentEvent => '活動';
+
+  @override
+  String get chatRecentMedia => '最近的照片和影片';
+
+  @override
+  String get chatRecentMediaLoadFailed => '無法載入最近的照片和影片';
+
+  @override
+  String get chatRecentMediaPermission => '需要照片存取權限才能顯示最近的照片和影片';
+
+  @override
+  String get chatRecentMediaEmpty => '沒有最近的照片或影片';
+
+  @override
+  String get chatRecentPhoto => '最近的照片';
+
+  @override
+  String get chatRecentVideo => '最近的影片';
+
+  @override
+  String get chatAttachmentTip => '打賞';
+
+  @override
+  String get chatAttachmentWhiteboard => '白板';
+
+  @override
+  String get chatAttachmentVideoNote => '影片留言';
+
+  @override
+  String get chatAttachmentCode => '程式碼';
+
+  @override
+  String get chatAttachmentShop => '商店';
+
+  @override
+  String chatSelectionLimit(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '最多選擇 $countString 項';
+  }
+
+  @override
+  String scheduledSendTonightAt(String time) {
+    return '今晚 ($time)';
+  }
+
+  @override
+  String scheduledSendTomorrowMorningAt(String time) {
+    return '明早 ($time)';
+  }
 }

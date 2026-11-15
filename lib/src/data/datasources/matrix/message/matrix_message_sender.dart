@@ -1,6 +1,9 @@
 import 'package:flutter/services.dart';
+
 import 'direct_chat_send_guard.dart';
+
 import 'dart:typed_data';
+
 import 'package:matrix/matrix.dart' as matrix;
 
 import '../../../../domain/entities/message_entity.dart';
@@ -17,9 +20,18 @@ import '../../../../core/utils/debug_log.dart';
 class MatrixMessageSender {
   final MatrixClientManager _clientManager;
   late final MatrixMediaSender _mediaSender;
+  final Map<Object, Future<bool>> _pendingResends = {};
 
-  MatrixMessageSender(this._clientManager, MatrixMediaUploader uploader) {
-    _mediaSender = MatrixMediaSender(_clientManager, uploader);
+  MatrixMessageSender(
+    this._clientManager,
+    MatrixMediaUploader uploader, {
+    int maxAttachmentBytes = 50 * 1024 * 1024,
+  }) {
+    _mediaSender = MatrixMediaSender(
+      _clientManager,
+      uploader,
+      maxAttachmentBytes: maxAttachmentBytes,
+    );
   }
 
   matrix.Client? get _client => _clientManager.client;
@@ -35,8 +47,10 @@ class MatrixMessageSender {
     required String filename,
     String? mimeType,
     int? selfDestructAfter,
+    String? transactionId,
   }) => _mediaSender.sendImageMessage(
     roomId,
+    transactionId: transactionId,
     imageBytes: imageBytes,
     filename: filename,
     mimeType: mimeType,
@@ -68,8 +82,10 @@ class MatrixMessageSender {
     String? mimeType,
     Uint8List? thumbnailBytes,
     int? selfDestructAfter,
+    String? transactionId,
   }) => _mediaSender.sendVideoMessage(
     roomId,
+    transactionId: transactionId,
     videoBytes: videoBytes,
     filename: filename,
     mimeType: mimeType,
@@ -87,8 +103,10 @@ class MatrixMessageSender {
     String? filePath,
     Stream<List<int>>? fileStream,
     int? fileSize,
+    String? transactionId,
   }) => _mediaSender.sendFileMessage(
     roomId,
+    transactionId: transactionId,
     fileBytes: fileBytes,
     filename: filename,
     mimeType: mimeType,
@@ -113,8 +131,20 @@ class MatrixMessageSender {
     int? selfDestructAfter,
     List<String>? mentionedUserIds,
     bool mentionsRoom = false,
+    String? transactionId,
   }) async {
-    final room = await prepareRoomForSending(_client, roomId);
+    final sendingClient = _client;
+    final user = sendingClient?.userID, token = sendingClient?.accessToken,
+        device = sendingClient?.deviceID;
+    void requireSameSession() {
+      if (sendingClient == null || !identical(_client, sendingClient) ||
+          !sendingClient.isLogged() || sendingClient.userID != user ||
+          sendingClient.accessToken != token || sendingClient.deviceID != device) {
+        throw StateError('Message sending account changed');
+      }
+    }
+
+    final room = await prepareRoomForSending(sendingClient, roomId);
     if (room == null) return null;
 
     final content = buildTextMessageContent(
@@ -127,10 +157,13 @@ class MatrixMessageSender {
 
     // 如果有特殊字段，使用 sendEvent；否则使用 sendTextEvent
     if (hasExtendedTextMetadata(content)) {
-      return await room.sendEvent(content);
+      requireSameSession();
+      return await room.sendEvent(content, txid: transactionId);
     }
 
-    return await room.sendTextEvent(text);
+    requireSameSession();
+
+    return await room.sendTextEvent(text, txid: transactionId);
   }
 
   /// 发送位置消息
@@ -223,7 +256,19 @@ class MatrixMessageSender {
     int? width,
     int? height,
     String? title,
+    String? transactionId,
   }) async {
+    final sendingClient = _client;
+    final user = sendingClient?.userID, token = sendingClient?.accessToken,
+        device = sendingClient?.deviceID;
+    void requireSameSession() {
+      if (sendingClient == null || !identical(_client, sendingClient) ||
+          !sendingClient.isLogged() || sendingClient.userID != user ||
+          sendingClient.accessToken != token || sendingClient.deviceID != device) {
+        throw StateError('Message sending account changed');
+      }
+    }
+
     debugLog('=== MatrixMessageDataSource.sendGifMessage start ===');
     debugLog('roomId: $roomId');
     debugLog('gifUrl: $gifUrl');
@@ -239,7 +284,7 @@ class MatrixMessageSender {
         throw Exception('未登录');
       }
 
-      final room = await prepareRoomForSending(_client, roomId);
+      final room = await prepareRoomForSending(sendingClient, roomId);
       if (room == null) {
         debugLog('ERROR: Room not found: $roomId');
         throw Exception('房间不存在: $roomId');
@@ -263,7 +308,9 @@ class MatrixMessageSender {
       debugLog('GIF content: $content');
       debugLog('Calling room.sendEvent...');
 
-      final result = await room.sendEvent(content);
+      requireSameSession();
+
+      final result = await room.sendEvent(content, txid: transactionId);
       debugLog('sendEvent result: $result');
 
       debugLog('=== sendGifMessage completed successfully ===');
@@ -291,7 +338,19 @@ class MatrixMessageSender {
     int? height,
     String? mimeType,
     int? size,
+    String? transactionId,
   }) async {
+    final sendingClient = _client;
+    final user = sendingClient?.userID, token = sendingClient?.accessToken,
+        device = sendingClient?.deviceID;
+    void requireSameSession() {
+      if (sendingClient == null || !identical(_client, sendingClient) ||
+          !sendingClient.isLogged() || sendingClient.userID != user ||
+          sendingClient.accessToken != token || sendingClient.deviceID != device) {
+        throw StateError('Message sending account changed');
+      }
+    }
+
     debugLog('=== MatrixMessageDataSource.sendStickerMessage start ===');
     debugLog('roomId: $roomId');
     debugLog('stickerId: $stickerId');
@@ -309,7 +368,7 @@ class MatrixMessageSender {
         throw Exception('未登录');
       }
 
-      final room = await prepareRoomForSending(_client, roomId);
+      final room = await prepareRoomForSending(sendingClient, roomId);
       if (room == null) {
         debugLog('ERROR: Room not found: $roomId');
         throw Exception('房间不存在: $roomId');
@@ -319,7 +378,8 @@ class MatrixMessageSender {
       if (url.startsWith('emoji:')) {
         final emojiChar = url.substring(6);
         debugLog('Sending emoji sticker as text: $emojiChar');
-        return await room.sendTextEvent(emojiChar);
+        requireSameSession();
+        return await room.sendTextEvent(emojiChar, txid: transactionId);
       }
 
       var mediaUrl = url;
@@ -368,8 +428,11 @@ class MatrixMessageSender {
       debugLog('Sticker content: $content');
       debugLog('Calling room.sendEvent with type m.sticker...');
 
+      requireSameSession();
+
       final result = await room.sendEvent(
         content,
+        txid: transactionId,
         type: matrix.EventTypes.Sticker,
       );
       debugLog('sendEvent result: $result');
@@ -415,20 +478,93 @@ class MatrixMessageSender {
   }
 
   /// 重发消息
-  Future<bool> resendMessage(String roomId, String eventId) async {
-    final room = await prepareRoomForSending(_client, roomId);
-    if (room == null) return false;
-
-    final event = await room.getEventById(eventId);
-    if (event == null) return false;
-
-    // 获取原始内容并重新发送
-    try {
-      await room.sendEvent(event.content);
-      return true;
-    } catch (e) {
-      return false;
-    }
+  Future<bool> resendMessage(String roomId, String eventId) {
+    final client = _client;
+    if (client == null || !client.isLogged()) return Future.value(false);
+    final user = client.userID,
+        token = client.accessToken,
+        device = client.deviceID,
+        server = client.homeserver;
+    if (user == null || user.isEmpty) return Future.value(false);
+    final key = (client, user, token, device, server, roomId, eventId);
+    bool current() =>
+        identical(_client, client) &&
+        client.isLogged() &&
+        client.userID == user &&
+        client.accessToken == token &&
+        client.deviceID == device &&
+        client.homeserver == server;
+    return _pendingResends.putIfAbsent(key, () async {
+      try {
+        final room = await prepareRoomForSending(client, roomId);
+        if (!current() || room == null || !identical(room.client, client)) {
+          return false;
+        }
+        final event = await room.getEventById(eventId);
+        if (!current() ||
+            !identical(client.getRoomById(roomId), room) ||
+            event == null ||
+            !identical(event.room, room) ||
+            event.senderId != user ||
+            event.status != matrix.EventStatus.error ||
+            event.stateKey != null ||
+            event.type == matrix.EventTypes.Encrypted) {
+          return false;
+        }
+        // Reuse the original transaction for server-side retry idempotency.
+        final originalTransaction = event.transactionId;
+        final transaction =
+            originalTransaction == null || originalTransaction.isEmpty
+            ? eventId
+            : originalTransaction;
+        final isMedia =
+            event.type == matrix.EventTypes.Message &&
+            {
+              matrix.MessageTypes.Image,
+              matrix.MessageTypes.Video,
+              matrix.MessageTypes.Audio,
+              matrix.MessageTypes.File,
+            }.contains(event.messageType);
+        final encryptedFile = event.content['file'];
+        final attachmentUrl = encryptedFile is Map
+            ? encryptedFile['url']
+            : event.content['url'];
+        final attachment = attachmentUrl is String
+            ? Uri.tryParse(attachmentUrl)
+            : null;
+        final alreadyUploaded =
+            attachment != null &&
+            attachment.host.isNotEmpty &&
+            {'mxc', 'https', 'http'}.contains(attachment.scheme);
+        // SDK media retries recover cached files and repeat failed uploads.
+        // Existing remote attachments (including GIFs) do not need a local cache.
+        // Non-media sends retain the event type (including m.sticker).
+        if (isMedia && !alreadyUploaded) {
+          if (originalTransaction == null || originalTransaction.isEmpty ||
+              event.content['filename'] is! String) return false;
+          // SDK sendAgain cancels the local event when its cache is missing.
+          // Check first so a recoverable failed message stays visible.
+          final cached = await client.database.getFile(
+            Uri(scheme: 'cache', host: 'file', path: originalTransaction),
+          );
+          if (!current() || cached == null) return false;
+        }
+        final receipt = isMedia && !alreadyUploaded
+            ? await event.sendAgain(txid: transaction)
+            : await room.sendEvent(
+                event.content,
+                txid: transaction,
+                type: event.type,
+              );
+        return receipt != null && receipt.isNotEmpty;
+      } catch (_) {
+        return false;
+      } finally {
+        // This removes the current operation, not a new asynchronous task.
+        // ignore: unawaited_futures
+        _pendingResends.remove(key);
+      }
+    });
   }
 
   /// 发送系统通知/拍一拍消息

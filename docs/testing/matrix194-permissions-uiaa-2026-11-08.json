@@ -1,0 +1,101 @@
+{
+  "image": "jevolk/tuwunel@sha256:0e86c6164d6c9f5b60291938eb61ad8395021c37fe58d47a963ea7edddbedaec",
+  "serverVersion": {
+    "name": "Tuwunel",
+    "version": "1.9.4",
+    "compiler": "rustc 1.95.0 (59807616e 2026-04-14)"
+  },
+  "checks": [
+    {
+      "check": "owner creates restricted private group",
+      "actual": 200,
+      "expected": 200,
+      "passed": true
+    },
+    {
+      "check": "uninvited account cannot join",
+      "actual": 403,
+      "expected": 403,
+      "passed": true
+    },
+    {
+      "check": "owner can invite",
+      "actual": 200,
+      "expected": 200,
+      "passed": true
+    },
+    {
+      "check": "invited account can join",
+      "actual": 200,
+      "expected": 200,
+      "passed": true
+    },
+    {
+      "check": "ordinary member cannot invite",
+      "actual": 403,
+      "expected": 403,
+      "passed": true
+    },
+    {
+      "check": "ordinary member cannot change group name",
+      "actual": 403,
+      "expected": 403,
+      "passed": true
+    },
+    {
+      "check": "joined member can send",
+      "actual": 200,
+      "expected": 200,
+      "passed": true
+    },
+    {
+      "check": "owner can remove member",
+      "actual": 200,
+      "expected": 200,
+      "passed": true
+    },
+    {
+      "check": "removed member cannot send",
+      "actual": 403,
+      "expected": 403,
+      "passed": true
+    },
+    {
+      "check": "device removal requires UIAA",
+      "actual": 401,
+      "expected": 401,
+      "passed": true
+    },
+    {
+      "check": "password stage advertised",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "check": "UIAA supplies continuation session",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "check": "same UIAA request completes with password",
+      "actual": 200,
+      "expected": 200,
+      "passed": true
+    },
+    {
+      "check": "deleted device token no longer authenticates",
+      "actual": 401,
+      "expected": 401,
+      "passed": true
+    }
+  ],
+  "scope": "Disposable HTTP protocol permission/UIAA acceptance only; not native UI, E2EE or production acceptance",
+  "containerRemoved": true,
+  "date": "2026-11-08",
+  "runnerSha256": "ebd7d75034b2cc8f7848f251f3667fcdc97e4cf61c4725e5b0927c1877cb3c85",
+  "passed": 14,
+  "failed": 0,
+  "fixtureCorrection": "Initial fixture explicitly included the creator in power-level users, rejected by the default room version; removing that fixture field allowed the intended checks. No client fix is claimed."
+}

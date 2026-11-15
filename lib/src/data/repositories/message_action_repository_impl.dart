@@ -1,7 +1,9 @@
 import 'dart:convert';
+
 import 'package:crypto/crypto.dart';
 
 import '../../domain/entities/message_entity.dart';
+import '../../domain/entities/saved_message_favorite.dart';
 import '../../domain/entities/message_reaction_entity.dart';
 import '../../domain/repositories/message_action_repository.dart';
 import '../datasources/local/preferences_datasource.dart';
@@ -9,7 +11,8 @@ import '../datasources/matrix/matrix_client_manager.dart';
 import '../datasources/matrix/matrix_reaction_datasource.dart';
 
 /// 消息操作仓库实现
-class MessageActionRepositoryImpl implements IMessageActionRepository {
+class MessageActionRepositoryImpl
+    implements IMessageActionRepository, IFavoriteDetailsRepository {
   final MatrixReactionDataSource _reactionDataSource;
   final MatrixClientManager _clientManager;
   final PreferencesDataSource _storage;
@@ -292,6 +295,30 @@ class MessageActionRepositoryImpl implements IMessageActionRepository {
     final snapshot = await _loadFavorites(scope);
     _checkFavoriteScope(scope);
     return List.unmodifiable(snapshot.messages);
+  }
+
+  @override
+  Future<List<SavedMessageFavorite>> getSavedMessageFavorites() async {
+    final scope = _favoriteScope();
+    final snapshot = await _loadFavorites(scope);
+    _checkFavoriteScope(scope);
+    return List.unmodifiable(
+      snapshot.messages.map((message) {
+        final metadata = snapshot.metadata[message.id];
+        final tags = metadata?['tags'];
+        final remark = metadata?['remark'];
+        if ((tags != null &&
+                (tags is! List || tags.any((dynamic tag) => tag is! String))) ||
+            (remark != null && remark is! String)) {
+          throw const FormatException('Invalid favorite annotations');
+        }
+        return SavedMessageFavorite(
+          message: message,
+          tags: tags == null ? const [] : List<String>.from(tags as List),
+          remark: remark as String? ?? '',
+        );
+      }),
+    );
   }
 
   @override

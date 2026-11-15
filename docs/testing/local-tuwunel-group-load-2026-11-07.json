@@ -1,0 +1,137 @@
+{
+  "passed": true,
+  "members": 20,
+  "messages": 10000,
+  "fileMessages": 100,
+  "deliveries": 200000,
+  "sendMilliseconds": 339033,
+  "totalMilliseconds": 1174155,
+  "offlineRecipient": 19,
+  "recipients": [
+    {
+      "recipient": 0,
+      "messages": 10000,
+      "unique": 10000
+    },
+    {
+      "recipient": 1,
+      "messages": 10000,
+      "unique": 10000
+    },
+    {
+      "recipient": 2,
+      "messages": 10000,
+      "unique": 10000
+    },
+    {
+      "recipient": 3,
+      "messages": 10000,
+      "unique": 10000
+    },
+    {
+      "recipient": 4,
+      "messages": 10000,
+      "unique": 10000
+    },
+    {
+      "recipient": 5,
+      "messages": 10000,
+      "unique": 10000
+    },
+    {
+      "recipient": 6,
+      "messages": 10000,
+      "unique": 10000
+    },
+    {
+      "recipient": 7,
+      "messages": 10000,
+      "unique": 10000
+    },
+    {
+      "recipient": 8,
+      "messages": 10000,
+      "unique": 10000
+    },
+    {
+      "recipient": 9,
+      "messages": 10000,
+      "unique": 10000
+    },
+    {
+      "recipient": 10,
+      "messages": 10000,
+      "unique": 10000
+    },
+    {
+      "recipient": 11,
+      "messages": 10000,
+      "unique": 10000
+    },
+    {
+      "recipient": 12,
+      "messages": 10000,
+      "unique": 10000
+    },
+    {
+      "recipient": 13,
+      "messages": 10000,
+      "unique": 10000
+    },
+    {
+      "recipient": 14,
+      "messages": 10000,
+      "unique": 10000
+    },
+    {
+      "recipient": 15,
+      "messages": 10000,
+      "unique": 10000
+    },
+    {
+      "recipient": 16,
+      "messages": 10000,
+      "unique": 10000
+    },
+    {
+      "recipient": 17,
+      "messages": 10000,
+      "unique": 10000
+    },
+    {
+      "recipient": 18,
+      "messages": 10000,
+      "unique": 10000
+    },
+    {
+      "recipient": 19,
+      "messages": 10000,
+      "unique": 10000
+    }
+  ],
+  "scope": "Matrix SDK clients, independent SQLite stores, synthetic data; no device UI/push acceptance",
+  "schema": 1,
+  "processExit": 0,
+  "sourceCommit": "ea0dc3661883dd652458c887a1b0e1bd7ffce5e5",
+  "testSourceSha256": "9dfeffb057b4ea6e5f599947c47da35c07d5315760002a29eb132a04931181d1",
+  "privateLogSha256": "4f771b1ec1de82c31758090836b1df4a1a129f4589d00695309040f62c9917fa",
+  "serverLogSha256": "ff9185c00cdc52347f75e6c944c730f6c0bf856c89e1234b2a3b4b41325e7086",
+  "plaintextMessageCanaryOccurrencesInCapturedServerLog": 0,
+  "environment": {
+    "server": "Tuwunel 1.9.4",
+    "imageDigest": "sha256:0e86c6164d6c9f5b60291938eb61ad8395021c37fe58d47a963ea7edddbedaec",
+    "loopbackPort": 18949,
+    "serverCpuLimit": 2,
+    "serverMemoryLimitGiB": 2,
+    "imageExecution": "linux/amd64 under macOS Docker emulation",
+    "clients": "20 SDK clients, independent SQLite stores",
+    "productionData": false
+  },
+  "limitations": [
+    "no physical-device UI or push gateway",
+    "attachment events counted; payload downloads not checked by this load test",
+    "zero plaintext canaries applies only to captured isolated server log, not production/push logs",
+    "no claim of production throughput, peak memory or end-to-end p95",
+    "temporary accounts logged out, not deactivated; owned database retained"
+  ]
+}

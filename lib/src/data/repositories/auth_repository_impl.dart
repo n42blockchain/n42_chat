@@ -1,5 +1,6 @@
 import '../../core/encryption/local_room_key_store.dart';
 import '../../core/encryption/token_device_session.dart';
+
 import 'dart:typed_data';
 import 'dart:async';
 
@@ -23,6 +24,7 @@ class AuthRepositoryImpl
     implements
         IAuthRepository,
         IAccountBoundAuthInvalidation,
+        IAccountBoundSessionChanges,
         IAccountBoundDeletionLifecycle,
         IConfirmedAccountDeletionGeneration {
   final MatrixAuthDataSource _authDataSource;
@@ -44,6 +46,7 @@ class AuthRepositoryImpl
   final _loginStateController = StreamController<bool>.broadcast();
   final _accountInvalidationController =
       StreamController<AuthSessionInvalidation>.broadcast();
+  final _accountSessionController = StreamController<void>.broadcast();
   int _matrixMonitorEpoch = 0;
   AuthSessionInvalidation? _currentMonitorOrigin;
   AuthSessionInvalidation? _deletionRequestOrigin;
@@ -57,6 +60,7 @@ class AuthRepositoryImpl
   bool _isAuthenticating = false;
   // 并发登录互斥
   Completer<void>? _authInProgress;
+  int _authenticationGeneration = 0;
   // dispose 后禁止再向已关闭的 StreamController 发送事件
   bool _isDisposed = false;
   // 认证窗口内收到的 SDK 登出状态，待流程结束后再统一处理
@@ -104,6 +108,9 @@ class AuthRepositoryImpl
   @override
   Stream<AuthSessionInvalidation> get accountInvalidationStream =>
       _accountInvalidationController.stream;
+
+  @override
+  Stream<void> get accountSessionChanges => _accountSessionController.stream;
 
   @override
   AuthSessionInvalidation? get currentAccountGeneration {
@@ -164,6 +171,7 @@ class AuthRepositoryImpl
     if (_authInProgress != null && !_authInProgress!.isCompleted) {
       return AuthResult.failure('认证已在进行中', type: AuthErrorType.rateLimited);
     }
+    _authenticationGeneration++;
     _authInProgress = Completer<void>();
     _isAuthenticating = true;
     try {
@@ -244,6 +252,7 @@ class AuthRepositoryImpl
     if (_authInProgress != null && !_authInProgress!.isCompleted) {
       return AuthResult.failure('认证已在进行中', type: AuthErrorType.rateLimited);
     }
+    _authenticationGeneration++;
     _authInProgress = Completer<void>();
     _isAuthenticating = true;
     try {
@@ -316,6 +325,7 @@ class AuthRepositoryImpl
     if (_authInProgress != null && !_authInProgress!.isCompleted) {
       return AuthResult.failure('认证已在进行中', type: AuthErrorType.rateLimited);
     }
+    _authenticationGeneration++;
     _authInProgress = Completer<void>();
     _isAuthenticating = true;
     try {
@@ -382,7 +392,11 @@ class AuthRepositoryImpl
             return result;
           }
 
-          authLog('Token restore failed, trying credentials');
+          if (result.errorType == AuthErrorType.accountLocked ||
+              result.errorType == AuthErrorType.accountDeactivated) {
+            return result;
+          }
+          authLog('Token restore failed, re-authentication required');
         }
       }
 
@@ -463,6 +477,13 @@ class AuthRepositoryImpl
     String? email,
     String? registrationToken,
   }) async {
+    if (_authInProgress != null && !_authInProgress!.isCompleted) {
+      return AuthResult.failure('认证已在进行中', type: AuthErrorType.rateLimited);
+    }
+    final operation = Completer<void>();
+    _authenticationGeneration++;
+    _authInProgress = operation;
+    _isAuthenticating = true;
     try {
       _clearCachedUserProfile();
       final response = await _authDataSource.register(
@@ -527,6 +548,11 @@ class AuthRepositoryImpl
         '注册失败: ${e.toString()}',
         type: AuthErrorType.unknown,
       );
+    } finally {
+      _isAuthenticating = false;
+      operation.complete();
+      if (identical(_authInProgress, operation)) _authInProgress = null;
+      _resumeMonitoringAfterAuthentication();
     }
   }
 
@@ -537,7 +563,17 @@ class AuthRepositoryImpl
     String? registrationToken,
   }) async {
     try {
+      final generation = _authenticationGeneration;
+      if (_isDisposed || isLoggedIn || _isAuthenticating) {
+        return AuthResult.failure('认证已在进行中', type: AuthErrorType.rateLimited);
+      }
       final username = await _generateAnonymousUsername(homeserver);
+      // Availability checks do not own the authentication lock. A completed
+      // login also invalidates them, even if that session has since logged out.
+      if (_isDisposed || isLoggedIn || _isAuthenticating ||
+          generation != _authenticationGeneration) {
+        return AuthResult.failure('认证已在进行中', type: AuthErrorType.rateLimited);
+      }
       final result = await register(
         homeserver: homeserver,
         username: username,
@@ -545,6 +581,16 @@ class AuthRepositoryImpl
         registrationToken: registrationToken,
       );
       if (!result.success || result.user == null) return result;
+      final registeredGeneration = _authenticationGeneration;
+      final isCurrent = _captureProfileSession();
+      bool guestIsCurrent() =>
+          !_isAuthenticating &&
+          registeredGeneration == _authenticationGeneration &&
+          _authDataSource.userId == result.user!.userId &&
+          isCurrent();
+      if (!guestIsCurrent()) {
+        return AuthResult.failure('认证已在进行中', type: AuthErrorType.rateLimited);
+      }
 
       // Anonymous Matrix localparts are deliberately random and should never
       // become the visible nickname. Persist a readable, stable guest name so
@@ -552,6 +598,9 @@ class AuthRepositoryImpl
       final displayName =
           'Live Guest ${FriendlyDisplayName.shortCode(result.user!.userId)}';
       final updated = await updateDisplayName(displayName);
+      if (!guestIsCurrent()) {
+        return AuthResult.failure('认证已在进行中', type: AuthErrorType.rateLimited);
+      }
       if (!updated) {
         authLog(
           'Anonymous account created but guest display name update failed',
@@ -638,12 +687,14 @@ class AuthRepositoryImpl
     final userId = client.userID;
     if (userId == null) return null;
 
+    final isCurrent = _captureProfileSession();
     try {
       // 并行请求标准资料和自定义资料
       final results = await Future.wait([
         _authDataSource.clientManager.getUserProfile(userId),
         getUserProfileData(),
       ]);
+      if (!isCurrent()) return null;
       final profile = results[0] as Profile;
 
       final avatarHttpUrl = MatrixUtils.getAvatarUrl(
@@ -656,10 +707,11 @@ class AuthRepositoryImpl
       _cachedAvatarUrl = avatarHttpUrl;
       _cachedDisplayName = profile.displayName ?? userId.localpart ?? '';
       await _syncStoredAccountProfile();
+      if (!isCurrent()) return null;
       return _buildCurrentUserEntity(userId);
     } catch (e) {
       authLog('Get profile failed - $e');
-      return currentUser;
+      return isCurrent() ? currentUser : null;
     }
   }
 
@@ -672,15 +724,33 @@ class AuthRepositoryImpl
     }
   }
 
+  // Keep multi-step profile work bound to the session that started it.
+  bool Function() _captureProfileSession() {
+    final manager = _authDataSource.clientManager;
+    final client = manager.client;
+    final userId = _authDataSource.userId;
+    final session = (client?.userID, client?.deviceID, client?.accessToken);
+    return () =>
+        !_isDisposed &&
+        isLoggedIn &&
+        identical(_authDataSource.clientManager, manager) &&
+        identical(manager.client, client) &&
+        _authDataSource.userId == userId &&
+        (client?.userID, client?.deviceID, client?.accessToken) == session;
+  }
+
   @override
   Future<bool> updateAvatar(Uint8List avatarBytes, String filename) async {
     if (!isLoggedIn) return false;
 
+    final isCurrent = _captureProfileSession();
     try {
       await _authDataSource.clientManager.setAvatar(avatarBytes, filename);
+      if (!isCurrent()) return false;
       final clearedNftAvatar = await updateUserProfileData(
         clearNftAvatar: true,
       );
+      if (!isCurrent()) return false;
       if (!clearedNftAvatar) {
         authLog('Avatar uploaded but failed to clear NFT avatar metadata');
         return false;
@@ -690,7 +760,7 @@ class AuthRepositoryImpl
       // 刷新用户资料以更新缓存的头像 URL
       await getCurrentUserProfile();
 
-      return true;
+      return isCurrent();
     } catch (e) {
       authLog('Update avatar failed - $e');
       return false;
@@ -701,9 +771,11 @@ class AuthRepositoryImpl
   Future<bool> updateDisplayName(String displayName) async {
     if (!isLoggedIn) return false;
 
+    final isCurrent = _captureProfileSession();
     try {
       await _authDataSource.clientManager.setDisplayName(displayName);
-      // 更新缓存
+      // A profile response for the previous session must not rename the new one.
+      if (!isCurrent()) return false;
       _cachedDisplayName = displayName;
       authLog('Display name updated to: $displayName');
       return true;
@@ -732,9 +804,13 @@ class AuthRepositoryImpl
     final client = _authDataSource.clientManager.client;
     if (client == null) return false;
 
+    final isCurrent = _captureProfileSession();
+    final userId = client.userID;
+    if (userId == null) return false;
     try {
       // 获取现有数据
       final existingData = await getUserProfileData() ?? {};
+      if (!isCurrent()) return false;
 
       // 合并新数据
       final newData = Map<String, dynamic>.from(existingData);
@@ -760,7 +836,8 @@ class AuthRepositoryImpl
       if (nftImageUrl != null) newData['nftImageUrl'] = nftImageUrl;
 
       // 保存到 Matrix 账户数据
-      await client.setAccountData(client.userID!, 'n42.user.profile', newData);
+      await client.setAccountData(userId, 'n42.user.profile', newData);
+      if (!isCurrent()) return false;
 
       // 更新缓存
       _cachedProfileData = newData;
@@ -770,6 +847,7 @@ class AuthRepositoryImpl
         await _syncPokeTextToRooms(pokeText);
       }
 
+      if (!isCurrent()) return false;
       authLog('Profile data updated (${newData.keys.length} fields)');
       return true;
     } catch (e) {
@@ -786,23 +864,27 @@ class AuthRepositoryImpl
       );
       return;
     }
+    final isCurrent = _captureProfileSession();
     _activePokeSyncs++;
     try {
       final client = _authDataSource.clientManager.client;
-      if (client == null) return;
+      if (client == null || !isCurrent()) return;
+      final userId = client.userID;
+      if (userId == null) return;
 
       // 获取所有已加入的房间
-      final rooms = client.rooms.where(
-        (room) => room.membership == Membership.join,
-      );
+      final rooms = client.rooms
+          .where((room) => room.membership == Membership.join)
+          .toList();
 
       for (final room in rooms) {
+        if (!isCurrent()) return;
         try {
           // 设置房间状态事件，以便其他成员可以读取
           await client.setRoomStateWithKey(
             room.id,
             'n42.member.profile',
-            client.userID!,
+            userId,
             {'pokeText': pokeText},
           );
           authLog('Synced pokeText to room ${room.id}');
@@ -832,6 +914,7 @@ class AuthRepositoryImpl
       return null;
     }
 
+    final isCurrent = _captureProfileSession();
     try {
       authLog('Getting account data for ${client.userID}');
       final data = await client.getAccountData(
@@ -839,6 +922,7 @@ class AuthRepositoryImpl
         'n42.user.profile',
       );
 
+      if (!isCurrent()) return null;
       _cachedProfileData = data;
       authLog('Profile data loaded (${data.keys.length} fields)');
       return data;
@@ -984,6 +1068,8 @@ class AuthRepositoryImpl
         case 'facebook':
           response = await _socialAuthApi.loginWithFacebook(
             accessToken: accessToken ?? primaryCredential,
+            limitedLogin: extra?['token_type'] == 'limited',
+            nonce: extra?['rawNonce'] as String?,
           );
           break;
         case 'twitter':
@@ -1068,6 +1154,7 @@ class AuthRepositoryImpl
     if (_authInProgress != null && !_authInProgress!.isCompleted) {
       return AuthResult.failure('认证已在进行中', type: AuthErrorType.rateLimited);
     }
+    _authenticationGeneration++;
     _authInProgress = Completer<void>();
     _isAuthenticating = true;
     try {
@@ -1419,6 +1506,19 @@ class AuthRepositoryImpl
   AuthResult _handleMatrixError(MatrixException e) {
     final errorCode = e.errcode;
 
+    if (errorCode == 'M_USER_LOCKED') {
+      return AuthResult.failure(
+        e.errorMessage,
+        type: AuthErrorType.accountLocked,
+      );
+    }
+    if (errorCode == 'M_USER_DEACTIVATED') {
+      return AuthResult.failure(
+        e.errorMessage,
+        type: AuthErrorType.accountDeactivated,
+      );
+    }
+
     if (errorCode.contains('M_FORBIDDEN') ||
         errorCode.contains('M_UNAUTHORIZED')) {
       return AuthResult.failure(
@@ -1463,6 +1563,7 @@ class AuthRepositoryImpl
     _matrixLoginStateSubscription?.cancel();
     _loginStateController.close();
     _accountInvalidationController.close();
+    unawaited(_accountSessionController.close());
   }
 
   Future<void> _handleSdkLogout(
@@ -1547,6 +1648,7 @@ class AuthRepositoryImpl
         observedClient == null ||
         observedUserId == null ||
         observedHomeserver == null) {
+      if (!_isDisposed) _accountSessionController.add(null);
       return;
     }
     bool sameOrigin() {
@@ -1579,6 +1681,7 @@ class AuthRepositoryImpl
           !identical(_confirmedDeletionOrigin, origin),
     );
     _currentMonitorOrigin = origin;
+    if (!_isDisposed) _accountSessionController.add(null);
     _matrixLoginStateSubscription = stream.listen((loginState) async {
       if (!sameOrigin()) {
         authLog('Ignoring login state from a replaced Matrix client');

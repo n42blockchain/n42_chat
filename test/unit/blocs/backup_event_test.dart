@@ -1,3 +1,4 @@
+import 'package:equatable/equatable.dart';
 // Tests for BackupEvent subclasses in backup_event.dart.
 // Pure Dart Equatable event classes — no platform deps.
 
@@ -5,6 +6,21 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:n42_chat/src/presentation/blocs/backup/backup_event.dart';
 
 void main() {
+  test('backup event debug output never includes password under global stringify', () {
+    final previous = EquatableConfig.stringify;
+    EquatableConfig.stringify = true;
+    addTearDown(() => EquatableConfig.stringify = previous);
+    for (final event in <BackupEvent>[
+      const CreateBackup(password: 'sensitive-fixture-password'),
+      const PreviewBackup(filePath: '/fixture', password: 'sensitive-fixture-password'),
+      const RestoreFromBackup(backupFilePath: '/fixture', password: 'sensitive-fixture-password'),
+    ]) {
+      expect(event.toString(), isNot(contains('sensitive-fixture-password')));
+      expect(event.toString(), contains(event.runtimeType.toString()));
+    }
+    expect(const CreateBackup(password: 'a'), isNot(const CreateBackup(password: 'b')));
+  });
+
   // ─────────────────────────────────────────────────
   // LoadBackupList
   // ─────────────────────────────────────────────────

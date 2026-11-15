@@ -1,4 +1,16 @@
+import '../../../domain/repositories/chat_catch_up_repository.dart';
+import '../../../domain/repositories/conversation_repository.dart';
+import 'history_share_page.dart';
+import '../../blocs/chat/scheduled_message_origin.dart';
+import '../../../domain/entities/recovered_composer_text.dart';
+import 'chat_catch_up_sheet.dart';
+
+import 'package:share_plus/share_plus.dart';
+
+import '../../../core/services/attachment_size_policy.dart';
+
 import 'dart:async';
+import 'package:uuid/uuid.dart';
 
 import '../../../data/datasources/matrix/message/encrypted_send_guard.dart';
 import '../../../data/datasources/matrix/message/direct_chat_send_guard.dart';
@@ -211,7 +223,7 @@ class _ChatPageContent extends StatefulWidget {
   State<_ChatPageContent> createState() => _ChatPageState();
 }
 
-class _ChatPageState extends State<_ChatPageContent> {
+class _ChatPageState extends State<_ChatPageContent> with WidgetsBindingObserver {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _inputController = TextEditingController();
   final FocusNode _inputFocusNode = FocusNode();
@@ -253,6 +265,8 @@ class _ChatPageState extends State<_ChatPageContent> {
 
   // 当前用户ID（用于表情回应高亮）
   String? _currentUserId;
+  ScheduledMessageOrigin? _scheduledOrigin;
+  bool _isSchedulingComposerText = false;
 
   // 贴纸输入联想（按词推荐贴纸）
   List<StickerHit> _stickerSuggestions = const [];
@@ -268,6 +282,8 @@ class _ChatPageState extends State<_ChatPageContent> {
   List<ChatMentionSelection> _composerMentions = const [];
   Future<List<ChatMentionMember>>? _groupMembersFuture;
   List<ChatMentionMember> _groupMembers = const [];
+  int? _groupMemberCountOverride;
+  int _groupMemberCountRevision = 0;
 
   // View Once 模式（阅后即焚媒体）
   bool _isViewOnce = false;
@@ -313,6 +329,28 @@ class _ChatPageState extends State<_ChatPageContent> {
   bool _showLinkPreviews = true;
   bool _sessionPrivacyShieldEnabled = false;
   int _privacyPreferencesLoadVersion = 0;
+  int _draftRevision = 0;
+  bool _draftLoaded = false;
+  Timer? _draftSaveTimer;
+  bool _restoringDraft = false;
+  String _lastDraftText = '';
+
+  void _onDraftInputChanged() {
+    _draftRevision++;
+    final text = _inputController.text;
+    if (text == _lastDraftText) return;
+    _lastDraftText = text;
+    _draftSaveTimer?.cancel();
+    if (_restoringDraft) return;
+    _draftSaveTimer = Timer(const Duration(milliseconds: 500), () {
+      if (mounted) _saveDraft();
+    });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed) _saveDraft();
+  }
   String? _pendingInitialTargetMessageId;
 
   /// initState 缓存的 ChatBloc，供 dispose 阶段安全使用（那时 context 已
@@ -322,6 +360,7 @@ class _ChatPageState extends State<_ChatPageContent> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
 
     // 缓存 bloc 引用供 dispose 使用：dispose 阶段 widget 已 deactivated，
     // 再走 context.read 会触发 "deactivated context" 警告（九测真机记录）。
@@ -375,6 +414,7 @@ class _ChatPageState extends State<_ChatPageContent> {
     _loadFontSize();
 
     // 加载草稿
+    _inputController.addListener(_onDraftInputChanged);
     _loadDraft();
 
     // 加载隐私相关配置（链接预览、私密聊天截图防护）
@@ -468,6 +508,7 @@ class _ChatPageState extends State<_ChatPageContent> {
 
   /// 加载当前用户ID
   void _loadCurrentUserId() {
+    _scheduledOrigin = ScheduledMessageOrigin.capture();
     try {
       final authRepository = getIt<IAuthRepository>();
       _currentUserId = authRepository.currentUser?.userId;
@@ -519,13 +560,31 @@ class _ChatPageState extends State<_ChatPageContent> {
 
   /// 加载草稿
   Future<void> _loadDraft() async {
-    final storage = getIt<PreferencesDataSource>();
-    final draft = await storage.getDraft(widget.conversation.id);
-    if (mounted && draft != null && draft.isNotEmpty) {
-      _inputController.text = draft;
-      _inputController.selection = TextSelection.fromPosition(
-        TextPosition(offset: draft.length),
-      );
+    final origin = _scheduledOrigin;
+    final owner = _currentUserId;
+    final room = widget.conversation.id;
+    final openingValue = _inputController.value;
+    if (origin?.isCurrent != true || owner == null || owner.isEmpty) return;
+    final openingRevision = _draftRevision;
+    try {
+      final storage = getIt<PreferencesDataSource>();
+      final draft = await storage.getAccountDraft(room, ownerUserId: owner,
+        isCurrent: () => mounted && origin!.isCurrent && _currentUserId == owner);
+      if (!mounted || origin?.isCurrent != true || _currentUserId != owner || widget.conversation.id != room) return;
+      _draftLoaded = true;
+      if (_draftRevision != openingRevision || _inputController.value != openingValue ||
+          openingValue.text.isNotEmpty || draft == null || draft.isEmpty) {
+        return;
+      }
+      _restoringDraft = true;
+      try {
+        _inputController.value = TextEditingValue(text: draft,
+          selection: TextSelection.collapsed(offset: draft.length));
+      } finally {
+        _restoringDraft = false;
+      }
+    } catch (_) {
+      debugLog('ChatPage: Unable to load account draft');
     }
   }
 
@@ -566,8 +625,19 @@ class _ChatPageState extends State<_ChatPageContent> {
 
   /// 保存草稿
   void _saveDraft() {
+    _draftSaveTimer?.cancel();
+    _draftSaveTimer = null;
+    // A failed/unfinished load is not evidence that the stored draft is empty.
+    if (!_draftLoaded && _draftRevision == 0) return;
+    final origin = _scheduledOrigin;
+    final owner = _currentUserId;
+    if (origin?.isCurrent != true || owner == null || owner.isEmpty) return;
     final storage = getIt<PreferencesDataSource>();
-    storage.saveDraft(widget.conversation.id, _inputController.text);
+    unawaited(storage.saveAccountDraft(widget.conversation.id, _inputController.text,
+      ownerUserId: owner, isCurrent: () => origin!.isCurrent && _currentUserId == owner,
+    ).catchError((Object _) {
+      debugLog('ChatPage: Unable to save account draft');
+    }));
   }
 
   /// 构建聊天背景装饰
@@ -591,6 +661,8 @@ class _ChatPageState extends State<_ChatPageContent> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _draftSaveTimer?.cancel();
     // 离开聊天页停止朗读(TtsService 是进程级单例,否则跨页继续播)
     unawaited(TtsService.instance.stop());
     _privacyPreferencesLoadVersion++;
@@ -680,7 +752,10 @@ class _ChatPageState extends State<_ChatPageContent> {
 
     // 斜杠命令拦截（编辑模式下不拦截）
     final chatBloc = context.read<ChatBloc>();
-    if (chatBloc.state.isSendingText || _pendingEncryptedDraft != null) return;
+    if (chatBloc.isClosed || chatBloc.state.isSendingText ||
+        _pendingEncryptedDraft != null) {
+      return;
+    }
     final editingMsg = chatBloc.state.editingMessage;
 
     if (editingMsg == null &&
@@ -693,6 +768,7 @@ class _ChatPageState extends State<_ChatPageContent> {
       return;
     }
 
+    int? clearedDraftRevision;
     if (editingMsg != null) {
       final actionBloc = getIt<MessageActionBloc>();
       actionBloc.add(
@@ -701,9 +777,27 @@ class _ChatPageState extends State<_ChatPageContent> {
       chatBloc.add(const SetEditTarget(null));
     } else {
       _pendingEncryptedDraft = text;
+      final origin = _scheduledOrigin;
+      final mentions = _composerMentions;
+      final completion = Completer<TextSendPreflight>();
+      unawaited(completion.future.then((result) {
+        if (result == TextSendPreflight.admitted || !mounted ||
+            origin?.isCurrent != true || _pendingEncryptedDraft != text) {
+          return;
+        }
+        _pendingEncryptedDraft = null;
+        _pendingEncryptedDraftStarted = false;
+        if (result == TextSendPreflight.rejected && _inputController.text.isEmpty &&
+            _draftRevision == clearedDraftRevision) {
+          _inputController.text = text;
+          setState(() => _composerMentions = mentions);
+          _saveDraft();
+        }
+      }));
       chatBloc.add(
         SendTextMessage(
           text,
+          preflightCompletion: completion,
           selfDestructAfter: _selfDestructAfter,
           mentionedUserIds: mentionPayload.mentionedUserIds,
           mentionsRoom: mentionPayload.mentionsRoom,
@@ -711,6 +805,7 @@ class _ChatPageState extends State<_ChatPageContent> {
       );
     }
     _inputController.clear();
+    clearedDraftRevision = _draftRevision;
     _clearComposerMentions();
   }
 
@@ -1403,7 +1498,10 @@ class _ChatPageState extends State<_ChatPageContent> {
                 _buildStickerPicker(),
 
               // 更多功能面板（仅在非多选模式下）
-              if (_showMorePanel && !_isMultiSelectMode) _buildMorePanel(),
+              if (_showMorePanel &&
+                  !_isMultiSelectMode &&
+                  MediaQuery.viewInsetsOf(context).bottom == 0)
+                _buildMorePanel(),
             ],
           ),
         ),

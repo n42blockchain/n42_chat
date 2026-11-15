@@ -7,11 +7,16 @@ extension ChatBlocMessageHandlers on ChatBloc {
     LoadMessages event,
     Emitter<ChatState> emit,
   ) async {
+    if (_currentRoomId != null && _currentRoomId != event.roomId) return;
+    final current = _captureChatContext(emit, _currentRoomId);
+    if (!current()) return;
     try {
       final messages = await _messageRepository.getMessages(
         event.roomId,
         limit: event.limit,
       );
+
+      if (!current()) return;
 
       // 构建当前消息的索引 Map (O(n) 而不是 O(n²))
       final currentMessagesMap = <String, MessageEntity>{};
@@ -53,20 +58,24 @@ extension ChatBlocMessageHandlers on ChatBloc {
         mergedMessages,
       );
 
+      if (!current()) return;
+
       // 获取消息的反应聚合结果
       mergedMessages = await _loadReactionAggregations(
         event.roomId,
         mergedMessages,
       );
 
+      if (!current()) return;
+
       // 应用关键词过滤
       mergedMessages = _applyContentFilter(mergedMessages);
 
       emit(
         state.copyWith(
-          messages: mergedMessages,
+          messages: _visibleHistory(_withLocalScheduledPreviews(mergedMessages)),
           isLoading: false,
-          hasMore: messages.length >= event.limit,
+          hasMore: messages.length >= event.limit && !_historyBoundaryReached(messages),
         ),
       );
 
@@ -75,6 +84,7 @@ extension ChatBlocMessageHandlers on ChatBloc {
         await _messageRepository.markAsRead(event.roomId, messages.first.id);
       }
     } catch (e) {
+      if (!current()) return;
       emit(
         state.copyWith(
           isLoading: false,
@@ -209,22 +219,28 @@ extension ChatBlocMessageHandlers on ChatBloc {
   ) async {
     if (state.isLoadingMore || !state.hasMore || _currentRoomId == null) return;
 
+    final roomId = _currentRoomId!;
+    final current = _captureChatContext(emit, roomId);
+    if (!current()) return;
     emit(state.copyWith(isLoadingMore: true));
 
     try {
       final moreMessages = await _messageRepository.loadMoreMessages(
-        _currentRoomId!,
+        roomId,
         limit: 50,
       );
 
+      if (!current()) return;
       emit(
         state.copyWith(
-          messages: moreMessages,
+          messages: _visibleHistory(moreMessages),
           isLoadingMore: false,
-          hasMore: moreMessages.length > state.messages.length,
+          hasMore: moreMessages.length > state.messages.length &&
+              !_historyBoundaryReached(moreMessages),
         ),
       );
     } catch (e) {
+      if (!current()) return;
       emit(
         state.copyWith(
           isLoadingMore: false,
@@ -241,15 +257,20 @@ extension ChatBlocMessageHandlers on ChatBloc {
   ) async {
     if (_currentRoomId == null) return;
 
-    await _messagesSubscription?.cancel();
+    final roomId = _currentRoomId!;
+    final current = _captureChatContext(null, roomId);
+    final previous = _messagesSubscription;
+    _messagesSubscription = null;
+    await previous?.cancel();
+    if (!current() || emit.isDone) return;
 
     _messagesSubscription = _messageRepository
-        .watchMessages(_currentRoomId!)
+        .watchMessages(roomId)
         .listen(
           (messages) {
             // 防止在 BLoC 关闭后添加事件
-            if (!isClosed) {
-              add(MessagesUpdated(messages));
+            if (current()) {
+              add(MessagesUpdated(messages, isCurrent: current));
             }
           },
           onError: (Object error) {
@@ -317,8 +338,9 @@ extension ChatBlocMessageHandlers on ChatBloc {
 
   /// 消息列表更新
   void onMessagesUpdated(MessagesUpdated event, Emitter<ChatState> emit) {
+    if (event.isCurrent != null && !event.isCurrent!()) return;
     // 过滤掉已本地删除的消息和线程内回复消息（线程回复只在线程详情页显示）
-    final filteredMessages = event.messages
+    final filteredMessages = _visibleHistory(event.messages)
         .where((m) => !_locallyDeletedMessageIds.contains(m.id))
         .where((m) => !m.isInThread)
         .toList();
@@ -409,7 +431,7 @@ extension ChatBlocMessageHandlers on ChatBloc {
     final typingUsers = _resolveCurrentTypingUsers();
 
     if (!isClosed) {
-      emit(state.copyWith(messages: mergedMessages, typingUsers: typingUsers));
+      emit(state.copyWith(messages: _visibleHistory(_withLocalScheduledPreviews(mergedMessages)), typingUsers: typingUsers));
       _scheduleTypingUsersRefresh(typingUsers);
 
       // 扫描失败消息加入自动重试队列

@@ -1,37 +1,44 @@
 #!/usr/bin/env dart
+
 // ignore_for_file: avoid_print
 
 import 'dart:io';
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:matrix/matrix.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-/// Matrix服务器集成测试脚本
-///
-/// 服务器: https://m.si46.world/
-/// 邀请码: c321fb4d6ce5e93984452cbd11427f5dfc8c02a2c728234ce8d6e5ce317e9a81
-///
-/// 运行方式:
-///   cd n42_chat
-///   dart run tool/server_test.dart
+import 'live_smoke_credentials.dart';
 
+/// Explicit live QA. Configure N42_TEST_HOMESERVER and either an existing
+/// username/password pair or N42_TEST_INVITE_CODE. No credentials are logged.
 void main() async {
   print('╔══════════════════════════════════════════════════════════════╗');
   print('║           N42 Chat Matrix Server Integration Test            ║');
   print('╚══════════════════════════════════════════════════════════════╝');
   print('');
 
-  const homeserver = 'https://m.si46.world';
-  // 邀请码请向管理员获取
-  const inviteCode = 'YOUR_INVITE_CODE_HERE';
-
-  // 测试用户
-  final testUsername = 'n42test${Random().nextInt(99999)}';
-  const testPassword = 'N42TestPass123!@#';
-
+  final homeserver = Platform.environment['N42_TEST_HOMESERVER']?.trim();
+  if (homeserver == null || homeserver.isEmpty) {
+    stderr.writeln('Missing N42_TEST_HOMESERVER.');
+    exit(2);
+  }
+  late final LiveSmokeCredentials credentials;
+  try {
+    credentials = LiveSmokeCredentials.fromEnvironment(
+      Platform.environment,
+      temporaryUsername: () =>
+          'n42qa${DateTime.now().microsecondsSinceEpoch}${Random.secure().nextInt(100000)}',
+    );
+  } on StateError catch (error) {
+    stderr.writeln(error.message);
+    exit(2);
+  }
+  final testUsername = credentials.username;
+  final testPassword = credentials.password;
+  final inviteCode = Platform.environment['N42_TEST_INVITE_CODE']?.trim();
   print('📡 服务器: $homeserver');
-  print('🔑 邀请码: ${inviteCode.substring(0, 20)}...');
   print('👤 测试用户: $testUsername');
   print('');
   print('═══════════════════════════════════════════════════════════════');
@@ -102,17 +109,25 @@ void main() async {
     });
 
     // 5. 注册用户
-    if (usernameAvailable) {
+    if (credentials.isTemporary && usernameAvailable) {
       await runTest('注册新用户', () async {
         try {
-          final result = await client.uiaRequestBackground(
-            (auth) => client.register(
-              username: testUsername,
-              password: testPassword,
-              initialDeviceDisplayName: 'N42 CLI Test',
-              auth: auth,
-            ),
+          Future<RegisterResponse> register(String? session) => client.register(
+            username: testUsername,
+            password: testPassword,
+            initialDeviceDisplayName: 'N42 CLI Test',
+            auth: _TokenAuth(inviteCode!, session: session),
           );
+          RegisterResponse result;
+          try {
+            result = await register(null);
+          } on MatrixException catch (error) {
+            if (error.response?.statusCode != 401) rethrow;
+            final body = jsonDecode(error.response!.body) as Map;
+            final session = body['session'] as String?;
+            if (session == null || session.isEmpty) rethrow;
+            result = await register(session);
+          }
           print('\n   用户ID: ${result.userId}');
         } catch (e) {
           if (e.toString().contains('Registration') ||
@@ -250,4 +265,12 @@ void main() async {
     print('🎉 所有测试通过！');
     exit(0);
   }
+}
+
+class _TokenAuth extends AuthenticationData {
+  _TokenAuth(this.token, {super.session})
+    : super(type: 'm.login.registration_token');
+  final String token;
+  @override
+  Map<String, dynamic> toJson() => {...super.toJson(), 'token': token};
 }

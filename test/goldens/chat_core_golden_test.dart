@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:n42_chat/l10n/app_localizations.dart';
@@ -15,7 +17,9 @@ void main() {
 
     await expectLater(
       find.byKey(const ValueKey('chat-core-golden')),
-      matchesGoldenFile('baselines/chat_core_light.png'),
+      matchesGoldenFile(
+        'baselines/chat_core_light_${Platform.operatingSystem}.png',
+      ),
     );
   });
 
@@ -24,7 +28,9 @@ void main() {
 
     await expectLater(
       find.byKey(const ValueKey('chat-core-golden')),
-      matchesGoldenFile('baselines/chat_core_dark.png'),
+      matchesGoldenFile(
+        'baselines/chat_core_dark_${Platform.operatingSystem}.png',
+      ),
     );
   });
 }
@@ -42,10 +48,23 @@ Future<void> _pumpGolden(WidgetTester tester, N42ChatTheme chatTheme) async {
       localizationsDelegates: S.localizationsDelegates,
       supportedLocales: S.supportedLocales,
       theme: chatTheme.toThemeData(),
-      home: _ChatCoreGolden(chatTheme: chatTheme),
+      home: Material(child: _ChatCoreGolden(chatTheme: chatTheme)),
     ),
   );
   await tester.pumpAndSettle();
+  final textStyle = DefaultTextStyle.of(
+    tester.element(find.byKey(const ValueKey('chat-core-golden'))),
+  ).style;
+  expect(
+    textStyle.debugLabel,
+    isNot(contains('fallback style')),
+    reason: 'Golden surfaces must inherit the real Material text style',
+  );
+  expect(
+    textStyle.decoration,
+    isNot(TextDecoration.underline),
+    reason: 'Missing Material applies Flutter error underlines',
+  );
 }
 
 class _ChatCoreGolden extends StatelessWidget {
@@ -55,7 +74,7 @@ class _ChatCoreGolden extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sectionStyle = Theme.of(context).textTheme.labelLarge;
+    final sectionStyle = Theme.of(context).textTheme.titleSmall;
 
     return RepaintBoundary(
       key: const ValueKey('chat-core-golden'),
@@ -143,9 +162,8 @@ class _ChatCoreGolden extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 MediaQuery(
-                  data: MediaQuery.of(
-                    context,
-                  ).copyWith(textScaler: const TextScaler.linear(1.3)),
+                  data: MediaQuery.of(context)
+                      .copyWith(textScaler: const TextScaler.linear(1.3)),
                   child: MessageBubble(
                     isSelf: false,
                     avatarName: 'A',

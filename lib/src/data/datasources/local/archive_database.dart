@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:crypto/crypto.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/foundation.dart';
@@ -9,6 +11,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqlite3/sqlite3.dart' as raw_sqlite;
+
 import '../../../core/utils/debug_log.dart';
 import '../../../domain/entities/message_entity.dart';
 import '../../../domain/entities/search_result_entity.dart';
@@ -94,6 +97,53 @@ class ArchiveDatabase extends _$ArchiveDatabase {
   static ArchiveDatabase? _instance;
   static Completer<ArchiveDatabase>? _initCompleter;
 
+  static final Map<String, Future<ArchiveDatabase>> _accountInstances = {};
+
+  /// Opens an account-owned archive without claiming the unowned legacy file.
+  static Future<ArchiveDatabase> getForAccount({
+    required String userId,
+    required Uri homeserver,
+  }) {
+    final scope = accountStorageId(userId: userId, homeserver: homeserver);
+    return _accountInstances.putIfAbsent(scope, () async {
+      try {
+        return ArchiveDatabase._internal(await _openConnection(scope: scope));
+      } catch (_) {
+        _accountInstances.removeWhere((key, _) => key == scope);
+        rethrow;
+      }
+    });
+  }
+
+  /// Hashes a structured identity so filenames contain no account identifiers.
+  static String accountStorageId({
+    required String userId,
+    required Uri homeserver,
+  }) {
+    if (!RegExp(r'^@[^:\s]+:[^\s]+$').hasMatch(userId) ||
+        homeserver.host.isEmpty ||
+        !{'https', 'http'}.contains(homeserver.scheme) ||
+        homeserver.userInfo.isNotEmpty ||
+        homeserver.hasQuery ||
+        homeserver.hasFragment) {
+      throw ArgumentError('A valid Matrix account and homeserver are required');
+    }
+    return sha256
+        .convert(utf8.encode(jsonEncode([homeserver.toString(), userId])))
+        .toString();
+  }
+
+  /// Closes owned archive handles during application/service teardown.
+  static Future<void> closeAccountInstances() async {
+    final pending = _accountInstances.values.toList();
+    _accountInstances.clear();
+    await Future.wait(
+      pending.map((database) async {
+        await (await database).close();
+      }),
+    );
+  }
+
   /// 获取单例实例
   static Future<ArchiveDatabase> getInstance() async {
     if (_instance != null) return _instance!;
@@ -116,7 +166,7 @@ class ArchiveDatabase extends _$ArchiveDatabase {
   }
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -149,9 +199,11 @@ class ArchiveDatabase extends _$ArchiveDatabase {
         'END',
       );
       await _createFtsDeleteTrigger();
+      await _createRedactionProtection();
     },
     onUpgrade: (Migrator m, int from, int to) async {
       debugLog('ArchiveDatabase: Migrating from v$from to v$to');
+      if (from < 2) await _createRedactionProtection();
     },
     beforeOpen: (details) async {
       if (details.hadUpgrade) {
@@ -165,6 +217,51 @@ class ArchiveDatabase extends _$ArchiveDatabase {
       await _createFtsDeleteTrigger();
     },
   );
+
+  // Like the FTS auxiliary tables, this is managed explicitly by migration.
+  // Store only event IDs, never the removed body or sender metadata.
+  Future<void> _createRedactionProtection() async {
+    await customStatement(
+      'CREATE TABLE IF NOT EXISTS archive_redactions ('
+      'event_id TEXT NOT NULL PRIMARY KEY)',
+    );
+    await customStatement(
+      'CREATE TRIGGER IF NOT EXISTS archive_reject_redacted_insert '
+      'BEFORE INSERT ON archived_messages '
+      'WHEN EXISTS (SELECT 1 FROM archive_redactions WHERE event_id = new.event_id) '
+      'BEGIN SELECT RAISE(IGNORE); END',
+    );
+  }
+
+  /// Persist a deletion marker and remove plaintext/FTS atomically. A marker
+  /// also protects events not yet archived from a later stale import.
+  Future<void> redactByEventId(String eventId) async {
+    if (eventId.isEmpty) throw ArgumentError('Event ID must not be empty');
+    await transaction(() async {
+      await customStatement(
+        'INSERT OR IGNORE INTO archive_redactions(event_id) VALUES (?)',
+        [eventId],
+      );
+      final removed = await (select(
+        archivedMessages,
+      )..where((row) => row.eventId.equals(eventId))).getSingleOrNull();
+      await deleteByEventId(eventId);
+      if (removed != null) {
+        final latest = (await getMessages(
+          removed.roomId,
+          limit: 1,
+        )).firstOrNull;
+        await updateMetadata(
+          ArchiveMetadataCompanion(
+            roomId: Value(removed.roomId),
+            lastArchivedEventId: Value(latest?.eventId),
+            lastArchivedTs: Value(latest?.originServerTs ?? 0),
+            totalArchived: Value(await getMessageCount(removed.roomId)),
+          ),
+        );
+      }
+    });
+  }
 
   /// Keeps an external-content FTS5 table synchronized on row deletion.
   Future<void> _createFtsDeleteTrigger() async {
@@ -189,9 +286,8 @@ class ArchiveDatabase extends _$ArchiveDatabase {
         // insertReturningOrNull:被 insertOrIgnore 忽略(eventId 已存在)时
         // 返回 null,真正插入才返回行——避免用 rowId>0 把被忽略行也计入
         // (last_insert_rowid 对被忽略行仍>0,会高估 totalArchived,复审 P2)。
-        final row = await into(
-          archivedMessages,
-        ).insertReturningOrNull(entry, mode: InsertMode.insertOrIgnore);
+        final row = await into(archivedMessages)
+            .insertReturningOrNull(entry, mode: InsertMode.insertOrIgnore);
         if (row != null) {
           inserted++;
         }
@@ -209,23 +305,36 @@ class ArchiveDatabase extends _$ArchiveDatabase {
   // 查询
   // ============================================
 
-  /// 分页查询归档消息（按时间倒序）
+  /// 分页查询归档消息（按时间、事件 ID 倒序）。
+  /// beforeEventId continues timestamp ties; timestamp-only callers remain exclusive.
   Future<List<ArchivedMessage>> getMessages(
     String roomId, {
     int? beforeTimestamp,
+    String? beforeEventId,
     int limit = 50,
   }) async {
+    if (beforeEventId != null && beforeTimestamp == null) {
+      throw ArgumentError('An event cursor requires its timestamp');
+    }
     final query = select(archivedMessages)
       ..where((t) {
         var expr = t.roomId.equals(roomId);
         if (beforeTimestamp != null) {
-          expr = expr & t.originServerTs.isSmallerThanValue(beforeTimestamp);
+          final older = t.originServerTs.isSmallerThanValue(beforeTimestamp);
+          expr =
+              expr &
+              (beforeEventId == null
+                  ? older
+                  : older |
+                        (t.originServerTs.equals(beforeTimestamp) &
+                            t.eventId.isSmallerThanValue(beforeEventId)));
         }
         return expr;
       })
       ..orderBy([
         (t) =>
             OrderingTerm(expression: t.originServerTs, mode: OrderingMode.desc),
+        (t) => OrderingTerm(expression: t.eventId, mode: OrderingMode.desc),
       ])
       ..limit(limit);
     return query.get();
@@ -531,14 +640,16 @@ const String _kArchiveDbKeyStorageKey = 'n42_chat_archive_db_key';
 ///
 /// The 256-bit random key lives in Keychain/Keystore. Existing plaintext
 /// archives are converted in place with sqlcipher_export.
-Future<LazyDatabase> _openConnection() async {
+Future<LazyDatabase> _openConnection({String? scope}) async {
   return LazyDatabase(() async {
     final appDir = await getApplicationDocumentsDirectory();
     final dbDir = Directory(p.join(appDir.path, 'n42_chat_storage'));
     if (!dbDir.existsSync()) {
       dbDir.createSync(recursive: true);
     }
-    final file = File(p.join(dbDir.path, 'archive.db'));
+    final file = File(
+      p.join(dbDir.path, scope == null ? 'archive.db' : 'archive_$scope.db'),
+    );
 
     // sqlite3 native assets select SQLCipher through the entrypoint's hook
     // configuration. Always probe the resolved library before touching history.
@@ -551,7 +662,7 @@ Future<LazyDatabase> _openConnection() async {
     }
 
     _recoverInterruptedArchiveMigration(file);
-    final passphrase = await _resolveArchivePassphrase(file);
+    final passphrase = await _resolveArchivePassphrase(file, scope: scope);
 
     // Convert a legacy plaintext archive without deleting it on failure.
     await _migratePlaintextArchiveIfNeeded(file, passphrase);
@@ -590,14 +701,17 @@ bool _isSqlCipherAvailable() {
 /// Returns the existing archive passphrase or creates one for a new/plaintext
 /// archive. An invalid stored key is never overwritten, and an encrypted file
 /// without its key fails closed instead of being assigned an unrelated key.
-Future<String> _resolveArchivePassphrase(File file) async {
+Future<String> _resolveArchivePassphrase(File file, {String? scope}) async {
+  final storageKey = scope == null
+      ? _kArchiveDbKeyStorageKey
+      : '${_kArchiveDbKeyStorageKey}_$scope';
   const storage = FlutterSecureStorage(
     aOptions: AndroidOptions(),
     iOptions: IOSOptions(
       accessibility: KeychainAccessibility.first_unlock_this_device,
     ),
   );
-  final existing = await storage.read(key: _kArchiveDbKeyStorageKey);
+  final existing = await storage.read(key: storageKey);
   if (existing != null) {
     if (!_isValidArchivePassphrase(existing)) {
       throw StateError('Stored archive.db passphrase is invalid');
@@ -617,7 +731,7 @@ Future<String> _resolveArchivePassphrase(File file) async {
   final rng = Random.secure();
   final bytes = List<int>.generate(32, (_) => rng.nextInt(256));
   final hex = bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
-  await storage.write(key: _kArchiveDbKeyStorageKey, value: hex);
+  await storage.write(key: storageKey, value: hex);
   debugLog('ArchiveDatabase: generated new SQLCipher passphrase');
   return hex;
 }

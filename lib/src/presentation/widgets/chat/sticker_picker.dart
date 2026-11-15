@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lottie/lottie.dart';
@@ -13,12 +15,15 @@ import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../data/datasources/bundled_sticker_packs.dart';
 import '../../../domain/entities/sticker_pack_entity.dart';
 import '../../../domain/repositories/sticker_repository.dart';
+import '../../../domain/repositories/auth_repository.dart';
 import '../../../core/theme/app_dimensions.dart';
 
 /// 贴纸选择回调
 typedef StickerSelectedCallback = void Function(Sticker sticker, String packId);
-typedef StickerLongPressedCallback =
-    Future<void> Function(Sticker sticker, String packId);
+typedef StickerLongPressedCallback = Future<void> Function(
+  Sticker sticker,
+  String packId,
+);
 
 /// 贴纸选择器面板
 ///
@@ -53,7 +58,11 @@ class StickerPicker extends StatefulWidget {
 
 class _StickerPickerState extends State<StickerPicker> {
   late final IStickerRepository _repository;
-  final PageController _pageController = PageController();
+  StreamSubscription<List<StickerPack>>? _packSubscription;
+  StreamSubscription<void>? _sessionChanges;
+  StreamSubscription<AuthSessionInvalidation>? _invalidations;
+  int _loadEpoch = 0;
+  Object? _viewScope;
   final TextEditingController _searchController = TextEditingController();
 
   List<StickerPack> _packs = [];
@@ -69,14 +78,111 @@ class _StickerPickerState extends State<StickerPicker> {
   void initState() {
     super.initState();
     _repository = getIt<IStickerRepository>();
-    _loadStickers();
+    _packSubscription = _repository.watchInstalledPacks().listen(
+      _onPacksChanged,
+      onError: (Object error, StackTrace stack) {
+        if (mounted) setState(() => _isLoading = false);
+      },
+    );
+    if (getIt.isRegistered<IAuthRepository>()) {
+      final auth = getIt<IAuthRepository>();
+      if (auth is IAccountBoundSessionChanges) {
+        _sessionChanges = (auth as IAccountBoundSessionChanges)
+            .accountSessionChanges
+            .listen((_) => _onAccountChanged());
+      }
+      if (auth is IAccountBoundAuthInvalidation) {
+        _invalidations = (auth as IAccountBoundAuthInvalidation)
+            .accountInvalidationStream
+            .listen((_) => _onAccountChanged());
+      }
+    }
+    unawaited(_loadStickers());
   }
 
   @override
   void dispose() {
-    _pageController.dispose();
+    _loadEpoch++;
+    unawaited(_packSubscription?.cancel());
+    unawaited(_sessionChanges?.cancel());
+    unawaited(_invalidations?.cancel());
     _searchController.dispose();
     super.dispose();
+  }
+
+  Object? _accountScope() {
+    if (!getIt.isRegistered<IStickerRepository>() ||
+        !identical(getIt<IStickerRepository>(), _repository)) {
+      return null;
+    }
+    if (getIt.isRegistered<IAuthRepository>()) {
+      final auth = getIt<IAuthRepository>();
+      if (auth is IAccountBoundDeletionLifecycle) {
+        final generation =
+            (auth as IAccountBoundDeletionLifecycle).currentAccountGeneration;
+        if (generation == null || !generation.isCurrent) return null;
+        return (auth, generation);
+      }
+    }
+    return _repository;
+  }
+
+  void _onAccountChanged() {
+    if (!mounted || _accountScope() == _viewScope) return;
+    _loadEpoch++;
+    _searchToken++;
+    _searchController.clear();
+    setState(() {
+      _viewScope = null;
+      _packs = [];
+      _recentStickers = [];
+      _searchResults = [];
+      _searchQuery = '';
+      _selectedPackIndex = 0;
+      _isLoading = false;
+    });
+    if (_accountScope() != null) unawaited(_loadStickers());
+  }
+
+  void _onPacksChanged(List<StickerPack> packs) {
+    if (!mounted) return;
+    final scope = _accountScope();
+    final sameAccount = scope != null && scope == _viewScope;
+    final selectedId =
+        sameAccount &&
+            _selectedPackIndex >= 0 &&
+            _selectedPackIndex < _packs.length
+        ? _packs[_selectedPackIndex].id
+        : null;
+    final epoch = ++_loadEpoch;
+    _searchToken++;
+    if (!sameAccount) _searchController.clear();
+    setState(() {
+      _viewScope = scope;
+      _packs = scope == null ? [] : List.unmodifiable(packs);
+      _recentStickers = [];
+      _searchResults = [];
+      if (!sameAccount) _searchQuery = '';
+      final selected = selectedId == null
+          ? -1
+          : _packs.indexWhere((p) => p.id == selectedId);
+      _selectedPackIndex = selected >= 0 ? selected : 0;
+      _isLoading = false;
+    });
+    if (scope != null) {
+      unawaited(_loadRecent(epoch, scope));
+      if (_searchQuery.isNotEmpty) unawaited(_onSearchChanged(_searchQuery));
+    }
+  }
+
+  Future<void> _loadRecent(int epoch, Object scope) async {
+    try {
+      final recent = await _repository.getRecentStickers(limit: 20);
+      if (!mounted || epoch != _loadEpoch || _accountScope() != scope) return;
+      setState(() => _recentStickers = recent);
+    } catch (_) {
+      /* Keep the current pack list available. */
+    }
   }
 
   Future<void> _onSearchChanged(String query) async {
@@ -87,12 +193,14 @@ class _StickerPickerState extends State<StickerPicker> {
       return;
     }
     final token = ++_searchToken;
+    final scope = _viewScope;
+    if (scope == null || _accountScope() != scope) return;
     try {
       final results = await _repository.searchStickers(trimmed, limit: 40);
-      if (!mounted || token != _searchToken) return;
+      if (!mounted || token != _searchToken || _accountScope() != scope) return;
       setState(() => _searchResults = results);
     } catch (_) {
-      if (!mounted || token != _searchToken) return;
+      if (!mounted || token != _searchToken || _accountScope() != scope) return;
       setState(() => _searchResults = const []);
     }
   }
@@ -107,37 +215,51 @@ class _StickerPickerState extends State<StickerPicker> {
   }
 
   Future<void> _loadStickers() async {
-    setState(() => _isLoading = true);
-
+    final scope = _accountScope();
+    final epoch = ++_loadEpoch;
+    _viewScope = scope;
+    setState(() => _isLoading = scope != null);
+    if (scope == null) return;
     try {
       final packs = await _repository.getInstalledPacks();
       final recent = await _repository.getRecentStickers(limit: 20);
-
-      if (!mounted) return;
+      if (!mounted || epoch != _loadEpoch || _accountScope() != scope) return;
       setState(() {
-        _packs = packs;
+        _packs = List.unmodifiable(packs);
         _recentStickers = recent;
         _isLoading = false;
       });
-    } catch (e) {
-      if (!mounted) return;
+    } catch (_) {
+      if (!mounted || epoch != _loadEpoch || _accountScope() != scope) return;
       setState(() => _isLoading = false);
     }
   }
 
+  bool _canUseSticker(Sticker sticker, String packId) =>
+      _viewScope != null &&
+      _accountScope() == _viewScope &&
+      (_packs.any(
+            (pack) => pack.id == packId && pack.stickers.contains(sticker),
+          ) ||
+          _recentStickers.any(
+            (recent) => recent.packId == packId && recent.sticker == sticker,
+          ) ||
+          _searchResults.any(
+            (hit) => hit.packId == packId && hit.sticker == sticker,
+          ));
+
   void _onStickerTap(Sticker sticker, String packId) {
+    if (!_canUseSticker(sticker, packId)) return;
+    final scope = _viewScope;
     widget.onStickerSelected(sticker, packId);
-    // 记录使用
-    _repository.recordStickerUsage(packId, sticker.id);
+    if (_accountScope() == scope) {
+      unawaited(_repository.recordStickerUsage(packId, sticker.id));
+    }
   }
 
   void _onPackSelected(int index) {
+    if (index < -1 || index >= _packs.length) return;
     setState(() => _selectedPackIndex = index);
-    _pageController.animateToPage(
-      index,
-      duration: const Duration(milliseconds: 200),
-      curve: Curves.easeOut,
-    );
   }
 
   @override
@@ -434,7 +556,11 @@ class _StickerPickerState extends State<StickerPicker> {
       onTap: () => _onStickerTap(sticker, packId),
       onLongPress: widget.onStickerLongPressed == null
           ? null
-          : () => widget.onStickerLongPressed!(sticker, packId),
+          : () {
+              if (_canUseSticker(sticker, packId)) {
+                widget.onStickerLongPressed!(sticker, packId);
+              }
+            },
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.placeholderOf(isDark),

@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -11,6 +12,42 @@ import 'package:n42_chat/src/presentation/pages/moment/video_feed_page.dart';
 class _Repository extends Mock implements IMomentRepository {}
 
 void main() {
+  testWidgets('video report action opens even when media is unavailable', (
+    tester,
+  ) async {
+    await getIt.reset();
+    final repo = _Repository();
+    final post = MomentEntity(
+      id: 'video-post',
+      userId: '@author:hs',
+      userName: 'Author',
+      content: 'Video',
+      timestamp: DateTime(2026),
+      sourceRoomId: '!moments:hs',
+      sourceEventId: r'$video',
+      media: const [
+        MomentMedia(url: '', httpUrl: '', type: MomentMediaType.video),
+      ],
+    );
+    when(() => repo.getMoments(limit: 50)).thenAnswer((_) async => [post]);
+    when(() => repo.watchMoments()).thenAnswer((_) => const Stream.empty());
+    getIt.registerSingleton<IMomentRepository>(repo);
+    addTearDown(getIt.reset);
+    await tester.pumpWidget(
+      const MaterialApp(
+        localizationsDelegates: S.localizationsDelegates,
+        supportedLocales: S.supportedLocales,
+        locale: Locale('en'),
+        home: VideoFeedPage(),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.flag_outlined));
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsOneWidget);
+    expect(find.text('Spam'), findsOneWidget);
+  });
+
   for (final error in [false, true]) {
     testWidgets(
       'late feed request cannot restore revoked content (stream error: $error)',
@@ -20,9 +57,8 @@ void main() {
         final changes = StreamController<List<MomentEntity>>.broadcast();
         final old = Completer<List<MomentEntity>>();
         var reads = 0;
-        when(
-          () => repo.getMoments(limit: 50),
-        ).thenAnswer((_) => reads++ == 0 ? old.future : Future.value([]));
+        when(() => repo.getMoments(limit: 50))
+            .thenAnswer((_) => reads++ == 0 ? old.future : Future.value([]));
         when(() => repo.watchMoments()).thenAnswer((_) => changes.stream);
         getIt.registerSingleton<IMomentRepository>(repo);
         addTearDown(() async {

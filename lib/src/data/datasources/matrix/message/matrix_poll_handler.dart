@@ -25,8 +25,20 @@ class MatrixPollHandler {
     bool isAnonymous = false,
     int? quizCorrectIndex,
     String? quizExplanation,
+    String? transactionId,
   }) async {
-    final room = await prepareRoomForSending(_client, roomId);
+    final sendingClient = _client;
+    final user = sendingClient?.userID, token = sendingClient?.accessToken,
+        device = sendingClient?.deviceID;
+    void requireSameSession() {
+      if (sendingClient == null || !identical(_client, sendingClient) ||
+          !sendingClient.isLogged() || sendingClient.userID != user ||
+          sendingClient.accessToken != token || sendingClient.deviceID != device) {
+        throw StateError('Message sending account changed');
+      }
+    }
+
+    final room = await prepareRoomForSending(sendingClient, roomId);
     if (room == null) {
       debugLog('MatrixMessageDataSource: Room not found: $roomId');
       return null;
@@ -38,7 +50,9 @@ class MatrixPollHandler {
         final index = entry.key;
         final text = entry.value;
         // 使用时间戳+索引生成唯一ID
-        final optionId = '${DateTime.now().millisecondsSinceEpoch}_$index';
+        final optionId = transactionId == null
+            ? '${DateTime.now().millisecondsSinceEpoch}_$index'
+            : '${transactionId}_$index';
         return {'id': optionId, 'org.matrix.msc1767.text': text};
       }).toList();
 
@@ -63,8 +77,11 @@ class MatrixPollHandler {
           },
       };
 
+      requireSameSession();
+
       final eventId = await room.sendEvent(
         content,
+        txid: transactionId,
         type: 'org.matrix.msc3381.poll.start',
       );
 

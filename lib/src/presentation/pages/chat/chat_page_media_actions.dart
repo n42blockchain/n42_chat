@@ -15,8 +15,6 @@ class _PersistedScheduledAttachment {
 
 /// 媒体操作相关方法（图片、视频、文件、语音的选择与发送）
 extension _ChatPageMediaActionsMethods on _ChatPageState {
-  static const int _maxEncryptedRoomFileBytes = 64 * 1024 * 1024;
-
   static const PermissionRequestOption _recentMediaPermission =
       PermissionRequestOption(
         androidPermission: AndroidPermission(
@@ -292,6 +290,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
   ///
   /// 编辑器中确认发送编辑后的图片，取消则不发送。
   Future<void> _editAndSendImage(XFile image, {DateTime? scheduledAt}) async {
+    var schedulingStarted = false;
     try {
       final bytes = await image.readAsBytes();
       if (!mounted) return;
@@ -314,6 +313,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       );
       filename = _ensureFilenameMatchesMimeType(filename, mimeType);
       if (scheduledAt != null) {
+        schedulingStarted = true;
         await _scheduleLocalAttachmentDraft(
           type: MessageType.image,
           scheduledAt: scheduledAt,
@@ -345,6 +345,21 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       }
     } catch (e) {
       debugLog('Edit image error: $e');
+      if (!mounted ||
+          (scheduledAt != null && _scheduledOrigin?.isCurrent != true))
+        return;
+      if (schedulingStarted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              S.of(context)?.chatSendImageFailed(e.toString()) ??
+                  'Failed to send image: $e',
+            ),
+            backgroundColor: AppColors.error,
+          ),
+        );
+        return;
+      }
       // 编辑器出错时回退到直接发送
       await _sendImage(image, scheduledAt: scheduledAt);
     }
@@ -642,6 +657,9 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
         );
       }
     } catch (e, stackTrace) {
+      if (!mounted ||
+          (scheduledAt != null && _scheduledOrigin?.isCurrent != true))
+        return;
       debugLog('Send video error: $e');
       debugLog('Stack trace: $stackTrace');
       if (mounted) {
@@ -807,6 +825,9 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
         );
       }
     } catch (e, stackTrace) {
+      if (!mounted ||
+          (scheduledAt != null && _scheduledOrigin?.isCurrent != true))
+        return;
       debugLog('Send image error: $e');
       debugLog('Stack trace: $stackTrace');
       if (mounted) {
@@ -886,6 +907,9 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
         );
       }
     } catch (e) {
+      if (!mounted ||
+          (scheduledAt != null && _scheduledOrigin?.isCurrent != true))
+        return;
       debugLog('Send file error: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -955,6 +979,9 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
         ),
       );
     } catch (e) {
+      if (!mounted ||
+          (scheduledAt != null && _scheduledOrigin?.isCurrent != true))
+        return;
       debugLog('Send original image as file error: $e');
       if (!mounted) {
         return;
@@ -1094,10 +1121,24 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       return;
     }
 
-    if (widget.conversation.isEncrypted &&
-        fileSize > _maxEncryptedRoomFileBytes) {
-      throw Exception(
-        'Encrypted rooms currently support secure file uploads up to 64MB',
+    final limit = await AttachmentSizePolicy.effectiveLimit(
+      getIt.isRegistered<MatrixClientManager>()
+          ? getIt<MatrixClientManager>().client
+          : null,
+      configuredLimit:
+          N42Chat.config?.maxFileSize ?? AttachmentSizePolicy.conservativeLimit,
+    );
+    if (!mounted) return;
+    if (fileSize <= 0 || fileSize > limit) {
+      throw StateError(
+        'File exceeds the ${(limit / (1024 * 1024)).toStringAsFixed(1)} MiB upload limit.',
+      );
+    }
+
+    if (scheduledAt != null &&
+        fileSize > AttachmentSizePolicy.conservativeLimit) {
+      throw StateError(
+        'Scheduled attachments support up to 50 MiB. Send this file now instead.',
       );
     }
 
@@ -1116,30 +1157,6 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
     }
 
     final chatBloc = context.read<ChatBloc>();
-
-    if (widget.conversation.isEncrypted) {
-      final secureBytes = await _resolveFileBytes(
-        fileBytes: fileBytes,
-        filePath: filePath,
-        fileStream: fileStream,
-      );
-      if (!mounted) {
-        return;
-      }
-      if (secureBytes == null || secureBytes.isEmpty) {
-        throw Exception('No readable file source available');
-      }
-
-      chatBloc.add(
-        SendFileMessage(
-          fileBytes: secureBytes,
-          filename: filename,
-          mimeType: mimeType,
-          fileSize: fileSize,
-        ),
-      );
-      return;
-    }
 
     if (filePath != null && filePath.isNotEmpty) {
       chatBloc.add(
@@ -1208,6 +1225,13 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
     int? fileSize,
     int? selfDestructAfter,
   }) async {
+    final ownerUserId = _currentUserId;
+    final roomId = widget.conversation.id;
+    if (ownerUserId == null ||
+        ownerUserId.isEmpty ||
+        _scheduledOrigin?.isCurrent != true) {
+      throw StateError('Scheduled message account changed');
+    }
     final persisted = await _persistScheduledAttachment(
       filename: filename,
       fileBytes: fileBytes,
@@ -1216,12 +1240,23 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       fileSize: fileSize,
     );
 
-    if (!mounted) {
-      return;
+    if (!mounted || _scheduledOrigin?.isCurrent != true) {
+      await File(persisted.localPath).delete();
+      throw StateError('Scheduled message account changed');
     }
 
-    context.read<ChatBloc>().add(
+    final bloc = context.read<ChatBloc>();
+    if (bloc.isClosed) {
+      await File(persisted.localPath).delete();
+      throw StateError('Scheduled message controller closed');
+    }
+    final completion = Completer<bool>();
+    bloc.add(
       SendScheduledMessage(
+        origin: _scheduledOrigin,
+        completion: completion,
+        ownerUserId: ownerUserId,
+        roomId: roomId,
         text: filename,
         type: type,
         payload: {
@@ -1234,6 +1269,13 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
         selfDestructAfter: selfDestructAfter,
       ),
     );
+    final saved = await completion.future;
+    // A rejected acknowledgement can follow uncertain storage failure. Keep
+    // the persisted attachment so a possibly stored draft never loses its file.
+    if (!saved) throw StateError('Scheduled attachment save not confirmed');
+    if (!mounted || _scheduledOrigin?.isCurrent != true) {
+      throw StateError('Scheduled message account changed');
+    }
   }
 
   Future<_PersistedScheduledAttachment> _persistScheduledAttachment({
@@ -1293,7 +1335,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
     final sanitized = filename
         .replaceAll(RegExp(r'[\\/:*?"<>|]'), '_')
         .replaceAll(' ', '_');
-    return '${DateTime.now().microsecondsSinceEpoch}_$sanitized';
+    return '${const Uuid().v4()}_$sanitized';
   }
 
   void _showScheduledAttachmentSnackBar(String filename, DateTime scheduledAt) {

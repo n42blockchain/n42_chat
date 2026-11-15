@@ -69,6 +69,84 @@ void main() {
     userId: session['userId']!,
     deviceId: session['deviceId']!,
   );
+  test('successful login announces its final usable session without security invalidation', () async {
+    final client = MockClient();
+    when(() => client.userID).thenReturn(session['userId']);
+    when(() => client.deviceID).thenReturn(session['deviceId']);
+    when(() => client.homeserver).thenReturn(Uri.parse(session['homeserver']!));
+    when(() => client.accessToken).thenReturn(session['accessToken']);
+    when(() => manager.client).thenReturn(client);
+    final observed = <AuthSessionInvalidation?>[];
+    final invalidated = <AuthSessionInvalidation>[];
+    final sessions = repository.accountSessionChanges.listen((_) => observed.add(repository.currentAccountGeneration));
+    final security = repository.accountInvalidationStream.listen(invalidated.add);
+    addTearDown(sessions.cancel); addTearDown(security.cancel);
+    expect((await login()).success, isTrue);
+    await Future<void>.delayed(Duration.zero);
+    final current = repository.currentAccountGeneration;
+    expect(current, isNotNull);
+    expect(current!.isCurrent, isTrue);
+    expect(observed.any((value) => identical(value, current)), isTrue);
+    expect(invalidated, isEmpty);
+  });
+
+  test(
+    'registration excludes concurrent password login and releases its lock',
+    () async {
+      final pending = Completer<RegisterResponse>();
+      when(
+        () => auth.register(
+          homeserver: any(named: 'homeserver'),
+          username: any(named: 'username'),
+          password: any(named: 'password'),
+          email: any(named: 'email'),
+          registrationToken: any(named: 'registrationToken'),
+        ),
+      ).thenAnswer((_) => pending.future);
+      final registration = repository.register(
+        homeserver: 'https://hs.test',
+        username: 'guest',
+        password: 'fixture-password',
+      );
+      expect((await login()).errorType, AuthErrorType.rateLimited);
+      verifyNever(
+        () => auth.loginWithPassword(
+          homeserver: any(named: 'homeserver'),
+          username: any(named: 'username'),
+          password: any(named: 'password'),
+        ),
+      );
+      pending.complete(RegisterResponse(userId: '@guest:hs.test'));
+      expect(
+        (await registration).errorType,
+        AuthErrorType.additionalAuthRequired,
+      );
+      expect((await login()).success, isTrue);
+    },
+  );
+
+  test('anonymous preflight cannot register after another authentication', () async {
+    final availability = Completer<bool>();
+    when(() => auth.isUsernameAvailable(any(), any()))
+        .thenAnswer((_) => availability.future);
+    when(() => auth.register(
+      homeserver: any(named: 'homeserver'), username: any(named: 'username'),
+      password: any(named: 'password'), email: any(named: 'email'),
+      registrationToken: any(named: 'registrationToken'),
+    )).thenAnswer((_) async => RegisterResponse(userId: '@guest:hs.test'));
+    final guest = repository.registerAnonymously(
+      homeserver: 'https://hs.test', password: 'fixture-password',
+    );
+    expect((await login()).success, isTrue);
+    availability.complete(true);
+    expect((await guest).errorType, AuthErrorType.rateLimited);
+    verifyNever(() => auth.register(
+      homeserver: any(named: 'homeserver'), username: any(named: 'username'),
+      password: any(named: 'password'), email: any(named: 'email'),
+      registrationToken: any(named: 'registrationToken'),
+    ));
+  });
+
   for (final anonymous in [false, true]) {
     for (final message in [
       'M_FORBIDDEN: Registration has been disabled',
@@ -291,6 +369,51 @@ void main() {
         expect((await login()).errorType, entry.value);
       },
     );
+  }
+  for (final code in ['M_USER_LOCKED', 'M_USER_DEACTIVATED']) {
+    for (final flow in ['password', 'token', 'restore']) {
+      test(
+        '$flow preserves $code without removing account credentials',
+        () async {
+          final failure = MatrixException.fromJson({
+            'errcode': code,
+            'error': 'Account unavailable',
+            'soft_logout': true,
+          });
+          when(
+            () => auth.loginWithPassword(
+              homeserver: any(named: 'homeserver'),
+              username: any(named: 'username'),
+              password: any(named: 'password'),
+            ),
+          ).thenThrow(failure);
+          when(
+            () => auth.loginWithToken(
+              homeserver: any(named: 'homeserver'),
+              accessToken: any(named: 'accessToken'),
+              userId: any(named: 'userId'),
+              deviceId: any(named: 'deviceId'),
+            ),
+          ).thenThrow(failure);
+          when(storage.getSession).thenAnswer((_) async => session);
+          final result = flow == 'password'
+              ? await login()
+              : flow == 'token'
+              ? await tokenLogin()
+              : await repository.restoreSession();
+          expect(result.success, isFalse);
+          expect(
+            result.errorType?.name,
+            code == 'M_USER_LOCKED' ? 'accountLocked' : 'accountDeactivated',
+          );
+          expect(result.errorMessage, 'Account unavailable');
+          verifyNever(storage.clearSession);
+          verifyNever(storage.clearCredentials);
+          verifyNever(() => storage.removeAccount(any()));
+          verifyNever(auth.logout);
+        },
+      );
+    }
   }
   test(
     'a pending password login rejects concurrent auth but releases the lock',

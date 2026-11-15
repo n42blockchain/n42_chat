@@ -1,24 +1,33 @@
 import 'dart:async';
+
 import '../../../data/datasources/matrix/message/encrypted_send_guard.dart';
 import '../../../data/datasources/matrix/message/direct_chat_send_guard.dart';
+
 import 'dart:io';
 import 'dart:math' show min;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:matrix/matrix.dart' show SyncStatus, SyncStatusUpdate;
+
+import '../../../domain/entities/chat_sync_phase.dart';
+
 import 'package:mime/mime.dart';
+import 'package:uuid/uuid.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 
 import '../../../core/services/speech_to_text_service.dart';
 import '../../../core/services/translation_service.dart';
 import '../../../core/utils/content_filter_utils.dart';
 import '../../../data/datasources/local/preferences_datasource.dart';
+import '../../../data/datasources/local/chat_history_clear_store.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/message_entity.dart';
 import '../../../core/utils/event_message_data.dart';
 import '../../../domain/entities/scheduled_message_draft.dart';
 import '../../../domain/repositories/group_repository.dart';
+import '../../../domain/repositories/auth_repository.dart';
+import '../../../data/services/account_action_capture.dart';
+import '../../../data/services/scheduled_draft_operation.dart';
 import '../../../domain/repositories/message_repository.dart';
 import 'chat_event.dart';
 import 'chat_state.dart';
@@ -32,16 +41,29 @@ part 'chat_bloc_feature_handlers.part.dart';
 part 'chat_bloc_retry_handlers.part.dart';
 
 /// 聊天BLoC
+class _ScheduledAccount {
+  final String userId;
+  final bool Function() isCurrent;
+  _ScheduledAccount(this.userId, this.isCurrent);
+}
+
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final IMessageRepository _messageRepository;
   final PreferencesDataSource _secureStorage;
+  final ChatHistoryClearStore? _historyClearStore;
+  DateTime? _historyClearedThrough;
+  String? _historyOwner;
+  bool _historyReady = true;
   final IGroupRepository? _groupRepository;
   final ITranslationService? _translationService;
   final MatrixClientManager? _clientManager;
+  final IAuthRepository? _authRepository;
 
   StreamSubscription<List<MessageEntity>>? _messagesSubscription;
   StreamSubscription<Map<String, dynamic>>? _pollResponsesSubscription;
   String? _currentRoomId;
+  int _chatGeneration = 0;
+  final Map<String, Object> _translationRequests = {};
 
   // 阅后即焚定时器
   Timer? _destructionTimer;
@@ -61,6 +83,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
   /// 待重试的消息ID及其重试次数
   final Map<String, int> _pendingRetryMessages = {};
+  int? _activeRetryGeneration;
+  bool Function()? _retryQueueIsCurrent;
 
   /// 已耗尽自动重试次数的消息ID集合
   ///
@@ -75,7 +99,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   static const int _baseRetryDelayMs = 2000;
 
   /// 同步状态订阅
-  StreamSubscription<SyncStatusUpdate>? _syncStatusSubscription;
+  StreamSubscription<ChatSyncPhase>? _syncStatusSubscription;
 
   /// 重试定时器
   Timer? _retryTimer;
@@ -86,14 +110,18 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   ChatBloc({
     required IMessageRepository messageRepository,
     required PreferencesDataSource secureStorage,
+    ChatHistoryClearStore? historyClearStore,
     IGroupRepository? groupRepository,
     ITranslationService? translationService,
     MatrixClientManager? clientManager,
+    IAuthRepository? authRepository,
   }) : _messageRepository = messageRepository,
        _secureStorage = secureStorage,
+       _historyClearStore = historyClearStore,
        _groupRepository = groupRepository,
        _translationService = translationService,
        _clientManager = clientManager,
+       _authRepository = authRepository,
        super(ChatState.initial()) {
     // 消息加载/订阅/更新
     on<InitializeChat>(_onInitializeChat);
@@ -198,6 +226,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     DestructionTimesLoaded event,
     Emitter<ChatState> emit,
   ) async {
+    if (event.isCurrent != null && !event.isCurrent!()) return;
     final updatedMessages = state.messages.map((msg) {
       final destroyedAt = event.destructionTimes[msg.id];
       if (destroyedAt != null &&
@@ -209,6 +238,22 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     }).toList();
     emit(state.copyWith(messages: updatedMessages));
   }
+
+  bool _historyBoundaryReached(List<MessageEntity> messages) =>
+      _historyClearedThrough != null && messages.any((message) =>
+          !message.timestamp.isAfter(_historyClearedThrough!));
+
+  List<MessageEntity> _visibleHistory(List<MessageEntity> messages) {
+    if (!_historyReady) return [];
+    final boundary = _historyClearedThrough;
+    return messages.where((message) =>
+      !_locallyDeletedMessageIds.contains(message.id) &&
+      (boundary == null || message.timestamp.isAfter(boundary))).toList();
+  }
+
+  /// Retain the originating session for callbacks kept by child routes.
+  bool Function() captureCurrentSession() =>
+      _captureChatContext(null, _currentRoomId);
 
   @override
   Future<void> close() {
@@ -230,7 +275,15 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     InitializeChat event,
     Emitter<ChatState> emit,
   ) async {
+    _chatGeneration++;
+    _pendingRetryMessages.clear();
+    _permanentlyFailedMessages.clear();
+    _translationRequests.clear();
     _currentRoomId = event.roomId;
+    _historyOwner = null;
+    _historyClearedThrough = null;
+    _historyReady = _historyClearStore == null;
+    final current = _captureChatContext(emit, event.roomId);
     _locallyDeletedMessageIds.clear();
 
     // 从持久化存储加载已删除的消息ID（异步，不阻塞）
@@ -238,8 +291,29 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
     // 立即显示界面，不等待网络
     emit(
-      state.copyWith(roomId: event.roomId, isLoading: false, clearError: true),
+      ChatState.initial().copyWith(
+        roomId: event.roomId, isLoading: false, clearError: true,
+        isSendingText: false, isSending: false, activeMediaSends: 0,
+      ),
     );
+
+    if (_historyClearStore != null) {
+      try {
+        final owner = await _messageRepository.getCurrentUserId();
+        if (!current()) return;
+        if (owner == null || owner.isEmpty) throw StateError('History owner unavailable');
+        final boundary = await _historyClearStore.read(
+          ownerUserId: owner, roomId: event.roomId, isCurrent: current,
+        );
+        if (!current()) return;
+        _historyOwner = owner;
+        _historyClearedThrough = boundary;
+        _historyReady = true;
+      } catch (error) {
+        if (current()) emit(state.copyWith(error: 'Failed to load chat history'));
+        return;
+      }
+    }
 
     // 先尝试快速加载本地缓存消息
     try {
@@ -248,7 +322,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         limit: 30, // 首屏只需要 30 条
       );
 
-      if (cachedMessages.isNotEmpty && !isClosed) {
+      if (!current()) return;
+      if (cachedMessages.isNotEmpty) {
         // 过滤已删除的消息
         final filteredMessages = cachedMessages
             .where((m) => !_locallyDeletedMessageIds.contains(m.id))
@@ -256,9 +331,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
         emit(
           state.copyWith(
-            messages: filteredMessages,
+            messages: _visibleHistory(_withLocalScheduledPreviews(filteredMessages)),
             isLoading: false,
-            hasMore: true,
+            hasMore: !_historyBoundaryReached(cachedMessages),
           ),
         );
         debugLog(
@@ -268,6 +343,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     } catch (e) {
       debugLog('ChatBloc: Failed to load cached messages: $e');
     }
+
+    if (!current()) return;
 
     // 订阅消息更新（后台同步）
     add(const SubscribeMessages());
@@ -307,11 +384,13 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   }
 
   void _loadContentFilter(String roomId) {
+    final current = _captureChatContext(null, roomId);
     Future.microtask(() async {
+      if (!current()) return;
       try {
         final filter = await _groupRepository?.getContentFilter(roomId);
-        if (!isClosed) {
-          add(ContentFilterLoaded(filter));
+        if (current()) {
+          add(ContentFilterLoaded(filter, isCurrent: current));
         }
       } catch (e) {
         // content filter 不影响聊天主流程，静默忽略错误
@@ -323,16 +402,20 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     ContentFilterLoaded event,
     Emitter<ChatState> emit,
   ) {
+    if (event.isCurrent != null && !event.isCurrent!()) return;
     emit(state.copyWith(contentFilter: event.config));
   }
 
   void _loadTranslationSettings() {
+    final current = _captureChatContext(null, _currentRoomId);
     Future.microtask(() async {
+      if (!current()) return;
       try {
         final settings = await _secureStorage.getTranslationSettings();
-        if (!isClosed && settings != null) {
+        if (current() && settings != null) {
           add(
             TranslationSettingsLoaded(
+              isCurrent: current,
               autoTranslate: settings['autoTranslate'] as bool? ?? false,
               defaultTargetLanguage: normalizeTranslationLanguageCode(
                 settings['defaultTargetLanguage'] as String? ??
@@ -362,12 +445,14 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
   /// 加载已保存的销毁时间
   void _loadSavedDestructionTimes(String roomId) {
+    final current = _captureChatContext(null, roomId);
     Future.microtask(() async {
+      if (!current()) return;
       try {
         final destructionTimes = await _secureStorage
             .getMessageDestructionTimes(roomId);
-        if (destructionTimes.isEmpty || isClosed) return;
-        add(DestructionTimesLoaded(destructionTimes));
+        if (destructionTimes.isEmpty || !current()) return;
+        add(DestructionTimesLoaded(destructionTimes, isCurrent: current));
       } catch (e) {
         debugLog('ChatBloc: Failed to load saved destruction times: $e');
       }
@@ -375,15 +460,30 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   }
 
   /// 后台加载完整消息数据
+  List<MessageEntity> _withLocalScheduledPreviews(List<MessageEntity> messages) {
+    final ids = messages.map((message) => message.id).toSet();
+    final owner = _clientManager?.client?.userID ?? _authRepository?.currentUser?.userId;
+    final previews = state.messages.where((message) =>
+        message.isScheduled &&
+        message.isFromMe &&
+        message.roomId == _currentRoomId &&
+        (owner == null || message.senderId == owner) &&
+        ids.add(message.id)).toList();
+    if (previews.isEmpty) return messages;
+    return [...messages, ...previews]
+      ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
+  }
+
   void _loadFullMessagesInBackground(String roomId) {
+    final current = _captureChatContext(null, roomId);
     Future.microtask(() async {
-      if (isClosed || _currentRoomId != roomId) return;
+      if (!current()) return;
 
       try {
         // 延迟加载 reactions 和 polls，避免阻塞首屏
         await Future<void>.delayed(const Duration(milliseconds: 100));
 
-        if (isClosed || _currentRoomId != roomId) return;
+        if (!current()) return;
 
         // 触发完整消息加载（包含 reactions 和 polls）
         add(LoadMessages(roomId));
@@ -395,10 +495,12 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
   /// 异步加载已删除消息ID
   void _loadDeletedMessageIds(String roomId) {
+    final current = _captureChatContext(null, roomId);
     Future.microtask(() async {
       try {
         final persistedDeletedIds = await _messageRepository
             .getLocallyDeletedMessageIds(roomId);
+        if (!current()) return;
         _locallyDeletedMessageIds.addAll(persistedDeletedIds);
         debugLog(
           'ChatBloc: Loaded ${persistedDeletedIds.length} locally deleted message IDs from storage',
@@ -411,6 +513,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
   /// 订阅投票响应事件
   void _subscribeToPollResponses(String roomId) {
+    final isCurrent = _captureChatContext(null, roomId);
+    if (!isCurrent()) return;
     _pollResponsesSubscription?.cancel();
     final stream = _messageRepository.watchPollResponses(roomId);
     if (stream == null) return;
@@ -418,7 +522,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     _pollResponsesSubscription = stream.listen(
       (response) {
         // 防止在 BLoC 关闭后添加事件
-        if (isClosed) return;
+        if (!isCurrent()) return;
 
         final type = response['type'] as String?;
         final pollEventId = response['pollEventId'] as String?;
@@ -437,10 +541,11 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
               selectedOptionIds: answers,
               senderId: senderId,
               isCurrentUser: isCurrentUser,
+              isCurrent: isCurrent,
             ),
           );
         } else if (type == 'end') {
-          add(PollEnded(pollEventId: pollEventId));
+          add(PollEnded(pollEventId: pollEventId, isCurrent: isCurrent));
         }
       },
       onError: (Object error) {
@@ -460,30 +565,72 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     });
   }
 
-  /// 加载定时消息
+  Future<_ScheduledAccount?> _captureScheduledAccount() async {
+    final manager = _clientManager;
+    final auth = _authRepository;
+    final origin = manager != null && auth != null
+        ? captureAccountAction(manager, auth)
+        : null;
+    // A configured lifecycle must supply a live generation, never fall back to
+    // matching user/token values after logout and a same-account login.
+    if (auth != null && origin == null) return null;
+    final client = manager?.client;
+    final user = client?.userID,
+        token = client?.accessToken,
+        device = client?.deviceID,
+        server = client?.homeserver;
+    final owner = await _messageRepository.getCurrentUserId();
+    bool current() =>
+        !isClosed &&
+        (origin == null || origin.isCurrent) &&
+        (manager == null ||
+            (client != null &&
+                identical(manager.client, client) &&
+                client.isLogged() &&
+                client.userID == user &&
+                user == owner &&
+                client.accessToken == token &&
+                client.deviceID == device &&
+                client.homeserver == server));
+    if (owner == null || owner.isEmpty || !current()) return null;
+    return _ScheduledAccount(owner, current);
+  }
+
+  Future<bool> _scheduledAccountIsCurrent(_ScheduledAccount account) async =>
+      account.isCurrent() &&
+      await _messageRepository.getCurrentUserId() == account.userId &&
+      account.isCurrent();
+
+  /// Load only drafts owned by the current account, and reject late previews.
   void _loadScheduledMessages(String roomId) {
     Future.microtask(() async {
       try {
+        final account = await _captureScheduledAccount();
+        if (account == null) return;
         final scheduledMessages = await _secureStorage.getScheduledMessages(
           roomId,
+          ownerUserId: account.userId,
         );
-        if (scheduledMessages.isEmpty || isClosed) return;
-
-        // 获取当前用户ID
-        final currentUserId = await _messageRepository.getCurrentUserId() ?? '';
-
-        // 为每个定时消息创建临时消息实体显示在UI中
-        final tempMessages = scheduledMessages
+        if (_currentRoomId != roomId ||
+            !await _scheduledAccountIsCurrent(account)) {
+          return;
+        }
+        final previews = scheduledMessages
             .map(
               (draft) => draft.toPreviewMessage(
                 roomId: roomId,
-                senderId: currentUserId,
+                senderId: account.userId,
               ),
             )
             .toList(growable: false);
-
-        if (tempMessages.isNotEmpty && !isClosed) {
-          add(ScheduledMessagesPreviewLoaded(tempMessages));
+        if (previews.isNotEmpty) {
+          add(
+            ScheduledMessagesPreviewLoaded(
+              previews,
+              ownerUserId: account.userId,
+              isCurrent: account.isCurrent,
+            ),
+          );
         }
       } catch (e) {
         debugLog('ChatBloc: Failed to load scheduled messages: $e');
@@ -495,6 +642,17 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     ScheduledMessagesPreviewLoaded event,
     Emitter<ChatState> emit,
   ) {
+    if (event.isCurrent != null && !event.isCurrent!()) return;
+    if (event.previewMessages.any(
+      (message) => message.roomId != _currentRoomId,
+    )) {
+      return;
+    }
+    if (event.ownerUserId != null &&
+        _clientManager != null &&
+        _clientManager.client?.userID != event.ownerUserId) {
+      return;
+    }
     final allMessages = [...state.messages, ...event.previewMessages];
     allMessages.sort((a, b) => b.timestamp.compareTo(a.timestamp));
     emit(state.copyWith(messages: allMessages));

@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/foundation.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/di/injection.dart';
 import '../../../core/services/biometric_service.dart';
@@ -27,6 +29,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final BiometricService _biometricService;
   final SecureStorageDataSource _secureStorage;
   final IdHubApi Function(String baseUrl) _idHubApiFactory;
+  final Future<SocialLoginResult?> Function(String provider, String nonce)?
+  _nativeSocialProof;
+  final Future<bool> Function(Uri)? _browserLoginLauncher;
+  bool _nativeSocialLoginBusy = false;
+  int _nativeSocialEpoch = 0;
   StreamSubscription<bool>? _loginStateSubscription;
   StreamSubscription<AuthSessionInvalidation>? _accountInvalidationSubscription;
   bool _logoutInProgress = false;
@@ -36,7 +43,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     BiometricService? biometricService,
     SecureStorageDataSource? secureStorage,
     IdHubApi Function(String baseUrl)? idHubApiFactory,
-  }) : _authRepository = authRepository,
+    Future<SocialLoginResult?> Function(String provider, String nonce)?
+    nativeSocialProof,
+    Future<bool> Function(Uri)? browserLoginLauncher,
+  }) : _browserLoginLauncher = browserLoginLauncher,
+       _nativeSocialProof = nativeSocialProof,
+       _authRepository = authRepository,
        _biometricService = biometricService ?? BiometricService(),
        _secureStorage = secureStorage ?? SecureStorageDataSource(),
        _idHubApiFactory =
@@ -182,6 +194,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     if (_logoutInProgress || !originIsCurrent()) {
       return;
     }
+    _nativeSocialEpoch++;
     _logoutInProgress = true;
     emit(state.copyWith(status: AuthStatus.loading));
 
@@ -468,6 +481,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         registrationToken: event.registrationToken,
       );
 
+      // A normal login/session check may finish while guest preflight waits.
+      // Its authenticated UI must survive an obsolete guest completion.
+      final currentUser = _authRepository.currentUser;
+      if (state.status == AuthStatus.authenticated &&
+          _authRepository.isLoggedIn &&
+          currentUser != null &&
+          state.user?.userId == currentUser.userId &&
+          (!result.success || result.user?.userId != currentUser.userId)) {
+        return;
+      }
+
       if (result.success && result.user != null) {
         await _completeAuthenticatedFlow(result.user!, emit);
       } else {
@@ -568,6 +592,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     if (result.success && result.user != null) {
       await _completeAuthenticatedFlow(result.user!, emit);
+    } else if (result.errorType == AuthErrorType.accountLocked ||
+        result.errorType == AuthErrorType.accountDeactivated) {
+      emit(
+        state.copyWith(
+          status: AuthStatus.error,
+          errorType: result.errorType,
+          errorMessage: result.errorMessage,
+        ),
+      );
     } else {
       emit(state.copyWith(status: AuthStatus.unauthenticated));
     }
@@ -871,12 +904,159 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   // 第三方登录
   // ============================================
 
+  Future<bool> _tryN42NativeSocialLogin(
+    String provider,
+    Emitter<AuthState> emit,
+  ) async {
+    final url = getIt.isRegistered<N42ChatConfig>()
+        ? getIt<N42ChatConfig>().n42NativeAuthUrl
+        : null;
+    if (url == null || url.isEmpty) return false;
+    if (_nativeSocialLoginBusy) return true;
+    _nativeSocialLoginBusy = true;
+    final epoch = ++_nativeSocialEpoch;
+    final startingUser = _authRepository.currentUser?.userId;
+    final failureKey = provider == 'google'
+        ? BlocMessageKeys.authGoogleLoginFailed
+        : provider == 'apple'
+        ? BlocMessageKeys.authAppleLoginFailed
+        : BlocMessageKeys.authFacebookLoginFailed;
+    IdHubApi? api;
+    try {
+      // Limited Login produces an OIDC proof on iOS. Android classic Facebook
+      // requires the separate authorization-code path; never send it as an ID token.
+      final isIOS = defaultTargetPlatform == TargetPlatform.iOS;
+      final isAndroid = defaultTargetPlatform == TargetPlatform.android;
+      if (kIsWeb || (!isIOS && !isAndroid)) {
+        throw StateError('Native OIDC login is not supported on this platform');
+      }
+      api = _idHubApiFactory(url);
+      IdHubWalletResponse credentials;
+      if (isAndroid && provider != 'google') {
+        final flow = await api.startBrowserLogin(provider);
+        if (emit.isDone ||
+            isClosed ||
+            epoch != _nativeSocialEpoch ||
+            _authRepository.currentUser?.userId != startingUser)
+          return true;
+        final launched =
+            await (_browserLoginLauncher?.call(flow.browserUrl) ??
+                launchUrl(
+                  flow.browserUrl,
+                  mode: LaunchMode.externalApplication,
+                ));
+        if (!launched) throw StateError('Browser login could not open');
+        final deadline = DateTime.now().add(flow.expiresIn);
+        IdHubWalletResponse? completed;
+        while (DateTime.now().isBefore(deadline)) {
+          if (emit.isDone ||
+              isClosed ||
+              epoch != _nativeSocialEpoch ||
+              _authRepository.currentUser?.userId != startingUser)
+            return true;
+          completed = await api.pollBrowserLogin(flow);
+          if (completed != null) break;
+          await Future<void>.delayed(const Duration(seconds: 2));
+        }
+        if (completed == null) throw StateError('Browser login expired');
+        credentials = completed;
+      } else {
+        final challenge = await api.startNativeLogin(
+          provider,
+          isIOS ? 'ios' : 'android',
+        );
+        if (emit.isDone ||
+            isClosed ||
+            epoch != _nativeSocialEpoch ||
+            _authRepository.currentUser?.userId != startingUser)
+          return true;
+        final service = AuthMethodsService();
+        final proof = _nativeSocialProof != null
+            ? await _nativeSocialProof(provider, challenge.nonce)
+            : provider == 'google'
+            ? await service.signInWithGoogle(requireServerCode: true)
+            : provider == 'apple'
+            ? await service.signInWithApple(serverNonce: challenge.nonce)
+            : await service.signInWithFacebook(serverNonce: challenge.nonce);
+        if (emit.isDone ||
+            isClosed ||
+            epoch != _nativeSocialEpoch ||
+            _authRepository.currentUser?.userId != startingUser)
+          return true;
+        if (proof == null) {
+          emit(
+            state.copyWith(
+              status: AuthStatus.unauthenticated,
+              errorMessage: BlocMessageKeys.authLoginCancelled,
+            ),
+          );
+          return true;
+        }
+        final code = proof.extra?['serverAuthCode'];
+        if (proof.provider != provider ||
+            (provider == 'google'
+                ? code is! String || code.isEmpty
+                : proof.idToken == null || proof.idToken!.isEmpty)) {
+          throw const FormatException('Missing provider identity token');
+        }
+        credentials = await api.completeNativeLogin(
+          challenge,
+          provider == 'google' ? '' : proof.idToken!,
+          serverAuthCode: provider == 'google' ? code as String : null,
+        );
+      }
+      if (emit.isDone ||
+          isClosed ||
+          epoch != _nativeSocialEpoch ||
+          _authRepository.currentUser?.userId != startingUser)
+        return true;
+      final result = await _authRepository.loginWithToken(
+        homeserver: credentials.matrixHomeserver!,
+        accessToken: credentials.matrixAccessToken!,
+        userId: credentials.matrixUserId!,
+        deviceId: credentials.matrixDeviceId ?? '',
+      );
+      if (emit.isDone || isClosed || epoch != _nativeSocialEpoch) return true;
+      if (result.success && result.user != null) {
+        if (result.user!.userId != credentials.matrixUserId ||
+            _authRepository.currentUser?.userId != credentials.matrixUserId) {
+          return true;
+        }
+        await _completeAuthenticatedFlow(result.user!, emit);
+      } else {
+        if (_authRepository.currentUser?.userId != startingUser) return true;
+        emit(
+          state.copyWith(
+            status: AuthStatus.error,
+            errorMessage: result.errorMessage ?? failureKey,
+          ),
+        );
+      }
+    } catch (_) {
+      if (!emit.isDone &&
+          !isClosed &&
+          epoch == _nativeSocialEpoch &&
+          _authRepository.currentUser?.userId == startingUser) {
+        emit(
+          state.copyWith(status: AuthStatus.error, errorMessage: failureKey),
+        );
+      }
+    } finally {
+      api?.close();
+      _nativeSocialLoginBusy = false;
+    }
+    // An opted-in N42 flow never falls back to legacy account lookup.
+    return true;
+  }
+
   /// Google 登录
   Future<void> _onGoogleLogin(
     AuthGoogleLoginRequested event,
     Emitter<AuthState> emit,
   ) async {
     emit(state.copyWith(status: AuthStatus.loading, errorMessage: null));
+
+    if (await _tryN42NativeSocialLogin('google', emit)) return;
 
     try {
       final authService = AuthMethodsService();
@@ -931,6 +1111,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     emit(state.copyWith(status: AuthStatus.loading, errorMessage: null));
+
+    if (await _tryN42NativeSocialLogin('apple', emit)) return;
 
     try {
       final authService = AuthMethodsService();
@@ -1031,6 +1213,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     emit(state.copyWith(status: AuthStatus.loading, errorMessage: null));
 
+    if (await _tryN42NativeSocialLogin('facebook', emit)) return;
+
     try {
       final authService = AuthMethodsService();
       final facebookResult = await authService.signInWithFacebook();
@@ -1049,10 +1233,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final result = await _authRepository.loginWithSocialToken(
         homeserver: event.homeserver,
         provider: 'facebook',
-        idToken: facebookResult.accessToken,
+        idToken: facebookResult.idToken ?? facebookResult.accessToken,
         accessToken: facebookResult.accessToken,
         email: facebookResult.email,
         displayName: facebookResult.displayName,
+        extra: facebookResult.extra,
       );
 
       if (result.success && result.user != null) {

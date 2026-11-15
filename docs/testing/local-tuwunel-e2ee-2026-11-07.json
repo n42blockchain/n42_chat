@@ -1,0 +1,30 @@
+{
+  "clients": 5,
+  "app_backup_recovery_passed": true,
+  "restored_sessions": 4,
+  "historical_key_absent_before_restore": true,
+  "historical_message_decrypted_after_restore": true,
+  "encrypted_events": 5,
+  "revoked_session_rejected": true,
+  "revoked_device_retains_previous_session_keys": true,
+  "revoked_device_cannot_decrypt_new_session": true,
+  "distinct_accounts": 3,
+  "same_account_second_device": true,
+  "decrypted_deliveries": 16,
+  "server_ciphertext_checks": 5,
+  "passed": true,
+  "scope": "isolated protocol and one backup recovery; not UI or physical-device acceptance",
+  "exit_code": 0,
+  "server_version": "Tuwunel 1.9.4",
+  "homeserver": "http://127.0.0.1:18948",
+  "source_sha256": "530f6da716cb15cdede633727b5fbc030df2ce3b0c8bb3a8c91ccdb59542a521",
+  "log_sha256": "3b7fdc8d2f8872fd91532c7c788468d950f1482894faedb554704fde901f0cfc",
+  "credential_output": false,
+  "backup_recovery_attempts_in_this_run": 1,
+  "limits": [
+    "one isolated recovery attempt; original 30-recovery target remains open",
+    "no cross-signing device verification acceptance",
+    "not physical-device UI or production acceptance",
+    "not production push or 10000-message load acceptance"
+  ]
+}

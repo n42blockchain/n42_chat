@@ -249,9 +249,8 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
     }
 
     if (paymentStatus == PaymentRequestLifecycleStatus.paid) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Payment already sent')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Payment already sent')));
       return;
     }
 
@@ -646,7 +645,11 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
     final isPdf =
         fileName.toLowerCase().endsWith('.pdf') ||
         mimeType == 'application/pdf';
-    if (isPdf && fileUrl != null) {
+    final hasEncryption =
+        message.metadata?.encryptKey != null ||
+        message.metadata?.encryptIv != null ||
+        message.metadata?.encryptSha256 != null;
+    if (isPdf && fileUrl != null && !hasEncryption) {
       Navigator.of(context).push(
         MaterialPageRoute<void>(
           builder: (_) => PdfViewerPage(
@@ -670,6 +673,9 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
             fileName: fileName,
             url: fileUrl!,
             headers: _buildAuthHeaders(fileUrl),
+            encryptKey: message.metadata?.encryptKey,
+            encryptIv: message.metadata?.encryptIv,
+            encryptSha256: message.metadata?.encryptSha256,
           ),
         ),
       );
@@ -689,7 +695,12 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
             try {
               final downloadService = getIt<DownloadService>();
               final downloadDir = await DownloadService.getDownloadDirectory();
-              final savePath = '$downloadDir/$fileName';
+              final safeName = fileName.split(RegExp(r'[/\\]')).last;
+              final directory = Directory(downloadDir);
+              await directory.create(recursive: true);
+              final target = await directory.createTemp('attachment-');
+              final savePath =
+                  '${target.path}/${safeName.isEmpty || safeName == "." || safeName == ".." ? "attachment" : safeName}';
 
               if (!mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
@@ -704,6 +715,9 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
                 savePath: savePath,
                 fileName: fileName,
                 headers: _buildAuthHeaders(fileUrl),
+                encryptKey: message.metadata?.encryptKey,
+                encryptIv: message.metadata?.encryptIv,
+                encryptSha256: message.metadata?.encryptSha256,
               );
               final task = await downloadService.waitForTaskCompletion(taskId);
               if (task.status != DownloadStatus.completed) {
@@ -716,7 +730,31 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
                     content: Text(
                       S.of(context)?.downloadComplete ?? 'Download complete',
                     ),
-                    duration: const Duration(seconds: 2),
+                    action: SnackBarAction(
+                      label: 'Open / Save',
+                      onPressed: () async {
+                        try {
+                          final box = context.findRenderObject() as RenderBox?;
+                          await SharePlus.instance.share(
+                            ShareParams(
+                              files: [XFile(savePath)],
+                              sharePositionOrigin: box == null
+                                  ? null
+                                  : box.localToGlobal(Offset.zero) & box.size,
+                            ),
+                          );
+                        } catch (_) {
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Unable to open this file.'),
+                              ),
+                            );
+                          }
+                        }
+                      },
+                    ),
+                    duration: const Duration(seconds: 8),
                   ),
                 );
               }
@@ -1018,6 +1056,16 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
 
   /// 打开聊天设置页面
   void _openChatSettings() async {
+    final settingsBloc = context.read<ChatBloc>();
+    final settingsRoomId = widget.conversation.id;
+    final settingsSessionIsCurrent = settingsBloc.captureCurrentSession();
+    final recoveryOrigin = _scheduledOrigin;
+    bool canClearHistory() => mounted && settingsSessionIsCurrent() && !settingsBloc.isClosed &&
+        settingsBloc.state.roomId == settingsRoomId &&
+        recoveryOrigin?.isCurrent == true;
+    final recoveryOwner = _currentUserId;
+    final openingRevision = _draftRevision;
+    final openingInput = _inputController.value;
     // 获取当前的 ContactBloc
     ContactBloc? contactBloc;
     try {
@@ -1058,8 +1106,14 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
             onMemberTap: (userId, displayName, avatarUrl) {
               _openMemberProfile(ctx, userId, displayName, avatarUrl);
             },
-            onClearHistory: () {
-              context.read<ChatBloc>().add(const ClearChatHistory());
+            canClearHistory: canClearHistory,
+            onClearHistoryAsync: () async {
+              if (!canClearHistory()) return false;
+              final completion = Completer<bool>();
+              settingsBloc.add(ClearChatHistory(
+                roomId: settingsRoomId, isCurrent: canClearHistory, completion: completion,
+              ));
+              return completion.future;
             },
           );
 
@@ -1072,8 +1126,25 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
     );
 
     await _loadBackground();
-    if (!mounted) {
+    if (!mounted || !settingsSessionIsCurrent() || settingsBloc.isClosed ||
+        widget.conversation.id != settingsRoomId) {
       return;
+    }
+
+    if (result is RecoveredComposerText) {
+      if (recoveryOrigin?.isCurrent != true || recoveryOwner == null ||
+          _currentUserId != recoveryOwner || result.ownerUserId != recoveryOwner ||
+          result.roomId != widget.conversation.id || result.text.trim().isEmpty ||
+          _draftRevision != openingRevision || _inputController.value != openingInput) { return; }
+      final text = openingInput.text.isEmpty ? result.text : '${openingInput.text}\n${result.text}';
+      _inputController.value = TextEditingValue(text: text, selection: TextSelection.collapsed(offset: text.length));
+      _saveDraft();
+      return;
+    }
+
+    if (widget.conversation.isGroup) {
+      await _refreshGroupMemberCount();
+      if (!mounted) return;
     }
 
     if (result is Map && result['action'] == 'search') {
@@ -1086,6 +1157,12 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
 
   /// 显示添加成员对话框
   void _showAddMemberDialog(BuildContext ctx) async {
+    final bloc = context.read<ChatBloc>();
+    final sessionIsCurrent = bloc.captureCurrentSession();
+    final roomId = widget.conversation.id;
+    bool current() => mounted && !bloc.isClosed && sessionIsCurrent() &&
+        widget.conversation.id == roomId && bloc.state.roomId == roomId;
+    if (!mounted || !current()) return;
     // 获取联系人列表
     List<ContactEntity> contacts = [];
     try {
@@ -1104,10 +1181,10 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
       final existing = members.map((m) => m.userId).toSet();
       contacts = contacts.where((c) => !existing.contains(c.userId)).toList();
     } catch (_) {
-      if (mounted) context.showErrorSnackBar(S.of(context)!.commonLoadFailed);
+      if (mounted && current()) context.showErrorSnackBar(S.of(context)!.commonLoadFailed);
       return;
     }
-    if (!mounted) return;
+    if (!mounted || !current()) return;
 
     if (contacts.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1130,11 +1207,14 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
       ),
     );
 
+    if (!mounted || !current()) return;
     if (selectedIds != null && selectedIds.isNotEmpty) {
       try {
         final groupRepository = getIt<IGroupRepository>();
         await groupRepository.inviteUsers(widget.conversation.id, selectedIds);
-        if (mounted) {
+        if (mounted && current()) {
+          await _refreshGroupMemberCount();
+          if (!mounted || !current()) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
@@ -1145,7 +1225,7 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
           );
         }
       } catch (e) {
-        if (mounted) {
+        if (mounted && current()) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
@@ -1161,10 +1241,18 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
 
   /// 从群中移除成员
   void _removeMemberFromGroup(String userId) async {
+    final bloc = context.read<ChatBloc>();
+    final sessionIsCurrent = bloc.captureCurrentSession();
+    final roomId = widget.conversation.id;
+    bool current() => mounted && !bloc.isClosed && sessionIsCurrent() &&
+        widget.conversation.id == roomId && bloc.state.roomId == roomId;
+    if (!mounted || !current()) return;
     try {
       final groupRepository = getIt<IGroupRepository>();
       await groupRepository.kickMember(widget.conversation.id, userId);
-      if (mounted) {
+      if (mounted && current()) {
+        await _refreshGroupMemberCount();
+        if (!mounted || !current()) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(S.of(context)?.chatMemberRemoved ?? 'Member removed'),
@@ -1172,7 +1260,7 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
         );
       }
     } catch (e) {
-      if (mounted) {
+      if (mounted && current()) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -1182,6 +1270,27 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
           ),
         );
       }
+    }
+  }
+
+  Future<void> _refreshGroupMemberCount() async {
+    if (!mounted) return;
+    final bloc = context.read<ChatBloc>();
+    final sessionIsCurrent = bloc.captureCurrentSession();
+    final roomId = widget.conversation.id;
+    final revision = ++_groupMemberCountRevision;
+    bool current() => mounted && !bloc.isClosed && sessionIsCurrent() &&
+        widget.conversation.id == roomId && bloc.state.roomId == roomId &&
+        revision == _groupMemberCountRevision;
+    if (!current()) return;
+    try {
+      final group = await getIt<IGroupRepository>().getGroup(roomId);
+      if (current() && group?.roomId == roomId &&
+          group!.memberCount != _groupMemberCountOverride) {
+        setState(() => _groupMemberCountOverride = group.memberCount);
+      }
+    } catch (e) {
+      debugLog('Failed to refresh group member count: $e');
     }
   }
 

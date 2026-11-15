@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:drift/drift.dart';
@@ -8,6 +9,7 @@ import 'package:path_provider/path_provider.dart';
 
 import '../../data/datasources/local/archive_database.dart';
 import '../utils/debug_log.dart';
+import 'archive_account_access.dart';
 
 /// 归档导入结果
 class ImportResult {
@@ -44,15 +46,52 @@ class ExportInfo {
 /// 提供归档数据库的压缩导出、SHA-256 校验和完整性验证。
 /// 当前使用 gzip 压缩（Dart 内置），后续可替换为 Zstd 以获得
 /// 更高压缩率（+20-30%）和更快解压速度（3-5x）。
-class ArchiveIntegrityService {
-  final ArchiveDatabase _db;
+class ArchiveImportLimits {
+  final int compressedBytes;
+  final int expandedBytes;
+  final int messages;
+  final int lineBytes;
 
-  ArchiveIntegrityService({required ArchiveDatabase db}) : _db = db;
+  const ArchiveImportLimits({
+    this.compressedBytes = 32 * 1024 * 1024,
+    this.expandedBytes = 64 * 1024 * 1024,
+    this.messages = 100000,
+    this.lineBytes = 1024 * 1024,
+  });
+}
+
+class ArchiveIntegrityService {
+  final ArchiveDatabase? _db;
+  final ArchiveAccountAccess? _access;
+  final ArchiveImportLimits _importLimits;
+  final Future<Directory> Function() _documentsDirectory;
+
+  ArchiveIntegrityService({
+    required ArchiveDatabase db,
+    Future<Directory> Function()? documentsDirectory,
+    ArchiveImportLimits importLimits = const ArchiveImportLimits(),
+  }) : _importLimits = importLimits,
+       _db = db,
+       _access = null,
+       _documentsDirectory =
+           documentsDirectory ?? getApplicationDocumentsDirectory;
+
+  ArchiveIntegrityService.accountScoped({
+    required ArchiveAccountAccess access,
+    Future<Directory> Function()? documentsDirectory,
+    ArchiveImportLimits importLimits = const ArchiveImportLimits(),
+  }) : _importLimits = importLimits,
+       _db = null,
+       _access = access,
+       _documentsDirectory =
+           documentsDirectory ?? getApplicationDocumentsDirectory;
 
   /// 获取归档目录
-  Future<Directory> _getArchiveDir() async {
-    final appDir = await getApplicationDocumentsDirectory();
-    final archiveDir = Directory(p.join(appDir.path, 'n42_chat_archives'));
+  Future<Directory> _getArchiveDir({String? scope}) async {
+    final appDir = await _documentsDirectory();
+    final archiveDir = Directory(
+      p.join(appDir.path, 'n42_chat_archives', scope ?? ''),
+    );
     if (!archiveDir.existsSync()) {
       archiveDir.createSync(recursive: true);
     }
@@ -63,28 +102,50 @@ class ArchiveIntegrityService {
   ///
   /// 输出路径: `<AppDocuments>/n42_chat_archives/archive_Q{quarter}.db.gz`
   Future<ExportInfo> exportQuarterlyArchive(int quarter) async {
-    final archiveDir = await _getArchiveDir();
+    final lease = await _access?.capture();
+    final archiveDir = await _getArchiveDir(scope: lease?.storageId);
+    lease?.ensureCurrent();
     final outputFile = File(p.join(archiveDir.path, 'archive_Q$quarter.db.gz'));
 
     // 从数据库查询该季度所有消息
-    final messages = await _queryQuarterMessages(quarter);
+    final messages = await _queryQuarterMessages(
+      lease?.database ?? _db!,
+      quarter,
+    );
+    lease?.ensureCurrent();
     if (messages.isEmpty) {
       throw StateError('No messages found for quarter $quarter');
     }
 
     // 序列化为 JSON Lines 格式（每行一条消息）
     final buffer = StringBuffer();
+    if (lease != null) {
+      buffer.writeln(
+        jsonEncode({'archiveOwner': lease.storageId, 'encoding': 'utf-8'}),
+      );
+    }
     for (final msg in messages) {
       buffer.writeln(_serializeMessage(msg));
     }
-    final rawBytes = Uint8List.fromList(buffer.toString().codeUnits);
+    final rawBytes = Uint8List.fromList(utf8.encode(buffer.toString()));
 
     // 压缩
     final compressed = gzip.encode(rawBytes);
-    await outputFile.writeAsBytes(compressed);
-
-    // 计算校验和
-    final checksum = await computeChecksum(outputFile);
+    final pendingFile = File(
+      '${outputFile.path}.${DateTime.now().microsecondsSinceEpoch}.partial',
+    );
+    late final String checksum;
+    try {
+      lease?.ensureCurrent();
+      await pendingFile.writeAsBytes(compressed, flush: true);
+      lease?.ensureCurrent();
+      checksum = await computeChecksum(pendingFile);
+      lease?.ensureCurrent();
+      await pendingFile.rename(outputFile.path);
+      lease?.ensureCurrent();
+    } finally {
+      if (await pendingFile.exists()) await pendingFile.delete();
+    }
 
     final ratio = rawBytes.isNotEmpty
         ? 1.0 - (compressed.length / rawBytes.length)
@@ -108,8 +169,7 @@ class ArchiveIntegrityService {
 
   /// 计算文件 SHA-256 校验和
   Future<String> computeChecksum(File file) async {
-    final bytes = await file.readAsBytes();
-    return sha256.convert(bytes).toString();
+    return (await sha256.bind(file.openRead()).first).toString();
   }
 
   /// 验证归档完整性（校验和比对）
@@ -123,7 +183,18 @@ class ArchiveIntegrityService {
   Future<ImportResult> importArchive(
     File compressedFile, {
     String? expectedChecksum,
+    bool allowUnownedLegacy = false,
   }) async {
+    ArchiveAccountLease? lease;
+    try {
+      lease = await _access?.capture();
+    } catch (error) {
+      return ImportResult(
+        success: false,
+        messagesImported: 0,
+        error: error.toString(),
+      );
+    }
     if (!compressedFile.existsSync()) {
       return const ImportResult(
         success: false,
@@ -132,26 +203,72 @@ class ArchiveIntegrityService {
       );
     }
 
-    // 校验完整性
-    if (expectedChecksum != null) {
-      final valid = await verifyArchive(compressedFile, expectedChecksum);
-      if (!valid) {
-        return const ImportResult(
-          success: false,
-          messagesImported: 0,
-          error: 'Checksum verification failed',
-        );
+    try {
+      if (_importLimits.compressedBytes <= 0 ||
+          _importLimits.expandedBytes <= 0 ||
+          _importLimits.messages <= 0 ||
+          _importLimits.lineBytes <= 0) {
+        throw ArgumentError('Archive import limits must be positive');
       }
+      if (await compressedFile.length() > _importLimits.compressedBytes) {
+        throw const FormatException('Compressed archive exceeds import limit');
+      }
+      lease?.ensureCurrent();
+    } catch (error) {
+      return ImportResult(
+        success: false,
+        messagesImported: 0,
+        error: error.toString(),
+      );
     }
 
     try {
-      // 解压
-      final compressedBytes = await compressedFile.readAsBytes();
-      final decompressed = gzip.decode(compressedBytes);
-      final content = String.fromCharCodes(decompressed);
+      lease?.ensureCurrent();
+      final database = lease?.database ?? _db!;
+      final decompressed = await _readBoundedArchive(
+        compressedFile,
+        lease,
+        expectedChecksum: expectedChecksum,
+      );
+      String content;
+      try {
+        content = utf8.decode(decompressed);
+      } on FormatException {
+        // Older archives used byte-sized code units; preserve that input path.
+        content = String.fromCharCodes(decompressed);
+      }
+      lease?.ensureCurrent();
 
       // 解析 JSON Lines
-      final lines = content.split('\n').where((l) => l.trim().isNotEmpty);
+      final lines = content
+          .split('\n')
+          .where((l) => l.trim().isNotEmpty)
+          .toList();
+      Object? first;
+      if (lines.isNotEmpty) {
+        try {
+          first = jsonDecode(lines.first);
+        } on FormatException {
+          // Preserve legacy per-line recovery; invalid message rows are skipped below.
+        }
+      }
+      final hasOwner = first is Map && first.containsKey('archiveOwner');
+      final owner = first is Map ? first['archiveOwner'] : null;
+      if (hasOwner) {
+        if (lease == null || owner is! String || owner != lease.storageId) {
+          throw StateError('Archive owner does not match the current account');
+        }
+        lines.removeAt(0);
+      } else if (lease != null && !allowUnownedLegacy) {
+        throw StateError(
+          'Legacy archive requires explicit ownership confirmation',
+        );
+      }
+      if (lines.length > _importLimits.messages) {
+        throw const FormatException(
+          'Archive message count exceeds import limit',
+        );
+      }
       final companions = <ArchivedMessagesCompanion>[];
 
       for (final line in lines) {
@@ -174,17 +291,37 @@ class ArchiveIntegrityService {
       }
 
       // 批量插入
-      final inserted = await _db.insertMessages(companions);
+      final inserted = await database.transaction(() async {
+        lease?.ensureCurrent();
+        final count = await database.insertMessages(companions);
+        for (final roomId
+            in companions.map((entry) => entry.roomId.value).toSet()) {
+          lease?.ensureCurrent();
+          final latest = (await database.getMessages(
+            roomId,
+            limit: 1,
+          )).firstOrNull;
+          await database.updateMetadata(
+            ArchiveMetadataCompanion(
+              roomId: Value(roomId),
+              lastArchivedEventId: Value(latest?.eventId),
+              lastArchivedTs: Value(latest?.originServerTs ?? 0),
+              totalArchived: Value(await database.getMessageCount(roomId)),
+              lastArchiveTime: Value(DateTime.now()),
+            ),
+          );
+        }
+        lease?.ensureCurrent();
+        return count;
+      });
+      lease?.ensureCurrent();
 
       debugLog(
         'ArchiveIntegrityService: Imported $inserted messages '
         'from ${compressedFile.path}',
       );
 
-      return ImportResult(
-        success: true,
-        messagesImported: inserted,
-      );
+      return ImportResult(success: true, messagesImported: inserted);
     } catch (e) {
       return ImportResult(
         success: false,
@@ -194,9 +331,73 @@ class ArchiveIntegrityService {
     }
   }
 
+  Future<Uint8List> _readBoundedArchive(
+    File file,
+    ArchiveAccountLease? lease, {
+    String? expectedChecksum,
+  }) async {
+    final digest = _ArchiveDigestSink();
+    final hasher = sha256.startChunkedConversion(digest);
+    Stream<List<int>> compressedChunks() async* {
+      var total = 0;
+      try {
+        await for (final chunk in file.openRead()) {
+          lease?.ensureCurrent();
+          total += chunk.length;
+          hasher.add(chunk);
+          if (total > _importLimits.compressedBytes) {
+            throw const FormatException(
+              'Compressed archive exceeds import limit',
+            );
+          }
+          // Bound the amount fed to each inflater call, including high-ratio input.
+          for (var offset = 0; offset < chunk.length; offset += 1024) {
+            yield chunk.sublist(offset, (offset + 1024).clamp(0, chunk.length));
+          }
+        }
+      } finally {
+        hasher.close();
+      }
+    }
+
+    final output = BytesBuilder(copy: false);
+    var expanded = 0;
+    var lineBytes = 0;
+    var lines = 0;
+    await for (final chunk in gzip.decoder.bind(compressedChunks())) {
+      lease?.ensureCurrent();
+      expanded += chunk.length;
+      if (expanded > _importLimits.expandedBytes) {
+        throw const FormatException('Expanded archive exceeds import limit');
+      }
+      for (final byte in chunk) {
+        if (byte == 10) {
+          lineBytes = 0;
+          lines++;
+          // One additional line is reserved for an account owner header.
+          if (lines > _importLimits.messages + 1) {
+            throw const FormatException(
+              'Archive message count exceeds import limit',
+            );
+          }
+        } else if (++lineBytes > _importLimits.lineBytes) {
+          throw const FormatException('Archive line exceeds import limit');
+        }
+      }
+      output.add(chunk);
+    }
+    if (expectedChecksum != null &&
+        digest.value?.toString() != expectedChecksum) {
+      throw const FormatException('Checksum verification failed');
+    }
+    return output.takeBytes();
+  }
+
   /// 列出所有已导出的归档文件
   Future<List<File>> listExportedArchives() async {
-    final archiveDir = await _getArchiveDir();
+    final lease = await _access?.capture();
+    final archiveDir = await _getArchiveDir(scope: lease?.storageId);
+    lease?.ensureCurrent();
     if (!archiveDir.existsSync()) return [];
     return archiveDir
         .listSync()
@@ -211,11 +412,16 @@ class ArchiveIntegrityService {
   // ============================================
 
   /// 查询指定季度的所有消息
-  Future<List<ArchivedMessage>> _queryQuarterMessages(int quarter) async {
-    final rows = await _db.customSelect(
-      'SELECT * FROM archived_messages WHERE quarter = ?',
-      variables: [Variable.withInt(quarter)],
-    ).get();
+  Future<List<ArchivedMessage>> _queryQuarterMessages(
+    ArchiveDatabase db,
+    int quarter,
+  ) async {
+    final rows = await db
+        .customSelect(
+          'SELECT * FROM archived_messages WHERE quarter = ?',
+          variables: [Variable.withInt(quarter)],
+        )
+        .get();
 
     return rows.map((row) {
       return ArchivedMessage(
@@ -284,4 +490,13 @@ class ArchiveIntegrityService {
       return null;
     }
   }
+}
+
+/// Retains only the digest, never the archived plaintext or compressed bytes.
+class _ArchiveDigestSink implements Sink<Digest> {
+  Digest? value;
+  @override
+  void add(Digest data) => value = data;
+  @override
+  void close() {}
 }

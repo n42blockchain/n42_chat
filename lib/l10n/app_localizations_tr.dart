@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -1992,70 +1993,70 @@ class STr extends S {
   String get settingsSecurityTitle => 'Güvenlik';
 
   @override
-  String get settingsDeleteAccountTitle => 'Delete account';
+  String get settingsDeleteAccountTitle => 'Hesabı sil';
 
   @override
   String get settingsDeleteAccountSubtitle =>
-      'Deactivate this Matrix account and clean up its local chat data';
+      'Bu Matrix hesabını devre dışı bırakın ve yerel sohbet verilerini temizleyin';
 
   @override
   String get settingsDeleteAccountExplanation =>
-      'This requests permanent Matrix account deactivation. After server confirmation, this app removes this account\'s local chat session and encryption keys when safe. Other accounts and your wallet are kept. Federation and server retention may limit data erasure.';
+      'Bu işlem Matrix hesabının kalıcı olarak devre dışı bırakılmasını ister. Sunucu onayından sonra uygulama, güvenli olduğunda bu hesabın yerel sohbet oturumunu ve şifreleme anahtarlarını kaldırır. Diğer hesaplar ve cüzdanınız korunur. Federasyon ve sunucunun saklama kuralları veri silmeyi sınırlayabilir.';
 
   @override
   String get settingsDeleteAccountPasswordOptional =>
-      'Matrix password, if requested';
+      'İstenirse Matrix parolası';
 
   @override
-  String get settingsDeleteAccountServerErase => 'Request server data erasure';
+  String get settingsDeleteAccountServerErase => 'Sunucudan veri silme iste';
 
   @override
   String get settingsDeleteAccountServerEraseDetail =>
-      'Ask this homeserver to erase account data where supported. Copies held by other servers or required by retention may remain.';
+      'Destekleniyorsa bu ana sunucudan hesap verilerini silmesini isteyin. Diğer sunuculardaki veya saklama kurallarının gerektirdiği kopyalar kalabilir.';
 
   @override
-  String get settingsDeleteAccountChooseStage => 'Verify this Matrix account';
+  String get settingsDeleteAccountChooseStage =>
+      'Bu Matrix hesabını doğrulayın';
 
   @override
-  String get settingsDeleteAccountUsePassword => 'Use Matrix password';
+  String get settingsDeleteAccountUsePassword => 'Matrix parolasını kullan';
 
   @override
-  String get settingsDeleteAccountUseBrowser => 'Continue in browser';
+  String get settingsDeleteAccountUseBrowser => 'Tarayıcıda devam et';
 
   @override
-  String get settingsDeleteAccountFallbackTitle =>
-      'Return from Matrix verification';
+  String get settingsDeleteAccountFallbackTitle => 'Matrix doğrulamasından dön';
 
   @override
   String get settingsDeleteAccountFallbackExplanation =>
-      'Returning from the browser does not confirm deletion. Check the original request with the Matrix server.';
+      'Tarayıcıdan dönmek silme işlemini onaylamaz. Asıl isteği Matrix sunucusundan kontrol edin.';
 
   @override
-  String get settingsDeleteAccountCheckServer => 'Check with server';
+  String get settingsDeleteAccountCheckServer => 'Sunucudan kontrol et';
 
   @override
   String get settingsDeleteAccountRequestFailed =>
-      'The Matrix server did not confirm account deletion.';
+      'Matrix sunucusu hesap silme işlemini onaylamadı.';
 
   @override
   String get settingsDeleteAccountPendingTitle =>
-      'Pending local account cleanup';
+      'Yerel hesap temizliği bekleniyor';
 
   @override
   String get settingsDeleteAccountPendingSubtitle =>
-      'Review cleanup for a previously deactivated Matrix account';
+      'Önceden devre dışı bırakılan Matrix hesabının temizliğini inceleyin';
 
   @override
   String get settingsDeleteAccountPendingReadError =>
-      'Unable to read pending cleanup records. Tap to retry.';
+      'Bekleyen temizlik kayıtları okunamadı. Tekrar denemek için dokunun.';
 
   @override
   String get settingsDeleteAccountPendingDetail =>
-      'The Matrix account was deactivated, but local cleanup is still pending. Other accounts remain available.';
+      'Matrix hesabı devre dışı bırakıldı, ancak yerel temizlik hâlâ bekliyor. Diğer hesaplar kullanılabilir durumda.';
 
   @override
   String get settingsDeleteAccountManagementNotConfirmed =>
-      'Account management opened in your browser. Deletion has not been confirmed in this app, so your chat session remains available.';
+      'Hesap yönetimi tarayıcınızda açıldı. Silme işlemi uygulamada onaylanmadığından sohbet oturumunuz kullanılabilir durumda kalır.';
 
   @override
   String get settingsKeyBackup => 'Anahtar Yedekleme';
@@ -5017,25 +5018,26 @@ class STr extends S {
   String get reportSelectReason => 'Lütfen bir neden seçin';
 
   @override
-  String get reportUnavailable => 'Sign in to send a report.';
+  String get reportUnavailable => 'Bildirim göndermek için oturum açın.';
 
   @override
   String get reportAccountChanged =>
-      'Account changed. Open this report again to send it.';
+      'Hesap değişti. Göndermek için bu bildirimi yeniden açın.';
 
   @override
   String get reportUnsupported =>
-      'This homeserver does not support user reports.';
+      'Bu ana sunucu kullanıcı bildirimlerini desteklemiyor.';
 
   @override
   String get reportRoomUnsupported =>
-      'This homeserver does not support room reports.';
+      'Bu ana sunucu oda bildirimlerini desteklemiyor.';
 
   @override
-  String get reportRateLimited => 'Too many reports. Please try again later.';
+  String get reportRateLimited =>
+      'Çok fazla bildirim. Lütfen daha sonra tekrar deneyin.';
 
   @override
-  String get reportCouldNotSend => 'Could not send report. Please try again.';
+  String get reportCouldNotSend => 'Bildirim gönderilemedi. Tekrar deneyin.';
 
   @override
   String get gameCenter => 'Oyunlar';
@@ -5926,31 +5928,31 @@ class STr extends S {
 
   @override
   String get chatEncryptionNotReady =>
-      'Secure connection is not ready. Message not sent. Check connection and device verification on both accounts, then retry.';
+      'Güvenli bağlantı hazır değil. Mesaj gönderilmedi. Her iki hesabın bağlantısını ve cihaz doğrulamasını kontrol edip tekrar deneyin.';
 
   @override
-  String get contactRequestPending => 'Awaiting acceptance';
+  String get contactRequestPending => 'Kabul bekleniyor';
 
   @override
   String get chatFriendRequestPending =>
-      'Friendship is not confirmed. Check Contacts > New Friends before sending.';
+      'Arkadaşlık onaylanmadı. Göndermeden önce Kişiler > Yeni Arkadaşlar bölümünü kontrol edin.';
 
   @override
   String contactPhotoCount(int count) {
-    return '$count photos';
+    return '$count fotoğraf';
   }
 
   @override
-  String get videoPublish => 'Publish video';
+  String get videoPublish => 'Video yayımla';
 
   @override
-  String get videoGoLive => 'Go live';
+  String get videoGoLive => 'Canlı yayın başlat';
 
   @override
-  String get videoSelect => 'Select video';
+  String get videoSelect => 'Video seç';
 
   @override
-  String get videoLiveUnavailable => 'Live broadcasting is unavailable';
+  String get videoLiveUnavailable => 'Canlı yayın kullanılamıyor';
 
   @override
   String get qrcodeAlbum => 'Albüm';
@@ -5959,105 +5961,414 @@ class STr extends S {
   String get settingsSwitchAccount => 'Hesap değiştir';
 
   @override
-  String get chatFilterUnread => 'Unread';
+  String get chatFilterUnread => 'Okunmamış';
 
   @override
-  String get chatFilterEmpty => 'No conversations in this filter';
+  String get chatFilterEmpty => 'Bu filtrede konuşma yok';
 
   @override
-  String get accountAdd => 'Add account';
+  String get accountAdd => 'Hesap ekle';
 
   @override
-  String get accountCurrent => 'Current account';
+  String get accountCurrent => 'Geçerli hesap';
 
   @override
-  String get accountSwitching => 'Switching account…';
+  String get accountSwitching => 'Hesap değiştiriliyor…';
 
   @override
   String get accountSwitchFailed =>
-      'Could not switch accounts. Try again, or add the account to sign in again.';
+      'Hesap değiştirilemedi. Tekrar deneyin veya yeniden oturum açmak için hesabı ekleyin.';
 
   @override
   String get accountSessionsHint =>
-      'Switch accounts here to keep each account’s messages and secure session separate.';
+      'Her hesabın mesajlarını ve güvenli oturumunu ayrı tutmak için hesapları buradan değiştirin.';
 
   @override
-  String get accountNoSaved => 'No saved accounts yet';
+  String get accountNoSaved => 'Henüz kayıtlı hesap yok';
 
   @override
-  String get contactRequestSent => 'Request sent';
+  String get contactRequestSent => 'İstek gönderildi';
 
   @override
-  String get contactRequestsIncoming => 'Received requests';
+  String get contactRequestsIncoming => 'Alınan istekler';
 
   @override
-  String get contactRequestsOutgoing => 'Sent requests';
+  String get contactRequestsOutgoing => 'Gönderilen istekler';
 
   @override
   String get contactRequestHint =>
-      'You can chat and call after the request is accepted.';
+      'İstek kabul edildikten sonra sohbet edebilir ve arama yapabilirsiniz.';
 
   @override
-  String get callReturnToCall => 'Return to call';
+  String get callReturnToCall => 'Aramaya dön';
 
   @override
-  String get chatMessageSending => 'Sending';
+  String get chatMessageSending => 'Gönderiliyor';
 
   @override
-  String get chatMessageSent => 'Sent';
+  String get chatMessageSent => 'Gönderildi';
 
   @override
-  String get chatMessageDelivered => 'Delivered';
+  String get chatMessageDelivered => 'Teslim edildi';
 
   @override
-  String get chatMessageRead => 'Read';
+  String get chatMessageRead => 'Okundu';
 
   @override
-  String get chatMessageFailed => 'Not sent. Tap to retry.';
+  String get chatMessageFailed => 'Gönderilmedi. Tekrar denemek için dokunun.';
 
   @override
   String get chatMessageUnavailable =>
-      'Message unavailable on this device. Tap to check recovery options.';
+      'Mesaj bu cihazda kullanılamıyor. Kurtarma seçeneklerini kontrol etmek için dokunun.';
 
   @override
-  String get contactStarredFriends => 'Starred friends';
+  String get contactStarredFriends => 'Yıldızlı arkadaşlar';
 
   @override
   String get chatRecipientKeysMissing =>
-      'This friend has no available encrypted session. Ask them to sign in and open the app, then retry. Use Switch Account instead of logging out when changing accounts.';
+      'Bu arkadaşınızın kullanılabilir şifreli oturumu yok. Oturum açıp uygulamayı açmasını isteyin, ardından tekrar deneyin. Hesap değiştirirken çıkış yapmak yerine Hesap Değiştir\'i kullanın.';
 
   @override
   String get chatSwitchForMessaging =>
-      'Changing accounts? Use Switch Account to keep your messages and secure sessions. Logging out revokes this device and can make incoming encrypted messages unavailable.';
+      'Hesap mı değiştiriyorsunuz? Mesajları ve güvenli oturumları korumak için Hesap Değiştir\'i kullanın. Çıkış yapmak bu cihazın erişimini iptal eder ve gelen şifreli mesajları kullanılamaz hâle getirebilir.';
 
   @override
   String get aiServiceUnavailable =>
-      'AI summaries are currently unavailable. Please try again after service access is restored.';
+      'Yapay zekâ özetleri şu anda kullanılamıyor. Hizmet erişimi geri geldiğinde tekrar deneyin.';
 
   @override
   String aiSummarizeMessages(int count) {
-    return 'Summarize $count recent messages';
+    return 'Son $count mesajı özetle';
   }
 
   @override
   String groupMembershipSummary(int joined, int invited) {
-    return '$joined joined · $invited invited';
+    return '$joined katıldı · $invited davet edildi';
   }
 
   @override
   String contactPendingCount(int count) {
-    return '$count pending requests';
+    return '$count bekleyen istek';
   }
 
   @override
-  String get chatDraftLabel => 'Draft';
+  String get chatDraftLabel => 'Taslak';
 
   @override
-  String get contactIndexLabel => 'Contact index';
+  String get contactIndexLabel => 'Kişi dizini';
 
   @override
   String get transferAssetUnavailable => 'Ödeme varlığı kullanılamıyor';
 
   @override
   String get transferPaymentRequestUnavailable => 'Ödeme isteği kullanılamıyor';
+
+  @override
+  String get chatCatchUp => 'Sohbete yetiş';
+
+  @override
+  String get chatCatchUpMentions => 'Bahsetmeler';
+
+  @override
+  String get chatCatchUpReplies => 'Bana verilen yanıtlar';
+
+  @override
+  String get chatCatchUpPinned => 'Sabitlenen mesajlar';
+
+  @override
+  String get chatCatchUpScope =>
+      'Bahsetmeler ve yanıtlar, okunmuş olanlar dâhil yüklenen mesajlarda aranır. Önceki yanıtları bulmak için daha eski mesajları yükleyin.';
+
+  @override
+  String get chatCatchUpLoadMore => 'Eski mesajları yükle';
+
+  @override
+  String get chatActionPreview => 'Takvim önerisini incele';
+
+  @override
+  String get chatActionPrivacy =>
+      'Onaydan sonra yalnızca aşağıdaki başlık ve saat takvim uygulamanızla paylaşılır. Saat dilimini kontrol edin. Takvim hesabınız bu etkinliği eşitleyebilir.';
+
+  @override
+  String get chatActionTitle => 'Sohbet etkinliği';
+
+  @override
+  String get chatActionSuggestion => 'Takvim önerisi';
+
+  @override
+  String get chatUnreadAttention => 'Okunmamış bahsetmeler ve yanıtlar';
+
+  @override
+  String get chatScanAgain => 'Yeniden tara';
+
+  @override
+  String get chatUnreadScope =>
+      'Sunucu geçmişini okuma işaretinize kadar tarar. Okumak için bir konuşma açın; sonuçları yeniden oluşturmak için yenileyin.';
+
+  @override
+  String get chatScanIncomplete =>
+      'Eksik: geçmiş, şifre çözme veya okuma işareti kullanılamıyor. Eşitlemeden sonra tekrar deneyin.';
+
+  @override
+  String get chatHistoryShare => 'Seçili geçmişi paylaş';
+
+  @override
+  String get chatHistoryExplanation =>
+      'Yalnızca yöneticiler için. Düz metni ve gruba katılmış bir üyeyle mevcut şifreli özel sohbeti seçin. Paylaşım, grupta görünür denetim mesajları oluşturur.';
+
+  @override
+  String get chatHistoryEnable => 'Paylaşımı etkinleştir';
+
+  @override
+  String get chatHistoryDisable => 'Paylaşımı devre dışı bırak';
+
+  @override
+  String get chatHistoryPolicy => 'Grup geçmişi paylaşım politikası';
+
+  @override
+  String get chatHistoryPolicyDetail =>
+      'Yalnızca yöneticiler paylaşabilir. Etkinleştirme, grup geçmişinin görünürlüğünü de katılımdan sonraki olaylarla sınırlar. Aşağıdaki metin mesajı sınırlarını ayarlayıp onaylayın.';
+
+  @override
+  String get chatHistoryPolicySaved => 'Politika kaydedildi';
+
+  @override
+  String get chatHistoryRecipient => 'Alıcıyla şifreli konuşma';
+
+  @override
+  String get chatHistoryReview => 'Seçili mesajları incele';
+
+  @override
+  String get chatHistoryMessages => 'mesaj';
+
+  @override
+  String get chatHistoryConfirmDetail =>
+      'Paylaşmadan önce alıcıyı, her mesajı ve saatini doğrulayın. Başarısız veya bilinmeyen bir sonuçta içerik zaten gönderilmiş olabilir: devam etmeden önce sonucu uzlaştırın.';
+
+  @override
+  String get chatHistoryCompleted =>
+      'Seçili geçmiş gönderildi ve grup denetimi onaylandı';
+
+  @override
+  String get chatHistoryPending =>
+      'Bekliyor: sonucu uzlaştırın, ardından devam etmek için yeniden onaylayın. Sonucu bilinmeyen gönderimler asla yinelenmez.';
+
+  @override
+  String get chatHistoryReconcile => 'Gönderim sonucunu uzlaştır';
+
+  @override
+  String get chatHistoryFailed =>
+      'Tamamlanamadı. Yönetici erişimini, grup politikasını, şifrelemeyi, alıcının üyeliğini ve seçimi kontrol edin. Gönderim başladıysa sonucunu uzlaştırın.';
+
+  @override
+  String get chatDeviceActions => 'Cihazdaki işlemler';
+
+  @override
+  String get chatDeviceActionsReview =>
+      'Onaydan sonra yalnızca bu mesaj sistemin cihaz içi işlem önerilerine verilir. Takvim, Anımsatıcılar veya Haritalar\'ı açmak için bir işlem seçin.';
+
+  @override
+  String get chatHistoryMaxMessages => 'Mesaj sınırı (1–50)';
+
+  @override
+  String get chatHistoryMaxHours => 'Geçmiş aralığı, saat (1–720)';
+
+  @override
+  String get chatNotifyAll => 'Tüm Mesajlar';
+
+  @override
+  String get chatNotifyAllDescription =>
+      'Bu sohbetteki her yeni mesaj için bildirim gönder';
+
+  @override
+  String get chatNotifyMentions => 'Yalnızca Bahsetmeler';
+
+  @override
+  String get chatNotifyMentionsDescription =>
+      'Yalnızca sizden bahsedildiğinde veya @room kullanıldığında bildirim gönder';
+
+  @override
+  String get chatNotifyMutedDescription =>
+      'Bu sohbetin bildirimlerini tüm cihazlarda kapat';
+
+  @override
+  String get scheduledMessagesTitle => 'Zamanlanmış mesajlar';
+
+  @override
+  String get scheduledMessagesEmpty => 'Henüz zamanlanmış mesaj yok';
+
+  @override
+  String get scheduledMessagesHint =>
+      'Mesaj zamanlamak için Gönder, Fotoğraflar, Dosyalar, bir GIF veya çıkartmaya uzun basın.';
+
+  @override
+  String get scheduledMessageCancelled => 'Zamanlanmış mesaj iptal edildi';
+
+  @override
+  String scheduledMessageCreatedAt(String time) {
+    return 'Oluşturulma: $time';
+  }
+
+  @override
+  String get scheduledDeliveryUnconfirmed => 'Teslimat doğrulanmadı';
+
+  @override
+  String get scheduledRecoveryCopy => 'Kurtarma kopyasını kaydet';
+
+  @override
+  String get scheduledRecoveryCopyHint =>
+      'Mesajlar değiştirilmeden veya gönderilmeden bu cihaza kaydedildi. Önizleme en fazla 8.000 karakter gösterir.';
+
+  @override
+  String get scheduledRecoveryCopies => 'Kurtarma kopyaları';
+
+  @override
+  String get scheduledRecoveryReset => 'Bozuk kuyruğu sıfırla';
+
+  @override
+  String get scheduledRecoveryResetHint =>
+      'Bu cihaza birebir kopya kaydedildi. Bu hesabın tüm zamanlanmış mesajları sıfırlansın mı? Bazıları zaten gönderilmiş olabilir. Kopyalar ve ekler korunur. Hiçbir şey yeniden gönderilmez.';
+
+  @override
+  String get scheduledRecoveryExportHint =>
+      'Bu dosya şifrelenmemiş taslak metni ve hesap bilgileri içerir. Ekler dahil değildir. Güvenilir bir hedef seçin.';
+
+  @override
+  String get scheduledRecoveryImport => 'Kurtarma kopyasını içe aktar';
+
+  @override
+  String get scheduledRecoveryImportHint =>
+      'Bu önizlemeyi yalnızca kurtarma kopyası olarak kaydet. Hiçbir mesaj planlanmaz veya gönderilmez. Ekler dahil değildir. Dosyanın yazarı doğrulanmamıştır.';
+
+  @override
+  String get scheduledRecoveryComposerHint =>
+      'İncelemek için metni mevcut taslağa ekleyin. Hiçbir şey gönderilmez. Ekler, bahsetmeler ve zamanlayıcılar geri yüklenmez. Bu mesajın daha önce iletilip iletilmediğini kontrol edin.';
+
+  @override
+  String get backupRecoverLegacyArchive => 'Eski yerel geçmişi kurtar';
+
+  @override
+  String get backupLegacyArchiveWarning =>
+      'Bu geçmişin sahibi doğrulanmamıştır. Yalnızca kendi odalarınızı aşağıdaki hesaba kopyalayın. Orijinal korunur.';
+
+  @override
+  String get backupOlderFiles => 'Eski yedek dosyaları';
+
+  @override
+  String get backupOlderFilesWarning =>
+      'Bu dosyalar başka bir hesaba ait olabilir. Geri yüklemeden önce içeriğini ve sahibini kontrol etmek için bir dosya seçin.';
+
+  @override
+  String get stickerImportTitle => 'Çıkartma paketini içe aktar';
+
+  @override
+  String get stickerImportLinkHint => 'Matrix çıkartma paketi bağlantısı';
+
+  @override
+  String get stickerImportPreview => 'Önizleme';
+
+  @override
+  String get stickerImportUnavailable =>
+      'Bu paket kullanılamıyor veya erişim izniniz yok.';
+
+  @override
+  String get stickerImportCopyNotice =>
+      'Bu paketin özel bir kopyasını ekleyin. Görselleri ve meta verileri uçtan uca şifrelenmez.';
+
+  @override
+  String get stickerImportFailed => 'Bu paket eklenemedi. Yeniden deneyin.';
+
+  @override
+  String get stickerImportAccountChanged =>
+      'Hesap değişti veya oturumun süresi doldu. Çıkartma içe aktarma ekranını yeniden açın.';
+
+  @override
+  String get stickerPackSourceRoom => 'Kaynak sohbet';
+
+  @override
+  String get stickerPackImages => 'Görseller';
+
+  @override
+  String get stickerPublishNotice =>
+      'Bu paketi seçilen grupta yayımlayın. Görseller ve meta veriler uçtan uca şifrelenmez. Grup durumunu okuyabilen kişiler bunlara erişebilir.';
+
+  @override
+  String get stickerPublishFailed =>
+      'Yayımlama onaylanmadı. Yeniden denemeden önce grubu kontrol edin.';
+
+  @override
+  String get stickerPublishReceiptMissing =>
+      'Yayımlandı ancak bağlantı kaydedilmedi. Bu sayfadan ayrılmadan önce paylaşın veya kopyalayın.';
+
+  @override
+  String get stickerSubscribe => 'Güncellemelere abone ol';
+
+  @override
+  String get stickerSubscribeNotice =>
+      'Paket yöneticilerinin gelecekteki değişikliklerini takip edin. Görseller ve meta veriler uçtan uca şifrelenmez. Aboneliği daha sonra iptal edebilirsiniz; bu işlem kaynak sohbete katılmanızı sağlamaz.';
+
+  @override
+  String get stickerSubscriptions => 'Çıkartma abonelikleri';
+
+  @override
+  String get stickerUnsubscribe => 'Abonelikten çık';
+
+  @override
+  String get stickerSubscriptionsEmpty => 'Çıkartma aboneliği yok';
+
+  @override
+  String get chatAttachmentEvent => 'Etkinlik';
+
+  @override
+  String get chatRecentMedia => 'Son fotoğraflar ve videolar';
+
+  @override
+  String get chatRecentMediaLoadFailed => 'Son medya yüklenemedi';
+
+  @override
+  String get chatRecentMediaPermission =>
+      'Son medyayı göstermek için fotoğraf erişimi gerekiyor';
+
+  @override
+  String get chatRecentMediaEmpty => 'Son fotoğraf veya video yok';
+
+  @override
+  String get chatRecentPhoto => 'Son fotoğraf';
+
+  @override
+  String get chatRecentVideo => 'Son video';
+
+  @override
+  String get chatAttachmentTip => 'Bahşiş';
+
+  @override
+  String get chatAttachmentWhiteboard => 'Beyaz tahta';
+
+  @override
+  String get chatAttachmentVideoNote => 'Video mesajı';
+
+  @override
+  String get chatAttachmentCode => 'Kod';
+
+  @override
+  String get chatAttachmentShop => 'Mağaza';
+
+  @override
+  String chatSelectionLimit(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Seçim sınırı: $countString';
+  }
+
+  @override
+  String scheduledSendTonightAt(String time) {
+    return 'Bu gece ($time)';
+  }
+
+  @override
+  String scheduledSendTomorrowMorningAt(String time) {
+    return 'Yarın sabah ($time)';
+  }
 }

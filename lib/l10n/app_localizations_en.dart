@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -6030,4 +6031,313 @@ class SEn extends S {
   @override
   String get transferPaymentRequestUnavailable =>
       'Payment request is unavailable';
+
+  @override
+  String get chatCatchUp => 'Catch up';
+
+  @override
+  String get chatCatchUpMentions => 'Mentions';
+
+  @override
+  String get chatCatchUpReplies => 'Replies to me';
+
+  @override
+  String get chatCatchUpPinned => 'Pinned messages';
+
+  @override
+  String get chatCatchUpScope =>
+      'Mentions and replies use loaded messages, including read messages. Load older messages to find earlier replies.';
+
+  @override
+  String get chatCatchUpLoadMore => 'Load older messages';
+
+  @override
+  String get chatActionPreview => 'Review calendar suggestion';
+
+  @override
+  String get chatActionPrivacy =>
+      'Only the title and time below will be shared with your calendar app after confirmation. Check the time zone. Your calendar account may sync this event.';
+
+  @override
+  String get chatActionTitle => 'Chat event';
+
+  @override
+  String get chatActionSuggestion => 'Calendar suggestion';
+
+  @override
+  String get chatUnreadAttention => 'Unread mentions and replies';
+
+  @override
+  String get chatScanAgain => 'Scan again';
+
+  @override
+  String get chatUnreadScope =>
+      'Scans server history to your read marker. Open a conversation to read it; refresh to rebuild the results.';
+
+  @override
+  String get chatScanIncomplete =>
+      'Incomplete: history, decryption or read marker unavailable. Try again after sync.';
+
+  @override
+  String get chatHistoryShare => 'Share selected history';
+
+  @override
+  String get chatHistoryExplanation =>
+      'Administrators only. Select plain text and an existing encrypted direct chat with a joined group member. Sharing creates visible audit messages in the group.';
+
+  @override
+  String get chatHistoryEnable => 'Enable sharing';
+
+  @override
+  String get chatHistoryDisable => 'Disable sharing';
+
+  @override
+  String get chatHistoryPolicy => 'Group history sharing policy';
+
+  @override
+  String get chatHistoryPolicyDetail =>
+      'Only administrators can share. Enabling also restricts group history visibility to events after joining. Set the text-message limits below and confirm.';
+
+  @override
+  String get chatHistoryPolicySaved => 'Policy saved';
+
+  @override
+  String get chatHistoryRecipient => 'Encrypted recipient conversation';
+
+  @override
+  String get chatHistoryReview => 'Review selected messages';
+
+  @override
+  String get chatHistoryMessages => 'messages';
+
+  @override
+  String get chatHistoryConfirmDetail =>
+      'Confirm this recipient, each message and its time before sharing. A failed or unknown result may already have sent content: reconcile before continuing.';
+
+  @override
+  String get chatHistoryCompleted =>
+      'Selected history sent and group audit confirmed';
+
+  @override
+  String get chatHistoryPending =>
+      'Pending: reconcile, then confirm again to continue. Unknown sends are never resent.';
+
+  @override
+  String get chatHistoryReconcile => 'Reconcile send result';
+
+  @override
+  String get chatHistoryFailed =>
+      'Unable to complete. Check administrator access, group policy, encryption, recipient membership and selection. If sending started, reconcile its result.';
+
+  @override
+  String get chatDeviceActions => 'On-device actions';
+
+  @override
+  String get chatDeviceActionsReview =>
+      'After confirmation, only this message is provided to the system on-device action suggestions. Choose an action to open Calendar, Reminders or Maps.';
+
+  @override
+  String get chatHistoryMaxMessages => 'Message limit (1–50)';
+
+  @override
+  String get chatHistoryMaxHours => 'History window in hours (1–720)';
+
+  @override
+  String get chatNotifyAll => 'All Messages';
+
+  @override
+  String get chatNotifyAllDescription =>
+      'Notify for every new message in this chat';
+
+  @override
+  String get chatNotifyMentions => 'Mentions Only';
+
+  @override
+  String get chatNotifyMentionsDescription =>
+      'Only notify when you are mentioned or @room is used';
+
+  @override
+  String get chatNotifyMutedDescription =>
+      'Disable notifications for this chat on all devices';
+
+  @override
+  String get scheduledMessagesTitle => 'Scheduled messages';
+
+  @override
+  String get scheduledMessagesEmpty => 'No scheduled messages yet';
+
+  @override
+  String get scheduledMessagesHint =>
+      'Long press Send, Photos, Files, a GIF or a sticker to schedule a message.';
+
+  @override
+  String get scheduledMessageCancelled => 'Scheduled message cancelled';
+
+  @override
+  String scheduledMessageCreatedAt(String time) {
+    return 'Created $time';
+  }
+
+  @override
+  String get scheduledDeliveryUnconfirmed => 'Delivery not confirmed';
+
+  @override
+  String get scheduledRecoveryCopy => 'Save recovery copy';
+
+  @override
+  String get scheduledRecoveryCopyHint =>
+      'Saved on this device without changing or sending messages. Preview shows up to 8,000 characters.';
+
+  @override
+  String get scheduledRecoveryCopies => 'Recovery copies';
+
+  @override
+  String get scheduledRecoveryReset => 'Reset damaged queue';
+
+  @override
+  String get scheduledRecoveryResetHint =>
+      'An exact copy is saved on this device. Reset all scheduled messages for this account? Some may already have been sent. Copies and attachments are kept. Nothing is resent.';
+
+  @override
+  String get scheduledRecoveryExportHint =>
+      'This file contains unencrypted draft text and account details. Attachments are not included. Choose a trusted destination.';
+
+  @override
+  String get scheduledRecoveryImport => 'Import recovery copy';
+
+  @override
+  String get scheduledRecoveryImportHint =>
+      'Save this preview as a recovery copy only. No messages will be scheduled or sent. Attachments are not included. The file author is not verified.';
+
+  @override
+  String get scheduledRecoveryComposerHint =>
+      'Append text to the current draft for review. Nothing is sent. Attachments, mentions and timers are not restored. Check whether this message was already delivered.';
+
+  @override
+  String get backupRecoverLegacyArchive => 'Recover older local history';
+
+  @override
+  String get backupLegacyArchiveWarning =>
+      'This history has no verified owner. Copy only your rooms to the account below. The original is kept.';
+
+  @override
+  String get backupOlderFiles => 'Older backup files';
+
+  @override
+  String get backupOlderFilesWarning =>
+      'These files may belong to another account. Select a file to check its contents and ownership before restoring.';
+
+  @override
+  String get stickerImportTitle => 'Import sticker pack';
+
+  @override
+  String get stickerImportLinkHint => 'Matrix sticker pack link';
+
+  @override
+  String get stickerImportPreview => 'Preview';
+
+  @override
+  String get stickerImportUnavailable =>
+      'This pack is unavailable or you do not have access.';
+
+  @override
+  String get stickerImportCopyNotice =>
+      'Add a private copy of this pack. Its images and metadata are not end-to-end encrypted.';
+
+  @override
+  String get stickerImportFailed => 'Could not add this pack. Try again.';
+
+  @override
+  String get stickerImportAccountChanged =>
+      'Account changed or session expired. Reopen sticker import.';
+
+  @override
+  String get stickerPackSourceRoom => 'Source chat';
+
+  @override
+  String get stickerPackImages => 'Images';
+
+  @override
+  String get stickerPublishNotice =>
+      'Publish this pack to the selected group. Its images and metadata are not end-to-end encrypted. People who can read the group state may access them.';
+
+  @override
+  String get stickerPublishFailed =>
+      'Publication was not confirmed. Check the group before trying again.';
+
+  @override
+  String get stickerPublishReceiptMissing =>
+      'Published, but the link was not saved. Share or copy it before leaving this page.';
+
+  @override
+  String get stickerSubscribe => 'Subscribe to updates';
+
+  @override
+  String get stickerSubscribeNotice =>
+      'Follow future changes made by this pack’s administrators. Images and metadata are not end-to-end encrypted. You can unsubscribe later; this does not join the source chat.';
+
+  @override
+  String get stickerSubscriptions => 'Sticker subscriptions';
+
+  @override
+  String get stickerUnsubscribe => 'Unsubscribe';
+
+  @override
+  String get stickerSubscriptionsEmpty => 'No sticker subscriptions';
+
+  @override
+  String get chatAttachmentEvent => 'Event';
+
+  @override
+  String get chatRecentMedia => 'Recent photos and videos';
+
+  @override
+  String get chatRecentMediaLoadFailed => 'Could not load recent media';
+
+  @override
+  String get chatRecentMediaPermission =>
+      'Photo access is needed to show recent media';
+
+  @override
+  String get chatRecentMediaEmpty => 'No recent photos or videos';
+
+  @override
+  String get chatRecentPhoto => 'Recent photo';
+
+  @override
+  String get chatRecentVideo => 'Recent video';
+
+  @override
+  String get chatAttachmentTip => 'Tip';
+
+  @override
+  String get chatAttachmentWhiteboard => 'Whiteboard';
+
+  @override
+  String get chatAttachmentVideoNote => 'Video note';
+
+  @override
+  String get chatAttachmentCode => 'Code';
+
+  @override
+  String get chatAttachmentShop => 'Shop';
+
+  @override
+  String chatSelectionLimit(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Selection limit: $countString';
+  }
+
+  @override
+  String scheduledSendTonightAt(String time) {
+    return 'Tonight ($time)';
+  }
+
+  @override
+  String scheduledSendTomorrowMorningAt(String time) {
+    return 'Tomorrow morning ($time)';
+  }
 }

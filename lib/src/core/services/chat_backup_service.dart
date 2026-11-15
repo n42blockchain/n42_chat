@@ -18,6 +18,14 @@ import '../constants/app_constants.dart';
 import 'message_archive_service.dart';
 import '../utils/debug_log.dart';
 
+class BackupPasswordRequired extends StateError {
+  BackupPasswordRequired() : super('This backup is password-protected');
+}
+
+class BackupSessionChanged extends StateError {
+  BackupSessionChanged() : super('Backup session changed');
+}
+
 /// 备份结果
 class BackupResult {
   final String backupId;
@@ -108,6 +116,7 @@ class BackupPreview {
   final bool hasMedia;
   final bool hasKeys;
   final bool hasSettings;
+  final List<String> warnings;
 
   const BackupPreview({
     required this.backupId,
@@ -117,6 +126,7 @@ class BackupPreview {
     required this.hasMedia,
     required this.hasKeys,
     required this.hasSettings,
+    this.warnings = const [],
   });
 }
 
@@ -196,24 +206,85 @@ class ChatBackupService {
     _archiveService = service;
   }
 
-  /// 获取备份目录
-  Future<Directory> _getBackupDir() async {
-    if (_backupDirProvider != null) {
-      final provided = await _backupDirProvider();
-      if (!provided.existsSync()) {
-        provided.createSync(recursive: true);
+  void Function() _captureBackupSession() {
+    final client = _clientManager.client;
+    if (client == null) throw StateError('Matrix client not available');
+    final user = client.userID;
+    final server = client.homeserver;
+    final token = client.accessToken;
+    final device = client.deviceID;
+    final archive = _archiveService;
+    return () {
+      if (!identical(_clientManager.client, client) ||
+          client.userID != user ||
+          client.homeserver != server ||
+          client.accessToken != token ||
+          client.deviceID != device ||
+          !identical(_archiveService, archive)) {
+        throw BackupSessionChanged();
       }
-      return provided;
-    }
+    };
+  }
 
-    final appDir = await getApplicationDocumentsDirectory();
-    final backupDir = Directory(
-      p.join(appDir.path, StorageConstants.backupDirName),
+  // Older cursors do not prove which rooms were exported. Start a full scan
+  // for a new identity or room set rather than skipping unexported history.
+  String? _incrementalCursorKey(List<String> roomIds) {
+    final client = _clientManager.client;
+    final user = client?.userID;
+    final server = client?.homeserver;
+    if (user == null || user.isEmpty || server == null) return null;
+    final owner = sha256.convert(
+      utf8.encode(
+        jsonEncode([server.toString(), user, roomIds.toSet().toList()..sort()]),
+      ),
     );
-    if (!backupDir.existsSync()) {
-      backupDir.createSync(recursive: true);
+    return '${_keyLastIncrementalBackupTs}_v3_$owner';
+  }
+
+  String? _backupDirectoryScope() {
+    final client = _clientManager.client;
+    final user = client?.userID;
+    final server = client?.homeserver;
+    if (user == null || server == null) return null;
+    try {
+      return ArchiveDatabase.accountStorageId(userId: user, homeserver: server);
+    } on ArgumentError {
+      return null;
     }
-    return backupDir;
+  }
+
+  /// Legacy root files are retained for explicit file selection, never adopted.
+  Future<Directory> _getBackupDir() async {
+    final scope = _backupDirectoryScope() ?? 'unowned';
+    final root = await _getBackupRoot();
+    final directory = Directory(p.join(root.path, scope));
+    if (!directory.existsSync()) directory.createSync(recursive: true);
+    return directory;
+  }
+
+  Future<Directory> _getBackupRoot() async {
+    if (_backupDirProvider != null) return _backupDirProvider();
+    final appDir = await getApplicationDocumentsDirectory();
+    return Directory(p.join(appDir.path, StorageConstants.backupDirName));
+  }
+
+  /// Explicit legacy discovery exposes filenames only, never adopts or deletes.
+  Future<List<File>> listLegacyBackupFiles() async {
+    if (_backupDirectoryScope() == null) return [];
+    final ensureCurrent = _captureBackupSession();
+    final root = await _getBackupRoot();
+    ensureCurrent();
+    if (!root.existsSync()) return [];
+    final files = <File>[];
+    await for (final entity in root.list(followLinks: false)) {
+      ensureCurrent();
+      if (entity is File && entity.path.endsWith(StorageConstants.backupExtension)) {
+        files.add(entity);
+      }
+    }
+    ensureCurrent();
+    files.sort((a, b) => a.path.compareTo(b.path));
+    return files;
   }
 
   /// 创建备份
@@ -221,13 +292,17 @@ class ChatBackupService {
     List<String>? roomIds,
     bool includeMedia = false,
     bool includeKeys = false,
+    bool fetchRemoteHistory = false,
     String? password,
     void Function(double progress)? onProgress,
   }) async {
+    final ensureCurrent = _captureBackupSession();
+    final client = _clientManager.client!;
     final backupId = const Uuid().v4();
     final now = DateTime.now();
     final backupDir = await _getBackupDir();
     final warnings = <String>[];
+    _warnUnknownExportOwner(warnings);
     final fileName =
         'backup_${now.year}${now.month.toString().padLeft(2, '0')}'
         '${now.day.toString().padLeft(2, '0')}_'
@@ -236,14 +311,15 @@ class ChatBackupService {
         '${StorageConstants.backupExtension}';
     final filePath = p.join(backupDir.path, fileName);
 
-    final client = _clientManager.client;
-    if (client == null) throw StateError('Matrix client not available');
+    ensureCurrent();
 
     final rooms = roomIds != null
         ? client.rooms.where((r) => roomIds.contains(r.id)).toList()
         : client.rooms;
 
+    ensureCurrent();
     onProgress?.call(0.1);
+    ensureCurrent();
 
     final includesKeysInBackup = await _collectKeyBackupSupport(
       includeKeys,
@@ -256,9 +332,14 @@ class ChatBackupService {
         'backupId': backupId,
         'createdAt': now.toIso8601String(),
         'appVersion': _appVersion,
+        'owner': {
+          'userId': client.userID,
+          'homeserver': client.homeserver?.toString(),
+        },
         'roomCount': rooms.length,
         'includesMedia': includeMedia,
         'includesKeys': includesKeysInBackup,
+        'historyScope': fetchRemoteHistory ? 'requestedRemoteHistory' : 'loadedTimeline',
         'checksum': '',
       },
       'rooms': <String, dynamic>{},
@@ -267,7 +348,9 @@ class ChatBackupService {
 
     // 导出房间数据
     int messageCount = 0;
+    var hasReadErrors = false;
     for (var i = 0; i < rooms.length; i++) {
+      ensureCurrent();
       final room = rooms[i];
       try {
         final roomData = <String, dynamic>{
@@ -278,36 +361,69 @@ class ChatBackupService {
           'memberCount': room.summary.mJoinedMemberCount ?? 0,
         };
 
-        // 获取消息（通过 room 的 lastEvent 等方式）
-        // Matrix SDK v6 不提供直接的 timeline getter
-        // 使用 room.getTimeline() 获取完整 timeline
+        // Export every eligible loaded event. Remote history pagination remains
+        // separate; the manifest explicitly describes this source scope.
         try {
           final timeline = await room.getTimeline();
-          final events = timeline.events
-              .where((e) => e.type == 'm.room.message')
-              .where((e) => !_isEphemeralEvent(e))
-              .take(1000)
-              .map(
-                (e) => {
-                  'eventId': e.eventId,
-                  'sender': e.senderId,
-                  'type': e.messageType,
-                  'body': e.body,
-                  'timestamp': e.originServerTs.toIso8601String(),
-                },
-              )
-              .toList();
-          roomData['messages'] = events;
-          messageCount += events.length;
+          try {
+            ensureCurrent();
+            if (fetchRemoteHistory) {
+              try {
+                var pages = 0;
+                while (timeline.canRequestHistory) {
+                  ensureCurrent();
+                  if (++pages > 10000) throw StateError('Backup history page limit reached');
+                  final before = (timeline.events.length,
+                    timeline.events.lastOrNull?.eventId, room.prev_batch);
+                  await timeline.requestHistory(historyCount: 500)
+                      .timeout(const Duration(seconds: 30));
+                  ensureCurrent();
+                  final after = (timeline.events.length,
+                    timeline.events.lastOrNull?.eventId, room.prev_batch);
+                  if (before == after && timeline.canRequestHistory) {
+                    throw StateError('Backup history pagination made no progress');
+                  }
+                }
+              } catch (_) {
+                hasReadErrors = true;
+              }
+            }
+            ensureCurrent();
+            final loadedEvents = timeline.events.toList();
+            final privateEventIds = loadedEvents.where(_isUnexportableEvent)
+                .map((event) => event.eventId).toSet();
+            final exportedEventIds = <String>{};
+            final events = loadedEvents
+                .where((e) => e.type == 'm.room.message')
+                .where((e) => !privateEventIds.contains(e.eventId))
+                .where((e) => exportedEventIds.add(e.eventId))
+                .map(
+                  (e) => {
+                    'eventId': e.eventId,
+                    'sender': e.senderId,
+                    'type': e.messageType,
+                    'body': e.body,
+                    'timestamp': e.originServerTs.toIso8601String(),
+                  },
+                )
+                .toList();
+            roomData['messages'] = events;
+            messageCount += events.length;
+          } finally {
+            timeline.cancelSubscriptions();
+          }
         } catch (_) {
-          // Timeline not available, skip messages
+          hasReadErrors = true;
+          // Preserve partial output while reporting the unread messages.
         }
 
         (backupData['rooms'] as Map<String, dynamic>)[room.id] = roomData;
       } catch (e) {
+        hasReadErrors = true;
         debugLog('ChatBackupService: Failed to export room ${room.id}: $e');
       }
 
+      ensureCurrent();
       onProgress?.call(0.1 + 0.7 * (i + 1) / rooms.length);
     }
 
@@ -322,14 +438,25 @@ class ChatBackupService {
       ];
       final settings = <String, String?>{};
       for (final key in settingsKeys) {
+        ensureCurrent();
         settings[key] = await _preferencesStorage.read(key);
+        ensureCurrent();
       }
       backupData['settings'] = settings;
     } catch (e) {
+      hasReadErrors = true;
       debugLog('ChatBackupService: Failed to export settings: $e');
     }
 
+    ensureCurrent();
     onProgress?.call(0.85);
+    ensureCurrent();
+
+    if (hasReadErrors) {
+      warnings.add('Some messages or settings could not be read. This backup is incomplete.');
+    }
+    (backupData['manifest'] as Map<String, dynamic>)['hasReadErrors'] = hasReadErrors;
+    (backupData['manifest'] as Map<String, dynamic>)['warnings'] = warnings;
 
     // 写入文件
     final finalJsonStr = _finalizeBackupJson(backupData);
@@ -346,9 +473,11 @@ class ChatBackupService {
       await file.writeAsString(finalJsonStr);
     }
 
+    ensureCurrent();
     onProgress?.call(1.0);
 
     final fileSize = await File(filePath).length();
+    ensureCurrent();
 
     return BackupResult(
       backupId: backupId,
@@ -399,12 +528,16 @@ class ChatBackupService {
 
   /// 列出所有备份
   Future<List<BackupInfo>> listBackups() async {
+    if (_backupDirectoryScope() == null) return [];
+    final ensureCurrent = _captureBackupSession();
     final backupDir = await _getBackupDir();
+    ensureCurrent();
     final results = <BackupInfo>[];
 
     if (!backupDir.existsSync()) return results;
 
     await for (final entity in backupDir.list()) {
+      ensureCurrent();
       if (entity is File &&
           entity.path.endsWith(StorageConstants.backupExtension)) {
         try {
@@ -429,18 +562,29 @@ class ChatBackupService {
       }
     }
 
+    ensureCurrent();
     results.sort((a, b) => b.createdAt.compareTo(a.createdAt));
     return results;
   }
 
   /// 删除备份
-  Future<void> deleteBackup(String backupId) async {
+  Future<void> deleteBackup(String backupId, {bool Function()? isCurrent}) async {
+    if (_backupDirectoryScope() == null) return;
+    final sessionCurrent = _captureBackupSession();
+    void ensureCurrent() {
+      if (isCurrent?.call() == false) throw StateError('Backup deletion account changed');
+      sessionCurrent();
+    }
+    ensureCurrent();
     final backups = await listBackups();
+    ensureCurrent();
     final target = backups.where((b) => b.backupId == backupId).firstOrNull;
     if (target != null) {
       final file = File(target.filePath);
       if (file.existsSync()) {
+        ensureCurrent();
         await file.delete();
+        ensureCurrent();
       }
     }
   }
@@ -454,6 +598,17 @@ class ChatBackupService {
     String? password,
     void Function(double progress)? onProgress,
   }) async {
+    final ensureCurrent = _captureBackupSession();
+    final client = _clientManager.client!;
+    final rooms = client.rooms
+        .where((room) => roomIds == null || roomIds.contains(room.id))
+        .toList();
+    final cursorKey = _incrementalCursorKey(
+      rooms.map((room) => room.id).toList(),
+    );
+    var complete = true;
+    final warnings = <String>[];
+    _warnUnknownExportOwner(warnings);
     final backupId = const Uuid().v4();
     final now = DateTime.now();
     final backupDir = await _getBackupDir();
@@ -465,23 +620,24 @@ class ChatBackupService {
         '${StorageConstants.backupExtension}';
     final filePath = p.join(backupDir.path, fileName);
 
-    final client = _clientManager.client;
-    if (client == null) throw StateError('Matrix client not available');
+    ensureCurrent();
 
     // 获取上次增量备份时间
-    final lastBackupTs = await _getLastIncrementalBackupTs();
+    final lastBackupTs = await _getLastIncrementalBackupTs(cursorKey);
 
-    final rooms = roomIds != null
-        ? client.rooms.where((r) => roomIds.contains(r.id)).toList()
-        : client.rooms;
-
+    ensureCurrent();
     onProgress?.call(0.1);
+    ensureCurrent();
 
     final backupData = <String, dynamic>{
       'manifest': {
         'backupId': backupId,
         'createdAt': now.toIso8601String(),
         'appVersion': _appVersion,
+        'owner': {
+          'userId': client.userID,
+          'homeserver': client.homeserver?.toString(),
+        },
         'roomCount': rooms.length,
         'isIncremental': true,
         'lastBackupTimestamp': lastBackupTs,
@@ -492,6 +648,7 @@ class ChatBackupService {
 
     int messageCount = 0;
     for (var i = 0; i < rooms.length; i++) {
+      ensureCurrent();
       final room = rooms[i];
       try {
         final roomData = <String, dynamic>{
@@ -501,9 +658,11 @@ class ChatBackupService {
 
         final messages = <Map<String, dynamic>>[];
         final seenEventIds = <String>{};
+        final privateEventIds = <String>{};
 
         void addMessage(Map<String, dynamic> message) {
           final eventId = message['eventId']?.toString();
+          if (privateEventIds.contains(eventId)) return;
           if (eventId != null &&
               eventId.isNotEmpty &&
               !seenEventIds.add(eventId)) {
@@ -515,38 +674,51 @@ class ChatBackupService {
         // 1. 从 Timeline 获取热数据（新消息）
         try {
           final timeline = await room.getTimeline();
-          for (final e in timeline.events) {
-            if (e.type != 'm.room.message') continue;
-            if (_isEphemeralEvent(e)) continue;
-            final ts = e.originServerTs.millisecondsSinceEpoch;
-            if (lastBackupTs > 0 && ts <= lastBackupTs) continue;
-            addMessage({
-              'eventId': e.eventId,
-              'sender': e.senderId,
-              'type': e.messageType,
-              'body': e.body,
-              'timestamp': e.originServerTs.toIso8601String(),
-              'ts': ts,
-            });
+          try {
+            ensureCurrent();
+            final loadedEvents = timeline.events.toList();
+            privateEventIds.addAll(loadedEvents.where(_isUnexportableEvent)
+                .map((event) => event.eventId));
+            for (final e in loadedEvents) {
+              if (e.type != 'm.room.message') continue;
+              if (_isUnexportableEvent(e)) continue;
+              final ts = e.originServerTs.millisecondsSinceEpoch;
+              if (lastBackupTs > 0 && ts <= lastBackupTs) continue;
+              addMessage({
+                'eventId': e.eventId,
+                'sender': e.senderId,
+                'type': e.messageType,
+                'body': e.body,
+                'timestamp': e.originServerTs.toIso8601String(),
+                'ts': ts,
+              });
+            }
+          } finally {
+            timeline.cancelSubscriptions();
           }
         } catch (e) {
+          complete = false;
           debugLog('ChatBackupService: Timeline error for ${room.id}: $e');
         }
 
+        ensureCurrent();
         // 2. 从归档获取历史消息（分页加载，避免 OOM）
         if (_archiveService != null) {
           try {
             const pageSize = 500;
-            int? cursor; // beforeTimestamp cursor for pagination
+            int? cursor;
+            String? cursorEventId; // Tie-break messages sharing a timestamp.
             bool hasMore = true;
 
             while (hasMore) {
               final archived = await _archiveService!.getArchivedMessages(
                 room.id,
                 beforeTimestamp: cursor,
+                beforeEventId: cursorEventId,
                 limit: pageSize,
               );
 
+              ensureCurrent();
               if (archived.isEmpty) break;
               hasMore = archived.length == pageSize;
 
@@ -577,10 +749,12 @@ class ChatBackupService {
 
               if (reachedCutoff) break;
 
-              // Move cursor to oldest message timestamp for next page
+              // Continue after the exact last row, including timestamp ties.
               cursor = archived.last.originServerTs;
+              cursorEventId = archived.last.eventId;
             }
           } catch (e) {
+            complete = false;
             debugLog('ChatBackupService: Archive error for ${room.id}: $e');
           }
         }
@@ -589,13 +763,26 @@ class ChatBackupService {
         messageCount += messages.length;
         (backupData['rooms'] as Map<String, dynamic>)[room.id] = roomData;
       } catch (e) {
+        complete = false;
         debugLog('ChatBackupService: Failed to backup room ${room.id}: $e');
       }
 
+      ensureCurrent();
       onProgress?.call(0.1 + 0.7 * (i + 1) / rooms.length);
     }
 
+    ensureCurrent();
     onProgress?.call(0.85);
+    ensureCurrent();
+
+    if (!complete) {
+      warnings.add(
+        'Some room history could not be read. The incremental checkpoint was not advanced; retry this backup.',
+      );
+    }
+    (backupData['manifest'] as Map<String, dynamic>)['hasReadErrors'] =
+        !complete;
+    (backupData['manifest'] as Map<String, dynamic>)['warnings'] = warnings;
 
     // 写入文件
     final finalJsonStr = _finalizeBackupJson(backupData);
@@ -610,12 +797,17 @@ class ChatBackupService {
       await File(filePath).writeAsString(finalJsonStr);
     }
 
+    ensureCurrent();
     // 记录本次备份时间
-    await _setLastIncrementalBackupTs(now.millisecondsSinceEpoch);
+    if (complete) {
+      await _setLastIncrementalBackupTs(now.millisecondsSinceEpoch, cursorKey);
+    }
+    ensureCurrent();
 
     onProgress?.call(1.0);
 
     final fileSize = await File(filePath).length();
+    ensureCurrent();
 
     return BackupResult(
       backupId: backupId,
@@ -624,6 +816,7 @@ class ChatBackupService {
       roomCount: rooms.length,
       messageCount: messageCount,
       createdAt: now,
+      warnings: warnings,
     );
   }
 
@@ -634,39 +827,91 @@ class ChatBackupService {
   Future<RestoreResult> restoreToArchive({
     required String backupFilePath,
     String? password,
+    List<String>? roomIds,
+    void Function(double progress)? onProgress,
+  }) async {
+    if (_archiveService == null) {
+      return const RestoreResult(errors: ['Archive service not available']);
+    }
+    final ensureCurrent = _captureBackupSession();
+    try {
+      final data = await _readBackupData(backupFilePath, password: password);
+      ensureCurrent();
+      return await _restoreArchiveData(data, roomIds: roomIds,
+        checkCurrent: ensureCurrent, onProgress: onProgress);
+    } catch (error) {
+      return RestoreResult(errors: ['Restore to archive failed: $error']);
+    }
+  }
+
+  Future<RestoreResult> _restoreArchiveData(Map<String, dynamic> data, {
+    List<String>? roomIds,
+    void Function()? checkCurrent,
     void Function(double progress)? onProgress,
   }) async {
     if (_archiveService == null) {
       return const RestoreResult(errors: ['Archive service not available']);
     }
 
+    final origin = _clientManager.client;
+    final user = origin?.userID;
+    final token = origin?.accessToken;
+    final device = origin?.deviceID;
+    final server = origin?.homeserver;
+    final archiveDb = _archiveService!;
+    void ensureCurrent() {
+      checkCurrent?.call();
+      if (!identical(_clientManager.client, origin) ||
+          !identical(_archiveService, archiveDb) ||
+          origin?.userID != user ||
+          origin?.accessToken != token ||
+          origin?.deviceID != device ||
+          origin?.homeserver != server) {
+        throw StateError('Archive restore session changed');
+      }
+    }
+
     try {
-      final data = await _readBackupData(backupFilePath, password: password);
+      ensureCurrent();
+      final ownerError = _backupOwnerError(data['manifest']);
+      if (ownerError != null) return RestoreResult(errors: [ownerError]);
       final rooms = data['rooms'] as Map<String, dynamic>? ?? {};
       final errors = <String>[];
 
       onProgress?.call(0.1);
 
-      final archiveDb = _archiveService!;
-      final roomEntries = rooms.entries.toList();
+      final roomEntries = rooms.entries.where((entry) => roomIds == null || roomIds.contains(entry.key)).toList();
       var roomsRestored = 0;
 
       for (var i = 0; i < roomEntries.length; i++) {
+        ensureCurrent();
         final entry = roomEntries[i];
         final roomId = entry.key;
         final roomData = entry.value as Map<String, dynamic>;
         final messages = (roomData['messages'] as List<dynamic>?) ?? [];
         final companions = <ArchivedMessagesCompanion>[];
+        // A private copy invalidates stale plaintext copies regardless of order.
+        final privateEventIds = messages
+            .whereType<Map<String, dynamic>>()
+            .where(_isEphemeralBackupEntry)
+            .map((message) => message['eventId']?.toString())
+            .whereType<String>()
+            .toSet();
 
         for (final msg in messages) {
+          ensureCurrent();
           try {
             final msgMap = msg as Map<String, dynamic>;
             final eventId = msgMap['eventId']?.toString();
-            if (eventId == null || eventId.isEmpty) {
+            if (eventId == null ||
+                eventId.isEmpty ||
+                privateEventIds.contains(eventId)) {
               continue;
             }
 
-            if (await archiveDb.isEventArchived(eventId)) {
+            final archived = await archiveDb.isEventArchived(eventId);
+            ensureCurrent();
+            if (archived) {
               continue;
             }
 
@@ -679,11 +924,13 @@ class ChatBackupService {
           }
         }
 
+        ensureCurrent();
         if (companions.isNotEmpty) {
           final inserted = await archiveDb.importArchivedMessages(
             roomId,
             companions,
           );
+          ensureCurrent();
           if (inserted > 0) {
             roomsRestored++;
           }
@@ -692,10 +939,12 @@ class ChatBackupService {
         onProgress?.call(0.1 + 0.9 * (i + 1) / roomEntries.length);
       }
 
+      ensureCurrent();
       return RestoreResult(
         roomsRestored: roomsRestored,
         settingsRestored: 0,
         errors: errors,
+        warnings: _restoreWarnings(data['manifest']),
       );
     } catch (e) {
       return RestoreResult(errors: ['Restore to archive failed: $e']);
@@ -703,9 +952,10 @@ class ChatBackupService {
   }
 
   /// 获取上次增量备份时间戳
-  Future<int> _getLastIncrementalBackupTs() async {
+  Future<int> _getLastIncrementalBackupTs(String? key) async {
+    if (key == null) return 0;
     try {
-      final value = await _secureStorage.read(_keyLastIncrementalBackupTs);
+      final value = await _secureStorage.read(key);
       return int.tryParse(value ?? '') ?? 0;
     } catch (_) {
       return 0;
@@ -713,8 +963,9 @@ class ChatBackupService {
   }
 
   /// 记录增量备份时间戳
-  Future<void> _setLastIncrementalBackupTs(int ts) async {
-    await _secureStorage.write(_keyLastIncrementalBackupTs, ts.toString());
+  Future<void> _setLastIncrementalBackupTs(int ts, String? key) async {
+    if (key == null) return;
+    await _secureStorage.write(key, ts.toString());
   }
 
   /// 预览备份内容
@@ -722,27 +973,83 @@ class ChatBackupService {
     String backupFilePath, {
     String? password,
   }) async {
-    final data = await _readBackupData(backupFilePath, password: password);
-    final manifest = data['manifest'] as Map<String, dynamic>? ?? {};
-    final rooms = data['rooms'] as Map<String, dynamic>? ?? {};
+    final ensureCurrent = _captureBackupSession();
+    try {
+      final data = await _readBackupData(backupFilePath, password: password);
+      ensureCurrent();
+      final manifest = data['manifest'] as Map<String, dynamic>? ?? {};
+      final ownerError = _backupOwnerError(manifest);
+      if (ownerError != null) throw StateError(ownerError);
+      final rooms = data['rooms'] as Map<String, dynamic>? ?? {};
+  
+      final roomNames = rooms.values
+          .map(
+            (r) => (r as Map<String, dynamic>)['name']?.toString() ?? 'Unknown',
+          )
+          .toList();
+  
+      return BackupPreview(
+        backupId: manifest['backupId']?.toString() ?? '',
+        createdAt:
+            DateTime.tryParse(manifest['createdAt']?.toString() ?? '') ??
+            DateTime.now(),
+        roomCount: rooms.length,
+        roomNames: roomNames,
+        hasMedia: manifest['includesMedia'] == true,
+        hasKeys: manifest['includesKeys'] == true,
+        hasSettings: data.containsKey('settings'),
+        warnings: _restoreWarnings(manifest),
+      );
+    } catch (_) {
+      ensureCurrent();
+      rethrow;
+    }
+  }
 
-    final roomNames = rooms.values
-        .map(
-          (r) => (r as Map<String, dynamic>)['name']?.toString() ?? 'Unknown',
-        )
-        .toList();
+  void _warnUnknownExportOwner(List<String> warnings) {
+    final client = _clientManager.client;
+    if (client?.userID == null || client!.userID!.trim().isEmpty ||
+        client.homeserver == null) {
+      warnings.add('Backup account ownership is unavailable. This file cannot be restored until ownership is resolved.');
+    }
+  }
 
-    return BackupPreview(
-      backupId: manifest['backupId']?.toString() ?? '',
-      createdAt:
-          DateTime.tryParse(manifest['createdAt']?.toString() ?? '') ??
-          DateTime.now(),
-      roomCount: rooms.length,
-      roomNames: roomNames,
-      hasMedia: manifest['includesMedia'] == true,
-      hasKeys: manifest['includesKeys'] == true,
-      hasSettings: data.containsKey('settings'),
-    );
+  String? _backupOwnerError(Object? manifest) {
+    final owner = manifest is Map ? manifest['owner'] : null;
+      final client = _clientManager.client;
+      final declaresOwner = manifest is Map && manifest.containsKey('owner');
+      if (declaresOwner && (owner is! Map ||
+          owner['userId'] is! String || (owner['userId'] as String).trim().isEmpty ||
+          owner['homeserver'] is! String || (owner['homeserver'] as String).trim().isEmpty)) {
+        return 'Backup account owner is invalid';
+      }
+      if (owner is Map &&
+          (owner['userId'] != client?.userID ||
+           owner['homeserver'] != client?.homeserver?.toString())) {
+        return 'Backup belongs to a different account or homeserver';
+      }
+    return null;
+  }
+
+  List<String> _restoreWarnings(Object? manifest) {
+    final warnings = _manifestWarnings(manifest);
+    if (manifest is! Map || manifest['owner'] is! Map) {
+      warnings.add('This legacy backup has no verified account owner.');
+    }
+    return warnings;
+  }
+
+  List<String> _manifestWarnings(Object? value) {
+    if (value is! Map) return <String>[];
+    final warnings = <String>{};
+    final entries = value['warnings'];
+    if (entries is List) {
+      warnings.addAll(entries.whereType<String>().where((s) => s.trim().isNotEmpty));
+    }
+    if (value['hasReadErrors'] == true) {
+      warnings.add('Some messages or settings could not be read. This backup is incomplete.');
+    }
+    return warnings.toList();
   }
 
   /// 验证备份完整性
@@ -762,28 +1069,44 @@ class ChatBackupService {
     List<String>? roomIds,
     bool restoreSettings = true,
     bool restoreKeys = false,
+    bool restoreMessages = false,
+    bool Function()? isCurrent,
     void Function(double progress)? onProgress,
   }) async {
+    final sessionCurrent = _captureBackupSession();
+    void ensureCurrent() {
+      if (isCurrent?.call() == false) throw StateError('Restore account changed');
+      sessionCurrent();
+    }
     try {
+      ensureCurrent();
       final data = await _readBackupData(backupFilePath, password: password);
+      ensureCurrent();
+      final manifest = data['manifest'];
+      final ownerError = _backupOwnerError(manifest);
+      if (ownerError != null) return RestoreResult(errors: [ownerError]);
       final rawSettings = data['settings'] as Map<String, dynamic>? ?? {};
 
       int settingsRestored = 0;
       final errors = <String>[];
-      final warnings = <String>[];
+      final warnings = _restoreWarnings(data['manifest']);
 
       onProgress?.call(0.1);
+      ensureCurrent();
 
       // 恢复设置
       if (restoreSettings && rawSettings.isNotEmpty) {
         final settings = await _normalizeRestorableSettings(rawSettings);
+        ensureCurrent();
         for (final entry in settings.entries) {
+          ensureCurrent();
           try {
             if (entry.value != null) {
               await _preferencesStorage.write(
                 entry.key,
                 entry.value.toString(),
               );
+              ensureCurrent();
               settingsRestored++;
             }
           } catch (e) {
@@ -792,20 +1115,33 @@ class ChatBackupService {
         }
       }
 
+      ensureCurrent();
       onProgress?.call(0.5);
+      ensureCurrent();
 
       if (restoreKeys) {
         warnings.add(_unsupportedKeyBackupWarning);
       }
 
-      // 注意：消息恢复依赖 Matrix 同步机制
-      // 本地备份主要用于保留设置和加密密钥
-      // 消息会在重新登录后从服务器同步
+      var roomsRestored = 0;
+      if (restoreMessages) {
+        final archived = await _restoreArchiveData(data,
+          roomIds: roomIds, checkCurrent: ensureCurrent,
+          onProgress: (progress) => onProgress?.call(0.5 + 0.5 * progress));
+        ensureCurrent();
+        roomsRestored = archived.roomsRestored;
+        errors.addAll(archived.errors);
+        for (final warning in archived.warnings) {
+          if (!warnings.contains(warning)) warnings.add(warning);
+        }
+      }
 
+      ensureCurrent();
       onProgress?.call(1.0);
+      ensureCurrent();
 
       return RestoreResult(
-        roomsRestored: 0,
+        roomsRestored: roomsRestored,
         settingsRestored: settingsRestored,
         keysRestored: false,
         errors: errors,
@@ -887,14 +1223,18 @@ class ChatBackupService {
     return migrated;
   }
 
-  /// Whether [event] carries a lifetime that a backup must not outlive.
+  /// Whether [event] must be excluded from new backups.
+  ///
+  /// Redaction excludes every loaded copy of the same event ID, including
+  /// stale plaintext still present in the timeline or merged archive.
   ///
   /// Self-destruct ({seconds}) and view-once ({after:1}) messages share the
   /// same metadata field. Writing their plaintext into a backup file would
   /// preserve it long after the message burned in-app, so they are excluded at
   /// export time — the archive already excludes them, this closes the timeline
   /// path that feeds backups directly.
-  static bool _isEphemeralEvent(dynamic event) =>
+  static bool _isUnexportableEvent(dynamic event) =>
+      event.redacted == true ||
       (event.content as Map?)?['n42.self_destruct'] != null;
 
   /// Whether a message entry from a backup file must not be restored.
@@ -921,9 +1261,8 @@ class ChatBackupService {
     final senderId = msgMap['sender']?.toString();
     final ts =
         msgMap['ts'] as int? ??
-        DateTime.tryParse(
-          msgMap['timestamp']?.toString() ?? '',
-        )?.millisecondsSinceEpoch;
+        DateTime.tryParse(msgMap['timestamp']?.toString() ?? '')
+            ?.millisecondsSinceEpoch;
     if (eventId == null || eventId.isEmpty || senderId == null || ts == null) {
       return null;
     }
@@ -1000,7 +1339,7 @@ class ChatBackupService {
 
     if (header == 'N42ENC3:') {
       if (password == null || password.isEmpty) {
-        throw StateError('This backup is password-protected');
+        throw BackupPasswordRequired();
       }
       final decrypted = _decryptAesGcm(bytes, password);
       final jsonStr = utf8.decode(decrypted);
@@ -1009,7 +1348,7 @@ class ChatBackupService {
 
     if (header == 'N42ENC2:') {
       if (password == null || password.isEmpty) {
-        throw StateError('This backup is password-protected');
+        throw BackupPasswordRequired();
       }
       final decrypted = _decryptAes256(bytes, password);
       final jsonStr = utf8.decode(decrypted);
@@ -1020,7 +1359,7 @@ class ChatBackupService {
     final headerV1 = utf8.decode(bytes.take(7).toList(), allowMalformed: true);
     if (headerV1 == 'N42ENC:') {
       if (password == null || password.isEmpty) {
-        throw StateError('This backup is password-protected');
+        throw BackupPasswordRequired();
       }
       final keyBytes = sha256.convert(utf8.encode(password)).bytes;
       final encryptedData = bytes.sublist(7);

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -96,9 +98,8 @@ void main() {
       ]);
 
       expect(
-        (await database.searchMessages(
-          'redacted',
-        )).map((message) => message.eventId),
+        (await database.searchMessages('redacted'))
+            .map((message) => message.eventId),
         [r'$redacted'],
       );
 
@@ -108,6 +109,184 @@ void main() {
       expect(await database.searchMessages('redacted'), isEmpty);
     },
   );
+
+  test('older imports preserve a consistent latest event cursor', () async {
+    const room = '!room:hs.test';
+    await service.importArchivedMessages(room, [
+      _entry(eventId: r'$new', roomId: room, timestamp: 200, body: 'new'),
+    ]);
+    await service.importArchivedMessages(room, [
+      _entry(eventId: r'$old', roomId: room, timestamp: 100, body: 'old'),
+    ]);
+    final metadata = await database.getMetadata(room);
+    expect(metadata!.lastArchivedTs, 200);
+    expect(metadata.lastArchivedEventId, r'$new');
+    expect(metadata.totalArchived, 2);
+  });
+
+  test('ignored duplicate cannot supply a forged latest cursor', () async {
+    const room = '!room:hs.test';
+    await service.importArchivedMessages(room, [
+      _entry(
+        eventId: r'$existing',
+        roomId: room,
+        timestamp: 100,
+        body: 'existing',
+      ),
+    ]);
+    await service.importArchivedMessages(room, [
+      _entry(
+        eventId: r'$existing',
+        roomId: room,
+        timestamp: 999,
+        body: 'ignored',
+      ),
+      _entry(eventId: r'$actual', roomId: room, timestamp: 200, body: 'actual'),
+    ]);
+    final metadata = await database.getMetadata(room);
+    expect(metadata!.lastArchivedTs, 200);
+    expect(metadata.lastArchivedEventId, r'$actual');
+    expect(metadata.totalArchived, 2);
+  });
+
+  test('mixed-room import is rejected before any write', () async {
+    const room = '!room:hs.test';
+    await expectLater(
+      service.importArchivedMessages(room, [
+        _entry(eventId: r'$valid', roomId: room, timestamp: 100, body: 'valid'),
+        _entry(
+          eventId: r'$wrong',
+          roomId: '!other:hs.test',
+          timestamp: 200,
+          body: 'wrong',
+        ),
+      ]),
+      throwsArgumentError,
+    );
+    expect(await database.getMessageCount(room), 0);
+    expect(await database.getMessageCount('!other:hs.test'), 0);
+    expect(await database.getMetadata(room), isNull);
+  });
+
+  test('deleting latest and final messages updates archive metadata', () async {
+    const room = '!room:hs.test';
+    await service.importArchivedMessages(room, [
+      _entry(eventId: r'$old', roomId: room, timestamp: 100, body: 'old'),
+      _entry(eventId: r'$new', roomId: room, timestamp: 200, body: 'new'),
+    ]);
+    await service.deleteArchivedMessage(r'$new');
+    var metadata = (await database.getMetadata(room))!;
+    expect(metadata.totalArchived, 1);
+    expect(metadata.lastArchivedEventId, r'$old');
+    expect(metadata.lastArchivedTs, 100);
+    await service.deleteArchivedMessage(r'$old');
+    metadata = (await database.getMetadata(room))!;
+    expect(metadata.totalArchived, 0);
+    expect(metadata.lastArchivedEventId, isNull);
+    expect(metadata.lastArchivedTs, 0);
+    expect(await database.searchMessages('old'), isEmpty);
+  });
+
+  test(
+    'metadata failure rolls back imported rows and searchable text',
+    () async {
+      await database.customStatement("""
+      CREATE TRIGGER fail_metadata BEFORE INSERT ON archive_metadata
+      BEGIN SELECT RAISE(ABORT, 'fixture metadata failure'); END
+    """);
+      await expectLater(
+        service.importArchivedMessages('!room:hs.test', [
+          _entry(
+            eventId: r'$rollback',
+            roomId: '!room:hs.test',
+            timestamp: 100,
+            body: 'rollback searchable text',
+          ),
+        ]),
+        throwsA(isA<Exception>()),
+      );
+      expect(await database.getMessageCount('!room:hs.test'), 0);
+      expect(await database.searchMessages('rollback'), isEmpty);
+      expect(await database.getMetadata('!room:hs.test'), isNull);
+    },
+  );
+
+  for (final failMetadata in [false, true]) {
+    test(
+      'background archive keeps persisted cursor and atomic writes: fail=$failMetadata',
+      () async {
+        const id = '!room:hs.test';
+        await service.importArchivedMessages(id, [
+          _entry(eventId: 'newer', roomId: id, timestamp: 200, body: 'newer'),
+        ]);
+        if (failMetadata) {
+          await database.customStatement("""
+          CREATE TRIGGER fail_background_metadata BEFORE INSERT ON archive_metadata
+          BEGIN SELECT RAISE(ABORT, 'fixture metadata failure'); END
+        """);
+        }
+        final manager = _ClientManager();
+        final client = _Client();
+        final room = _Room();
+        final timeline = _Timeline();
+        when(() => manager.client).thenReturn(client);
+        when(() => client.getRoomById(id)).thenReturn(room);
+        when(() => room.id).thenReturn(id);
+        when(() => room.getTimeline()).thenAnswer((_) async => timeline);
+        when(() => timeline.requestHistory(historyCount: 10))
+            .thenAnswer((_) async {});
+        when(() => timeline.events).thenReturn([
+          matrix.Event(
+            type: matrix.EventTypes.Message,
+            content: {'msgtype': 'm.text', 'body': 'older'},
+            senderId: '@alice:hs.test',
+            eventId: 'older',
+            room: room,
+            originServerTs: DateTime.fromMillisecondsSinceEpoch(100),
+          ),
+        ]);
+        service = MessageArchiveService(db: database, clientManager: manager);
+        if (failMetadata) {
+          await expectLater(
+            service.archiveRoom(id, batchSize: 10),
+            throwsA(isA<Exception>()),
+          );
+          expect(await database.isEventArchived('older'), isFalse);
+          expect(await database.searchMessages('older'), isEmpty);
+        } else {
+          expect(
+            (await service.archiveRoom(id, batchSize: 10)).archivedCount,
+            1,
+          );
+        }
+        final metadata = (await database.getMetadata(id))!;
+        expect(metadata.lastArchivedEventId, 'newer');
+        expect(metadata.lastArchivedTs, 200);
+        expect(metadata.totalArchived, failMetadata ? 1 : 2);
+        verify(() => timeline.cancelSubscriptions()).called(1);
+      },
+    );
+  }
+
+  for (final size in [0, -1]) {
+    test(
+      'invalid archive batch size fails before touching a session: $size',
+      () async {
+        final manager = _ClientManager();
+        final isolated = MessageArchiveService(
+          db: database,
+          clientManager: manager,
+        );
+        await expectLater(
+          isolated.archiveRoom('!room:hs.test', batchSize: size),
+          throwsArgumentError,
+        );
+        verifyNever(() => manager.client);
+        expect(await database.getMessageCount('!room:hs.test'), 0);
+        expect(await database.getMetadata('!room:hs.test'), isNull);
+      },
+    );
+  }
 
   test('empty archive import does not create metadata', () async {
     expect(await service.importArchivedMessages('!empty:hs.test', []), 0);
@@ -181,4 +360,126 @@ void main() {
       verify(() => timeline.cancelSubscriptions()).called(1);
     },
   );
+  for (final previouslyArchived in [false, true]) {
+    test(
+      'redacted timeline removes archive and FTS previouslyArchived=$previouslyArchived',
+      () async {
+        final manager = _ClientManager();
+        final client = _Client();
+        final room = _Room();
+        final timeline = _Timeline();
+        when(() => manager.client).thenReturn(client);
+        when(() => client.getRoomById('!room:hs.test')).thenReturn(room);
+        when(() => room.id).thenReturn('!room:hs.test');
+        when(() => room.getTimeline()).thenAnswer((_) async => timeline);
+        when(() => timeline.requestHistory(historyCount: 10))
+            .thenAnswer((_) async {});
+        if (previouslyArchived) {
+          await database.insertMessages([
+            _entry(
+              eventId: 'redacted',
+              roomId: '!room:hs.test',
+              timestamp: 1,
+              body: 'secret plaintext',
+            ),
+          ]);
+        }
+        await database.insertMessages([
+          _entry(
+            eventId: 'keep',
+            roomId: '!other:hs.test',
+            timestamp: 2,
+            body: 'retained text',
+          ),
+        ]);
+        final event = matrix.Event(
+          type: matrix.EventTypes.Message,
+          content: {'body': 'secret plaintext'},
+          senderId: '@alice:hs.test',
+          eventId: 'redacted',
+          room: room,
+          originServerTs: DateTime.utc(2026),
+        );
+        event.setRedactionEvent(
+          matrix.Event(
+            type: 'm.room.redaction',
+            content: {},
+            senderId: '@alice:hs.test',
+            eventId: 'redaction',
+            room: room,
+            originServerTs: DateTime.utc(2026),
+          ),
+        );
+        when(() => timeline.events).thenReturn([event]);
+        service = MessageArchiveService(db: database, clientManager: manager);
+        final result = await service.archiveRoom(
+          '!room:hs.test',
+          batchSize: 10,
+        );
+        expect(result.archivedCount, 0);
+        expect(await service.isEventArchived('redacted'), isFalse);
+        expect(await database.searchMessages('secret'), isEmpty);
+        expect(await service.isEventArchived('keep'), isTrue);
+        verify(() => timeline.cancelSubscriptions()).called(1);
+      },
+    );
+  }
+  test(
+    'deleted archived plaintext cannot return through a stale import',
+    () async {
+      final stale = _entry(
+        eventId: 'forgotten',
+        roomId: '!room:hs.test',
+        timestamp: 1,
+        body: 'forbidden secret',
+      );
+      await service.importArchivedMessages('!room:hs.test', [stale]);
+      await service.deleteArchivedMessage('forgotten');
+      expect(await service.importArchivedMessages('!room:hs.test', [stale]), 0);
+      expect(await database.searchMessages('forbidden'), isEmpty);
+      expect(await service.isEventArchived('forgotten'), isFalse);
+    },
+  );
+  for (final duringHistory in [false, true]) {
+    test(
+      'archive stops on account change during history=$duringHistory',
+      () async {
+        final manager = _ClientManager();
+        final client = _Client();
+        final room = _Room();
+        final timeline = _Timeline();
+        when(() => manager.client).thenReturn(client);
+        when(() => client.userID).thenReturn('@a:test');
+        when(() => client.getRoomById('room')).thenReturn(room);
+        final entered = Completer<void>();
+        final load = Completer<matrix.Timeline>();
+        final history = Completer<void>();
+        when(() => room.getTimeline()).thenAnswer((_) {
+          if (!duringHistory) entered.complete();
+          return duringHistory ? Future.value(timeline) : load.future;
+        });
+        when(() => timeline.events).thenReturn([]);
+        when(() => timeline.requestHistory(historyCount: 10)).thenAnswer((_) {
+          entered.complete();
+          return history.future;
+        });
+        service = MessageArchiveService(db: database, clientManager: manager);
+        final pending = service.archiveRoom('room', batchSize: 10);
+        final assertion = expectLater(pending, throwsStateError);
+        await entered.future;
+        when(() => client.userID).thenReturn('@b:test');
+        if (duringHistory) {
+          history.complete();
+        } else {
+          load.complete(timeline);
+        }
+        await assertion;
+        expect(await database.getMessageCount('room'), 0);
+        if (!duringHistory) {
+          verifyNever(() => timeline.requestHistory(historyCount: 10));
+        }
+        verify(() => timeline.cancelSubscriptions()).called(1);
+      },
+    );
+  }
 }

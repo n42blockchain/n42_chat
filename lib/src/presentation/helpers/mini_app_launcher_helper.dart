@@ -38,7 +38,31 @@ class MiniAppLauncherHelper {
     required MiniAppEntity app,
     required String roomId,
     String? initialUrl,
-  }) {
+  }) async {
+    if (initialUrl != null) {
+      final registered = findBuiltInAppById(app.id);
+      if (registered == null || registered.url != app.url) return null;
+      final approved = await showDialog<bool>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: Text('Open ${registered.name}?'),
+          content: Text(
+            '${registered.developer ?? registered.name}\n${Uri.parse(registered.url).host}',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: const Text('Open'),
+            ),
+          ],
+        ),
+      );
+      if (approved != true || !context.mounted) return null;
+    }
     return Navigator.of(context).push<T>(
       MaterialPageRoute<T>(
         builder: (_) =>

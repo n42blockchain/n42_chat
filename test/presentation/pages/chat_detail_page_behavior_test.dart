@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:n42_chat/l10n/app_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
@@ -28,7 +30,11 @@ void main() {
   Future<void> pumpPage(
     WidgetTester tester, {
     bool pinned = false,
+    Locale? locale,
+    double textScale = 1,
     VoidCallback? onClearHistory,
+    Future<bool> Function()? onClearHistoryAsync,
+    bool Function()? canClearHistory,
     bool canChangeSettings = false,
     void Function(String userId, String displayName, String? avatarUrl)?
     onMemberTap,
@@ -36,6 +42,18 @@ void main() {
   }) async {
     await tester.pumpWidget(
       MaterialApp(
+        locale: locale,
+        localizationsDelegates: locale == null
+            ? null
+            : S.localizationsDelegates,
+        supportedLocales: locale == null
+            ? const [Locale('en')]
+            : S.supportedLocales,
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(context)
+              .copyWith(textScaler: TextScaler.linear(textScale)),
+          child: child!,
+        ),
         home: BlocProvider<ContactBloc>.value(
           value: contactBloc,
           child: ChatDetailPage(
@@ -47,6 +65,8 @@ void main() {
                   isPinned: pinned,
                 ),
             onClearHistory: onClearHistory,
+            onClearHistoryAsync: onClearHistoryAsync,
+            canClearHistory: canClearHistory,
             canChangeSettings: canChangeSettings,
             onMemberTap: onMemberTap,
           ),
@@ -64,16 +84,13 @@ void main() {
     contactBloc = ContactBloc(_ContactRepository());
     getIt.registerSingleton<IConversationRepository>(repository);
     getIt.registerSingleton<IGroupRepository>(groupRepository);
-    when(
-      () => repository.getNotificationMode(roomId),
-    ).thenAnswer((_) async => ConversationNotificationMode.allMessages);
-    when(
-      () => repository.getStrongReminder(roomId),
-    ).thenAnswer((_) async => false);
+    when(() => repository.getNotificationMode(roomId))
+        .thenAnswer((_) async => ConversationNotificationMode.allMessages);
+    when(() => repository.getStrongReminder(roomId))
+        .thenAnswer((_) async => false);
     when(() => groupRepository.getGroup(roomId)).thenAnswer((_) async => null);
-    when(
-      () => groupRepository.getGroupMembers(roomId),
-    ).thenAnswer((_) async => []);
+    when(() => groupRepository.getGroupMembers(roomId))
+        .thenAnswer((_) async => []);
     when(
       () => repository.setNotificationMode(
         roomId,
@@ -90,9 +107,8 @@ void main() {
   testWidgets(
     'loads pin and strong-reminder state from the conversation services',
     (tester) async {
-      when(
-        () => repository.getStrongReminder(roomId),
-      ).thenAnswer((_) async => true);
+      when(() => repository.getStrongReminder(roomId))
+          .thenAnswer((_) async => true);
 
       await pumpPage(tester, pinned: true);
 
@@ -107,9 +123,8 @@ void main() {
     tester,
   ) async {
     await pumpPage(tester);
-    when(
-      () => repository.setPinned(roomId, true),
-    ).thenThrow(StateError('offline'));
+    when(() => repository.setPinned(roomId, true))
+        .thenThrow(StateError('offline'));
 
     await tester.ensureVisible(find.text('Pin Chat'));
     await tester.tap(find.text('Pin Chat'));
@@ -121,9 +136,8 @@ void main() {
 
   testWidgets('persists strong-reminder changes', (tester) async {
     await pumpPage(tester);
-    when(
-      () => repository.setStrongReminder(roomId, true),
-    ).thenAnswer((_) async {});
+    when(() => repository.setStrongReminder(roomId, true))
+        .thenAnswer((_) async {});
 
     await tester.ensureVisible(find.text('Strong Reminder'));
     await tester.tap(find.text('Strong Reminder'));
@@ -156,6 +170,62 @@ void main() {
     expect(find.text('Mentions Only'), findsOneWidget);
   });
 
+  for (final locale in S.supportedLocales) {
+    testWidgets(
+      'notification controls work in $locale on narrow large-text screens',
+      (tester) async {
+        tester.view.physicalSize = const Size(390, 700);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        when(
+          () => repository.setNotificationMode(
+            roomId,
+            ConversationNotificationMode.muted,
+          ),
+        ).thenAnswer((_) async {});
+        final strings = await S.delegate.load(locale);
+        await pumpPage(tester, locale: locale, textScale: 1.6);
+        await tester.ensureVisible(
+          find.text(strings.settingsMessageNotifications),
+        );
+        await tester.tap(find.text(strings.settingsMessageNotifications));
+        await tester.pumpAndSettle();
+        final sheet = find.byType(BottomSheet);
+        expect(
+          find.descendant(
+            of: sheet,
+            matching: find.text(strings.chatNotifyAll),
+          ),
+          findsOneWidget,
+        );
+        expect(find.text(strings.chatNotifyAllDescription), findsOneWidget);
+        expect(
+          find.text(strings.chatNotifyMentionsDescription),
+          findsOneWidget,
+        );
+        expect(strings.chatNotifyMentionsDescription, contains('@room'));
+        expect(tester.takeException(), isNull);
+        final mute = find.descendant(
+          of: sheet,
+          matching: find.text(strings.commonMute),
+        );
+        await tester.ensureVisible(mute);
+        await tester.tap(mute);
+        await tester.pumpAndSettle();
+        verify(
+          () => repository.setNotificationMode(
+            roomId,
+            ConversationNotificationMode.muted,
+          ),
+        ).called(1);
+        expect(find.byType(BottomSheet), findsNothing);
+        expect(find.text(strings.commonMute), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
+
   testWidgets('notification mode rolls back when persistence fails', (
     tester,
   ) async {
@@ -174,6 +244,36 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('All Messages'), findsOneWidget);
+  });
+
+  for (final succeeds in [false, true]) {
+    testWidgets('clear feedback waits for persistence, success=$succeeds', (tester) async {
+      final pending = Completer<bool>();
+      await pumpPage(tester, onClearHistoryAsync: () => pending.future);
+      await tester.ensureVisible(find.text('Clear Chat History'));
+      await tester.tap(find.text('Clear Chat History'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(TextButton, 'Clear'));
+      await tester.pumpAndSettle();
+      expect(find.text('Chat history cleared'), findsNothing);
+      pending.complete(succeeds);
+      await tester.pumpAndSettle();
+      expect(find.text(succeeds ? 'Chat history cleared' : 'Failed to save'), findsOneWidget);
+    });
+  }
+
+  testWidgets('stale clear confirmation cannot invoke callback or report success', (tester) async {
+    var current = true;
+    var calls = 0;
+    await pumpPage(tester, onClearHistory: () => calls++, canClearHistory: () => current);
+    await tester.ensureVisible(find.text('Clear Chat History'));
+    await tester.tap(find.text('Clear Chat History'));
+    await tester.pumpAndSettle();
+    current = false;
+    await tester.tap(find.widgetWithText(TextButton, 'Clear'));
+    await tester.pumpAndSettle();
+    expect(calls, 0);
+    expect(find.text('Chat history cleared'), findsNothing);
   });
 
   testWidgets(
@@ -310,9 +410,8 @@ void main() {
         announcement: 'Old announcement',
       ),
     );
-    when(
-      () => groupRepository.setGroupAnnouncement(roomId, 'New announcement'),
-    ).thenAnswer((_) async {});
+    when(() => groupRepository.setGroupAnnouncement(roomId, 'New announcement'))
+        .thenAnswer((_) async {});
     await pumpPage(
       tester,
       canChangeSettings: true,
@@ -346,9 +445,8 @@ void main() {
         announcement: 'Existing announcement',
       ),
     );
-    when(
-      () => groupRepository.setGroupAnnouncement(roomId, 'Replacement'),
-    ).thenThrow(StateError('offline'));
+    when(() => groupRepository.setGroupAnnouncement(roomId, 'Replacement'))
+        .thenThrow(StateError('offline'));
     await pumpPage(
       tester,
       canChangeSettings: true,

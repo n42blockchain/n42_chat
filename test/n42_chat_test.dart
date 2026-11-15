@@ -131,7 +131,7 @@ void main() {
     test('wechatDark should have correct dark mode', () {
       final theme = N42ChatTheme.wechatDark();
 
-      expect(theme.primaryColor, equals(AppColors.primary));
+      expect(theme.primaryColor, equals(AppColors.primaryDark));
       expect(theme.isDark, isTrue);
     });
 

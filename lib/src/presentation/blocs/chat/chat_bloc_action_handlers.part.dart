@@ -11,17 +11,22 @@ extension ChatBlocActionHandlers on ChatBloc {
     ResendMessage event,
     Emitter<ChatState> emit,
   ) async {
-    if (_currentRoomId == null) return;
+    final roomId = _currentRoomId;
+    if (roomId == null) return;
+    final isCurrent = _captureChatContext(emit, roomId);
+    if (!isCurrent()) return;
 
     try {
-      await _messageRepository.resendMessage(_currentRoomId!, event.messageId);
+      final success = await _messageRepository.resendMessage(roomId, event.messageId);
+      if (!isCurrent()) return;
+      if (!success) throw StateError('Resend rejected');
       // 旧的 EventStatus.error 事件仍在 SDK 时间线中，将其 ID 加入本地删除集合
       // 防止 scanFailedMessages 将旧事件重新入队形成死循环。
       _locallyDeletedMessageIds.add(event.messageId);
       // 允许新事件（由 resendMessage 创建）被自动重试系统处理
       _permanentlyFailedMessages.remove(event.messageId);
     } catch (e) {
-      emit(state.copyWith(error: 'Failed to resend'));
+      if (isCurrent()) emit(state.copyWith(error: 'Failed to resend'));
     }
   }
 
@@ -38,35 +43,50 @@ extension ChatBlocActionHandlers on ChatBloc {
     RedactMessage event,
     Emitter<ChatState> emit,
   ) async {
-    if (_currentRoomId == null) return;
+    final roomId = _currentRoomId;
+    if (roomId == null) return;
+    final isCurrent = _captureChatContext(emit, roomId);
+    if (!isCurrent()) return;
 
-    // 保存原始消息列表，用于失败时回滚
-    final originalMessages = List<MessageEntity>.unmodifiable(state.messages);
+    // Roll back only this operation, preserving messages received in the meantime.
+    MessageEntity? originalMessage;
+    MessageEntity? optimisticMessage;
 
     // 立即在本地将消息标记为已撤回（乐观更新）
     // 使消息立即显示为"已撤回"提示，而不是消失
     final optimisticMessages = state.messages.map((m) {
       if (m.id == event.messageId) {
-        return m.copyWith(type: MessageType.redacted, content: '');
+        originalMessage = m;
+        optimisticMessage = m.copyWith(type: MessageType.redacted, content: '');
+        return optimisticMessage!;
       }
       return m;
     }).toList();
     emit(state.copyWith(messages: optimisticMessages));
 
     try {
-      await _messageRepository.redactMessage(
-        _currentRoomId!,
+      final success = await _messageRepository.redactMessage(
+        roomId,
         event.messageId,
         reason: event.reason,
       );
+      if (!success) throw StateError('Redaction rejected');
       // 服务器确认后无需额外操作：
       // Matrix sync 会将该事件重新推回，onMessagesUpdated 中会以
       // MessageType.redacted 合并，与当前状态一致，不会产生闪烁。
     } catch (e) {
-      // 服务器撤回失败：回滚乐观更新，恢复原始消息列表
+      if (!isCurrent()) return;
+      // Never undo a newer sync result or another operation.
       debugLog('ChatBloc: Failed to redact message ${event.messageId}: $e');
       emit(
-        state.copyWith(messages: originalMessages, error: 'Failed to recall'),
+        state.copyWith(
+          messages: state.messages.map((message) {
+            return originalMessage != null && identical(message, optimisticMessage)
+                ? originalMessage!
+                : message;
+          }).toList(),
+          error: 'Failed to recall',
+        ),
       );
     }
   }
@@ -142,7 +162,13 @@ extension ChatBlocActionHandlers on ChatBloc {
     ReplyToMessage event,
     Emitter<ChatState> emit,
   ) async {
-    if (_currentRoomId == null) return;
+    final roomId = _currentRoomId;
+    if (roomId == null) return;
+    final isCurrent = _captureChatContext(emit, roomId);
+    if (!isCurrent()) return;
+    final mentionedUserIds = event.mentionedUserIds == null
+        ? null
+        : List<String>.of(event.mentionedUserIds!);
 
     emit(state.copyWith(isSending: true, clearError: true));
 
@@ -150,17 +176,27 @@ extension ChatBlocActionHandlers on ChatBloc {
       final selfDestructAfter = await _resolveSelfDestructAfter(
         event.selfDestructAfter,
       );
-      await _messageRepository.replyToMessage(
-        _currentRoomId!,
+      if (!isCurrent()) return;
+      final receipt = await _messageRepository.replyToMessage(
+        roomId,
         event.replyToMessageId,
         event.text,
         selfDestructAfter: selfDestructAfter,
-        mentionedUserIds: event.mentionedUserIds,
+        mentionedUserIds: mentionedUserIds,
         mentionsRoom: event.mentionsRoom,
       );
-      emit(state.copyWith(isSending: false, clearReplyTarget: true));
+      if (!isCurrent()) return;
+      if (receipt == null || receipt.id.trim().isEmpty) {
+        throw StateError('Reply acknowledgement unavailable');
+      }
+      emit(state.copyWith(
+        isSending: false,
+        clearReplyTarget: state.replyTarget?.id == event.replyToMessageId,
+      ));
     } catch (e) {
-      emit(state.copyWith(isSending: false, error: 'Failed to reply'));
+      if (isCurrent()) {
+        emit(state.copyWith(isSending: false, error: 'Failed to reply'));
+      }
     }
   }
 
@@ -190,11 +226,19 @@ extension ChatBlocActionHandlers on ChatBloc {
 
   /// 添加表情回应
   Future<void> onAddReaction(AddReaction event, Emitter<ChatState> emit) async {
-    if (_currentRoomId == null) return;
+    final roomId = _currentRoomId;
+    if (roomId == null) return;
+    final isCurrent = _captureChatContext(emit, roomId);
+    if (!isCurrent()) return;
+
+    MessageReaction? originalReaction;
+    MessageReaction? optimisticReaction;
+    var changed = false;
 
     try {
       // 先立即更新本地UI，显示表情回应
       final currentUserId = await _messageRepository.getCurrentUserId();
+      if (!isCurrent()) return;
       final updatedMessages = state.messages.map((msg) {
         if (msg.id == event.messageId) {
           // 查找是否已有该表情的回应
@@ -202,6 +246,9 @@ extension ChatBlocActionHandlers on ChatBloc {
             (r) => r.key == event.emoji,
           );
 
+          changed = true;
+          originalReaction = existingReactionIndex < 0
+              ? null : msg.reactions[existingReactionIndex];
           List<MessageReaction> newReactions;
           if (existingReactionIndex >= 0) {
             // 已有该表情，增加计数
@@ -256,6 +303,9 @@ extension ChatBlocActionHandlers on ChatBloc {
             ];
           }
 
+          for (final reaction in newReactions) {
+            if (reaction.key == event.emoji) optimisticReaction = reaction;
+          }
           return msg.copyWith(reactions: newReactions);
         }
         return msg;
@@ -264,17 +314,32 @@ extension ChatBlocActionHandlers on ChatBloc {
       emit(state.copyWith(messages: updatedMessages));
 
       // 发送到服务器
-      await _messageRepository.addReaction(
-        _currentRoomId!,
+      final success = await _messageRepository.addReaction(
+        roomId,
         event.messageId,
         event.emoji,
       );
+      if (!success) throw StateError('Reaction rejected');
       debugLog(
         'ChatBloc: Reaction $event.emoji added to message ${event.messageId}',
       );
     } catch (e) {
       debugLog('ChatBloc: Failed to add reaction: $e');
-      emit(state.copyWith(error: 'Failed to add reaction'));
+      if (!isCurrent()) return;
+      final restored = state.messages.map((message) {
+        if (!changed || message.id != event.messageId) return message;
+        MessageReaction? currentReaction;
+        for (final reaction in message.reactions) {
+          if (reaction.key == event.emoji) currentReaction = reaction;
+        }
+        // Preserve later updates to this emoji, other reactions and message fields.
+        if (!identical(currentReaction, optimisticReaction)) return message;
+        final reactions = message.reactions
+            .where((reaction) => reaction.key != event.emoji).toList();
+        if (originalReaction != null) reactions.add(originalReaction!);
+        return message.copyWith(reactions: reactions);
+      }).toList();
+      emit(state.copyWith(messages: restored, error: 'Failed to add reaction'));
     }
   }
 
@@ -285,18 +350,22 @@ extension ChatBlocActionHandlers on ChatBloc {
     MarkMessageAsRead event,
     Emitter<ChatState> emit,
   ) async {
-    if (_currentRoomId == null) return;
+    final roomId = _currentRoomId;
+    if (roomId == null) return;
+    final isCurrent = _captureChatContext(emit, roomId);
+    if (!isCurrent()) return;
 
     try {
       // 检查隐私设置：是否允许发送已读回执
       final shouldSendReadReceipts = await _secureStorage
           .shouldShowReadReceipts();
+      if (!isCurrent()) return;
       if (!shouldSendReadReceipts) {
         debugLog('ChatBloc: Skipping read receipt due to privacy settings');
         return;
       }
 
-      await _messageRepository.markAsRead(_currentRoomId!, event.messageId);
+      await _messageRepository.markAsRead(roomId, event.messageId);
     } catch (e) {
       // 静默失败
       debugLog('Error: $e');
@@ -310,12 +379,16 @@ extension ChatBlocActionHandlers on ChatBloc {
     SendTypingNotification event,
     Emitter<ChatState> emit,
   ) async {
-    if (_currentRoomId == null) return;
+    final roomId = _currentRoomId;
+    if (roomId == null) return;
+    final isCurrent = _captureChatContext(emit, roomId);
+    if (!isCurrent()) return;
 
     try {
       // 检查隐私设置：是否允许发送输入状态
       final shouldSendTypingIndicator = await _secureStorage
           .shouldShowTypingIndicator();
+      if (!isCurrent()) return;
       if (!shouldSendTypingIndicator) {
         debugLog(
           'ChatBloc: Skipping typing notification due to privacy settings',
@@ -324,7 +397,7 @@ extension ChatBlocActionHandlers on ChatBloc {
       }
 
       await _messageRepository.sendTypingNotification(
-        _currentRoomId!,
+        roomId,
         event.isTyping,
       );
     } catch (e) {
@@ -335,21 +408,38 @@ extension ChatBlocActionHandlers on ChatBloc {
 
   /// 清理聊天室
   Future<void> onDisposeChat(DisposeChat event, Emitter<ChatState> emit) async {
-    await _messagesSubscription?.cancel();
+    _chatGeneration++;
+    // Detach the old session before awaiting cancellation. A new initialization
+    // can then install its subscriptions without this cleanup touching them.
+    final subscriptions = <StreamSubscription<dynamic>?>[
+      _messagesSubscription, _pollResponsesSubscription, _syncStatusSubscription,
+    ];
     _messagesSubscription = null;
+    _pollResponsesSubscription = null;
+    _syncStatusSubscription = null;
     _typingUsersTimer?.cancel();
     _typingUsersTimer = null;
-    await _syncStatusSubscription?.cancel();
-    _syncStatusSubscription = null;
     _retryTimer?.cancel();
     _retryTimer = null;
+    _destructionTimer?.cancel();
+    _destructionTimer = null;
+    _scheduledMessageTimer?.cancel();
+    _scheduledMessageTimer = null;
+    _translationRequests.clear();
     _pendingRetryMessages.clear();
     _permanentlyFailedMessages.clear();
     _currentRoomId = null;
     _locallyDeletedMessageIds.clear();
-    if (!isClosed) {
+    if (!isClosed && !emit.isDone) {
       emit(ChatState.initial());
     }
+    await Future.wait(subscriptions.map((subscription) async {
+      try {
+        await subscription?.cancel();
+      } catch (error) {
+        debugLog('ChatBloc: Failed to cancel disposed subscription: $error');
+      }
+    }));
   }
 
   /// 清空聊天记录（本地）
@@ -357,13 +447,38 @@ extension ChatBlocActionHandlers on ChatBloc {
     ClearChatHistory event,
     Emitter<ChatState> emit,
   ) async {
-    debugLog('ChatBloc: Clearing chat history for room $_currentRoomId');
-
-    // 清空本地消息列表
-    _locallyDeletedMessageIds.addAll(state.messages.map((m) => m.id));
-
-    if (!isClosed) {
-      emit(state.copyWith(messages: [], clearError: true));
+    var completed = false;
+    final roomId = _currentRoomId;
+    final sessionCurrent = _captureChatContext(emit, roomId);
+    bool current() => sessionCurrent() &&
+        (event.isCurrent == null || event.isCurrent!());
+    try {
+      if (roomId == null || !current() ||
+          (event.roomId != null && event.roomId != roomId)) {
+        return;
+      }
+      final store = _historyClearStore;
+      if (store != null) {
+        final owner = _historyOwner;
+        if (!_historyReady || owner == null) throw StateError('History owner unavailable');
+        final boundary = await store.clearThrough(
+          ownerUserId: owner, roomId: roomId, boundary: DateTime.now(), isCurrent: current,
+        );
+        if (!current()) return;
+        _historyClearedThrough = boundary;
+        emit(state.copyWith(messages: _visibleHistory(state.messages), clearError: true));
+      } else {
+        // Legacy embedded callers retain in-memory clearing. Never acknowledge
+        // this path as a durable clear to the production confirmation UI.
+        if (event.completion != null) throw StateError('History storage unavailable');
+        _locallyDeletedMessageIds.addAll(state.messages.map((m) => m.id));
+        emit(state.copyWith(messages: [], clearError: true));
+      }
+      completed = true;
+    } catch (error) {
+      if (current()) emit(state.copyWith(error: 'Failed to clear chat history'));
+    } finally {
+      if (event.completion?.isCompleted == false) event.completion!.complete(completed);
     }
   }
 
@@ -432,6 +547,8 @@ extension ChatBlocActionHandlers on ChatBloc {
       if (!sameOrigin() || (origin != null && !origin.isCurrent)) return;
       // 通过 error 字段发送成功信号（使用特殊前缀区分）
       emit(state.copyWith(error: 'success:report'));
+      // Keep the acknowledgement transient across later timeline updates.
+      emit(state.copyWith(clearError: true));
     } catch (e) {
       if (!sameOrigin() || (origin != null && !origin.isCurrent)) return;
       debugLog('ChatBloc: Failed to report message: $e');

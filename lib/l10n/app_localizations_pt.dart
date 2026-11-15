@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -2009,70 +2010,71 @@ class SPt extends S {
   String get settingsSecurityTitle => 'Segurança';
 
   @override
-  String get settingsDeleteAccountTitle => 'Delete account';
+  String get settingsDeleteAccountTitle => 'Eliminar conta';
 
   @override
   String get settingsDeleteAccountSubtitle =>
-      'Deactivate this Matrix account and clean up its local chat data';
+      'Desativar esta conta Matrix e limpar seus dados locais de conversa';
 
   @override
   String get settingsDeleteAccountExplanation =>
-      'This requests permanent Matrix account deactivation. After server confirmation, this app removes this account\'s local chat session and encryption keys when safe. Other accounts and your wallet are kept. Federation and server retention may limit data erasure.';
+      'Esta ação solicita a desativação permanente da conta Matrix. Após a confirmação do servidor, o aplicação remove a sessão local de conversa e as chaves de encriptação desta conta quando for seguro. As outras contas e sua carteira são mantidas. A federação e as políticas de retenção dos servidores podem limitar a exclusão de dados.';
 
   @override
   String get settingsDeleteAccountPasswordOptional =>
-      'Matrix password, if requested';
+      'Palavra-passe do Matrix, se solicitada';
 
   @override
-  String get settingsDeleteAccountServerErase => 'Request server data erasure';
+  String get settingsDeleteAccountServerErase =>
+      'Solicitar exclusão de dados do servidor';
 
   @override
   String get settingsDeleteAccountServerEraseDetail =>
-      'Ask this homeserver to erase account data where supported. Copies held by other servers or required by retention may remain.';
+      'Peça a este servidor de origem que exclua os dados da conta, quando houver suporte. Cópias mantidas por outros servidores ou exigidas por políticas de retenção podem permanecer.';
 
   @override
-  String get settingsDeleteAccountChooseStage => 'Verify this Matrix account';
+  String get settingsDeleteAccountChooseStage => 'Verificar esta conta Matrix';
 
   @override
-  String get settingsDeleteAccountUsePassword => 'Use Matrix password';
+  String get settingsDeleteAccountUsePassword => 'Usar palavra-passe do Matrix';
 
   @override
-  String get settingsDeleteAccountUseBrowser => 'Continue in browser';
+  String get settingsDeleteAccountUseBrowser => 'Continuar no navegador';
 
   @override
   String get settingsDeleteAccountFallbackTitle =>
-      'Return from Matrix verification';
+      'Retornar da verificação do Matrix';
 
   @override
   String get settingsDeleteAccountFallbackExplanation =>
-      'Returning from the browser does not confirm deletion. Check the original request with the Matrix server.';
+      'Retornar do navegador não confirma a exclusão. Verifique a solicitação original com o servidor Matrix.';
 
   @override
-  String get settingsDeleteAccountCheckServer => 'Check with server';
+  String get settingsDeleteAccountCheckServer => 'Verificar com o servidor';
 
   @override
   String get settingsDeleteAccountRequestFailed =>
-      'The Matrix server did not confirm account deletion.';
+      'O servidor Matrix não confirmou a exclusão da conta.';
 
   @override
   String get settingsDeleteAccountPendingTitle =>
-      'Pending local account cleanup';
+      'Limpeza local da conta pendente';
 
   @override
   String get settingsDeleteAccountPendingSubtitle =>
-      'Review cleanup for a previously deactivated Matrix account';
+      'Revisar a limpeza de uma conta Matrix desativada anteriormente';
 
   @override
   String get settingsDeleteAccountPendingReadError =>
-      'Unable to read pending cleanup records. Tap to retry.';
+      'Não foi possível ler os registos de limpeza pendentes. Toque para tentar novamente.';
 
   @override
   String get settingsDeleteAccountPendingDetail =>
-      'The Matrix account was deactivated, but local cleanup is still pending. Other accounts remain available.';
+      'A conta Matrix foi desativada, mas a limpeza local ainda está pendente. As outras contas continuam disponíveis.';
 
   @override
   String get settingsDeleteAccountManagementNotConfirmed =>
-      'Account management opened in your browser. Deletion has not been confirmed in this app, so your chat session remains available.';
+      'O gestão da conta foi aberto no navegador. A exclusão não foi confirmada neste aplicação, portanto sua sessão de conversa permanece disponível.';
 
   @override
   String get settingsKeyBackup => 'Backup de Chaves';
@@ -4459,7 +4461,7 @@ class SPt extends S {
   String get mobileData => 'Dados móveis';
 
   @override
-  String get roaming => 'Roaming';
+  String get roaming => 'Itinerância';
 
   @override
   String get storageManagement => 'Armazenamento';
@@ -4763,7 +4765,7 @@ class SPt extends S {
   String get aiRewriteFormal => 'Formal';
 
   @override
-  String get aiRewriteCasual => 'Casual';
+  String get aiRewriteCasual => 'Informal';
 
   @override
   String get aiRewritePlayful => 'Brincalhão';
@@ -5045,25 +5047,26 @@ class SPt extends S {
   String get reportSelectReason => 'Selecione um motivo';
 
   @override
-  String get reportUnavailable => 'Sign in to send a report.';
+  String get reportUnavailable => 'Entre na conta para enviar uma denúncia.';
 
   @override
   String get reportAccountChanged =>
-      'Account changed. Open this report again to send it.';
+      'A conta foi alterada. Abra esta denúncia novamente para enviá-la.';
 
   @override
   String get reportUnsupported =>
-      'This homeserver does not support user reports.';
+      'Este servidor de origem não oferece suporte a denúncias de utilizadores.';
 
   @override
   String get reportRoomUnsupported =>
-      'This homeserver does not support room reports.';
+      'Este servidor de origem não oferece suporte a denúncias de salas.';
 
   @override
-  String get reportRateLimited => 'Too many reports. Please try again later.';
+  String get reportRateLimited => 'Muitas denúncias. Tente de novo mais tarde.';
 
   @override
-  String get reportCouldNotSend => 'Could not send report. Please try again.';
+  String get reportCouldNotSend =>
+      'Não foi possível enviar a denúncia. Tente de novo.';
 
   @override
   String get gameCenter => 'Jogos';
@@ -5954,31 +5957,32 @@ class SPt extends S {
 
   @override
   String get chatEncryptionNotReady =>
-      'Secure connection is not ready. Message not sent. Check connection and device verification on both accounts, then retry.';
+      'A ligação segura não está pronta. Mensagem não enviada. Verifique a ligação e a verificação dos dispositivos de ambas as contas e tente de novo.';
 
   @override
-  String get contactRequestPending => 'Awaiting acceptance';
+  String get contactRequestPending => 'A aguardar aceitação';
 
   @override
   String get chatFriendRequestPending =>
-      'Friendship is not confirmed. Check Contacts > New Friends before sending.';
+      'A amizade não foi confirmada. Verifique Contactos > Novos amigos antes de enviar mensagens.';
 
   @override
   String contactPhotoCount(int count) {
-    return '$count photos';
+    return '$count fotos';
   }
 
   @override
-  String get videoPublish => 'Publish video';
+  String get videoPublish => 'Publicar vídeo';
 
   @override
-  String get videoGoLive => 'Go live';
+  String get videoGoLive => 'Iniciar transmissão ao vivo';
 
   @override
-  String get videoSelect => 'Select video';
+  String get videoSelect => 'Selecionar vídeo';
 
   @override
-  String get videoLiveUnavailable => 'Live broadcasting is unavailable';
+  String get videoLiveUnavailable =>
+      'A transmissão ao vivo não está disponível';
 
   @override
   String get qrcodeAlbum => 'Álbum';
@@ -6090,6 +6094,318 @@ class SPt extends S {
   @override
   String get transferPaymentRequestUnavailable =>
       'O pedido de pagamento não está disponível';
+
+  @override
+  String get chatCatchUp => 'Colocar em dia';
+
+  @override
+  String get chatCatchUpMentions => 'Menções';
+
+  @override
+  String get chatCatchUpReplies => 'Respostas às minhas mensagens';
+
+  @override
+  String get chatCatchUpPinned => 'Mensagens fixadas';
+
+  @override
+  String get chatCatchUpScope =>
+      'As menções e respostas usam as mensagens carregadas, inclusive as já lidas. Carregue mensagens mais antigas para encontrar respostas anteriores.';
+
+  @override
+  String get chatCatchUpLoadMore => 'Carregar mensagens mais antigas';
+
+  @override
+  String get chatActionPreview => 'Revisar sugestão de calendário';
+
+  @override
+  String get chatActionPrivacy =>
+      'Somente o título e o horário abaixo serão partilhados com seu aplicação de calendário após a confirmação. Verifique o fuso horário. Sua conta de calendário pode sincronizar este evento.';
+
+  @override
+  String get chatActionTitle => 'Evento da conversa';
+
+  @override
+  String get chatActionSuggestion => 'Sugestão de calendário';
+
+  @override
+  String get chatUnreadAttention => 'Menções e respostas não lidas';
+
+  @override
+  String get chatScanAgain => 'Pesquisar novamente';
+
+  @override
+  String get chatUnreadScope =>
+      'Examina o histórico do servidor até seu marcador de leitura. Abra uma conversa para lê-la; atualize para reconstruir os resultados.';
+
+  @override
+  String get chatScanIncomplete =>
+      'Incompleto: histórico, desencriptação ou marcador de leitura indisponível. Tente de novo após a sincronização.';
+
+  @override
+  String get chatHistoryShare => 'Partilhar histórico selecionado';
+
+  @override
+  String get chatHistoryExplanation =>
+      'Somente administradores. Selecione texto simples e uma conversa direta encriptada existente com um membro que tenha entrado no grupo. O partilha cria mensagens de auditoria visíveis no grupo.';
+
+  @override
+  String get chatHistoryEnable => 'Ativar partilha';
+
+  @override
+  String get chatHistoryDisable => 'Desativar partilha';
+
+  @override
+  String get chatHistoryPolicy => 'Política de partilha do histórico do grupo';
+
+  @override
+  String get chatHistoryPolicyDetail =>
+      'Somente administradores podem partilhar. A ativação também restringe a visibilidade do histórico do grupo aos eventos posteriores à entrada. Defina abaixo os limites de mensagens de texto e confirme.';
+
+  @override
+  String get chatHistoryPolicySaved => 'Política guardada';
+
+  @override
+  String get chatHistoryRecipient => 'Conversa encriptada do destinatário';
+
+  @override
+  String get chatHistoryReview => 'Revisar mensagens selecionadas';
+
+  @override
+  String get chatHistoryMessages => 'mensagens';
+
+  @override
+  String get chatHistoryConfirmDetail =>
+      'Antes de partilhar, confirme o destinatário, cada mensagem e seu horário. Um resultado de falha ou desconhecido pode já ter enviado conteúdo: verifique o resultado antes de continuar.';
+
+  @override
+  String get chatHistoryCompleted =>
+      'Histórico selecionado enviado e auditoria do grupo confirmada';
+
+  @override
+  String get chatHistoryPending =>
+      'Pendente: verifique o resultado e confirme novamente para continuar. Envios com resultado desconhecido nunca são repetidos.';
+
+  @override
+  String get chatHistoryReconcile => 'Verificar resultado do envio';
+
+  @override
+  String get chatHistoryFailed =>
+      'Não foi possível concluir. Verifique o acesso de administrador, a política do grupo, a encriptação, a participação do destinatário e a seleção. Se o envio começou, verifique seu resultado.';
+
+  @override
+  String get chatDeviceActions => 'Ações no dispositivo';
+
+  @override
+  String get chatDeviceActionsReview =>
+      'Após a confirmação, somente esta mensagem é fornecida às sugestões de ações do sistema no dispositivo. Escolha uma ação para abrir Calendário, Lembretes ou Mapas.';
+
+  @override
+  String get chatHistoryMaxMessages => 'Limite de mensagens (1–50)';
+
+  @override
+  String get chatHistoryMaxHours => 'Período do histórico em horas (1–720)';
+
+  @override
+  String get chatNotifyAll => 'Todas as mensagens';
+
+  @override
+  String get chatNotifyAllDescription =>
+      'Notificar cada nova mensagem nesta conversa';
+
+  @override
+  String get chatNotifyMentions => 'Apenas menções';
+
+  @override
+  String get chatNotifyMentionsDescription =>
+      'Notificar apenas quando houver uma menção a si ou for usado @room';
+
+  @override
+  String get chatNotifyMutedDescription =>
+      'Desativar as notificações desta conversa em todos os dispositivos';
+
+  @override
+  String get scheduledMessagesTitle => 'Mensagens agendadas';
+
+  @override
+  String get scheduledMessagesEmpty => 'Ainda não há mensagens agendadas';
+
+  @override
+  String get scheduledMessagesHint =>
+      'Mantenha premido Enviar, Fotografias, Ficheiros, um GIF ou um autocolante para agendar uma mensagem.';
+
+  @override
+  String get scheduledMessageCancelled => 'Mensagem agendada cancelada';
+
+  @override
+  String scheduledMessageCreatedAt(String time) {
+    return 'Criado em $time';
+  }
+
+  @override
+  String get scheduledDeliveryUnconfirmed => 'Entrega não confirmada';
+
+  @override
+  String get scheduledRecoveryCopy => 'Guardar cópia de recuperação';
+
+  @override
+  String get scheduledRecoveryCopyHint =>
+      'Guardada neste dispositivo sem alterar nem enviar mensagens. A pré-visualização mostra até 8.000 caracteres.';
+
+  @override
+  String get scheduledRecoveryCopies => 'Cópias de recuperação';
+
+  @override
+  String get scheduledRecoveryReset => 'Repor fila danificada';
+
+  @override
+  String get scheduledRecoveryResetHint =>
+      'Foi guardada uma cópia exata neste dispositivo. Repor todas as mensagens agendadas desta conta? Algumas podem já ter sido enviadas. As cópias e os anexos serão mantidos. Nada será reenviado.';
+
+  @override
+  String get scheduledRecoveryExportHint =>
+      'Este ficheiro contém texto de rascunhos e dados da conta não encriptados. Os anexos não estão incluídos. Escolha um destino de confiança.';
+
+  @override
+  String get scheduledRecoveryImport => 'Importar cópia de recuperação';
+
+  @override
+  String get scheduledRecoveryImportHint =>
+      'Guardar esta pré-visualização apenas como cópia de recuperação. Nenhuma mensagem será agendada ou enviada. Os anexos não estão incluídos. O autor do ficheiro não foi verificado.';
+
+  @override
+  String get scheduledRecoveryComposerHint =>
+      'Acrescente o texto ao rascunho atual para revisão. Nada será enviado. Anexos, menções e temporizadores não serão restaurados. Verifique se esta mensagem já foi entregue.';
+
+  @override
+  String get backupRecoverLegacyArchive => 'Recuperar histórico local anterior';
+
+  @override
+  String get backupLegacyArchiveWarning =>
+      'O proprietário deste histórico não foi verificado. Copie apenas as suas salas para a conta abaixo. O original é mantido.';
+
+  @override
+  String get backupOlderFiles => 'Ficheiros de cópia anteriores';
+
+  @override
+  String get backupOlderFilesWarning =>
+      'Estes ficheiros podem pertencer a outra conta. Selecione um ficheiro para verificar o conteúdo e o proprietário antes de restaurar.';
+
+  @override
+  String get stickerImportTitle => 'Importar pacote de autocolantes';
+
+  @override
+  String get stickerImportLinkHint =>
+      'Ligação do pacote de autocolantes Matrix';
+
+  @override
+  String get stickerImportPreview => 'Pré-visualização';
+
+  @override
+  String get stickerImportUnavailable =>
+      'Este pacote não está disponível ou não tem acesso.';
+
+  @override
+  String get stickerImportCopyNotice =>
+      'Adicione uma cópia privada deste pacote. As imagens e os metadados não são encriptados ponto a ponto.';
+
+  @override
+  String get stickerImportFailed =>
+      'Não foi possível adicionar este pacote. Tente novamente.';
+
+  @override
+  String get stickerImportAccountChanged =>
+      'A conta mudou ou a sessão expirou. Volte a abrir a importação de autocolantes.';
+
+  @override
+  String get stickerPackSourceRoom => 'Conversa de origem';
+
+  @override
+  String get stickerPackImages => 'Imagens';
+
+  @override
+  String get stickerPublishNotice =>
+      'Publique este pacote no grupo selecionado. As imagens e os metadados não têm encriptação ponto a ponto. Quem puder ler o estado do grupo poderá aceder-lhes.';
+
+  @override
+  String get stickerPublishFailed =>
+      'A publicação não foi confirmada. Verifique o grupo antes de tentar novamente.';
+
+  @override
+  String get stickerPublishReceiptMissing =>
+      'Publicado, mas a ligação não foi guardada. Partilhe-a ou copie-a antes de sair desta página.';
+
+  @override
+  String get stickerSubscribe => 'Subscrever atualizações';
+
+  @override
+  String get stickerSubscribeNotice =>
+      'Receba futuras alterações dos administradores do pacote. As imagens e os metadados não têm encriptação ponto a ponto. Pode cancelar a subscrição mais tarde; isto não o faz aderir à conversa de origem.';
+
+  @override
+  String get stickerSubscriptions => 'Subscrições de autocolantes';
+
+  @override
+  String get stickerUnsubscribe => 'Cancelar subscrição';
+
+  @override
+  String get stickerSubscriptionsEmpty => 'Sem subscrições de autocolantes';
+
+  @override
+  String get chatAttachmentEvent => 'Evento';
+
+  @override
+  String get chatRecentMedia => 'Fotografias e vídeos recentes';
+
+  @override
+  String get chatRecentMediaLoadFailed =>
+      'Não foi possível carregar os conteúdos recentes';
+
+  @override
+  String get chatRecentMediaPermission =>
+      'É necessário acesso às fotografias para mostrar os conteúdos recentes';
+
+  @override
+  String get chatRecentMediaEmpty => 'Sem fotografias ou vídeos recentes';
+
+  @override
+  String get chatRecentPhoto => 'Fotografia recente';
+
+  @override
+  String get chatRecentVideo => 'Vídeo recente';
+
+  @override
+  String get chatAttachmentTip => 'Gorjeta';
+
+  @override
+  String get chatAttachmentWhiteboard => 'Quadro branco';
+
+  @override
+  String get chatAttachmentVideoNote => 'Mensagem de vídeo';
+
+  @override
+  String get chatAttachmentCode => 'Código';
+
+  @override
+  String get chatAttachmentShop => 'Loja';
+
+  @override
+  String chatSelectionLimit(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Limite de seleção: $countString';
+  }
+
+  @override
+  String scheduledSendTonightAt(String time) {
+    return 'Hoje à noite ($time)';
+  }
+
+  @override
+  String scheduledSendTomorrowMorningAt(String time) {
+    return 'Amanhã de manhã ($time)';
+  }
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).
@@ -8095,6 +8411,73 @@ class SPtBr extends SPt {
 
   @override
   String get settingsSecurityTitle => 'Segurança';
+
+  @override
+  String get settingsDeleteAccountTitle => 'Excluir conta';
+
+  @override
+  String get settingsDeleteAccountSubtitle =>
+      'Desativar esta conta Matrix e limpar seus dados locais de conversa';
+
+  @override
+  String get settingsDeleteAccountExplanation =>
+      'Esta ação solicita a desativação permanente da conta Matrix. Após a confirmação do servidor, o aplicativo remove a sessão local de conversa e as chaves de criptografia desta conta quando for seguro. As outras contas e sua carteira são mantidas. A federação e as políticas de retenção dos servidores podem limitar a exclusão de dados.';
+
+  @override
+  String get settingsDeleteAccountPasswordOptional =>
+      'Senha do Matrix, se solicitada';
+
+  @override
+  String get settingsDeleteAccountServerErase =>
+      'Solicitar exclusão de dados do servidor';
+
+  @override
+  String get settingsDeleteAccountServerEraseDetail =>
+      'Peça a este servidor de origem que exclua os dados da conta, quando houver suporte. Cópias mantidas por outros servidores ou exigidas por políticas de retenção podem permanecer.';
+
+  @override
+  String get settingsDeleteAccountChooseStage => 'Verificar esta conta Matrix';
+
+  @override
+  String get settingsDeleteAccountUsePassword => 'Usar senha do Matrix';
+
+  @override
+  String get settingsDeleteAccountUseBrowser => 'Continuar no navegador';
+
+  @override
+  String get settingsDeleteAccountFallbackTitle =>
+      'Retornar da verificação do Matrix';
+
+  @override
+  String get settingsDeleteAccountFallbackExplanation =>
+      'Retornar do navegador não confirma a exclusão. Verifique a solicitação original com o servidor Matrix.';
+
+  @override
+  String get settingsDeleteAccountCheckServer => 'Verificar com o servidor';
+
+  @override
+  String get settingsDeleteAccountRequestFailed =>
+      'O servidor Matrix não confirmou a exclusão da conta.';
+
+  @override
+  String get settingsDeleteAccountPendingTitle =>
+      'Limpeza local da conta pendente';
+
+  @override
+  String get settingsDeleteAccountPendingSubtitle =>
+      'Revisar a limpeza de uma conta Matrix desativada anteriormente';
+
+  @override
+  String get settingsDeleteAccountPendingReadError =>
+      'Não foi possível ler os registros de limpeza pendentes. Toque para tentar novamente.';
+
+  @override
+  String get settingsDeleteAccountPendingDetail =>
+      'A conta Matrix foi desativada, mas a limpeza local ainda está pendente. As outras contas continuam disponíveis.';
+
+  @override
+  String get settingsDeleteAccountManagementNotConfirmed =>
+      'O gerenciamento da conta foi aberto no navegador. A exclusão não foi confirmada neste aplicativo, portanto sua sessão de conversa permanece disponível.';
 
   @override
   String get settingsKeyBackup => 'Backup de Chaves';
@@ -10481,7 +10864,7 @@ class SPtBr extends SPt {
   String get mobileData => 'Dados móveis';
 
   @override
-  String get roaming => 'Roaming';
+  String get roaming => 'Itinerância';
 
   @override
   String get storageManagement => 'Armazenamento';
@@ -10785,7 +11168,7 @@ class SPtBr extends SPt {
   String get aiRewriteFormal => 'Formal';
 
   @override
-  String get aiRewriteCasual => 'Casual';
+  String get aiRewriteCasual => 'Informal';
 
   @override
   String get aiRewritePlayful => 'Brincalhão';
@@ -11065,6 +11448,29 @@ class SPtBr extends SPt {
 
   @override
   String get reportSelectReason => 'Selecione um motivo';
+
+  @override
+  String get reportUnavailable => 'Entre na conta para enviar uma denúncia.';
+
+  @override
+  String get reportAccountChanged =>
+      'A conta foi alterada. Abra esta denúncia novamente para enviá-la.';
+
+  @override
+  String get reportUnsupported =>
+      'Este servidor de origem não oferece suporte a denúncias de usuários.';
+
+  @override
+  String get reportRoomUnsupported =>
+      'Este servidor de origem não oferece suporte a denúncias de salas.';
+
+  @override
+  String get reportRateLimited =>
+      'Muitas denúncias. Tente novamente mais tarde.';
+
+  @override
+  String get reportCouldNotSend =>
+      'Não foi possível enviar a denúncia. Tente novamente.';
 
   @override
   String get gameCenter => 'Jogos';
@@ -11955,31 +12361,32 @@ class SPtBr extends SPt {
 
   @override
   String get chatEncryptionNotReady =>
-      'Secure connection is not ready. Message not sent. Check connection and device verification on both accounts, then retry.';
+      'A conexão segura não está pronta. Mensagem não enviada. Verifique a conexão e a verificação dos dispositivos de ambas as contas e tente novamente.';
 
   @override
-  String get contactRequestPending => 'Awaiting acceptance';
+  String get contactRequestPending => 'Aguardando aceitação';
 
   @override
   String get chatFriendRequestPending =>
-      'Friendship is not confirmed. Check Contacts > New Friends before sending.';
+      'A amizade não foi confirmada. Verifique Contatos > Novos amigos antes de enviar mensagens.';
 
   @override
   String contactPhotoCount(int count) {
-    return '$count photos';
+    return '$count fotos';
   }
 
   @override
-  String get videoPublish => 'Publish video';
+  String get videoPublish => 'Publicar vídeo';
 
   @override
-  String get videoGoLive => 'Go live';
+  String get videoGoLive => 'Iniciar transmissão ao vivo';
 
   @override
-  String get videoSelect => 'Select video';
+  String get videoSelect => 'Selecionar vídeo';
 
   @override
-  String get videoLiveUnavailable => 'Live broadcasting is unavailable';
+  String get videoLiveUnavailable =>
+      'A transmissão ao vivo não está disponível';
 
   @override
   String get qrcodeAlbum => 'Álbum';
@@ -12091,4 +12498,316 @@ class SPtBr extends SPt {
   @override
   String get transferPaymentRequestUnavailable =>
       'A solicitação de pagamento não está disponível';
+
+  @override
+  String get chatCatchUp => 'Colocar em dia';
+
+  @override
+  String get chatCatchUpMentions => 'Menções';
+
+  @override
+  String get chatCatchUpReplies => 'Respostas às minhas mensagens';
+
+  @override
+  String get chatCatchUpPinned => 'Mensagens fixadas';
+
+  @override
+  String get chatCatchUpScope =>
+      'As menções e respostas usam as mensagens carregadas, inclusive as já lidas. Carregue mensagens mais antigas para encontrar respostas anteriores.';
+
+  @override
+  String get chatCatchUpLoadMore => 'Carregar mensagens mais antigas';
+
+  @override
+  String get chatActionPreview => 'Revisar sugestão de calendário';
+
+  @override
+  String get chatActionPrivacy =>
+      'Somente o título e o horário abaixo serão compartilhados com seu aplicativo de calendário após a confirmação. Verifique o fuso horário. Sua conta de calendário pode sincronizar este evento.';
+
+  @override
+  String get chatActionTitle => 'Evento da conversa';
+
+  @override
+  String get chatActionSuggestion => 'Sugestão de calendário';
+
+  @override
+  String get chatUnreadAttention => 'Menções e respostas não lidas';
+
+  @override
+  String get chatScanAgain => 'Pesquisar novamente';
+
+  @override
+  String get chatUnreadScope =>
+      'Examina o histórico do servidor até seu marcador de leitura. Abra uma conversa para lê-la; atualize para reconstruir os resultados.';
+
+  @override
+  String get chatScanIncomplete =>
+      'Incompleto: histórico, descriptografia ou marcador de leitura indisponível. Tente novamente após a sincronização.';
+
+  @override
+  String get chatHistoryShare => 'Compartilhar histórico selecionado';
+
+  @override
+  String get chatHistoryExplanation =>
+      'Somente administradores. Selecione texto simples e uma conversa direta criptografada existente com um membro que tenha entrado no grupo. O compartilhamento cria mensagens de auditoria visíveis no grupo.';
+
+  @override
+  String get chatHistoryEnable => 'Ativar compartilhamento';
+
+  @override
+  String get chatHistoryDisable => 'Desativar compartilhamento';
+
+  @override
+  String get chatHistoryPolicy =>
+      'Política de compartilhamento do histórico do grupo';
+
+  @override
+  String get chatHistoryPolicyDetail =>
+      'Somente administradores podem compartilhar. A ativação também restringe a visibilidade do histórico do grupo aos eventos posteriores à entrada. Defina abaixo os limites de mensagens de texto e confirme.';
+
+  @override
+  String get chatHistoryPolicySaved => 'Política salva';
+
+  @override
+  String get chatHistoryRecipient => 'Conversa criptografada do destinatário';
+
+  @override
+  String get chatHistoryReview => 'Revisar mensagens selecionadas';
+
+  @override
+  String get chatHistoryMessages => 'mensagens';
+
+  @override
+  String get chatHistoryConfirmDetail =>
+      'Antes de compartilhar, confirme o destinatário, cada mensagem e seu horário. Um resultado de falha ou desconhecido pode já ter enviado conteúdo: verifique o resultado antes de continuar.';
+
+  @override
+  String get chatHistoryCompleted =>
+      'Histórico selecionado enviado e auditoria do grupo confirmada';
+
+  @override
+  String get chatHistoryPending =>
+      'Pendente: verifique o resultado e confirme novamente para continuar. Envios com resultado desconhecido nunca são repetidos.';
+
+  @override
+  String get chatHistoryReconcile => 'Verificar resultado do envio';
+
+  @override
+  String get chatHistoryFailed =>
+      'Não foi possível concluir. Verifique o acesso de administrador, a política do grupo, a criptografia, a participação do destinatário e a seleção. Se o envio começou, verifique seu resultado.';
+
+  @override
+  String get chatDeviceActions => 'Ações no dispositivo';
+
+  @override
+  String get chatDeviceActionsReview =>
+      'Após a confirmação, somente esta mensagem é fornecida às sugestões de ações do sistema no dispositivo. Escolha uma ação para abrir Calendário, Lembretes ou Mapas.';
+
+  @override
+  String get chatHistoryMaxMessages => 'Limite de mensagens (1–50)';
+
+  @override
+  String get chatHistoryMaxHours => 'Período do histórico em horas (1–720)';
+
+  @override
+  String get chatNotifyAll => 'Todas as mensagens';
+
+  @override
+  String get chatNotifyAllDescription =>
+      'Notificar cada nova mensagem nesta conversa';
+
+  @override
+  String get chatNotifyMentions => 'Apenas menções';
+
+  @override
+  String get chatNotifyMentionsDescription =>
+      'Notificar apenas quando você for mencionado ou @room for usado';
+
+  @override
+  String get chatNotifyMutedDescription =>
+      'Desativar as notificações desta conversa em todos os dispositivos';
+
+  @override
+  String get scheduledMessagesTitle => 'Mensagens agendadas';
+
+  @override
+  String get scheduledMessagesEmpty => 'Ainda não há mensagens agendadas';
+
+  @override
+  String get scheduledMessagesHint =>
+      'Mantenha pressionado Enviar, Fotos, Arquivos, um GIF ou uma figurinha para agendar uma mensagem.';
+
+  @override
+  String get scheduledMessageCancelled => 'Mensagem agendada cancelada';
+
+  @override
+  String scheduledMessageCreatedAt(String time) {
+    return 'Criado em $time';
+  }
+
+  @override
+  String get scheduledDeliveryUnconfirmed => 'Entrega não confirmada';
+
+  @override
+  String get scheduledRecoveryCopy => 'Salvar cópia de recuperação';
+
+  @override
+  String get scheduledRecoveryCopyHint =>
+      'Salva neste dispositivo sem alterar nem enviar mensagens. A prévia mostra até 8.000 caracteres.';
+
+  @override
+  String get scheduledRecoveryCopies => 'Cópias de recuperação';
+
+  @override
+  String get scheduledRecoveryReset => 'Redefinir fila danificada';
+
+  @override
+  String get scheduledRecoveryResetHint =>
+      'Uma cópia exata foi salva neste dispositivo. Redefinir todas as mensagens agendadas desta conta? Algumas podem já ter sido enviadas. As cópias e os anexos serão mantidos. Nada será reenviado.';
+
+  @override
+  String get scheduledRecoveryExportHint =>
+      'Este arquivo contém texto de rascunhos e dados da conta não criptografados. Os anexos não estão incluídos. Escolha um destino confiável.';
+
+  @override
+  String get scheduledRecoveryImport => 'Importar cópia de recuperação';
+
+  @override
+  String get scheduledRecoveryImportHint =>
+      'Salvar esta prévia apenas como cópia de recuperação. Nenhuma mensagem será agendada ou enviada. Os anexos não estão incluídos. O autor do arquivo não foi verificado.';
+
+  @override
+  String get scheduledRecoveryComposerHint =>
+      'Acrescente o texto ao rascunho atual para revisão. Nada será enviado. Anexos, menções e temporizadores não serão restaurados. Verifique se esta mensagem já foi entregue.';
+
+  @override
+  String get backupRecoverLegacyArchive => 'Recuperar histórico local anterior';
+
+  @override
+  String get backupLegacyArchiveWarning =>
+      'O proprietário deste histórico não foi verificado. Copie apenas suas salas para a conta abaixo. O original será mantido.';
+
+  @override
+  String get backupOlderFiles => 'Arquivos de backup anteriores';
+
+  @override
+  String get backupOlderFilesWarning =>
+      'Estes arquivos podem pertencer a outra conta. Selecione um arquivo para verificar o conteúdo e o proprietário antes de restaurar.';
+
+  @override
+  String get stickerImportTitle => 'Importar pacote de figurinhas';
+
+  @override
+  String get stickerImportLinkHint => 'Link do pacote de figurinhas Matrix';
+
+  @override
+  String get stickerImportPreview => 'Prévia';
+
+  @override
+  String get stickerImportUnavailable =>
+      'Este pacote não está disponível ou você não tem acesso.';
+
+  @override
+  String get stickerImportCopyNotice =>
+      'Adicione uma cópia privada deste pacote. As imagens e os metadados não têm criptografia de ponta a ponta.';
+
+  @override
+  String get stickerImportFailed =>
+      'Não foi possível adicionar este pacote. Tente novamente.';
+
+  @override
+  String get stickerImportAccountChanged =>
+      'A conta mudou ou a sessão expirou. Abra a importação de figurinhas novamente.';
+
+  @override
+  String get stickerPackSourceRoom => 'Conversa de origem';
+
+  @override
+  String get stickerPackImages => 'Imagens';
+
+  @override
+  String get stickerPublishNotice =>
+      'Publique este pacote no grupo selecionado. As imagens e os metadados não têm criptografia de ponta a ponta. Quem puder ler o estado do grupo poderá acessá-los.';
+
+  @override
+  String get stickerPublishFailed =>
+      'A publicação não foi confirmada. Verifique o grupo antes de tentar novamente.';
+
+  @override
+  String get stickerPublishReceiptMissing =>
+      'Publicado, mas o link não foi salvo. Compartilhe ou copie o link antes de sair desta página.';
+
+  @override
+  String get stickerSubscribe => 'Assinar atualizações';
+
+  @override
+  String get stickerSubscribeNotice =>
+      'Receba futuras alterações dos administradores do pacote. Imagens e metadados não têm criptografia de ponta a ponta. Você pode cancelar a assinatura depois; isso não faz você entrar na conversa de origem.';
+
+  @override
+  String get stickerSubscriptions => 'Assinaturas de figurinhas';
+
+  @override
+  String get stickerUnsubscribe => 'Cancelar assinatura';
+
+  @override
+  String get stickerSubscriptionsEmpty => 'Nenhuma assinatura de figurinhas';
+
+  @override
+  String get chatAttachmentEvent => 'Evento';
+
+  @override
+  String get chatRecentMedia => 'Fotos e vídeos recentes';
+
+  @override
+  String get chatRecentMediaLoadFailed =>
+      'Não foi possível carregar as mídias recentes';
+
+  @override
+  String get chatRecentMediaPermission =>
+      'É necessário acesso às fotos para mostrar as mídias recentes';
+
+  @override
+  String get chatRecentMediaEmpty => 'Nenhuma foto ou vídeo recente';
+
+  @override
+  String get chatRecentPhoto => 'Foto recente';
+
+  @override
+  String get chatRecentVideo => 'Vídeo recente';
+
+  @override
+  String get chatAttachmentTip => 'Gorjeta';
+
+  @override
+  String get chatAttachmentWhiteboard => 'Quadro branco';
+
+  @override
+  String get chatAttachmentVideoNote => 'Mensagem de vídeo';
+
+  @override
+  String get chatAttachmentCode => 'Código';
+
+  @override
+  String get chatAttachmentShop => 'Loja';
+
+  @override
+  String chatSelectionLimit(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Limite de seleção: $countString';
+  }
+
+  @override
+  String scheduledSendTonightAt(String time) {
+    return 'Hoje à noite ($time)';
+  }
+
+  @override
+  String scheduledSendTomorrowMorningAt(String time) {
+    return 'Amanhã de manhã ($time)';
+  }
 }

@@ -151,7 +151,7 @@ void main() {
       setUp: () {
         when(
           () => mockRepo.sendThreadTextMessage(any(), any(), any()),
-        ).thenAnswer((_) async => null);
+        ).thenAnswer((_) async => _makeMessage(id: r'$sent'));
       },
       act: (bloc) => bloc.add(const SendThreadTextMessage('Hello thread!')),
       expect: () => [
@@ -243,11 +243,12 @@ void main() {
 
   group('DisposeThread', () {
     blocTest<ThreadBloc, ThreadState>(
-      'cancels stream subscription without error',
+      'clears thread state when disposing',
       build: buildBloc,
+      seed: () => ThreadState(roomId: _kRoomId, threadRootEventId: _kRootEventId,
+        rootMessage: _makeMessage(), isLoading: true),
       act: (bloc) => bloc.add(const DisposeThread()),
-      // DisposeThread just cancels subscription, no state change
-      expect: () => <Never>[],
+      expect: () => [ThreadState.initial()],
     );
   });
 

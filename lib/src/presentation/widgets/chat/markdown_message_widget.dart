@@ -8,6 +8,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/custom_emoji.dart';
 import '../../../core/utils/message_markdown_utils.dart';
 import 'custom_emoji_text.dart';
+import 'safe_markdown_document.dart';
 import '../../../core/theme/app_dimensions.dart';
 
 /// Markdown 消息渲染组件
@@ -38,6 +39,7 @@ class MarkdownMessageWidget extends StatelessWidget {
 
     return MarkdownBody(
       data: displayText,
+      imageBuilder: blockedMarkdownImage,
       selectable: false,
       softLineBreak: true,
       inlineSyntaxes: <md.InlineSyntax>[_CustomEmojiMarkdownSyntax()],

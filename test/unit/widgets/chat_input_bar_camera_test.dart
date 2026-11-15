@@ -3,6 +3,25 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:n42_chat/src/presentation/widgets/chat/chat_input_bar.dart';
 
 void main() {
+  testWidgets('long press scheduling leaves text for owner acknowledgement', (tester) async {
+    var scheduled = 0;
+    await tester.pumpWidget(MaterialApp(home: Scaffold(body: ChatInputBar(
+      showVoiceButton: false,
+      showQuickReplyButton: false,
+      showEmojiButton: false,
+      onSendText: (_) {},
+      onScheduledSend: (_) => scheduled++,
+    ))));
+    await tester.enterText(find.byType(TextField), 'Keep until saved');
+    await tester.pump();
+    await tester.longPress(find.byIcon(Icons.send));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.schedule));
+    await tester.pumpAndSettle();
+    expect(scheduled, 1);
+    expect(tester.widget<TextField>(find.byType(TextField)).controller!.text, 'Keep until saved');
+  });
+
   testWidgets('空输入时显示相机快捷入口，输入文字后切换为发送', (tester) async {
     var cameraTaps = 0;
     await tester.pumpWidget(

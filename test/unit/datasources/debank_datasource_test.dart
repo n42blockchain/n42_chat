@@ -26,7 +26,7 @@ void main() {
         });
 
         final datasource = DeBankDatasource(
-          baseUrl: 'https://api.n42.ai/proxy/v1/debank',
+          baseUrl: 'https://api.n42.world/proxy/v1/debank',
           authToken: 'proxy-token',
           useProxyEndpoint: true,
           httpClient: client,
@@ -55,7 +55,7 @@ void main() {
       });
 
       final datasource = DeBankDatasource(
-        baseUrl: 'https://api.n42.ai/proxy/v1/debank',
+        baseUrl: 'https://api.n42.world/proxy/v1/debank',
         authToken: 'proxy-token',
         useProxyEndpoint: true,
         httpClient: client,

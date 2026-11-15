@@ -120,6 +120,70 @@ void main() {
   });
   tearDown(() => SharedPreferences.setMockInitialValues({}));
 
+  test('annotated favorites survive edits and a repository restart', () async {
+    await seedLegacy();
+    final initial = await repository.getSavedMessageFavorites();
+    expect(initial.map((entry) => entry.message.id), ['one', 'two']);
+    expect(initial.first.tags, ['work']);
+    expect(initial.first.remark, 'keep');
+    expect(initial.last.tags, isEmpty);
+    expect(initial.last.remark, isEmpty);
+    expect(platform.writes, 0);
+    expect(() => initial.first.tags.add('mutated'), throwsUnsupportedError);
+    await repository.editFavoriteTags('one', ['updated']);
+    await repository.editFavoriteRemark('one', 'Follow up');
+    restartPreferences();
+    final reopened = await fresh().getSavedMessageFavorites();
+    expect(reopened.first.tags, ['updated']);
+    expect(reopened.first.remark, 'Follow up');
+    expect(initial.first.tags, ['work']);
+    expect(initial.first.remark, 'keep');
+  });
+
+  test('annotated favorites remain partitioned by account', () async {
+    await seedLegacy();
+    expect((await repository.getSavedMessageFavorites()).first.remark, 'keep');
+    account = '@bob:test';
+    expect(await repository.getSavedMessageFavorites(), isEmpty);
+    account = '@alice:test';
+    expect((await repository.getSavedMessageFavorites()).first.tags, ['work']);
+  });
+
+  test(
+    'late annotation read cannot complete as a replacement account',
+    () async {
+      await seedLegacy();
+      final delayed = _DelayedStorage();
+      final reader = MessageActionRepositoryImpl(_Reaction(), manager, delayed);
+      final result = reader.getSavedMessageFavorites();
+      final rejected = expectLater(result, throwsStateError);
+      await delayed.started.future;
+      account = '@bob:test';
+      delayed.release.complete();
+      await rejected;
+      expect(await fresh().getSavedMessageFavorites(), isEmpty);
+    },
+  );
+
+  for (final metadata in [
+    '{"one":{"tags":["work",42]}}',
+    '{"one":{"remark":42}}',
+  ]) {
+    test(
+      'malformed annotations fail without replacing stored data: $metadata',
+      () async {
+        await seedLegacy(meta: metadata);
+        final before = await record();
+        await expectLater(
+          repository.getSavedMessageFavorites(),
+          throwsFormatException,
+        );
+        expect(platform.writes, 0);
+        expect(await record(), before);
+      },
+    );
+  }
+
   test(
     'deletion commits the message and metadata in a single platform write',
     () async {

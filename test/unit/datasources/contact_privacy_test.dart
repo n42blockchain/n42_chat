@@ -698,6 +698,170 @@ void main() {
   );
 
   test(
+    'friend sharing still invites both social rooms in the original session',
+    () async {
+      room('moments', me);
+      room('stories', me, story: true);
+      for (final id in ['moments', 'stories']) {
+        states[id]!['m.room.member/$friend'] = event('m.room.member', friend, {
+          'membership': 'leave',
+        });
+      }
+      when(() => client.inviteUser(any(), friend, reason: any(named: 'reason')))
+          .thenAnswer((_) async {});
+      await MatrixMomentDataSource(manager).inviteFriendToMomentRoom(friend);
+      verify(
+        () => client.inviteUser(
+          'moments',
+          friend,
+          reason: ContactPrivacyService.momentReason,
+        ),
+      ).called(1);
+      verify(
+        () => client.inviteUser(
+          'stories',
+          friend,
+          reason: ContactPrivacyService.storyReason,
+        ),
+      ).called(1);
+    },
+  );
+
+  test('privacy enforcement stops before bans when credentials change during state write', () async {
+    final owned = room('moments', me);
+    account[ContactPrivacyService.accountType] = matrix.BasicEvent(
+      type: ContactPrivacyService.accountType,
+      content: {
+        friend: {'hideMyMoments': true},
+      },
+    );
+    var token = 'original';
+    when(() => client.accessToken).thenAnswer((_) => token);
+    when(
+      () => client.setRoomStateWithKey(
+        'moments',
+        ContactPrivacyService.policyType,
+        '',
+        any(),
+      ),
+    ).thenAnswer((_) async {
+      token = 'replacement';
+      return 'policy';
+    });
+    await expectLater(privacy.apply(owned), throwsStateError);
+    verifyNever(() => client.ban(any(), any(), reason: any(named: 'reason')));
+  });
+
+  test(
+    'social room creation stops before tagging when the login changes',
+    () async {
+      var token = 'original';
+      when(() => client.accessToken).thenAnswer((_) => token);
+      final created = room('new-room', me);
+      rooms.clear();
+      when(() => created.addTag(any())).thenAnswer((_) async {});
+      when(
+        () => client.createRoom(
+          name: 'My Moments',
+          creationContent: {'type': ContactPrivacyService.momentTag},
+          visibility: matrix.Visibility.private,
+          preset: matrix.CreateRoomPreset.privateChat,
+          initialState: any(named: 'initialState'),
+          powerLevelContentOverride: any(named: 'powerLevelContentOverride'),
+        ),
+      ).thenAnswer((_) async {
+        rooms.add(created);
+        token = 'replacement';
+        return 'new-room';
+      });
+      await expectLater(privacy.ownRoom(), throwsStateError);
+      verifyNever(() => created.addTag(any()));
+      verifyNever(() => client.setRoomStateWithKey(any(), any(), any(), any()));
+    },
+  );
+
+  for (final changedField in ['token', 'device', 'homeserver']) {
+    test(
+      'friend sharing rejects $changedField replacement during privacy load',
+      () async {
+        room('moments', me);
+        room('stories', me, story: true);
+        for (final id in ['moments', 'stories']) {
+          states[id]!['m.room.member/$friend'] = event(
+            'm.room.member',
+            friend,
+            {'membership': 'leave'},
+          );
+        }
+        var token = 'original-token';
+        var device = 'original-device';
+        var homeserver = Uri.parse('https://original.invalid');
+        when(() => client.accessToken).thenAnswer((_) => token);
+        when(() => client.deviceID).thenAnswer((_) => device);
+        when(() => client.homeserver).thenAnswer((_) => homeserver);
+        when(() => client.getAccountData(me, ContactPrivacyService.accountType))
+            .thenAnswer((_) async {
+              if (changedField == 'token') token = 'replacement-token';
+              if (changedField == 'device') device = 'replacement-device';
+              if (changedField == 'homeserver') {
+                homeserver = Uri.parse('https://replacement.invalid');
+              }
+              return {};
+            });
+        when(
+          () => client.inviteUser(any(), friend, reason: any(named: 'reason')),
+        ).thenAnswer((_) async {});
+        await expectLater(
+          MatrixMomentDataSource(manager).inviteFriendToMomentRoom(friend),
+          throwsStateError,
+        );
+        verifyNever(
+          () => client.inviteUser(any(), friend, reason: any(named: 'reason')),
+        );
+      },
+    );
+  }
+
+  test(
+    'friend sharing never continues into a replacement account status room',
+    () async {
+      const otherId = '@other:hs';
+      room('moments', me);
+      room('stories', me, story: true);
+      final otherStory = room('other-stories', otherId, story: true);
+      for (final id in ['moments', 'stories', 'other-stories']) {
+        states[id]!['m.room.member/$friend'] = event('m.room.member', friend, {
+          'membership': 'leave',
+        });
+        states[id]!['${ContactPrivacyService.policyType}/'] = event(
+          ContactPrivacyService.policyType,
+          id == 'other-stories' ? otherId : me,
+          {'moments': <String>[], 'status': <String>[]},
+        );
+      }
+      final other = _Client();
+      when(() => other.userID).thenReturn(otherId);
+      when(() => other.accountData).thenReturn({});
+      when(() => other.rooms).thenReturn([otherStory]);
+      when(() => other.inviteUser(any(), friend, reason: any(named: 'reason')))
+          .thenAnswer((_) async {});
+      when(
+        () =>
+            client.inviteUser('moments', friend, reason: any(named: 'reason')),
+      ).thenAnswer((_) async {
+        when(() => manager.client).thenReturn(other);
+      });
+      await expectLater(
+        MatrixMomentDataSource(manager).inviteFriendToMomentRoom(friend),
+        throwsStateError,
+      );
+      verifyNever(
+        () => other.inviteUser(any(), friend, reason: any(named: 'reason')),
+      );
+    },
+  );
+
+  test(
     'cached detail and profile reads re-check local and remote permissions',
     () async {
       final theirs = room('theirs', friend);
