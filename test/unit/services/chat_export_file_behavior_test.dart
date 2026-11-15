@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:n42_chat/src/core/services/chat_export_service.dart';
 import 'package:n42_chat/src/domain/entities/message_entity.dart';
+import 'package:path/path.dart' as p;
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 
 class _Paths extends PathProviderPlatform {
@@ -63,9 +64,10 @@ void main() {
           roomName: 'Room/../../Name',
           format: format,
         );
-        expect(file.path, startsWith('${directory.path}/'));
+        expect(p.isWithin(directory.path, file.path), isTrue);
+        expect(p.dirname(p.dirname(file.path)), p.normalize(directory.path));
         expect(file.path, endsWith('.${format.name}'));
-        expect(file.path, isNot(contains('/../')));
+        expect(p.split(file.path), isNot(contains('..')));
         final text = await file.readAsString();
         expect(text, isNot(contains('ephemeral-fixture')));
         expect(

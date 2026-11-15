@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:intl/intl.dart';
+import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -58,7 +59,7 @@ class ChatExportService {
     };
     final sanitizedName = roomName.replaceAll(_unsafeExportNameRegExp, '_');
     final file = File(
-      '${exportDir.path}/chat_${sanitizedName}_$timestamp.$extension',
+      p.join(exportDir.path, 'chat_${sanitizedName}_$timestamp.$extension'),
     );
     await file.writeAsString(content);
 
