@@ -9,7 +9,8 @@ import 'package:http/testing.dart';
 import 'package:n42_chat/src/data/datasources/matrix/matrix_client_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'package:vodozemac/vodozemac.dart' as vod;
+
+import '../../fixtures/crypto/native_vodozemac.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -26,22 +27,7 @@ void main() {
               'chat-avatar-session-',
             );
             addTearDown(() => dir.delete(recursive: true));
-            if (!vod.isInitialized()) {
-              final packageConfig = File('.dart_tool/package_config.json')
-                  .absolute;
-              final config =
-                  jsonDecode(await packageConfig.readAsString()) as Map;
-              final pkg = (config['packages'] as List).firstWhere(
-                (item) => item['name'] == 'flutter_vodozemac',
-              ) as Map;
-              final root = packageConfig.uri
-                  .resolve(pkg['rootUri'] as String)
-                  .toFilePath();
-              await Link('${dir.path}/libvodozemac_bindings_dart.dylib').create(
-                '$root/macos/flutter_vodozemac/flutter_vodozemac.xcframework/macos-arm64_x86_64/libflutter_vodozemac.dylib',
-              );
-              await vod.init(libraryPath: '${dir.path}/');
-            }
+            await initNativeVodozemac(dir);
             sqfliteFfiInit();
             databaseFactory = databaseFactoryFfi;
             final manager = MatrixClientManager.instance;
@@ -155,6 +141,7 @@ void main() {
             expect(profileWrites, reject ? 0 : 1);
             expect(fallbackCalls, !replaced && sdkFails ? 1 : 0);
           },
+          skip: nativeVodozemacSkip,
         );
       }
     }

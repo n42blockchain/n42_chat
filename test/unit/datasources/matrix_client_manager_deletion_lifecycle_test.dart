@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -8,7 +7,8 @@ import 'package:mocktail/mocktail.dart';
 import 'package:n42_chat/src/data/datasources/matrix/matrix_client_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'package:vodozemac/vodozemac.dart' as vod;
+
+import '../../fixtures/crypto/native_vodozemac.dart';
 
 class _PausedDatabase extends Mock implements DatabaseApi {}
 
@@ -18,22 +18,7 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     final dir = await Directory.systemTemp.createTemp('chat-deletion-db-race-');
     addTearDown(() => dir.delete(recursive: true));
-    if (!vod.isInitialized()) {
-      final packageConfig = File('.dart_tool/package_config.json').absolute;
-      final config = jsonDecode(await packageConfig.readAsString()) as Map;
-      final pkg =
-          (config['packages'] as List).firstWhere(
-                (item) => item['name'] == 'flutter_vodozemac',
-              )
-              as Map;
-      final root = packageConfig.uri
-          .resolve(pkg['rootUri'] as String)
-          .toFilePath();
-      await Link('${dir.path}/libvodozemac_bindings_dart.dylib').create(
-        '$root/macos/flutter_vodozemac/flutter_vodozemac.xcframework/macos-arm64_x86_64/libflutter_vodozemac.dylib',
-      );
-      await vod.init(libraryPath: '${dir.path}/');
-    }
+    await initNativeVodozemac(dir);
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
     final manager = MatrixClientManager.instance;
@@ -126,5 +111,5 @@ void main() {
     expect(await clearingBeforeDispose, isTrue);
     await disposing;
     expect(manager.client, isNull);
-  });
+  }, skip: nativeVodozemacSkip);
 }
