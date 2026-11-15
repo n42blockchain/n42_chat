@@ -353,6 +353,7 @@ void main() {
       expect(picker.source, ImageSource.gallery);
       final names = (await store.load())['photos'] as List;
       expect(names, hasLength(2));
+      expect(names.toSet(), hasLength(2), reason: 'Each import needs a file');
       final saved = await tester.runAsync(
         () => store.photo(names.first as String),
       );
@@ -372,6 +373,15 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('Photos'));
       await tester.pumpAndSettle();
+      // Thumbnail reads started under fake async keep their file handles open
+      // until real I/O callbacks run, and Windows cannot delete an open file.
+      // Let those reads finish as they would in the app before deleting.
+      for (var i = 0; i < 5; i++) {
+        await tester.runAsync(
+          () => Future<void>.delayed(const Duration(milliseconds: 20)),
+        );
+        await tester.pump();
+      }
       await tester.runAsync(() async {
         await tester.tap(find.byIcon(Icons.delete_outline).first);
         final deadline = DateTime.now().add(const Duration(seconds: 5));
