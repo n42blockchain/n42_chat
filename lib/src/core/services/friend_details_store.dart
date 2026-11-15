@@ -63,6 +63,10 @@ class FriendDetailsStore {
       try {
         await file.create(exclusive: true);
         return (name, file);
+      } on PathExistsException {
+        // Taken. Checking exists() instead would race with a concurrent
+        // import whose copy is replacing the reserved file.
+        stamp++;
       } on FileSystemException {
         if (!await file.exists()) rethrow;
         stamp++;
