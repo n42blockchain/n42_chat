@@ -1287,7 +1287,10 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
   }) async {
     final targetDirectory = await _ensureScheduledAttachmentDirectory();
     final targetFile = File(
-      '${targetDirectory.path}/${_buildScheduledAttachmentFilename(filename)}',
+      p.join(
+        targetDirectory.path,
+        _buildScheduledAttachmentFilename(filename),
+      ),
     );
 
     if (filePath != null && filePath.isNotEmpty) {
@@ -1324,7 +1327,9 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
 
   Future<Directory> _ensureScheduledAttachmentDirectory() async {
     final appSupportDir = await getApplicationSupportDirectory();
-    final directory = Directory('${appSupportDir.path}/scheduled_attachments');
+    final directory = Directory(
+      p.join(appSupportDir.path, 'scheduled_attachments'),
+    );
     if (!await directory.exists()) {
       await directory.create(recursive: true);
     }

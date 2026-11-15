@@ -50,6 +50,7 @@ import 'package:n42_chat/src/presentation/widgets/chat/chat_more_panel.dart';
 import 'package:n42_chat/src/presentation/widgets/chat/expression_panel.dart';
 import 'package:n42_chat/src/presentation/widgets/chat/poll_create_sheet.dart';
 import 'package:n42_chat/src/presentation/widgets/chat/open_red_packet_dialog.dart';
+import 'package:path/path.dart' as p;
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -503,8 +504,15 @@ void main() {
     tester,
   ) async {
     imagePicker.mediaFiles = [
-      XFile.fromData(Uint8List.fromList([1, 2]), path: '/picked/first.jpg'),
-      XFile.fromData(Uint8List.fromList([3, 4, 5]), path: '/picked/second.png'),
+      // Host-native paths: XFile derives its name with the host separator.
+      XFile.fromData(
+        Uint8List.fromList([1, 2]),
+        path: p.join(p.separator, 'picked', 'first.jpg'),
+      ),
+      XFile.fromData(
+        Uint8List.fromList([3, 4, 5]),
+        path: p.join(p.separator, 'picked', 'second.png'),
+      ),
     ];
     final chat = await pumpChat(tester);
     final sentEvents = <ChatEvent>[];
@@ -656,11 +664,12 @@ void main() {
     expect(scheduled.payload, containsPair('fileSize', 4));
     expect(scheduled.scheduledAt.isAfter(DateTime.now()), isTrue);
     expect(
-      localPath,
-      startsWith('${appSupportDirectory.path}/scheduled_attachments/'),
+      p.dirname(localPath),
+      p.join(appSupportDirectory.path, 'scheduled_attachments'),
     );
-    expect(localPath, isNot(contains('..')));
-    expect(localPath, isNot(contains(':')));
+    expect(p.split(localPath), isNot(contains('..')));
+    // The stored name is sanitised; the drive prefix on Windows may hold ':'.
+    expect(p.basename(localPath), isNot(contains(':')));
     expect(persistedFile.readAsBytesSync(), [7, 8, 9, 10]);
     expect(persistedFile.lengthSync(), 4);
     expect(find.text('Scheduled original image: ${scheduled.text}'), findsNothing);
