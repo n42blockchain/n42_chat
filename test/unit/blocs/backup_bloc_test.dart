@@ -96,6 +96,7 @@ void main() {
             includeMedia: any(named: 'includeMedia'),
             includeKeys: any(named: 'includeKeys'),
             password: any(named: 'password'),
+            allowPlaintext: any(named: 'allowPlaintext'),
             onProgress: any(named: 'onProgress'),
           ),
         ).thenAnswer((_) async => _makeBackupResult());
@@ -126,6 +127,7 @@ void main() {
             includeMedia: any(named: 'includeMedia'),
             includeKeys: any(named: 'includeKeys'),
             password: any(named: 'password'),
+            allowPlaintext: any(named: 'allowPlaintext'),
             onProgress: any(named: 'onProgress'),
           ),
         ).thenThrow(Exception('IO error'));

@@ -99,9 +99,9 @@ void main() {
           if (broken)
             when(() => timeline.events).thenThrow(StateError('read failed'));
           if (incremental) {
-            await service.createIncrementalBackup();
+            await service.createIncrementalBackup(allowPlaintext: true);
           } else {
-            final result = await service.createBackup();
+            final result = await service.createBackup(allowPlaintext: true);
             final data = jsonDecode(await File(result.filePath).readAsString()) as Map;
             expect(data['manifest']['hasReadErrors'], broken);
             if (broken) {
@@ -136,9 +136,9 @@ void main() {
         )]);
       });
       if (changeAccount) {
-        await expectLater(service.createBackup(fetchRemoteHistory: true), throwsStateError);
+        await expectLater(service.createBackup(allowPlaintext: true, fetchRemoteHistory: true), throwsStateError);
       } else {
-        final result = await service.createBackup(fetchRemoteHistory: true);
+        final result = await service.createBackup(allowPlaintext: true, fetchRemoteHistory: true);
         expect(result.messageCount, 2);
         final data = jsonDecode(await File(result.filePath).readAsString()) as Map;
         expect(data['manifest']['historyScope'], 'requestedRemoteHistory');
@@ -168,7 +168,7 @@ void main() {
           content: {'msgtype': 'm.text', 'body': 'retained older message'}, room: room,
         )]);
       });
-      final result = await service.createBackup(fetchRemoteHistory: true);
+      final result = await service.createBackup(allowPlaintext: true, fetchRemoteHistory: true);
       final data = jsonDecode(await File(result.filePath).readAsString()) as Map;
       expect(result.messageCount, failAfterPage ? 2 : 1);
       expect(data['manifest']['hasReadErrors'], isTrue);
@@ -187,7 +187,7 @@ void main() {
     when(() => client.rooms).thenReturn([room]);
     when(() => timeline.canRequestHistory).thenReturn(true);
     when(() => timeline.requestHistory(historyCount: 500)).thenAnswer((_) async {});
-    final result = await service.createBackup(fetchRemoteHistory: true);
+    final result = await service.createBackup(allowPlaintext: true, fetchRemoteHistory: true);
     expect(result.messageCount, 1);
     expect(result.warnings, isNotEmpty);
     verify(() => timeline.requestHistory(historyCount: 500)).called(1);
@@ -208,7 +208,7 @@ void main() {
           type: 'm.room.message', room: room,
           content: {'msgtype': 'm.text', 'body': 'private fixture', 'n42.self_destruct': {'seconds': 10}});
         when(() => timeline.events).thenReturn(privateFirst ? [private, original] : [original, private]);
-        final result = incremental ? await service.createIncrementalBackup() : await service.createBackup();
+        final result = incremental ? await service.createIncrementalBackup(allowPlaintext: true) : await service.createBackup(allowPlaintext: true);
         expect(result.messageCount, 0);
         expect(await File(result.filePath).readAsString(), isNot(contains('historical message')));
       });
@@ -233,7 +233,7 @@ void main() {
           }});
         expect(redacted.redacted, isTrue);
         when(() => timeline.events).thenReturn(redactedFirst ? [redacted, original] : [original, redacted]);
-        final result = incremental ? await service.createIncrementalBackup() : await service.createBackup();
+        final result = incremental ? await service.createIncrementalBackup(allowPlaintext: true) : await service.createBackup(allowPlaintext: true);
         expect(result.messageCount, 0);
         expect(await File(result.filePath).readAsString(), isNot(contains('historical message')));
         verify(() => timeline.cancelSubscriptions()).called(1);
@@ -249,7 +249,7 @@ void main() {
     when(() => client.rooms).thenReturn([room]);
     final original = timeline.events.single;
     when(() => timeline.events).thenReturn([original, original, original]);
-    final result = await service.createBackup();
+    final result = await service.createBackup(allowPlaintext: true);
     final data = jsonDecode(await File(result.filePath).readAsString()) as Map;
     expect(result.messageCount, 1);
     expect(data['rooms']['!overlap:example.org']['messages'], hasLength(1));
@@ -267,7 +267,7 @@ void main() {
       originServerTs: DateTime(2026), type: 'm.room.message',
       content: {'msgtype': 'm.text', 'body': 'message-$index'}, room: room,
     )));
-    final result = await service.createBackup();
+    final result = await service.createBackup(allowPlaintext: true);
     final data = jsonDecode(await File(result.filePath).readAsString()) as Map;
     expect(result.messageCount, 1005);
     expect(data['rooms']['!large:example.org']['messages'], hasLength(1005));
@@ -280,7 +280,7 @@ void main() {
       if (invalid == 'unknown-user') when(() => client.userID).thenReturn(null);
       if (invalid == 'empty-user') when(() => client.userID).thenReturn('');
       if (invalid == 'unknown-server') when(() => client.homeserver).thenReturn(null);
-      final backup = await service.createBackup();
+      final backup = await service.createBackup(allowPlaintext: true);
       expect(backup.warnings, contains(contains('ownership is unavailable')));
       final result = await service.restoreFromBackup(backupFilePath: backup.filePath);
       expect(result.hasErrors, isTrue);
@@ -291,7 +291,7 @@ void main() {
 
   for (final mismatch in ['user', 'server']) {
     test('restore rejects backup owner mismatch: $mismatch', () async {
-      final backup = await service.createBackup();
+      final backup = await service.createBackup(allowPlaintext: true);
       if (mismatch == 'user') {
         when(() => client.userID).thenReturn('@other:example.org');
       } else {
@@ -310,7 +310,7 @@ void main() {
   }
 
   test('restore refuses stale confirmation origin even with unchanged client', () async {
-    final backup = await service.createBackup();
+    final backup = await service.createBackup(allowPlaintext: true);
     final result = await service.restoreFromBackup(
       backupFilePath: backup.filePath,
       isCurrent: () => false,
@@ -321,7 +321,7 @@ void main() {
 
   for (final progress in [0.1, 0.5, 1.0]) {
     test('restore rejects account change at progress $progress', () async {
-      final backup = await service.createBackup();
+      final backup = await service.createBackup(allowPlaintext: true);
       final result = await service.restoreFromBackup(
         backupFilePath: backup.filePath,
         restoreSettings: false,
@@ -367,7 +367,7 @@ void main() {
         );
       }
       await database.insertMessages(entries);
-      final result = await service.createIncrementalBackup();
+      final result = await service.createIncrementalBackup(allowPlaintext: true);
       expect(result.warnings, isEmpty);
       expect(result.messageCount, expected.length);
       final data =
@@ -391,10 +391,12 @@ void main() {
         () => client.rooms,
       ).thenReturn(scope == 'new room' ? [firstRoom] : [firstRoom, secondRoom]);
       final first = await service.createIncrementalBackup(
+        allowPlaintext: true,
         roomIds: scope == 'different subset' ? [firstRoom.id] : null,
       );
       when(() => client.rooms).thenReturn([secondRoom, firstRoom]);
       final second = await service.createIncrementalBackup(
+        allowPlaintext: true,
         roomIds: scope == 'different subset' ? [secondRoom.id] : null,
       );
       final data =
@@ -438,7 +440,7 @@ void main() {
             ),
           ).thenThrow(StateError('fixture archive failed'));
         }
-        final failed = await service.createIncrementalBackup();
+        final failed = await service.createIncrementalBackup(allowPlaintext: true);
         expect(failed.warnings, isNotEmpty);
         final data =
             jsonDecode(await File(failed.filePath).readAsString()) as Map;
@@ -456,7 +458,7 @@ void main() {
             ),
           ).thenAnswer((_) async => []);
         }
-        final recovered = await service.createIncrementalBackup();
+        final recovered = await service.createIncrementalBackup(allowPlaintext: true);
         expect(recovered.messageCount, 1);
         expect(recovered.warnings, isEmpty);
         expect(await service.verifyBackup(recovered.filePath), isTrue);
@@ -466,7 +468,7 @@ void main() {
 
   for (final change in ['user', 'server', 'unknown', 'legacy']) {
     test('incremental cursor does not cross $change ownership', () async {
-      final first = await service.createIncrementalBackup();
+      final first = await service.createIncrementalBackup(allowPlaintext: true);
       if (change == 'user') {
         when(() => client.userID).thenReturn('@bob:example.org');
       } else if (change == 'server') {
@@ -481,12 +483,12 @@ void main() {
           first.createdAt.millisecondsSinceEpoch.toString(),
         );
       }
-      final next = await service.createIncrementalBackup();
+      final next = await service.createIncrementalBackup(allowPlaintext: true);
       final data = jsonDecode(await File(next.filePath).readAsString()) as Map;
       expect((data['manifest'] as Map)['lastBackupTimestamp'], 0);
       if (change == 'user') {
         when(() => client.userID).thenReturn('@alice:example.org');
-        final resumed = await service.createIncrementalBackup();
+        final resumed = await service.createIncrementalBackup(allowPlaintext: true);
         final restored =
             jsonDecode(await File(resumed.filePath).readAsString()) as Map;
         expect(
@@ -523,8 +525,8 @@ void main() {
 
             await expectLater(
               incremental
-                  ? service.createIncrementalBackup(onProgress: progress)
-                  : service.createBackup(onProgress: progress),
+                  ? service.createIncrementalBackup(allowPlaintext: true, onProgress: progress)
+                  : service.createBackup(allowPlaintext: true, onProgress: progress),
               throwsStateError,
             );
             expect(await directory.list(recursive: true).where((entry) => entry is File).toList(), isEmpty);
@@ -539,8 +541,8 @@ void main() {
       '${incremental ? 'incremental' : 'full'} consecutive backups preserve both files',
       () async {
         Future<BackupResult> create() => incremental
-            ? service.createIncrementalBackup()
-            : service.createBackup();
+            ? service.createIncrementalBackup(allowPlaintext: true)
+            : service.createBackup(allowPlaintext: true);
         final first = await create();
         final originalBytes = await File(first.filePath).readAsBytes();
         final second = await create();
@@ -558,7 +560,10 @@ void main() {
     'full backup progress finishes only after a verifiable file exists',
     () async {
       final progress = <double>[];
-      final result = await service.createBackup(onProgress: progress.add);
+      final result = await service.createBackup(
+        allowPlaintext: true,
+        onProgress: progress.add,
+      );
       expect(progress, [0.1, 0.85, 1.0]);
       expect(result.messageCount, 0);
       expect(result.roomCount, 0);
@@ -575,8 +580,8 @@ void main() {
     'missing client rejects creation and does not leave a backup file',
     () async {
       when(() => manager.client).thenReturn(null);
-      await expectLater(service.createBackup(), throwsStateError);
-      await expectLater(service.createIncrementalBackup(), throwsStateError);
+      await expectLater(service.createBackup(allowPlaintext: true), throwsStateError);
+      await expectLater(service.createIncrementalBackup(allowPlaintext: true), throwsStateError);
       expect(await directory.list(recursive: true).where((entry) => entry is File).toList(), isEmpty);
       final estimate = await service.estimateBackupSize(includeMedia: true);
       expect(estimate.estimatedBytes, 0);
@@ -703,7 +708,7 @@ void main() {
       )).hasSettings,
       isFalse,
     );
-    final next = await service.createIncrementalBackup();
+    final next = await service.createIncrementalBackup(allowPlaintext: true);
     final manifest = jsonDecode(
       await File(next.filePath).readAsString(),
     )['manifest'];
@@ -716,7 +721,7 @@ void main() {
     'restoring without settings does not change current preferences',
     () async {
       await preferences.write('n42_chat_settings', '{"fixture":"old"}');
-      final result = await service.createBackup();
+      final result = await service.createBackup(allowPlaintext: true);
       await preferences.write('n42_chat_settings', '{"fixture":"current"}');
       final progress = <double>[];
       final restored = await service.restoreFromBackup(
@@ -734,20 +739,30 @@ void main() {
     },
   );
   test('empty password uses the ordinary readable backup format', () async {
-    final result = await service.createBackup(password: '');
+    final result = await service.createBackup(allowPlaintext: true, password: '');
     expect(
       jsonDecode(await File(result.filePath).readAsString()),
       isA<Map<String, dynamic>>(),
     );
     expect(await service.verifyBackup(result.filePath), isTrue);
   });
+  test('plaintext backups require an explicit opt-in and write no file', () async {
+    for (final password in <String?>[null, '']) {
+      await expectLater(service.createBackup(password: password), throwsStateError);
+      await expectLater(
+        service.createIncrementalBackup(password: password),
+        throwsStateError,
+      );
+    }
+    expect(await directory.list(recursive: true).where((entry) => entry is File).toList(), isEmpty);
+  });
   test('backup files list and deletion are partitioned by account and server', () async {
-    final first = await service.createBackup();
+    final first = await service.createBackup(allowPlaintext: true);
     when(() => client.userID).thenReturn('@bob:example.org');
     expect(await service.listBackups(), isEmpty);
     await service.deleteBackup(first.backupId);
     expect(await File(first.filePath).exists(), isTrue);
-    final second = await service.createBackup();
+    final second = await service.createBackup(allowPlaintext: true);
     expect(File(first.filePath).parent.path, isNot(File(second.filePath).parent.path));
     when(() => client.userID).thenReturn('@alice:example.org');
     when(() => client.homeserver).thenReturn(Uri.parse('https://other.example.org'));
@@ -762,7 +777,7 @@ void main() {
   });
 
   test('legacy root backups remain available for explicit preview only', () async {
-    final result = await service.createBackup();
+    final result = await service.createBackup(allowPlaintext: true);
     final rootCopy = File('${directory.path}/legacy-root.n42backup');
     await File(result.filePath).copy(rootCopy.path);
     await File(result.filePath).delete();
@@ -773,7 +788,7 @@ void main() {
 
   for (final deleting in [false, true]) {
     test('account change while resolving backup directory cancels ${deleting ? 'deletion' : 'listing'}', () async {
-      final result = await service.createBackup();
+      final result = await service.createBackup(allowPlaintext: true);
       final gate = Completer<Directory>();
       final guarded = ChatBackupService(clientManager: manager, secureStorage: secure,
         preferencesStorage: preferences, backupDirProvider: () => gate.future);
@@ -787,7 +802,7 @@ void main() {
   }
 
   test('legacy discovery lists only root backup files and preserves them', () async {
-    final owned = await service.createBackup();
+    final owned = await service.createBackup(allowPlaintext: true);
     final old = await File(owned.filePath).copy('${directory.path}/old.n42backup');
     await File('${directory.path}/notes.txt').writeAsString('ignore');
     await Directory('${directory.path}/folder.n42backup').create();
@@ -827,7 +842,7 @@ void main() {
   });
 
   test('requested message restoration reports unavailable archive instead of success', () async {
-    final backup = await service.createBackup();
+    final backup = await service.createBackup(allowPlaintext: true);
     final result = await service.restoreFromBackup(backupFilePath: backup.filePath,
       restoreMessages: true, restoreSettings: false);
     expect(result.hasErrors, isTrue);
@@ -856,7 +871,7 @@ void main() {
   });
 
   test('deletion rechecks confirmation generation after directory await', () async {
-    final backup = await service.createBackup();
+    final backup = await service.createBackup(allowPlaintext: true);
     final gate = Completer<Directory>();
     var current = true;
     final guarded = ChatBackupService(clientManager: manager, secureStorage: secure,
@@ -889,7 +904,7 @@ void main() {
     await File('${directory.path}/notes.txt').writeAsString('ignore');
     await Directory('${directory.path}/folder.n42backup').create();
     expect(await service.listBackups(), isEmpty);
-    final result = await service.createBackup(includeMedia: true);
+    final result = await service.createBackup(allowPlaintext: true, includeMedia: true);
     final listed = (await service.listBackups()).single;
     expect(listed.backupId, result.backupId);
     expect(listed.includesMedia, isTrue);
@@ -904,7 +919,7 @@ void main() {
     expect(await File(result.filePath).exists(), isFalse);
   });
   test('deleting an unknown backup preserves an existing one', () async {
-    final result = await service.createBackup();
+    final result = await service.createBackup(allowPlaintext: true);
     await service.deleteBackup('not-present');
     expect(await File(result.filePath).exists(), isTrue);
     await service.deleteBackup(result.backupId);
@@ -943,7 +958,7 @@ void main() {
   });
 
   test('missing archive service returns an explicit restore failure', () async {
-    final result = await service.createBackup();
+    final result = await service.createBackup(allowPlaintext: true);
     final restored = await service.restoreToArchive(
       backupFilePath: result.filePath,
     );

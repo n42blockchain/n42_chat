@@ -223,6 +223,10 @@ class MatrixAuthDataSource {
     // 设置homeserver
     final homeserverUri = Uri.parse(homeserver);
     await finalClient.checkHomeserver(homeserverUri);
+    // Never send the new password over cleartext HTTP to a remote host.
+    MatrixClientManager.requireTransportSecurity(
+      finalClient.homeserver ?? homeserverUri,
+    );
 
     // Discover the server's UIA flow first. Only send an invitation token
     // when the server requests that stage, and keep its session between stages.
