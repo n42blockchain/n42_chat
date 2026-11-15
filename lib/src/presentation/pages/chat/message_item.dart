@@ -18,6 +18,7 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/remark_service.dart';
 import '../../../core/services/url_preview_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
 import '../../../core/utils/payment_request_status_utils.dart';
 import '../../../domain/entities/message_entity.dart';
 import '../../../domain/entities/message_reaction_entity.dart';
@@ -490,16 +491,23 @@ class MessageItem extends StatelessWidget {
 
     final textColor = message.isFromMe
         ? AppColors.sentText(isDark).withValues(alpha: 0.8)
-        : context.textSecondary;
+        : context.textSupporting;
+    // The brand-colored sender name measured under 1.5:1 on the dark self
+    // bubble; the leading bar keeps the accent and the name uses the label
+    // color of the bubble it sits on.
+    final senderColor = message.isFromMe
+        ? AppColors.sentText(isDark)
+        : context.textPrimary;
 
-    // 包装 GestureDetector 以支持点击跳转到原消息
-    return GestureDetector(
+    // Tapping the quote jumps to the original message.
+    return _BubbleTap(
+      borderRadius: BorderRadius.circular(AppDimensions.radiusS),
       onTap: () {
         if (message.replyToId != null && onReplyQuoteTap != null) {
           onReplyQuoteTap!(message.replyToId!);
         }
       },
-      child: Container(
+      child: Ink(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         decoration: BoxDecoration(
           color: bgColor,
@@ -517,11 +525,11 @@ class MessageItem extends StatelessWidget {
                 message.replyToSender!,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   height: 1.3,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.primary,
+                  fontWeight: FontWeight.w600,
+                  color: senderColor,
                 ),
               ),
             Text(
@@ -565,18 +573,21 @@ class MessageItem extends StatelessWidget {
         children: [
           textWidget,
           const SizedBox(height: 2),
-          GestureDetector(
+          _BubbleTap(
+            borderRadius: BorderRadius.circular(AppDimensions.radiusS),
             onTap: () => _showEditHistory(context),
             child: Text(
               S.of(context)?.chatEdited ?? 'Edited',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
+              // 11pt is the smallest legible size; the tertiary color and
+              // 50% black were below 3:1 on their bubbles.
               style: TextStyle(
-                fontSize: 10,
+                fontSize: 11,
                 height: 1.3,
                 color: message.isFromMe
-                    ? AppColors.sentText(isDark).withValues(alpha: 0.5)
-                    : context.textTertiary,
+                    ? AppColors.sentText(isDark).withValues(alpha: 0.7)
+                    : context.textSupporting,
                 fontStyle: FontStyle.italic,
               ),
             ),
@@ -795,9 +806,8 @@ class MessageItem extends StatelessWidget {
                             fontSize: 12,
                             height: 1.3,
                             color: message.isFromMe
-                                ? AppColors.sentText(
-                                    isDark,
-                                  ).withValues(alpha: 0.6)
+                                ? AppColors.sentText(isDark)
+                                      .withValues(alpha: 0.6)
                                 : context.textSecondary,
                           ),
                         ),
@@ -928,18 +938,16 @@ class MessageItem extends StatelessWidget {
 
     if (url.startsWith('asset:')) {
       final path = url.substring(6);
-      if (RegExp(
-        r'^assets/stickers/openmoji/[A-Za-z0-9_-]+\.svg$',
-      ).hasMatch(path)) {
+      if (RegExp(r'^assets/stickers/openmoji/[A-Za-z0-9_-]+\.svg$')
+          .hasMatch(path)) {
         return SizedBox(
           width: size,
           height: size,
           child: SvgPicture.asset(path),
         );
       }
-      if (RegExp(
-        r'^assets/stickers/lottie/[A-Za-z0-9_-]+\.json$',
-      ).hasMatch(path)) {
+      if (RegExp(r'^assets/stickers/lottie/[A-Za-z0-9_-]+\.json$')
+          .hasMatch(path)) {
         return SizedBox(width: size, height: size, child: Lottie.asset(path));
       }
     }
@@ -1564,9 +1572,8 @@ class MessageItem extends StatelessWidget {
                               fontSize: 11,
                               height: 1.3,
                               color: message.isFromMe
-                                  ? AppColors.sentText(
-                                      isDark,
-                                    ).withValues(alpha: 0.7)
+                                  ? AppColors.sentText(isDark)
+                                        .withValues(alpha: 0.7)
                                   : AppColors.textSecondary,
                             ),
                           ),
@@ -1854,7 +1861,7 @@ class MessageItem extends StatelessWidget {
         : context.textPrimary;
     final subColor = message.isFromMe
         ? AppColors.sentText(isDark).withValues(alpha: 0.75)
-        : context.textSecondary;
+        : context.textSupporting;
 
     Widget row(IconData icon, String text, {int maxLines = 2}) {
       return Padding(
@@ -1925,7 +1932,9 @@ class MessageItem extends StatelessWidget {
             button: true,
             label: A11yL10n.of(context).addToCalendar,
             excludeSemantics: true,
-            child: GestureDetector(
+            child: _BubbleTap(
+              minTarget: true,
+              borderRadius: BorderRadius.circular(AppDimensions.radiusS),
               onTap: () => _addCalendarEvent(context, data),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -1958,9 +1967,8 @@ class MessageItem extends StatelessWidget {
     EventMessageData data,
   ) async {
     try {
-      await const MethodChannel(
-        'n42.chat/calendar',
-      ).invokeMethod<bool>('addEvent', data.toContent());
+      await const MethodChannel('n42.chat/calendar')
+          .invokeMethod<bool>('addEvent', data.toContent());
     } catch (_) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -2115,117 +2123,121 @@ class MessageItem extends StatelessWidget {
               selected: isSelected,
               label: A11yL10n.of(context).pollOption(optionText, voteCount),
               excludeSemantics: true,
-              child: GestureDetector(
-                onTap: canChangeVote
-                    ? () => onPollVote?.call(
-                        message.id,
-                        optionId,
-                        myVotes,
-                        maxSelections,
-                      )
-                    : null,
-                child: Container(
-                  margin: const EdgeInsets.only(bottom: 8),
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: switch (quizState) {
-                      QuizOptionState.correct => AppColors.success.withValues(
-                        alpha: 0.12,
-                      ),
-                      QuizOptionState.wrongPicked => AppColors.error.withValues(
-                        alpha: 0.12,
-                      ),
-                      _ =>
-                        isSelected
-                            ? AppColors.primary.withValues(alpha: 0.1)
-                            : AppColors.inputBgOf(isDark),
-                    },
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: AppDimensions.spacingS),
+                child: _BubbleTap(
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+                  onTap: canChangeVote
+                      ? () => onPollVote?.call(
+                          message.id,
+                          optionId,
+                          myVotes,
+                          maxSelections,
+                        )
+                      : null,
+                  // Ink paints the option fill on the tap's Material so the
+                  // press shows above it.
+                  child: Ink(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
                       color: switch (quizState) {
-                        QuizOptionState.correct => AppColors.success,
-                        QuizOptionState.wrongPicked => AppColors.error,
+                        QuizOptionState.correct => AppColors.success.withValues(
+                          alpha: 0.12,
+                        ),
+                        QuizOptionState.wrongPicked =>
+                          AppColors.error.withValues(alpha: 0.12),
                         _ =>
-                          isSelected ? AppColors.primary : Colors.transparent,
+                          isSelected
+                              ? AppColors.primary.withValues(alpha: 0.1)
+                              : AppColors.inputBgOf(isDark),
                       },
-                      width: 1.5,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: switch (quizState) {
+                          QuizOptionState.correct => AppColors.success,
+                          QuizOptionState.wrongPicked => AppColors.error,
+                          _ =>
+                            isSelected ? AppColors.primary : Colors.transparent,
+                        },
+                        width: 1.5,
+                      ),
                     ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              optionText,
-                              maxLines: 3,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 14,
-                                height: 1.35,
-                                color: context.textPrimary,
-                                fontWeight: isSelected
-                                    ? FontWeight.w600
-                                    : FontWeight.normal,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                optionText,
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  height: 1.35,
+                                  color: context.textPrimary,
+                                  fontWeight: isSelected
+                                      ? FontWeight.w600
+                                      : FontWeight.normal,
+                                ),
                               ),
                             ),
-                          ),
-                          if (quizState == QuizOptionState.correct)
-                            const Icon(
-                              Icons.check_circle,
-                              size: 18,
-                              color: AppColors.success,
-                            )
-                          else if (quizState == QuizOptionState.wrongPicked)
-                            const Icon(
-                              Icons.cancel,
-                              size: 18,
-                              color: AppColors.error,
-                            )
-                          else if (isSelected)
-                            const Icon(
-                              Icons.check_circle,
-                              size: 18,
-                              color: AppColors.primary,
+                            if (quizState == QuizOptionState.correct)
+                              const Icon(
+                                Icons.check_circle,
+                                size: 18,
+                                color: AppColors.success,
+                              )
+                            else if (quizState == QuizOptionState.wrongPicked)
+                              const Icon(
+                                Icons.cancel,
+                                size: 18,
+                                color: AppColors.error,
+                              )
+                            else if (isSelected)
+                              const Icon(
+                                Icons.check_circle,
+                                size: 18,
+                                color: AppColors.primary,
+                              ),
+                          ],
+                        ),
+                        if (totalVoters > 0) ...[
+                          const SizedBox(height: 6),
+                          // 投票进度条
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(2),
+                            child: LinearProgressIndicator(
+                              value: percentage / 100,
+                              backgroundColor: isDark
+                                  ? Colors.grey[700]
+                                  : Colors.grey[300],
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                isSelected ? AppColors.primary : Colors.grey,
+                              ),
+                              minHeight: 4,
                             ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            S
+                                    .of(context)
+                                    ?.chatPollVotesFormat(
+                                      voteCount,
+                                      percentage.toStringAsFixed(0),
+                                    ) ??
+                                '$voteCount votes (${percentage.toStringAsFixed(0)}%)',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 11,
+                              height: 1.3,
+                              color: context.textSupporting,
+                            ),
+                          ),
                         ],
-                      ),
-                      if (totalVoters > 0) ...[
-                        const SizedBox(height: 6),
-                        // 投票进度条
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(2),
-                          child: LinearProgressIndicator(
-                            value: percentage / 100,
-                            backgroundColor: isDark
-                                ? Colors.grey[700]
-                                : Colors.grey[300],
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              isSelected ? AppColors.primary : Colors.grey,
-                            ),
-                            minHeight: 4,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          S
-                                  .of(context)
-                                  ?.chatPollVotesFormat(
-                                    voteCount,
-                                    percentage.toStringAsFixed(0),
-                                  ) ??
-                              '$voteCount votes (${percentage.toStringAsFixed(0)}%)',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 11,
-                            height: 1.3,
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
                       ],
-                    ],
+                    ),
                   ),
                 ),
               ),
@@ -2279,10 +2291,10 @@ class MessageItem extends StatelessWidget {
                       '$totalVoters participants',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
                     height: 1.3,
-                    color: AppColors.textSecondary,
+                    color: context.textSupporting,
                   ),
                 ),
               ),
@@ -2291,7 +2303,9 @@ class MessageItem extends StatelessWidget {
                   button: true,
                   label: S.of(context)?.chatEndPollButton ?? 'End Poll',
                   excludeSemantics: true,
-                  child: GestureDetector(
+                  child: _BubbleTap(
+                    minTarget: true,
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                     onTap: () => onEndPoll?.call(message.id),
                     child: Text(
                       S.of(context)?.chatEndPollButton ?? 'End Poll',
@@ -2322,9 +2336,8 @@ class MessageItem extends StatelessWidget {
         Flexible(
           child: Text(
             S.of(context)!.chatMessageUnavailable,
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(color: context.textSecondary),
+            style: Theme.of(context).textTheme.bodyMedium
+                ?.copyWith(color: context.textSecondary),
           ),
         ),
       ],
@@ -2364,14 +2377,11 @@ class MessageItem extends StatelessWidget {
           : (S.of(context)?.chatVoiceCallCancelled ?? '语音通话已取消');
     }
 
-    // 未接来电显示红色
-    final textColor = isMissed && !message.isFromMe
-        ? AppColors.error
-        : (message.isFromMe
-              ? AppColors.sentText(isDark)
-              : (isDark
-                    ? AppColors.textPrimaryDark
-                    : AppColors.messageTextReceived));
+    // The red phone icon marks a missed call; red text measured about 3.4:1
+    // on the light bubble, so the label keeps the bubble's text color.
+    final textColor = (message.isFromMe
+        ? AppColors.sentText(isDark)
+        : (isDark ? AppColors.textPrimaryDark : AppColors.messageTextReceived));
 
     final iconColor = isMissed && !message.isFromMe
         ? AppColors.error
@@ -2412,12 +2422,14 @@ class MessageItem extends StatelessWidget {
               button: true,
               label: S.of(context)?.chatCallBack ?? '回拨',
               excludeSemantics: true,
-              child: GestureDetector(
+              child: _BubbleTap(
+                minTarget: true,
+                borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                 onTap: () => onCallBack?.call(message),
-                child: Container(
+                child: Ink(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
+                    horizontal: AppDimensions.spacingS,
+                    vertical: AppDimensions.spacingXS,
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.primary.withValues(alpha: 0.1),
@@ -2533,6 +2545,13 @@ class MessageItem extends StatelessWidget {
     final hasCustomEmoji = CustomEmojiParser.hasKnownEmoji(text);
 
     final matches = _addressRegex.allMatches(text).toList();
+    // The brand indigo was about 3:1 on the green self bubble and about
+    // 3.3:1 on the dark received bubble. Self links use the bubble's text
+    // color (the underline stays the affordance); dark mode uses the lighter
+    // brand tint (about 5:1).
+    final linkColor = message.isFromMe
+        ? textColor
+        : (context.isDarkMode ? AppColors.primaryLight : AppColors.primary);
     if (matches.isEmpty) {
       if (hasCustomEmoji) {
         return CustomEmojiText(text: text, style: style);
@@ -2560,15 +2579,16 @@ class MessageItem extends StatelessWidget {
         WidgetSpan(
           alignment: PlaceholderAlignment.baseline,
           baseline: TextBaseline.alphabetic,
-          child: GestureDetector(
+          child: _BubbleTap(
+            borderRadius: BorderRadius.circular(AppDimensions.radiusS),
             onTap: () => _showAddressActions(context, addr),
             child: Text(
               addr,
               style: TextStyle(
                 fontSize: messageFontSize ?? 16,
-                color: AppColors.primary,
+                color: linkColor,
                 decoration: TextDecoration.underline,
-                decorationColor: AppColors.primary.withValues(alpha: 0.5),
+                decorationColor: linkColor.withValues(alpha: 0.5),
                 height: 1.4,
               ),
             ),
@@ -2643,6 +2663,53 @@ class MessageItem extends StatelessWidget {
             const SizedBox(height: 8),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Press feedback for small actions drawn inside a message bubble.
+///
+/// Bubbles paint an opaque fill, so a bare gesture detector gave no visible
+/// press and an InkWell would splash underneath the fill. A transparent
+/// Material puts the ink above it. [minTarget] grows the hit area to the
+/// 44-point minimum around an unchanged visual, for standalone actions.
+class _BubbleTap extends StatelessWidget {
+  const _BubbleTap({
+    required this.onTap,
+    required this.child,
+    this.borderRadius,
+    this.minTarget = false,
+  });
+
+  final VoidCallback? onTap;
+  final Widget child;
+  final BorderRadius? borderRadius;
+  final bool minTarget;
+
+  static const double _minTarget = 44;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      type: MaterialType.transparency,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: borderRadius,
+        child: minTarget
+            ? ConstrainedBox(
+                constraints: const BoxConstraints(
+                  minWidth: _minTarget,
+                  minHeight: _minTarget,
+                ),
+                child: Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  widthFactor: 1,
+                  heightFactor: 1,
+                  child: child,
+                ),
+              )
+            : child,
       ),
     );
   }
