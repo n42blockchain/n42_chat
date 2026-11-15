@@ -180,16 +180,26 @@ void main() {
       seed: () => LiveLocationState(
         activeSharings: {'@alice:s': _makeLocation()},
       ),
+      // Move the sharer so the update differs from the seed even when the
+      // host clock gives both fixtures the same timestamp.
       act: (bloc) => bloc.add(
-        LiveLocationUpdated(_makeLocation(userId: '@alice:s')),
+        LiveLocationUpdated(
+          _makeLocation(userId: '@alice:s').copyWith(latitude: 31.24),
+        ),
       ),
       // The location is updated (replaced); map still has the key
       expect: () => [
-        isA<LiveLocationState>().having(
-          (s) => s.activeSharings.length,
-          'activeSharings.length',
-          1,
-        ),
+        isA<LiveLocationState>()
+            .having(
+              (s) => s.activeSharings.length,
+              'activeSharings.length',
+              1,
+            )
+            .having(
+              (s) => s.activeSharings['@alice:s']?.latitude,
+              'alice latitude',
+              31.24,
+            ),
       ],
     );
   });
