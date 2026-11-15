@@ -9,6 +9,22 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:n42_chat/src/data/datasources/local/preferences_datasource.dart';
 import 'package:n42_chat/src/domain/entities/message_entity.dart';
 
+/// Symlink cases need a host that can create links. Windows only allows that
+/// with Developer Mode or administrator rights; POSIX hosts always can.
+final Object _symlinkSkip = _symlinkUnavailableReason() ?? false;
+
+String? _symlinkUnavailableReason() {
+  final probe = Directory.systemTemp.createTempSync('n42_link_probe');
+  try {
+    Link('${probe.path}/link').createSync(probe.path);
+    return null;
+  } on FileSystemException {
+    return 'This host cannot create symlinks; on Windows enable Developer Mode.';
+  } finally {
+    probe.deleteSync(recursive: true);
+  }
+}
+
 class _Paths extends PathProviderPlatform {
   _Paths(this.root);
   final String root;
@@ -226,7 +242,7 @@ void main() {
     await remove();
     expect(await link.exists(), isTrue);
     expect(await file.readAsString(), 'keep');
-  });
+  }, skip: _symlinkSkip);
   test('symlink alias in another queue protects the target', () async {
     final file = await File('${managed.path}/file').writeAsString('keep');
     final alias = await Link('${root.path}/alias').create(file.path);
@@ -234,7 +250,7 @@ void main() {
     await save(alias.path, id: 'two', owner: '@b:test');
     await remove();
     expect(await file.exists(), isTrue);
-  });
+  }, skip: _symlinkSkip);
   test(
     'corrupt other queue defers cleanup without undoing cancellation',
     () async {
@@ -261,5 +277,6 @@ void main() {
       await remove();
       expect(await file.exists(), isTrue);
     },
+    skip: _symlinkSkip,
   );
 }
