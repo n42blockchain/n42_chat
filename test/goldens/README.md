@@ -46,3 +46,10 @@ on which the reviewed macOS baseline was generated (local host 27.2). A first
 macos-latest run used macOS 26.6.2 and differed by four/six icon-edge pixels
 with channel deltas of at most three. No comparator tolerance was changed;
 the aligned runner still needs a successful comparison.
+
+Windows development hosts use their own baselines as well. They were generated
+with Flutter 3.47.8 (the CI version) on Windows 11 and reviewed against the
+Linux images: layout, wrapping, radii and colors match, and the only
+differences are Ahem glyph-edge pixels (6,143 light / 5,727 dark against
+Linux). CI does not run a Windows job, so these files guard local runs only and
+must be refreshed together with the Linux and macOS baselines.
