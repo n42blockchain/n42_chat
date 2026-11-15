@@ -11,6 +11,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:n42_chat/l10n/app_localizations.dart';
 import 'package:n42_chat/src/core/services/chat_backup_service.dart';
 import 'package:n42_chat/src/presentation/pages/settings/backup_restore_page.dart';
+import 'package:path/path.dart' as p;
 
 class _Manager extends Mock implements MatrixClientManager {}
 
@@ -21,8 +22,11 @@ class _Auth extends Mock
 
 class _Service extends Mock implements ChatBackupService {}
 
+// A host-native path, so the picker's Uri round-trip returns it unchanged.
+final _fixturePath = p.join(p.separator, 'tmp', 'fixture.n42backup');
+
 base class _PickedFile extends PlatformFile {
-  _PickedFile() : uri = Uri.file('/tmp/fixture.n42backup');
+  _PickedFile() : uri = Uri.file(_fixturePath);
   @override
   final String name = 'fixture.n42backup';
   @override
@@ -268,7 +272,7 @@ void main() {
       when(() => service.listBackups()).thenAnswer((_) async => []);
       when(() => service.listLegacyBackupFiles()).thenAnswer((_) async {
         if (outcome == 'stale-list') current = false;
-        return outcome == 'empty' ? [] : [File('/tmp/fixture.n42backup')];
+        return outcome == 'empty' ? [] : [File(_fixturePath)];
       });
       GetIt.instance.registerSingleton<ChatBackupService>(service);
       GetIt.instance.registerSingleton<MatrixClientManager>(manager);
@@ -335,10 +339,10 @@ void main() {
       );
       when(() => auth.currentAccountGeneration).thenReturn(generation);
       when(() => service.listBackups()).thenAnswer((_) async => fromHistory ? [BackupInfo(
-        backupId: 'fixture', filePath: '/tmp/fixture.n42backup', fileSizeBytes: 1024,
+        backupId: 'fixture', filePath: _fixturePath, fileSizeBytes: 1024,
         createdAt: DateTime(2026), roomCount: 1, includesMedia: false, includesKeys: false,
       )] : []);
-      when(() => service.listLegacyBackupFiles()).thenAnswer((_) async => [File('/tmp/fixture.n42backup')]);
+      when(() => service.listLegacyBackupFiles()).thenAnswer((_) async => [File(_fixturePath)]);
       final previous = FilePickerPlatform.instance;
       final picker = _FilePicker();
       final protected = mode.startsWith('password-');
@@ -347,7 +351,7 @@ void main() {
           ['preview-cancel', 'confirm', 'stale-confirm'].contains(mode);
       if (selected) {
         picker.result = _PickedFile();
-        when(() => service.previewBackup('/tmp/fixture.n42backup')).thenAnswer(
+        when(() => service.previewBackup(_fixturePath)).thenAnswer(
           (_) async => BackupPreview(
             backupId: 'fixture',
             createdAt: DateTime(2026),
@@ -361,7 +365,7 @@ void main() {
         );
         when(
           () => service.restoreFromBackup(
-            backupFilePath: '/tmp/fixture.n42backup',
+            backupFilePath: _fixturePath,
             restoreMessages: true,
             isCurrent: any(named: 'isCurrent'),
             onProgress: any(named: 'onProgress'),
@@ -369,11 +373,11 @@ void main() {
         ).thenAnswer((_) async => const RestoreResult());
       }
       if (protected) {
-        when(() => service.previewBackup('/tmp/fixture.n42backup'))
+        when(() => service.previewBackup(_fixturePath))
             .thenThrow(BackupPasswordRequired());
         when(
           () => service.previewBackup(
-            '/tmp/fixture.n42backup',
+            _fixturePath,
             password: 'fixture-password',
           ),
         ).thenAnswer(
@@ -390,7 +394,7 @@ void main() {
         );
         when(
           () => service.restoreFromBackup(
-            backupFilePath: '/tmp/fixture.n42backup',
+            backupFilePath: _fixturePath,
             restoreMessages: true,
             password: 'fixture-password',
             isCurrent: any(named: 'isCurrent'),
@@ -401,7 +405,7 @@ void main() {
       if (mode == 'password-wrong') {
         when(
           () => service.previewBackup(
-            '/tmp/fixture.n42backup',
+            _fixturePath,
             password: 'fixture-password',
           ),
         ).thenThrow(const FormatException('fixture-invalid-password'));
@@ -459,7 +463,7 @@ void main() {
           await tester.pumpAndSettle();
           verifyNever(
             () => service.previewBackup(
-              '/tmp/fixture.n42backup',
+              _fixturePath,
               password: any(named: 'password'),
             ),
           );
@@ -486,7 +490,7 @@ void main() {
           );
           verifyNever(
             () => service.restoreFromBackup(
-              backupFilePath: '/tmp/fixture.n42backup',
+              backupFilePath: _fixturePath,
             restoreMessages: true,
               password: 'fixture-password',
               isCurrent: any(named: 'isCurrent'),
@@ -501,7 +505,7 @@ void main() {
         await tester.pumpAndSettle();
         verify(
           () => service.restoreFromBackup(
-            backupFilePath: '/tmp/fixture.n42backup',
+            backupFilePath: _fixturePath,
             restoreMessages: true,
             password: 'fixture-password',
             isCurrent: any(named: 'isCurrent'),
@@ -530,7 +534,7 @@ void main() {
         }
         await tester.pumpAndSettle();
         final verification = () => service.restoreFromBackup(
-          backupFilePath: '/tmp/fixture.n42backup',
+          backupFilePath: _fixturePath,
             restoreMessages: true,
           isCurrent: any(named: 'isCurrent'),
           onProgress: any(named: 'onProgress'),

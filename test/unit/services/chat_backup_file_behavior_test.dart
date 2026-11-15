@@ -8,6 +8,7 @@ import 'package:drift/native.dart';
 import 'package:n42_chat/src/data/datasources/local/archive_database.dart';
 import 'package:matrix/matrix.dart' as matrix;
 import 'package:mocktail/mocktail.dart';
+import 'package:path/path.dart' as p;
 import 'package:n42_chat/src/core/services/chat_backup_service.dart';
 import 'package:n42_chat/src/core/services/message_archive_service.dart';
 import 'package:n42_chat/src/data/datasources/local/preferences_datasource.dart';
@@ -803,9 +804,9 @@ void main() {
 
   test('legacy discovery lists only root backup files and preserves them', () async {
     final owned = await service.createBackup(allowPlaintext: true);
-    final old = await File(owned.filePath).copy('${directory.path}/old.n42backup');
-    await File('${directory.path}/notes.txt').writeAsString('ignore');
-    await Directory('${directory.path}/folder.n42backup').create();
+    final old = await File(owned.filePath).copy(p.join(directory.path, 'old.n42backup'));
+    await File(p.join(directory.path, 'notes.txt')).writeAsString('ignore');
+    await Directory(p.join(directory.path, 'folder.n42backup')).create();
     final files = await service.listLegacyBackupFiles();
     expect(files.map((file) => file.path), [old.path]);
     expect(await old.exists(), isTrue);

@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:path/path.dart' as p;
 import 'package:n42_chat/l10n/app_localizations.dart';
 import 'package:n42_chat/src/presentation/widgets/chat/music_select_sheet.dart';
 
@@ -33,6 +34,9 @@ class _FilePicker extends FilePickerPlatform {
     return result;
   }
 }
+
+// Host-native absolute paths, so the picker round-trips them unchanged.
+String _musicPath(String name) => p.join(p.separator, 'music', name);
 
 base class _PickedFile extends PlatformFile {
   _PickedFile({required this.name, required String path})
@@ -225,7 +229,7 @@ void main() {
     final picker = _FilePicker()
       ..result = _PickedFile(
         name: 'Aimer - Ref:rain.mp3',
-        path: '/music/ref-rain.mp3',
+        path: _musicPath('ref-rain.mp3'),
       );
     FilePickerPlatform.instance = picker;
     final result = await openSheet(tester);
@@ -239,7 +243,7 @@ void main() {
     expect(await result.future, {
       'name': 'Ref:rain',
       'artist': 'Aimer',
-      'url': '/music/ref-rain.mp3',
+      'url': _musicPath('ref-rain.mp3'),
       'isLocal': true,
     });
   });
@@ -248,7 +252,10 @@ void main() {
     tester,
   ) async {
     final picker = _FilePicker()
-      ..result = _PickedFile(name: 'Recording.m4a', path: '/music/recording');
+      ..result = _PickedFile(
+        name: 'Recording.m4a',
+        path: _musicPath('recording'),
+      );
     FilePickerPlatform.instance = picker;
     final result = await openSheet(tester);
     await selectTab(tester, 'Local');
@@ -259,7 +266,7 @@ void main() {
     expect(await result.future, {
       'name': 'Recording',
       'artist': '未知歌手',
-      'url': '/music/recording',
+      'url': _musicPath('recording'),
       'isLocal': true,
     });
   });

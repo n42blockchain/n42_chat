@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:n42_chat/src/presentation/pages/chat/picked_file_upload_source.dart';
+import 'package:path/path.dart' as p;
 
 void main() {
   test(
@@ -14,7 +15,7 @@ void main() {
       final source = await PickedFileUploadSource.from(file);
 
       expect(source.filename, 'picked.bin');
-      expect(source.filePath, '/tmp/picked.bin');
+      expect(source.filePath, _pickedPath);
       expect(source.fileSize, 4);
       expect(await source.fileStream.expand((chunk) => chunk).toList(), bytes);
     },
@@ -31,6 +32,9 @@ void main() {
   });
 }
 
+// A host-native absolute path, so the picker round-trips it unchanged.
+final _pickedPath = p.join(p.separator, 'tmp', 'picked.bin');
+
 base class _TestPlatformFile extends PlatformFile {
   _TestPlatformFile(this.bytes, int? length) : _length = length;
 
@@ -42,7 +46,7 @@ base class _TestPlatformFile extends PlatformFile {
   String get name => 'picked.bin';
 
   @override
-  Uri get uri => Uri.file('/tmp/picked.bin');
+  Uri get uri => Uri.file(_pickedPath);
 
   @override
   int? lengthSync() => _length;
