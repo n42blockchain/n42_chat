@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:crypto/crypto.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -29,26 +30,43 @@ class FriendDetailsStore {
   }
 
   Future<Directory> _directory() async =>
-      Directory('${(await getApplicationSupportDirectory()).path}/$key');
+      Directory(p.join((await getApplicationSupportDirectory()).path, key));
 
   Future<File> photo(String name) async {
     if (!RegExp(r'^\d+\.jpg$').hasMatch(name)) {
       throw ArgumentError('Invalid contact photo name');
     }
-    return File('${(await _directory()).path}/$name');
+    return File(p.join((await _directory()).path, name));
   }
 
   Future<String> importPhoto(XFile image) async {
     final directory = await _directory();
     await directory.create(recursive: true);
-    final name = '${DateTime.now().microsecondsSinceEpoch}.jpg';
-    final destination = File('${directory.path}/$name');
+    final (name, destination) = await _reservePhotoFile(directory);
     try {
       await image.saveTo(destination.path);
       return name;
     } catch (_) {
       if (await destination.exists()) await destination.delete();
       rethrow;
+    }
+  }
+
+  /// Claims an unused timestamp name. Several photos imported together can
+  /// read the same clock value (Windows ticks are coarse), and reusing a name
+  /// would overwrite the earlier photo and list it twice.
+  Future<(String, File)> _reservePhotoFile(Directory directory) async {
+    var stamp = DateTime.now().microsecondsSinceEpoch;
+    while (true) {
+      final name = '$stamp.jpg';
+      final file = File(p.join(directory.path, name));
+      try {
+        await file.create(exclusive: true);
+        return (name, file);
+      } on FileSystemException {
+        if (!await file.exists()) rethrow;
+        stamp++;
+      }
     }
   }
 
