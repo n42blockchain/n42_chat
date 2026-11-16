@@ -230,9 +230,9 @@ class _StickerStorePageState extends State<StickerStorePage>
         ],
         bottom: TabBar(
           controller: _tabController,
-          labelColor: AppColors.primary,
+          labelColor: AppColors.primaryOf(context),
           unselectedLabelColor: context.textSecondary,
-          indicatorColor: AppColors.primary,
+          indicatorColor: AppColors.primaryOf(context),
           tabs: const [
             Tab(text: 'Store'),
             Tab(text: 'My Stickers'),
@@ -312,10 +312,12 @@ class _StickerStorePageState extends State<StickerStorePage>
           ),
           decoration: BoxDecoration(
             color: isSelected
-                ? AppColors.primary.withValues(alpha: 0.1)
+                ? AppColors.primaryOf(context).withValues(alpha: 0.1)
                 : AppColors.inputBgOf(isDark),
             borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
-            border: isSelected ? Border.all(color: AppColors.primary) : null,
+            border: isSelected
+                ? Border.all(color: AppColors.primaryOf(context))
+                : null,
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -329,7 +331,9 @@ class _StickerStorePageState extends State<StickerStorePage>
                 style: TextStyle(
                   fontSize: 13,
                   height: 1.3,
-                  color: isSelected ? AppColors.primary : context.textPrimary,
+                  color: isSelected
+                      ? AppColors.primaryOf(context)
+                      : context.textPrimary,
                 ),
               ),
             ],
@@ -444,10 +448,10 @@ class _StickerStorePageState extends State<StickerStorePage>
                           ),
                           if (pack.isOfficial) ...[
                             const SizedBox(width: AppDimensions.spacingXS),
-                            const Icon(
+                            Icon(
                               Icons.verified,
                               size: 16,
-                              color: AppColors.primary,
+                              color: AppColors.primaryOf(context),
                             ),
                           ],
                         ],
@@ -472,8 +476,8 @@ class _StickerStorePageState extends State<StickerStorePage>
                   OutlinedButton(
                     onPressed: () => _openCustomPack(pack.id),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.primary,
-                      side: const BorderSide(color: AppColors.primary),
+                      foregroundColor: AppColors.primaryOf(context),
+                      side: BorderSide(color: AppColors.primaryOf(context)),
                     ),
                     child: const Text('Manage'),
                   )
@@ -491,7 +495,7 @@ class _StickerStorePageState extends State<StickerStorePage>
                   ElevatedButton(
                     onPressed: () => _installPack(pack),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
+                      backgroundColor: AppColors.primaryOf(context),
                       foregroundColor: Colors.white,
                     ),
                     child: const Text('Add'),
@@ -608,7 +612,7 @@ class _StickerStorePageState extends State<StickerStorePage>
               icon: const Icon(Icons.store),
               label: const Text('Browse Store'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
+                backgroundColor: AppColors.primaryOf(context),
                 foregroundColor: Colors.white,
               ),
             ),

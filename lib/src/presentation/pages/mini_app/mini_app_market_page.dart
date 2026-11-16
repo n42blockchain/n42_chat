@@ -80,8 +80,8 @@ class _MiniAppMarketPageState extends State<MiniAppMarketPage>
           controller: _tabController,
           isScrollable: true,
           tabAlignment: TabAlignment.start,
-          indicatorColor: AppColors.primary,
-          labelColor: AppColors.primary,
+          indicatorColor: AppColors.primaryOf(context),
+          labelColor: AppColors.primaryOf(context),
           unselectedLabelColor: context.textSecondary,
           tabs: [
             Tab(text: l10n?.miniAppCategoryAll ?? 'All'),
@@ -98,7 +98,10 @@ class _MiniAppMarketPageState extends State<MiniAppMarketPage>
               controller: _searchController,
               decoration: InputDecoration(
                 hintText: l10n?.miniAppSearch ?? 'Search apps...',
-                prefixIcon: const Icon(Icons.search, color: AppColors.primary),
+                prefixIcon: Icon(
+                  Icons.search,
+                  color: AppColors.primaryOf(context),
+                ),
                 filled: true,
                 fillColor: context.surfaceColor,
                 border: OutlineInputBorder(
@@ -287,16 +290,17 @@ class _AppListTile extends StatelessWidget {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.primary.withValues(alpha: 0.1),
+                              color: AppColors.primaryOf(context)
+                                  .withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(
                                 AppDimensions.radiusS,
                               ),
                             ),
-                            child: const Text(
+                            child: Text(
                               'Official',
                               style: TextStyle(
                                 fontSize: 10,
-                                color: AppColors.primary,
+                                color: AppColors.primaryOf(context),
                                 fontWeight: FontWeight.w600,
                               ),
                             ),

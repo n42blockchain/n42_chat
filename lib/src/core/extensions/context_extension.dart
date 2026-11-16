@@ -216,7 +216,9 @@ extension ContextExtension on BuildContext {
             child: Text(
               confirm,
               style: TextStyle(
-                color: isDanger ? AppColors.error : AppColors.primary,
+                color: isDanger
+                    ? AppColors.error
+                    : AppColors.primaryOf(context),
               ),
             ),
           ),
@@ -237,8 +239,10 @@ extension ContextExtension on BuildContext {
           content: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+              CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  AppColors.primaryOf(context),
+                ),
               ),
               if (message != null) ...[
                 const SizedBox(width: AppDimensions.spacing),

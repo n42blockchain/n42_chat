@@ -196,7 +196,7 @@ class _ExpressionPanelState extends State<ExpressionPanel> {
           child: Container(
             alignment: Alignment.center,
             color: selected
-                ? AppColors.primary.withValues(alpha: 0.12)
+                ? AppColors.primaryOf(context).withValues(alpha: 0.12)
                 : Colors.transparent,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
@@ -206,7 +206,9 @@ class _ExpressionPanelState extends State<ExpressionPanel> {
                   Icon(
                     icon,
                     size: 20,
-                    color: selected ? AppColors.primary : context.textSecondary,
+                    color: selected
+                        ? AppColors.primaryOf(context)
+                        : context.textSecondary,
                   ),
                   const SizedBox(height: 2),
                   Text(
@@ -216,7 +218,7 @@ class _ExpressionPanelState extends State<ExpressionPanel> {
                     style: TextStyle(
                       fontSize: 12,
                       color: selected
-                          ? AppColors.primary
+                          ? AppColors.primaryOf(context)
                           : context.textSecondary,
                     ),
                   ),

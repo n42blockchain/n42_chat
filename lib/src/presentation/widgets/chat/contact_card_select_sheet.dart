@@ -175,7 +175,7 @@ class _ContactCardSelectSheetState extends State<ContactCardSelectSheet> {
                                   ),
                                 )
                               : CircleAvatar(
-                                  backgroundColor: AppColors.primary,
+                                  backgroundColor: AppColors.primaryOf(context),
                                   child: Text(
                                     contact.effectiveDisplayName.isNotEmpty
                                         ? contact.effectiveDisplayName[0]

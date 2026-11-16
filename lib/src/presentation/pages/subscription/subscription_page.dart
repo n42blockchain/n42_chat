@@ -49,7 +49,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Subscribed to ${plan.name}'),
-        backgroundColor: AppColors.primary,
+        backgroundColor: AppColors.primaryOf(context),
         duration: const Duration(seconds: 2),
       ),
     );
@@ -73,7 +73,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _createPlan,
-        backgroundColor: AppColors.primary,
+        backgroundColor: AppColors.primaryOf(context),
         icon: const Icon(Icons.add, color: Colors.white),
         label: const Text('New plan', style: TextStyle(color: Colors.white)),
       ),
@@ -254,8 +254,8 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
               children: [
                 Text(
                   plan.priceLabel,
-                  style: const TextStyle(
-                    color: AppColors.primary,
+                  style: TextStyle(
+                    color: AppColors.primaryOf(context),
                     fontWeight: FontWeight.w700,
                     fontSize: 15,
                   ),
@@ -264,7 +264,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                 ElevatedButton(
                   onPressed: () => _subscribe(plan),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: AppColors.primaryOf(context),
                     foregroundColor: Colors.white,
                   ),
                   child: const Text('Subscribe'),

@@ -132,7 +132,7 @@ class _BackupSectionState extends State<_BackupSection> {
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Row(
               children: [
-                const Icon(Icons.backup, color: AppColors.primary, size: 20),
+                Icon(Icons.backup, color: AppColors.primaryOf(context), size: 20),
                 const SizedBox(width: AppDimensions.spacingS),
                 Text(
                   'Create Backup',
@@ -190,7 +190,7 @@ class _BackupSectionState extends State<_BackupSection> {
               style: TextStyle(fontSize: 15, height: 1.3, color: textColor),
             ),
             value: _usePassword,
-            activeColor: AppColors.primary,
+            activeColor: AppColors.primaryOf(context),
             onChanged: (v) => setState(() => _usePassword = v ?? false),
           ),
           if (_usePassword)
@@ -232,7 +232,7 @@ class _BackupSectionState extends State<_BackupSection> {
                         );
                       },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: AppColors.primaryOf(context),
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(
                     vertical: AppDimensions.spacingM,

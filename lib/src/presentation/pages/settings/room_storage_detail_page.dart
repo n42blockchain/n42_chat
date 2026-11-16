@@ -94,9 +94,9 @@ class _RoomStorageDetailPageState extends State<RoomStorageDetailPage>
         ),
         bottom: TabBar(
           controller: _tabController,
-          labelColor: AppColors.primary,
+          labelColor: AppColors.primaryOf(context),
           unselectedLabelColor: context.textSecondary,
-          indicatorColor: AppColors.primary,
+          indicatorColor: AppColors.primaryOf(context),
           tabs: _tabs.map((t) => Tab(text: t)).toList(),
         ),
       ),
@@ -390,8 +390,8 @@ class _MediaFileTile extends StatelessWidget {
               child: Container(
                 width: 18,
                 height: 18,
-                decoration: const BoxDecoration(
-                  color: AppColors.primary,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryOf(context),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(Icons.check, color: Colors.white, size: 12),

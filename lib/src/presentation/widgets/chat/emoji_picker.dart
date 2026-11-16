@@ -871,9 +871,9 @@ class _EmojiPickerState extends State<EmojiPicker>
                     child: TabBar(
                       controller: _tabController,
                       isScrollable: true,
-                      labelColor: AppColors.primary,
+                      labelColor: AppColors.primaryOf(context),
                       unselectedLabelColor: context.textSecondary,
-                      indicatorColor: AppColors.primary,
+                      indicatorColor: AppColors.primaryOf(context),
                       indicatorSize: TabBarIndicatorSize.label,
                       tabs: _categories.map((category) {
                         return Tab(icon: Icon(category.icon, size: 20));
@@ -924,7 +924,7 @@ class _EmojiPickerState extends State<EmojiPicker>
                         child: Container(
                           width: 60,
                           height: 44,
-                          color: AppColors.primary,
+                          color: AppColors.primaryOf(context),
                           child: Center(
                             child: Text(
                               S.of(context)?.chatSendButton ?? 'Send',

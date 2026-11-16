@@ -52,7 +52,7 @@ class VoteProgressBar extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final barColor = isWinner
-        ? AppColors.primary
+        ? AppColors.primaryOf(context)
         : isSelected
         ? AppColors.info
         : ChatColors.of(context).trackBg;
@@ -70,12 +70,12 @@ class VoteProgressBar extends StatelessWidget {
           Row(
             children: [
               if (isSelected)
-                const Padding(
-                  padding: EdgeInsets.only(right: 6),
+                Padding(
+                  padding: const EdgeInsets.only(right: 6),
                   child: Icon(
                     Icons.check_circle,
                     size: 16,
-                    color: AppColors.primary,
+                    color: AppColors.primaryOf(context),
                   ),
                 ),
               Expanded(
@@ -104,7 +104,7 @@ class VoteProgressBar extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: isWinner ? AppColors.primary : textColor,
+                    color: isWinner ? AppColors.primaryOf(context) : textColor,
                   ),
                 ),
               ),

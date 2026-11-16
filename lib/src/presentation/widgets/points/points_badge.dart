@@ -53,7 +53,7 @@ class PointsBadge extends StatelessWidget {
           vertical: _verticalPadding,
         ),
         decoration: BoxDecoration(
-          color: AppColors.primary.withValues(alpha: 0.12),
+          color: AppColors.primaryOf(context).withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(_borderRadius),
         ),
         child: Row(

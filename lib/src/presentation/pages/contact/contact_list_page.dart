@@ -1685,7 +1685,7 @@ class _GroupListPageState extends State<_GroupListPage> {
             icon: const Icon(Icons.add),
             label: Text(S.of(context)?.commonCreateGroup ?? 'Create Group'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
+              backgroundColor: AppColors.primaryOf(context),
               foregroundColor: Colors.white,
             ),
           ),
@@ -1810,10 +1810,10 @@ class _GroupListPageState extends State<_GroupListPage> {
           S.of(context)?.commonInvitedToJoinGroup ?? 'Invited to join group',
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13,
             height: 1.3,
-            color: AppColors.primary,
+            color: AppColors.primaryOf(context),
           ),
         ),
         trailing: Row(
@@ -2055,7 +2055,7 @@ class _RecommendContactSheetState extends State<_RecommendContactSheet> {
           Padding(
             padding: const EdgeInsets.all(12),
             child: TextField(
-              cursorColor: AppColors.primary,
+              cursorColor: AppColors.primaryOf(context),
               decoration: InputDecoration(
                 hintText:
                     S.of(context)?.commonSearchContacts ?? 'Search contacts',

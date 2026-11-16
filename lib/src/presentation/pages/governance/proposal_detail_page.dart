@@ -454,7 +454,7 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
                   ? () => _castVote(proposal)
                   : null,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
+                backgroundColor: AppColors.primaryOf(context),
                 disabledBackgroundColor: ChatColors.of(context)
                     .buttonDisabledBg,
                 foregroundColor: Colors.white,

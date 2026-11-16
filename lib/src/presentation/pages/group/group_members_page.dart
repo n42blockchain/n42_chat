@@ -195,7 +195,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: AppColors.primary,
+                  color: AppColors.primaryOf(context),
                   borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                 ),
                 child: Text(

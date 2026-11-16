@@ -287,8 +287,8 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+        CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryOf(context)),
         ),
         const SizedBox(height: AppDimensions.spacingXL),
         Text(
@@ -329,7 +329,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
         const Spacer(),
 
         // 标题
-        const Icon(Icons.security, size: 48, color: AppColors.primary),
+        Icon(Icons.security, size: 48, color: AppColors.primaryOf(context)),
         const SizedBox(height: AppDimensions.spacing),
         Text(
           S.of(context)?.securityVerifyDevice ?? 'Verify this device',
@@ -394,7 +394,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
               child: ElevatedButton(
                 onPressed: _onConfirm,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: AppColors.primaryOf(context),
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
@@ -483,7 +483,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
         ElevatedButton(
           onPressed: () => Navigator.pop(context, true),
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primary,
+            backgroundColor: AppColors.primaryOf(context),
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 14),
             shape: RoundedRectangleBorder(
@@ -564,7 +564,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
                 _startVerification();
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
+                backgroundColor: AppColors.primaryOf(context),
                 foregroundColor: Colors.white,
               ),
               child: Text(S.of(context)?.commonTryAgain ?? 'Try Again'),

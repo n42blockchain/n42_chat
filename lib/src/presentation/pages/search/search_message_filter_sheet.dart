@@ -159,7 +159,7 @@ class _SearchMessageFilterSheetState extends State<_SearchMessageFilterSheet> {
                   width: double.infinity,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
+                      backgroundColor: AppColors.primaryOf(context),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
                     onPressed: _apply,

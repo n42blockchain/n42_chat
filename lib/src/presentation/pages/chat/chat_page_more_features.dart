@@ -25,14 +25,14 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
                     width: 44,
                     height: 44,
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.1),
+                      color: AppColors.primaryOf(context).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(
                         AppDimensions.radiusM,
                       ),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.location_on,
-                      color: AppColors.primary,
+                      color: AppColors.primaryOf(context),
                       size: 24,
                     ),
                   ),
@@ -378,7 +378,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
           S.of(context)?.chatTransferSent(transfer.amount, transfer.token) ??
               'Sent ${transfer.amount} ${transfer.token} transfer',
         ),
-        backgroundColor: AppColors.primary,
+        backgroundColor: AppColors.primaryOf(context),
       ),
     );
   }
@@ -654,7 +654,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
     final actions = <PaymentCommerceAction>[
       PaymentCommerceAction(
         icon: Icons.auto_awesome,
-        color: AppColors.primary,
+        color: AppColors.primaryOf(context),
         title: 'AI Assistant',
         subtitle: 'Describe a task, open the right mini app',
         onTap: () =>
@@ -677,7 +677,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
         ),
       PaymentCommerceAction(
         icon: Icons.apps_rounded,
-        color: AppColors.primary,
+        color: AppColors.primaryOf(context),
         title: S.of(context)?.miniAppMarketTitle ?? 'Mini Apps',
         onTap: () => _openMiniApps(initialCategory: MiniAppCategory.commerce),
       ),
@@ -718,7 +718,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
       case MiniAppLauncherHelper.creatorPassAppId:
         return Colors.deepPurple;
       default:
-        return AppColors.primary;
+        return AppColors.primaryOf(context);
     }
   }
 

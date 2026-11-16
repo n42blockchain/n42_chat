@@ -536,7 +536,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                 trailing:
                     _notificationMode ==
                         ConversationNotificationMode.allMessages
-                    ? const Icon(Icons.check, color: AppColors.primary)
+                    ? Icon(Icons.check, color: AppColors.primaryOf(context))
                     : null,
                 onTap: () => Navigator.pop(
                   ctx,
@@ -556,7 +556,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                 trailing:
                     _notificationMode ==
                         ConversationNotificationMode.mentionsOnly
-                    ? const Icon(Icons.check, color: AppColors.primary)
+                    ? Icon(Icons.check, color: AppColors.primaryOf(context))
                     : null,
                 onTap: () => Navigator.pop(
                   ctx,
@@ -575,7 +575,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                 ),
                 trailing:
                     _notificationMode == ConversationNotificationMode.muted
-                    ? const Icon(Icons.check, color: AppColors.primary)
+                    ? Icon(Icons.check, color: AppColors.primaryOf(context))
                     : null,
                 onTap: () =>
                     Navigator.pop(ctx, ConversationNotificationMode.muted),
@@ -1342,7 +1342,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                   );
                   onChanged(newValue);
                 },
-                activeTrackColor: AppColors.primary,
+                activeTrackColor: AppColors.primaryOf(context),
               ),
             ],
           ),
@@ -1580,7 +1580,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                       style: TextStyle(color: context.textPrimary),
                     ),
                     value: reason,
-                    activeColor: AppColors.primary,
+                    activeColor: AppColors.primaryOf(context),
                     contentPadding: EdgeInsets.zero,
                     dense: true,
                   ),

@@ -273,7 +273,7 @@ class _AutoDownloadSettingsPageState extends State<AutoDownloadSettingsPage> {
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Row(
               children: [
-                Icon(icon, size: 20, color: AppColors.primary),
+                Icon(icon, size: 20, color: AppColors.primaryOf(context)),
                 const SizedBox(width: AppDimensions.spacingS),
                 Text(
                   title,
@@ -297,7 +297,7 @@ class _AutoDownloadSettingsPageState extends State<AutoDownloadSettingsPage> {
       title: Text(title, style: const TextStyle(fontSize: 14)),
       value: value,
       onChanged: onChanged,
-      activeThumbColor: AppColors.primary,
+      activeThumbColor: AppColors.primaryOf(context),
       dense: true,
     );
   }
@@ -313,14 +313,14 @@ class _AutoDownloadSettingsPageState extends State<AutoDownloadSettingsPage> {
       margin: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing),
       padding: const EdgeInsets.all(AppDimensions.spacing),
       decoration: BoxDecoration(
-        color: ChatColors.of(context).brandBannerTint(AppColors.primary),
+        color: ChatColors.of(context).brandBannerTint(AppColors.primaryOf(context)),
         borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+        border: Border.all(color: AppColors.primaryOf(context).withValues(alpha: 0.2)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 20, color: AppColors.primary),
+          Icon(icon, size: 20, color: AppColors.primaryOf(context)),
           const SizedBox(width: AppDimensions.spacingM),
           Expanded(
             child: Column(

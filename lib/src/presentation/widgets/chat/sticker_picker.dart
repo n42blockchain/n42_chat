@@ -466,7 +466,9 @@ class _StickerPickerState extends State<StickerPicker> {
           decoration: BoxDecoration(
             border: Border(
               bottom: BorderSide(
-                color: isSelected ? AppColors.primary : Colors.transparent,
+                color: isSelected
+                    ? AppColors.primaryOf(context)
+                    : Colors.transparent,
                 width: 2,
               ),
             ),
@@ -477,7 +479,7 @@ class _StickerPickerState extends State<StickerPicker> {
                     icon,
                     size: 22,
                     color: isSelected
-                        ? AppColors.primary
+                        ? AppColors.primaryOf(context)
                         : context.textSecondary,
                   )
                 : Text(
@@ -485,7 +487,7 @@ class _StickerPickerState extends State<StickerPicker> {
                     style: TextStyle(
                       fontSize: emoji != null ? 22 : 14,
                       color: isSelected
-                          ? AppColors.primary
+                          ? AppColors.primaryOf(context)
                           : context.textSecondary,
                     ),
                   ),

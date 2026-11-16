@@ -91,15 +91,15 @@ class WelcomePage extends StatelessWidget {
           width: 68,
           height: 68,
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
+            gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [AppColors.primary, AppColors.primaryLight],
+              colors: [AppColors.primaryOf(context), AppColors.primaryLight],
             ),
             borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withValues(alpha: 0.3),
+                color: AppColors.primaryOf(context).withValues(alpha: 0.3),
                 blurRadius: 14,
                 offset: const Offset(0, 6),
               ),
@@ -181,7 +181,7 @@ class WelcomePage extends StatelessWidget {
             key: const ValueKey<String>('chat_welcome_login'),
             onPressed: onLogin,
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
+              backgroundColor: AppColors.primaryOf(context),
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(25),
@@ -208,8 +208,8 @@ class WelcomePage extends StatelessWidget {
             key: const ValueKey<String>('chat_welcome_register'),
             onPressed: onRegister,
             style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.primary,
-              side: const BorderSide(color: AppColors.primary, width: 1.5),
+              foregroundColor: AppColors.primaryOf(context),
+              side: BorderSide(color: AppColors.primaryOf(context), width: 1.5),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(25),
               ),
@@ -312,12 +312,12 @@ class _FeatureItem extends StatelessWidget {
           width: 48,
           height: 48,
           decoration: BoxDecoration(
-            color: AppColors.primary.withValues(alpha: 0.10),
+            color: AppColors.primaryOf(context).withValues(alpha: 0.10),
             borderRadius: BorderRadius.circular(AppDimensions.radiusL),
           ),
           child: Icon(
             icon,
-            color: AppColors.primary,
+            color: AppColors.primaryOf(context),
             size: AppDimensions.iconSize,
           ),
         ),

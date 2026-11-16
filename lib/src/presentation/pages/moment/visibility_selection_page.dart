@@ -184,7 +184,7 @@ class _VisibilitySelectionPageState extends State<VisibilitySelectionPage> {
                         ),
                         selected: allSelected,
                         onSelected: (_) => _toggleTag(tag),
-                        selectedColor: AppColors.primary,
+                        selectedColor: AppColors.primaryOf(context),
                         backgroundColor: AppColors.inputBgOf(isDark),
                         checkmarkColor: Colors.white,
                       );
@@ -218,7 +218,7 @@ class _VisibilitySelectionPageState extends State<VisibilitySelectionPage> {
                     ),
                     trailing: Checkbox(
                       value: isSelected,
-                      activeColor: AppColors.primary,
+                      activeColor: AppColors.primaryOf(context),
                       onChanged: (value) {
                         setState(() {
                           if (value == true) {
@@ -269,7 +269,7 @@ class _VisibilitySelectionPageState extends State<VisibilitySelectionPage> {
                       ? null
                       : () => Navigator.of(context).pop(_selectedIds.toList()),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: AppColors.primaryOf(context),
                     foregroundColor: Colors.white,
                     disabledBackgroundColor: AppColors.inputBgOf(isDark),
                     shape: RoundedRectangleBorder(

@@ -173,9 +173,9 @@ class _ArticleReaderPageState extends State<ArticleReaderPage> {
         fontWeight: FontWeight.w600,
       ),
       blockquoteDecoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.06),
-        border: const Border(
-          left: BorderSide(color: AppColors.primary, width: 3),
+        color: AppColors.primaryOf(context).withValues(alpha: 0.06),
+        border: Border(
+          left: BorderSide(color: AppColors.primaryOf(context), width: 3),
         ),
       ),
       blockquotePadding: const EdgeInsets.fromLTRB(12, 8, 12, 8),

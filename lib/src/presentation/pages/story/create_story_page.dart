@@ -375,8 +375,8 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(
-                    color: AppColors.primary,
+                  borderSide: BorderSide(
+                    color: AppColors.primaryOf(context),
                     width: 2,
                   ),
                 ),
@@ -410,13 +410,13 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
                 width: 80,
                 height: 80,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
+                  color: AppColors.primaryOf(context).withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.add_photo_alternate_outlined,
                   size: 40,
-                  color: AppColors.primary,
+                  color: AppColors.primaryOf(context),
                 ),
               ),
               const SizedBox(height: 16),
@@ -658,7 +658,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
           decoration: BoxDecoration(
             color: _mode == StoryMode.text
                 ? Colors.white.withValues(alpha: 0.15)
-                : AppColors.primary.withValues(alpha: 0.08),
+                : AppColors.primaryOf(context).withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(20),
           ),
           child: Row(
@@ -669,7 +669,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
                 size: 16,
                 color: _mode == StoryMode.text
                     ? _currentTextColor
-                    : AppColors.primary,
+                    : AppColors.primaryOf(context),
               ),
               const SizedBox(width: 6),
               Flexible(
@@ -682,7 +682,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
                     height: 1.3,
                     color: _mode == StoryMode.text
                         ? _currentTextColor
-                        : AppColors.primary,
+                        : AppColors.primaryOf(context),
                     fontWeight: FontWeight.w500,
                   ),
                 ),

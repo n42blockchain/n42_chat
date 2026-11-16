@@ -188,7 +188,7 @@ extension _ChatPageAppBarMethods on _ChatPageState {
           onPressed: _selectAllMessages,
           child: Text(
             S.of(context)?.chatSelectAll ?? 'Select All',
-            style: AppTextStyles.bodySmall.copyWith(color: AppColors.primary),
+            style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryOf(context)),
           ),
         ),
       ],

@@ -157,12 +157,12 @@ class _NearbyPageState extends State<NearbyPage> {
               width: 88,
               height: 88,
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.12),
+                color: AppColors.primaryOf(context).withValues(alpha: 0.12),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.near_me_outlined,
-                color: AppColors.primary,
+                color: AppColors.primaryOf(context),
                 size: 42,
               ),
             ),
@@ -235,7 +235,7 @@ class _NearbyPageState extends State<NearbyPage> {
         itemBuilder: (context, index) {
           if (index == 0) {
             return Container(
-              color: AppColors.primary.withValues(alpha: 0.08),
+              color: AppColors.primaryOf(context).withValues(alpha: 0.08),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               child: Text(
                 'Approximate distance · public location posts only',

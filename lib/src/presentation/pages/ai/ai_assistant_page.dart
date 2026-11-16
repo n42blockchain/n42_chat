@@ -311,15 +311,18 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
     IconData icon,
   ) {
     return ActionChip(
-      avatar: Icon(icon, size: 16, color: AppColors.primary),
+      avatar: Icon(icon, size: 16, color: AppColors.primaryOf(context)),
       label: Text(
         label,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(fontSize: 13, height: 1.3, color: context.textPrimary),
       ),
-      backgroundColor: ChatColors.of(context).brandTint(AppColors.primary),
-      side: BorderSide(color: AppColors.primary.withValues(alpha: 0.2)),
+      backgroundColor: ChatColors.of(context)
+          .brandTint(AppColors.primaryOf(context)),
+      side: BorderSide(
+        color: AppColors.primaryOf(context).withValues(alpha: 0.2),
+      ),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       onPressed: () {
         context.read<AiAssistantBloc>().add(SendAiMessage(label));
@@ -341,7 +344,8 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
           if (!isUser) ...[
             CircleAvatar(
               radius: 16,
-              backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+              backgroundColor: AppColors.primaryOf(context)
+                  .withValues(alpha: 0.1),
               child: const Text('🤖', style: TextStyle(fontSize: 16)),
             ),
             const SizedBox(width: 8),
@@ -350,7 +354,9 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
-                color: isUser ? AppColors.primary : context.surfaceColor,
+                color: isUser
+                    ? AppColors.primaryOf(context)
+                    : context.surfaceColor,
                 borderRadius: BorderRadius.circular(16).copyWith(
                   topLeft: isUser ? null : const Radius.circular(4),
                   topRight: isUser ? const Radius.circular(4) : null,
@@ -410,11 +416,12 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
             const SizedBox(width: 8),
             CircleAvatar(
               radius: 16,
-              backgroundColor: AppColors.primary.withValues(alpha: 0.2),
-              child: const Icon(
+              backgroundColor: AppColors.primaryOf(context)
+                  .withValues(alpha: 0.2),
+              child: Icon(
                 Icons.person,
                 size: 18,
-                color: AppColors.primary,
+                color: AppColors.primaryOf(context),
               ),
             ),
           ],
@@ -432,7 +439,8 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
         children: [
           CircleAvatar(
             radius: 16,
-            backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+            backgroundColor: AppColors.primaryOf(context)
+                .withValues(alpha: 0.1),
             child: const Text('🤖', style: TextStyle(fontSize: 16)),
           ),
           const SizedBox(width: 8),
@@ -548,7 +556,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
                 width: 32,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: canSend ? AppColors.primary : Colors.grey,
+                  color: canSend ? AppColors.primaryOf(context) : Colors.grey,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: const Icon(
@@ -664,8 +672,8 @@ class _TypingDotState extends State<_TypingDot>
           child: Container(
             width: 6,
             height: 6,
-            decoration: const BoxDecoration(
-              color: AppColors.primary,
+            decoration: BoxDecoration(
+              color: AppColors.primaryOf(context),
               shape: BoxShape.circle,
             ),
           ),

@@ -145,7 +145,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
                               _selectedMedia.isNotEmpty;
                     return TextButton(
                       style: TextButton.styleFrom(
-                        foregroundColor: AppColors.primary,
+                        foregroundColor: AppColors.primaryOf(context),
                         disabledForegroundColor: AppColors.textTertiary,
                       ),
                       onPressed: canPost ? _postMoment : null,
@@ -518,7 +518,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
               title: Text(s?.momentVisibilityPublic ?? 'Public'),
               subtitle: const Text('All friends can see'),
               trailing: _visibility == MomentVisibility.public
-                  ? const Icon(Icons.check, color: AppColors.primary)
+                  ? Icon(Icons.check, color: AppColors.primaryOf(context))
                   : null,
               onTap: () {
                 setState(() {
@@ -534,7 +534,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
               title: Text(s?.momentVisibilityPrivate ?? 'Private'),
               subtitle: const Text('Only you can see'),
               trailing: _visibility == MomentVisibility.private
-                  ? const Icon(Icons.check, color: AppColors.primary)
+                  ? Icon(Icons.check, color: AppColors.primaryOf(context))
                   : null,
               onTap: () {
                 setState(() {
@@ -550,7 +550,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
               title: Text(s?.momentVisibilityPartial ?? 'Selected Friends'),
               subtitle: const Text('Choose who can see'),
               trailing: _visibility == MomentVisibility.partial
-                  ? const Icon(Icons.check, color: AppColors.primary)
+                  ? Icon(Icons.check, color: AppColors.primaryOf(context))
                   : null,
               onTap: () {
                 Navigator.pop(ctx);
@@ -564,7 +564,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
               ),
               subtitle: const Text('Hide from specific friends'),
               trailing: _visibility == MomentVisibility.excluded
-                  ? const Icon(Icons.check, color: AppColors.primary)
+                  ? Icon(Icons.check, color: AppColors.primaryOf(context))
                   : null,
               onTap: () {
                 Navigator.pop(ctx);

@@ -144,9 +144,9 @@ class _MediaGalleryPageState extends State<MediaGalleryPage>
             child: TabBar(
               controller: _tabController,
               isScrollable: true,
-              labelColor: AppColors.primary,
+              labelColor: AppColors.primaryOf(context),
               unselectedLabelColor: context.textSecondary,
-              indicatorColor: AppColors.primary,
+              indicatorColor: AppColors.primaryOf(context),
               tabs: [
                 Tab(text: S.of(context)?.mediaAll ?? 'All'),
                 Tab(text: S.of(context)?.mediaImages ?? 'Images'),
@@ -406,7 +406,7 @@ class _MediaGalleryPageState extends State<MediaGalleryPage>
           color: ChatColors.of(context).placeholderTile,
           borderRadius: BorderRadius.circular(AppDimensions.radiusM),
         ),
-        child: Icon(icon, color: AppColors.primary),
+        child: Icon(icon, color: AppColors.primaryOf(context)),
       ),
       title: Text(
         fileName,

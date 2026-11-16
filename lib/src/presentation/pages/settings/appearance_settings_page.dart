@@ -204,7 +204,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
         ),
       ),
       trailing: isSelected
-          ? const Icon(Icons.check_rounded, color: AppColors.primary)
+          ? Icon(Icons.check_rounded, color: AppColors.primaryOf(context))
           : null,
       onTap: () {
         _updateSettings(_settings.copyWith(themeMode: value));
@@ -259,7 +259,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
         style: TextStyle(fontSize: previewFontSize, color: context.textPrimary),
       ),
       trailing: isSelected
-          ? const Icon(Icons.check, color: AppColors.primary)
+          ? Icon(Icons.check, color: AppColors.primaryOf(context))
           : null,
       onTap: () {
         _updateSettings(_settings.copyWith(fontSize: value));
@@ -305,7 +305,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
             max: 3,
             divisions: 3,
             label: labels[sliderValue.round()],
-            activeColor: AppColors.primary,
+            activeColor: AppColors.primaryOf(context),
             onChanged: (value) {
               setState(
                 () => _settings = _settings.copyWith(
@@ -394,7 +394,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
         ),
       ),
       trailing: isSelected
-          ? const Icon(Icons.check_rounded, color: AppColors.primary)
+          ? Icon(Icons.check_rounded, color: AppColors.primaryOf(context))
           : null,
       onTap: () {
         _updateSettings(_settings.copyWith(bubbleStyle: value));

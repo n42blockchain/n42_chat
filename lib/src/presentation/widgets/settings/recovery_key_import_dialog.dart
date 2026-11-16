@@ -50,11 +50,11 @@ class _RecoveryKeyImportDialogState extends State<RecoveryKeyImportDialog> {
     final accountId = client?.userID ?? 'Unknown account';
     final homeserver = client?.homeserver?.host ?? 'Unknown homeserver';
     return AlertDialog(
-      title: const Row(
+      title: Row(
         children: [
-          Icon(Icons.key, color: AppColors.primary),
-          SizedBox(width: AppDimensions.spacingS),
-          Expanded(
+          Icon(Icons.key, color: AppColors.primaryOf(context)),
+          const SizedBox(width: AppDimensions.spacingS),
+          const Expanded(
             child: Text('Import Recovery Key', style: TextStyle(fontSize: 18)),
           ),
         ],
@@ -104,7 +104,7 @@ class _RecoveryKeyImportDialogState extends State<RecoveryKeyImportDialog> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-                  borderSide: const BorderSide(color: AppColors.primary),
+                  borderSide: BorderSide(color: AppColors.primaryOf(context)),
                 ),
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.paste, size: 20),

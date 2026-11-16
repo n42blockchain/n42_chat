@@ -125,7 +125,9 @@ class _FiatRampPageState extends State<FiatRampPage> {
             ),
             const SizedBox(height: AppDimensions.spacingL),
             FilledButton(
-              style: FilledButton.styleFrom(backgroundColor: AppColors.primary),
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.primaryOf(context),
+              ),
               onPressed: () => Navigator.of(context).pop(),
               child: const Text('Back'),
             ),

@@ -116,9 +116,9 @@ class _SpaceListViewState extends State<_SpaceListView>
               color: context.surfaceColor,
               child: TabBar(
                 controller: _tabController,
-                labelColor: AppColors.primary,
+                labelColor: AppColors.primaryOf(context),
                 unselectedLabelColor: context.textSecondary,
-                indicatorColor: AppColors.primary,
+                indicatorColor: AppColors.primaryOf(context),
                 tabs: [
                   Tab(text: S.of(context)?.spacesJoined ?? 'Joined'),
                   Tab(text: S.of(context)?.spacesDiscover ?? 'Discover'),

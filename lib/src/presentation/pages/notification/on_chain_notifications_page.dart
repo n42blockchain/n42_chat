@@ -75,8 +75,8 @@ class _OnChainNotificationsPageState extends State<OnChainNotificationsPage> {
                 ),
                 child: Text(
                   l10n?.onChainMarkAllRead ?? 'Mark all read',
-                  style: const TextStyle(
-                    color: AppColors.primary,
+                  style: TextStyle(
+                    color: AppColors.primaryOf(context),
                     fontSize: 13,
                   ),
                 ),
@@ -224,7 +224,8 @@ class _OnChainNotificationItem extends StatelessWidget {
       onTap: onTap,
       child: Container(
         color: unread
-            ? ChatColors.of(context).brandTintFaint(AppColors.primary)
+            ? ChatColors.of(context)
+                  .brandTintFaint(AppColors.primaryOf(context))
             : null,
         padding: const EdgeInsets.symmetric(
           horizontal: AppDimensions.spacing,
@@ -296,17 +297,17 @@ class _OnChainNotificationItem extends StatelessWidget {
                     const SizedBox(height: AppDimensions.spacingXS),
                     Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.open_in_new,
                           size: 12,
-                          color: AppColors.primary,
+                          color: AppColors.primaryOf(context),
                         ),
                         const SizedBox(width: AppDimensions.spacingXS),
                         Text(
                           S.of(context)?.onChainViewDetails ?? 'View details',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
-                            color: AppColors.primary,
+                            color: AppColors.primaryOf(context),
                           ),
                         ),
                       ],
@@ -322,8 +323,8 @@ class _OnChainNotificationItem extends StatelessWidget {
                 width: 8,
                 height: 8,
                 margin: const EdgeInsets.only(top: 6),
-                decoration: const BoxDecoration(
-                  color: AppColors.primary,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryOf(context),
                   shape: BoxShape.circle,
                 ),
               ),

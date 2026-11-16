@@ -86,9 +86,9 @@ class _GroupAlbumViewState extends State<_GroupAlbumView>
   Widget _buildTabBar(BuildContext context) {
     return TabBar(
       controller: _tabController,
-      labelColor: AppColors.primary,
+      labelColor: AppColors.primaryOf(context),
       unselectedLabelColor: context.textSecondary,
-      indicatorColor: AppColors.primary,
+      indicatorColor: AppColors.primaryOf(context),
       tabs: [
         Tab(text: S.of(context)?.commonAll ?? 'All'),
         Tab(text: S.of(context)?.groupImages ?? 'Images'),
@@ -240,10 +240,10 @@ class _GroupAlbumViewState extends State<_GroupAlbumView>
       children: [
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: AppColors.primary,
+            color: AppColors.primaryOf(context),
           ),
         ),
         const SizedBox(height: AppDimensions.spacingXS),

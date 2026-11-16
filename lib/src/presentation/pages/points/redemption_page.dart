@@ -101,7 +101,7 @@ class _RedemptionPageState extends State<RedemptionPage> {
 
           return RefreshIndicator(
             onRefresh: () async => _loadItems(),
-            color: AppColors.primary,
+            color: AppColors.primaryOf(context),
             child: CustomScrollView(
               slivers: [
                 SliverToBoxAdapter(child: _buildPointsHeader(context, state)),
@@ -341,7 +341,7 @@ class _RedemptionPageState extends State<RedemptionPage> {
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
+                backgroundColor: AppColors.primaryOf(context),
                 foregroundColor: Colors.white,
               ),
               onPressed: () {
@@ -463,7 +463,7 @@ class _RedemptionCard extends StatelessWidget {
                           height: 1.3,
                           fontWeight: FontWeight.w700,
                           color: canAfford
-                              ? AppColors.primary
+                              ? AppColors.primaryOf(context)
                               : AppColors.error,
                         ),
                       ),
@@ -492,7 +492,7 @@ class _RedemptionCard extends StatelessWidget {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: isDisabled
                             ? ChatColors.of(context).disabledFill
-                            : AppColors.primary,
+                            : AppColors.primaryOf(context),
                         foregroundColor: isDisabled
                             ? AppColors.textDisabled
                             : Colors.white,

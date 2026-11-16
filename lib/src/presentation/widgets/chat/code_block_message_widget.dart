@@ -217,11 +217,11 @@ class CodeBlockMessageWidget extends StatelessWidget {
     final messenger = ScaffoldMessenger.of(context);
     messenger.clearSnackBars();
     messenger.showSnackBar(
-      const SnackBar(
-        content: Text('Code copied'),
-        duration: Duration(seconds: 1),
+      SnackBar(
+        content: const Text('Code copied'),
+        duration: const Duration(seconds: 1),
         behavior: SnackBarBehavior.floating,
-        backgroundColor: AppColors.primary,
+        backgroundColor: AppColors.primaryOf(context),
       ),
     );
   }

@@ -83,7 +83,7 @@ class _LiveLocationViewState extends State<_LiveLocationView> {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: AppColors.primary,
+                color: AppColors.primaryOf(context),
                 shape: BoxShape.circle,
                 border: Border.all(color: Colors.white, width: 2),
                 boxShadow: [
@@ -238,7 +238,7 @@ class _LiveLocationViewState extends State<_LiveLocationView> {
                       child: ElevatedButton(
                         onPressed: () => _showDurationPicker(context),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
+                          backgroundColor: AppColors.primaryOf(context),
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(
                             vertical: AppDimensions.spacingM,
@@ -281,9 +281,9 @@ class _LiveLocationViewState extends State<_LiveLocationView> {
         _formatRemaining(context, location),
         style: TextStyle(color: context.textSecondary, fontSize: 12),
       ),
-      trailing: const Icon(
+      trailing: Icon(
         Icons.my_location,
-        color: AppColors.primary,
+        color: AppColors.primaryOf(context),
         size: 20,
       ),
       onTap: () {

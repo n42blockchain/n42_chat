@@ -160,7 +160,7 @@ class SimpleContactTile extends StatelessWidget {
         color: selected
             ? (isDark
                   ? AppColors.primaryDark.withValues(alpha: 0.2)
-                  : AppColors.primary.withValues(alpha: 0.1))
+                  : AppColors.primaryOf(context).withValues(alpha: 0.1))
             : context.surfaceColor,
         child: InkWell(
           onTap: onTap,
@@ -188,9 +188,9 @@ class SimpleContactTile extends StatelessWidget {
                   ),
                 ),
                 if (selected)
-                  const Icon(
+                  Icon(
                     Icons.check_circle,
-                    color: AppColors.primary,
+                    color: AppColors.primaryOf(context),
                     size: 24,
                   ),
               ],

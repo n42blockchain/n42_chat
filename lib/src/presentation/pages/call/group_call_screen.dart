@@ -366,7 +366,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
         decoration: BoxDecoration(
           color: Colors.grey[900],
           border: participant.isSpeaking
-              ? Border.all(color: AppColors.primary, width: 2)
+              ? Border.all(color: AppColors.primaryOf(context), width: 2)
               : null,
         ),
         child: Stack(
@@ -475,7 +475,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                     vertical: AppDimensions.spacingXS,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.9),
+                    color: AppColors.primaryOf(context).withValues(alpha: 0.9),
                     borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                   ),
                   child: Row(
@@ -543,9 +543,9 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                 ),
                 child: Row(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.screen_share,
-                      color: AppColors.primary,
+                      color: AppColors.primaryOf(context),
                       size: 18,
                     ),
                     const SizedBox(width: AppDimensions.spacingS),
@@ -662,8 +662,8 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                           Container(
                             width: 6,
                             height: 6,
-                            decoration: const BoxDecoration(
-                              color: AppColors.primary,
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryOf(context),
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -795,7 +795,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                         ? (S.of(context)?.callStopSharing ?? 'Stop sharing')
                         : (S.of(context)?.callShareScreen ?? 'Share screen'),
                     isActive: _isScreenSharing,
-                    activeColor: AppColors.primary,
+                    activeColor: AppColors.primaryOf(context),
                     onPressed: _toggleScreenShare,
                   ),
                 ),
@@ -938,7 +938,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.2),
+                      color: AppColors.primaryOf(context).withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(
                         AppDimensions.radiusL,
                       ),
@@ -947,8 +947,8 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                       '${_participants.length}',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: AppColors.primary,
+                      style: TextStyle(
+                        color: AppColors.primaryOf(context),
                         fontSize: 14,
                         height: 1.3,
                         fontWeight: FontWeight.w500,
@@ -1022,11 +1022,11 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
               child: Icon(Icons.videocam_off, color: AppColors.error, size: 18),
             ),
           if (participant.isScreenSharing)
-            const Padding(
-              padding: EdgeInsets.only(left: AppDimensions.spacingS),
+            Padding(
+              padding: const EdgeInsets.only(left: AppDimensions.spacingS),
               child: Icon(
                 Icons.screen_share,
-                color: AppColors.primary,
+                color: AppColors.primaryOf(context),
                 size: 18,
               ),
             ),
@@ -1049,7 +1049,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const CircularProgressIndicator(color: AppColors.primary),
+              CircularProgressIndicator(color: AppColors.primaryOf(context)),
               const SizedBox(height: AppDimensions.spacingXL),
               Text(
                 S.of(context)?.callJoiningMeeting ?? 'Joining meeting...',

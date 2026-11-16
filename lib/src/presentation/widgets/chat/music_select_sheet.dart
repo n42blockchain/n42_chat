@@ -272,7 +272,9 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
         decoration: BoxDecoration(
           border: Border(
             bottom: BorderSide(
-              color: isSelected ? AppColors.primary : Colors.transparent,
+              color: isSelected
+                  ? AppColors.primaryOf(context)
+                  : Colors.transparent,
               width: 2,
             ),
           ),
@@ -284,7 +286,7 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
               icon,
               size: 18,
               color: isSelected
-                  ? AppColors.primary
+                  ? AppColors.primaryOf(context)
                   : (AppColors.textSecondaryOf(widget.isDark)),
             ),
             const SizedBox(width: 6),
@@ -292,7 +294,7 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
               label,
               style: TextStyle(
                 color: isSelected
-                    ? AppColors.primary
+                    ? AppColors.primaryOf(context)
                     : (AppColors.textSecondaryOf(widget.isDark)),
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
@@ -363,14 +365,15 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
                         width: 48,
                         height: 48,
                         decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.1),
+                          color: AppColors.primaryOf(context)
+                              .withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(
                             AppDimensions.radiusM,
                           ),
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.music_note,
-                          color: AppColors.primary,
+                          color: AppColors.primaryOf(context),
                         ),
                       ),
                       title: Text(
@@ -386,9 +389,9 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
                           color: AppColors.textSecondaryOf(widget.isDark),
                         ),
                       ),
-                      trailing: const Icon(
+                      trailing: Icon(
                         Icons.send,
-                        color: AppColors.primary,
+                        color: AppColors.primaryOf(context),
                       ),
                       onTap: () => Navigator.pop(context, song),
                     );
@@ -413,14 +416,14 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
           Container(
             padding: const EdgeInsets.all(AppDimensions.spacingM),
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
+              color: AppColors.primaryOf(context).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppDimensions.radiusM),
             ),
             child: Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.info_outline,
-                  color: AppColors.primary,
+                  color: AppColors.primaryOf(context),
                   size: 20,
                 ),
                 const SizedBox(width: AppDimensions.spacingS),
@@ -507,7 +510,7 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
             child: ElevatedButton(
               onPressed: _shareNetworkLink,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
+                backgroundColor: AppColors.primaryOf(context),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
@@ -539,13 +542,13 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
               width: 100,
               height: 100,
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
+                color: AppColors.primaryOf(context).withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.audio_file,
                 size: 50,
-                color: AppColors.primary,
+                color: AppColors.primaryOf(context),
               ),
             ),
             const SizedBox(height: AppDimensions.spacingXL),
@@ -569,7 +572,7 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
               icon: const Icon(Icons.folder_open),
               label: Text(S.of(context)?.chatSelectFileButton ?? 'Select File'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
+                backgroundColor: AppColors.primaryOf(context),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppDimensions.spacingXXL,

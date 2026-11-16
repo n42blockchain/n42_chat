@@ -94,7 +94,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                   style: TextStyle(color: textColor),
                 ),
                 trailing: mode == _settings.privacyMode
-                    ? const Icon(Icons.check, color: AppColors.primary)
+                    ? Icon(Icons.check, color: AppColors.primaryOf(context))
                     : null,
                 onTap: () => Navigator.pop(ctx, mode),
               );
@@ -282,7 +282,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
             width: 32,
             height: 32,
             decoration: BoxDecoration(
-              color: AppColors.primary,
+              color: AppColors.primaryOf(context),
               borderRadius: BorderRadius.circular(6),
             ),
             child: Icon(icon, color: Colors.white, size: 20),
@@ -310,7 +310,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeTrackColor: AppColors.primary,
+            activeTrackColor: AppColors.primaryOf(context),
           ),
         ],
       ),
@@ -371,7 +371,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: AppColors.primary,
+                color: AppColors.primaryOf(context),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Icon(icon, color: Colors.white, size: 20),

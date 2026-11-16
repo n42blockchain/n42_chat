@@ -301,12 +301,12 @@ class MessageBubble extends StatelessWidget {
   Widget _buildSendingIndicator(BuildContext context) {
     return Semantics(
       label: A11yL10n.of(context).sending,
-      child: const SizedBox(
+      child: SizedBox(
         width: 14,
         height: 14,
         child: CircularProgressIndicator(
           strokeWidth: 1.5,
-          valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+          valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryOf(context)),
         ),
       ),
     );

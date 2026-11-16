@@ -164,7 +164,7 @@ class StoryBar extends StatelessWidget {
                         width: 22,
                         height: 22,
                         decoration: BoxDecoration(
-                          color: AppColors.primary,
+                          color: AppColors.primaryOf(context),
                           shape: BoxShape.circle,
                           border: Border.all(
                             color: context.surfaceColor,

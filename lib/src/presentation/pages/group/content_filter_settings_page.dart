@@ -117,7 +117,7 @@ class _ContentFilterSettingsPageState extends State<ContentFilterSettingsPage> {
               onPressed: _isLoading || _isSaving ? null : _save,
               child: Text(
                 l10n?.commonConfirm ?? 'Save',
-                style: const TextStyle(color: AppColors.primary),
+                style: TextStyle(color: AppColors.primaryOf(context)),
               ),
             ),
           ],
@@ -218,9 +218,9 @@ class _ContentFilterSettingsPageState extends State<ContentFilterSettingsPage> {
                                 ),
                                 const SizedBox(width: AppDimensions.spacingS),
                                 IconButton(
-                                  icon: const Icon(
+                                  icon: Icon(
                                     Icons.add_circle_outline,
-                                    color: AppColors.primary,
+                                    color: AppColors.primaryOf(context),
                                   ),
                                   onPressed: _addWord,
                                 ),

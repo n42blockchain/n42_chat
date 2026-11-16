@@ -104,14 +104,14 @@ extension _ChatPageInputMethods on _ChatPageState {
                   decoration: BoxDecoration(
                     color: _isRecordingCancelled
                         ? AppColors.error
-                        : AppColors.primary,
+                        : AppColors.primaryOf(context),
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
                         color:
                             (_isRecordingCancelled
                                     ? AppColors.error
-                                    : AppColors.primary)
+                                    : AppColors.primaryOf(context))
                                 .withValues(alpha: 0.4),
                         blurRadius: 30,
                         spreadRadius: 10,
@@ -280,11 +280,11 @@ extension _ChatPageInputMethods on _ChatPageState {
               ListTile(
                 leading: Icon(
                   Icons.timer_off_outlined,
-                  color: _selfDestructAfter == null ? AppColors.primary : null,
+                  color: _selfDestructAfter == null ? AppColors.primaryOf(context) : null,
                 ),
                 title: Text(l10n?.chatTimerOff ?? 'Off'),
                 trailing: _selfDestructAfter == null
-                    ? const Icon(Icons.check, color: AppColors.primary)
+                    ? Icon(Icons.check, color: AppColors.primaryOf(context))
                     : null,
                 onTap: () => Navigator.pop(ctx, -1),
               ),
@@ -328,20 +328,20 @@ extension _ChatPageInputMethods on _ChatPageState {
         horizontal: AppDimensions.spacing,
         vertical: AppDimensions.spacingS,
       ),
-      color: AppColors.primary.withValues(alpha: 0.1),
+      color: AppColors.primaryOf(context).withValues(alpha: 0.1),
       child: Row(
         children: [
-          const Icon(Icons.timer, size: 16, color: AppColors.primary),
+          Icon(Icons.timer, size: 16, color: AppColors.primaryOf(context)),
           const SizedBox(width: AppDimensions.spacingS),
           Expanded(
             child: Text(
               s?.chatViewOnce ?? 'View Once',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 height: 1.3,
-                color: AppColors.primary,
+                color: AppColors.primaryOf(context),
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -850,16 +850,16 @@ extension _ChatPageInputMethods on _ChatPageState {
                       CircleAvatar(
                         radius: 18,
                         backgroundColor: isRoomMention
-                            ? AppColors.primary.withValues(alpha: 0.12)
+                            ? AppColors.primaryOf(context).withValues(alpha: 0.12)
                             : AppColors.placeholderOf(isDark),
                         backgroundImage: !isRoomMention && avatarUrl.isNotEmpty
                             ? NetworkImage(avatarUrl)
                             : null,
                         child: isRoomMention
-                            ? const Icon(
+                            ? Icon(
                                 Icons.alternate_email,
                                 size: 18,
-                                color: AppColors.primary,
+                                color: AppColors.primaryOf(context),
                               )
                             : (avatarUrl.isEmpty
                                   ? Text(

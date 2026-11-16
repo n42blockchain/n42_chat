@@ -303,7 +303,7 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-                borderSide: const BorderSide(color: AppColors.primary),
+                borderSide: BorderSide(color: AppColors.primaryOf(context)),
               ),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: AppDimensions.spacingM,
@@ -359,7 +359,7 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-                borderSide: const BorderSide(color: AppColors.primary),
+                borderSide: BorderSide(color: AppColors.primaryOf(context)),
               ),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: AppDimensions.spacingM,
@@ -454,8 +454,8 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
                           borderRadius: BorderRadius.circular(
                             AppDimensions.radiusM,
                           ),
-                          borderSide: const BorderSide(
-                            color: AppColors.primary,
+                          borderSide: BorderSide(
+                            color: AppColors.primaryOf(context),
                           ),
                         ),
                         contentPadding: const EdgeInsets.symmetric(
@@ -501,9 +501,9 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
               icon: const Icon(Icons.add, size: 18),
               label: const Text('Add Choice'),
               style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.primary,
+                foregroundColor: AppColors.primaryOf(context),
                 side: BorderSide(
-                  color: AppColors.primary.withValues(alpha: 0.5),
+                  color: AppColors.primaryOf(context).withValues(alpha: 0.5),
                 ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppDimensions.radiusM),
@@ -572,7 +572,7 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
                 unawaited(_submitProposal());
               },
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
+          backgroundColor: AppColors.primaryOf(context),
           disabledBackgroundColor: ChatColors.of(context).buttonDisabledBg,
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(

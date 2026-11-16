@@ -84,8 +84,8 @@ class _RedPacketHistoryPageState extends State<RedPacketHistoryPage>
             Tab(text: l10n?.redPacketSent ?? 'Sent'),
             Tab(text: l10n?.redPacketReceived ?? 'Received'),
           ],
-          indicatorColor: AppColors.primary,
-          labelColor: AppColors.primary,
+          indicatorColor: AppColors.primaryOf(context),
+          labelColor: AppColors.primaryOf(context),
           unselectedLabelColor: context.textSecondary,
         ),
       ),
@@ -150,7 +150,7 @@ class _RedPacketHistoryPageState extends State<RedPacketHistoryPage>
       RedPacketLifecycle.expired => l10n?.redPacketExpired ?? 'Expired',
     };
     final statusColor = switch (rp.lifecycle) {
-      RedPacketLifecycle.active => AppColors.primary,
+      RedPacketLifecycle.active => AppColors.primaryOf(context),
       RedPacketLifecycle.completed => AppColors.success,
       RedPacketLifecycle.expired => context.textTertiary,
     };

@@ -433,7 +433,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
                             height: 1.3,
                             color: context.textPrimary,
                           ),
-                          cursorColor: AppColors.primary,
+                          cursorColor: AppColors.primaryOf(context),
                           onSubmitted: (_) => _searchUser(),
                         ),
                       ),
@@ -442,7 +442,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
                     ElevatedButton(
                       onPressed: _isLoading ? null : _searchUser,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
+                        backgroundColor: AppColors.primaryOf(context),
                         foregroundColor: Colors.white,
                         minimumSize: const Size(72, 44),
                         shape: RoundedRectangleBorder(
@@ -485,12 +485,12 @@ class _AddFriendPageState extends State<AddFriendPage> {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
+                    color: AppColors.primaryOf(context).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.contacts,
-                    color: AppColors.primary,
+                    color: AppColors.primaryOf(context),
                     size: 22,
                   ),
                 ),
@@ -610,8 +610,8 @@ class _AddFriendPageState extends State<AddFriendPage> {
       trailing: OutlinedButton(
         onPressed: () => _openUserProfile(userId),
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.primary,
-          side: const BorderSide(color: AppColors.primary),
+          foregroundColor: AppColors.primaryOf(context),
+          side: BorderSide(color: AppColors.primaryOf(context)),
           padding: const EdgeInsets.symmetric(
             horizontal: AppDimensions.spacing,
           ),
@@ -673,7 +673,7 @@ class _InputTypeChip extends StatelessWidget {
         icon = Icons.verified_outlined;
       case _InputType.matrixId:
         label = 'Matrix ID';
-        color = AppColors.primary;
+        color = AppColors.primaryOf(context);
         icon = Icons.person_outline;
       case _InputType.username:
         label = 'Username';
@@ -776,7 +776,7 @@ class _SearchMethodRow extends StatelessWidget {
       children: [
         _MethodCard(
           icon: Icons.person_outline,
-          color: AppColors.primary,
+          color: AppColors.primaryOf(context),
           title: 'Matrix ID',
           desc: '@user:server.com',
           isDark: isDark,

@@ -70,7 +70,7 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
       body: BlocBuilder<SocialGraphBloc, SocialGraphState>(
         builder: (context, state) {
           return RefreshIndicator(
-            color: AppColors.primary,
+            color: AppColors.primaryOf(context),
             onRefresh: () async => _loadData(),
             child: _buildBody(context, state, isDark),
           );
@@ -108,9 +108,11 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
 
         // Content
         if (state.isRecommendationsLoading && state.recommendations.isEmpty)
-          const SliverFillRemaining(
+          SliverFillRemaining(
             child: Center(
-              child: CircularProgressIndicator(color: AppColors.primary),
+              child: CircularProgressIndicator(
+                color: AppColors.primaryOf(context),
+              ),
             ),
           )
         else if (state.hasRecommendationsError && state.recommendations.isEmpty)
@@ -234,7 +236,8 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
                           vertical: 3,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.08),
+                          color: AppColors.primaryOf(context)
+                              .withValues(alpha: 0.08),
                           borderRadius: BorderRadius.circular(
                             AppDimensions.radiusM,
                           ),
@@ -243,11 +246,11 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
                           chain.toUpperCase(),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
                             height: 1.3,
                             fontWeight: FontWeight.w500,
-                            color: AppColors.primary,
+                            color: AppColors.primaryOf(context),
                           ),
                         ),
                       );
@@ -445,7 +448,9 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
               onPressed: _loadData,
               icon: const Icon(Icons.refresh, size: 18),
               label: const Text('Retry'),
-              style: TextButton.styleFrom(foregroundColor: AppColors.primary),
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.primaryOf(context),
+              ),
             ),
           ],
         ),

@@ -220,7 +220,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
                               MaterialTapTargetSize.shrinkWrap,
                           backgroundColor: ChatColors.of(
                             context,
-                          ).brandTintStrong(AppColors.primary),
+                          ).brandTintStrong(AppColors.primaryOf(context)),
                         ),
                       )
                       .toList(),
@@ -331,7 +331,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
     return SliverAppBar(
       expandedHeight: 200,
       pinned: true,
-      backgroundColor: ChatColors.of(context).brandHeaderBg(AppColors.primary),
+      backgroundColor: ChatColors.of(context).brandHeaderBg(AppColors.primaryOf(context)),
       actions: [
         // 治理提案入口：GovernanceBloc/三页面/数据层此前全部就位，但全仓
         // 零导航入口（附录 C 误标 ✅，2026-08-15 复核发现）——在此接线。
@@ -629,10 +629,10 @@ class _SpaceDetailScaffold extends StatelessWidget {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: AppColors.primary.withValues(alpha: 0.1),
+            color: AppColors.primaryOf(context).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(AppDimensions.radiusM),
           ),
-          child: const Icon(Icons.tag, color: AppColors.primary, size: 20),
+          child: Icon(Icons.tag, color: AppColors.primaryOf(context), size: 20),
         ),
         title: Text(
           child.name,

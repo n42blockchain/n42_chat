@@ -112,10 +112,10 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
           if (_isDirty)
             TextButton(
               onPressed: _save,
-              child: const Text(
+              child: Text(
                 'Save',
                 style: TextStyle(
-                  color: AppColors.primary,
+                  color: AppColors.primaryOf(context),
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -222,9 +222,9 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
               _buildSection(
                 title: 'Reward Rules',
                 trailing: IconButton(
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.add_circle_outline,
-                    color: AppColors.primary,
+                    color: AppColors.primaryOf(context),
                   ),
                   onPressed: _showAddRuleDialog,
                 ),
@@ -370,7 +370,7 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeTrackColor: AppColors.primary,
+            activeTrackColor: AppColors.primaryOf(context),
           ),
         ],
       ),
@@ -534,7 +534,7 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: AppColors.primaryOf(context),
                     foregroundColor: Colors.white,
                   ),
                   onPressed: () {
@@ -633,7 +633,7 @@ class _RuleTile extends StatelessWidget {
           Switch(
             value: rule.isEnabled,
             onChanged: onToggle,
-            activeTrackColor: AppColors.primary,
+            activeTrackColor: AppColors.primaryOf(context),
           ),
           IconButton(
             icon: Icon(

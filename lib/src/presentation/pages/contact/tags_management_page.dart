@@ -286,7 +286,7 @@ class _TagsManagementPageState extends State<TagsManagementPage> {
                   : () => Navigator.pop(context, _selectedTags.toList()),
               child: Text(
                 S.of(context)?.commonConfirm ?? 'OK',
-                style: const TextStyle(color: AppColors.primary),
+                style: TextStyle(color: AppColors.primaryOf(context)),
               ),
             ),
         ],
@@ -319,7 +319,7 @@ class _TagsManagementPageState extends State<TagsManagementPage> {
                       S.of(context)?.contactCreateTag ?? 'Create Tag',
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
+                      backgroundColor: AppColors.primaryOf(context),
                       foregroundColor: Colors.white,
                     ),
                   ),
@@ -349,7 +349,7 @@ class _TagsManagementPageState extends State<TagsManagementPage> {
                                       }
                                     });
                                   },
-                            activeColor: AppColors.primary,
+                            activeColor: AppColors.primaryOf(context),
                           )
                         : const Icon(Icons.label_outline),
                     title: Text(

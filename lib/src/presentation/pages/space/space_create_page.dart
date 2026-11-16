@@ -221,10 +221,10 @@ class _TypeCard extends StatelessWidget {
         padding: const EdgeInsets.all(AppDimensions.spacing),
         decoration: BoxDecoration(
           color: selected
-              ? AppColors.primary.withValues(alpha: 0.1)
+              ? AppColors.primaryOf(context).withValues(alpha: 0.1)
               : context.surfaceColor,
           border: Border.all(
-            color: selected ? AppColors.primary : Colors.transparent,
+            color: selected ? AppColors.primaryOf(context) : Colors.transparent,
             width: 2,
           ),
           borderRadius: BorderRadius.circular(AppDimensions.radiusL),
@@ -234,14 +234,18 @@ class _TypeCard extends StatelessWidget {
           children: [
             Icon(
               icon,
-              color: selected ? AppColors.primary : context.textSecondary,
+              color: selected
+                  ? AppColors.primaryOf(context)
+                  : context.textSecondary,
             ),
             const SizedBox(height: AppDimensions.spacingS),
             Text(
               title,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                color: selected ? AppColors.primary : context.textPrimary,
+                color: selected
+                    ? AppColors.primaryOf(context)
+                    : context.textPrimary,
               ),
             ),
             const SizedBox(height: AppDimensions.spacingXS),

@@ -157,7 +157,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
                           'Done(${_selectedUserIds.length})',
                       style: TextStyle(
                         color: _selectedUserIds.isNotEmpty
-                            ? AppColors.primary
+                            ? AppColors.primaryOf(context)
                             : AppColors.textSecondary,
                       ),
                     ),

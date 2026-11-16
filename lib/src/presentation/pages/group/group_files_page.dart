@@ -117,9 +117,9 @@ class _GroupFilesPageState extends State<GroupFilesPage>
   Widget _buildTabBar(BuildContext context) {
     return TabBar(
       controller: _tabController,
-      labelColor: AppColors.primary,
+      labelColor: AppColors.primaryOf(context),
       unselectedLabelColor: context.textSecondary,
-      indicatorColor: AppColors.primary,
+      indicatorColor: AppColors.primaryOf(context),
       tabs: [
         Tab(text: S.of(context)?.commonAll ?? 'All'),
         Tab(text: S.of(context)?.groupDocuments ?? 'Docs'),
@@ -257,7 +257,7 @@ class _GroupFilesPageState extends State<GroupFilesPage>
           ],
         ),
         trailing: IconButton(
-          icon: const Icon(Icons.download, color: AppColors.primary),
+          icon: Icon(Icons.download, color: AppColors.primaryOf(context)),
           onPressed: () => _downloadFile(file),
         ),
         onTap: () => _openFile(file),

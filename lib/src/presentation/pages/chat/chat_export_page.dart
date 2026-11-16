@@ -382,7 +382,7 @@ class _ChatExportPageState extends State<ChatExportPage> {
                   ? null
                   : _export,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
+                backgroundColor: AppColors.primaryOf(context),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
@@ -449,7 +449,7 @@ class _ChatExportPageState extends State<ChatExportPage> {
             )
           : null,
       value: value,
-      activeColor: AppColors.primary,
+      activeColor: AppColors.primaryOf(context),
     );
   }
 
@@ -473,10 +473,10 @@ class _ChatExportPageState extends State<ChatExportPage> {
         ),
         child: Row(
           children: [
-            const Icon(
+            Icon(
               Icons.calendar_today_outlined,
               size: 18,
-              color: AppColors.primary,
+              color: AppColors.primaryOf(context),
             ),
             const SizedBox(width: AppDimensions.spacingM),
             Expanded(

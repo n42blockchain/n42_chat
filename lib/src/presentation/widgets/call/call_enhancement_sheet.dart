@@ -414,7 +414,7 @@ class _SwitchTile extends StatelessWidget {
         ),
         secondary: Icon(
           icon,
-          color: enabled ? AppColors.primary : subtitleColor,
+          color: enabled ? AppColors.primaryOf(context) : subtitleColor,
         ),
         title: Text(title),
         subtitle: Text(
@@ -462,7 +462,7 @@ class _ActionTile extends StatelessWidget {
           horizontal: AppDimensions.spacing,
           vertical: AppDimensions.spacingS,
         ),
-        leading: Icon(icon, color: iconColor ?? AppColors.primary),
+        leading: Icon(icon, color: iconColor ?? AppColors.primaryOf(context)),
         title: Text(title),
         subtitle: Text(
           subtitle,

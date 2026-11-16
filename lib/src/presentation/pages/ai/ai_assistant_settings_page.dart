@@ -162,7 +162,7 @@ class AiAssistantSettingsPage extends StatelessWidget {
     Color? subtitleColor,
   }) {
     return ListTile(
-      leading: Icon(icon, color: AppColors.primary, size: 22),
+      leading: Icon(icon, color: AppColors.primaryOf(context), size: 22),
       title: Text(
         title,
         style: TextStyle(fontSize: 15, color: context.textPrimary),

@@ -366,8 +366,8 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
                       (_isBiometricAvailable || _isBiometricEnabled))
                   ? _onBiometricToggle
                   : null,
-              activeTrackColor: AppColors.primary.withValues(alpha: 0.5),
-              activeThumbColor: AppColors.primary,
+              activeTrackColor: AppColors.primaryOf(context).withValues(alpha: 0.5),
+              activeThumbColor: AppColors.primaryOf(context),
             ),
             onTap:
                 (!_biometricBusy &&
@@ -406,10 +406,10 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
+                  color: AppColors.primaryOf(context).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(Icons.key, color: AppColors.primary),
+                child: Icon(Icons.key, color: AppColors.primaryOf(context)),
               ),
               title: Text(
                 l10n?.authPasskeyNoRegistered ?? 'No passkeys registered',
@@ -811,7 +811,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: enabled ? AppColors.success : AppColors.primary,
+                color: enabled ? AppColors.success : AppColors.primaryOf(context),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: const Icon(
@@ -966,7 +966,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
         height: 40,
         decoration: BoxDecoration(
           color: device.isCurrentDevice
-              ? AppColors.primary.withValues(alpha: 0.1)
+              ? AppColors.primaryOf(context).withValues(alpha: 0.1)
               : device.isVerified
               ? AppColors.success.withValues(alpha: 0.1)
               : AppColors.warning.withValues(alpha: 0.1),
@@ -975,7 +975,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
         child: Icon(
           device.isCurrentDevice ? Icons.smartphone : Icons.phone_android,
           color: device.isCurrentDevice
-              ? AppColors.primary
+              ? AppColors.primaryOf(context)
               : device.isVerified
               ? AppColors.success
               : AppColors.warning,
@@ -1001,7 +1001,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
           fontSize: 12,
           height: 1.3,
           color: device.isCurrentDevice
-              ? AppColors.primary
+              ? AppColors.primaryOf(context)
               : device.isVerified
               ? AppColors.success
               : AppColors.warning,
@@ -1493,7 +1493,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
       key: key,
       leading: Icon(
         icon,
-        color: isDestructive ? AppColors.error : AppColors.primary,
+        color: isDestructive ? AppColors.error : AppColors.primaryOf(context),
       ),
       title: Text(title, style: TextStyle(color: color)),
       subtitle: subtitle != null
@@ -1917,7 +1917,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
                     height: 48,
                     decoration: BoxDecoration(
                       color: device.isCurrentDevice
-                          ? AppColors.primary.withValues(alpha: 0.1)
+                          ? AppColors.primaryOf(context).withValues(alpha: 0.1)
                           : device.isVerified
                           ? AppColors.success.withValues(alpha: 0.1)
                           : AppColors.warning.withValues(alpha: 0.1),
@@ -1928,7 +1928,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
                           ? Icons.smartphone
                           : Icons.phone_android,
                       color: device.isCurrentDevice
-                          ? AppColors.primary
+                          ? AppColors.primaryOf(context)
                           : device.isVerified
                           ? AppColors.success
                           : AppColors.warning,
@@ -1956,11 +1956,11 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
                             S.of(context)?.settingsThisDevice ?? 'This device',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 13,
                               height: 1.3,
                               fontWeight: FontWeight.w500,
-                              color: AppColors.primary,
+                              color: AppColors.primaryOf(context),
                             ),
                           ),
                       ],
@@ -2023,7 +2023,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage>
                     ),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      backgroundColor: AppColors.primary,
+                      backgroundColor: AppColors.primaryOf(context),
                       foregroundColor: Colors.white,
                     ),
                   ),

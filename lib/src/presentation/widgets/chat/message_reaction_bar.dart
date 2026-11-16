@@ -70,11 +70,13 @@ class _ReactionChip extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             color: hasReacted
-                ? AppColors.primary.withValues(alpha: 0.2)
+                ? AppColors.primaryOf(context).withValues(alpha: 0.2)
                 : context.surfaceColor,
             borderRadius: BorderRadius.circular(AppDimensions.radiusL),
             border: Border.all(
-              color: hasReacted ? AppColors.primary : context.dividerColor,
+              color: hasReacted
+                  ? AppColors.primaryOf(context)
+                  : context.dividerColor,
               width: 1,
             ),
           ),
@@ -89,7 +91,7 @@ class _ReactionChip extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12,
                     color: hasReacted
-                        ? AppColors.primary
+                        ? AppColors.primaryOf(context)
                         : context.textSecondary,
                   ),
                 ),

@@ -342,14 +342,16 @@ extension _ChatPageMessageListMethods on _ChatPageState {
                   shape: BoxShape.circle,
                   color: isRedacted
                       ? context.dividerColor
-                      : (isSelected ? AppColors.primary : Colors.transparent),
+                      : (isSelected
+                            ? AppColors.primaryOf(context)
+                            : Colors.transparent),
                   border: Border.all(
                     // redacted 用 textTertiary（淡，禁用语义）；可选中状态用 textSecondary
                     // 保证未选中圆圈在白底上仍清晰可见。
                     color: isRedacted
                         ? context.textTertiary
                         : (isSelected
-                              ? AppColors.primary
+                              ? AppColors.primaryOf(context)
                               : context.textSecondary),
                     width: 2,
                   ),
@@ -411,15 +413,19 @@ extension _ChatPageMessageListMethods on _ChatPageState {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.lock_outline, size: 16, color: AppColors.primary),
+            Icon(
+              Icons.lock_outline,
+              size: 16,
+              color: AppColors.primaryOf(context),
+            ),
             const SizedBox(width: AppDimensions.spacingS),
             Flexible(
               child: Text(
                 S.of(context)?.chatEncryptionNotice ?? 'This chat is end-to-end encrypted. Only you and the recipient can read the messages.',
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
-                  color: AppColors.primary,
+                  color: AppColors.primaryOf(context),
                   height: 1.4,
                 ),
               ),
@@ -464,7 +470,11 @@ extension _ChatPageMessageListMethods on _ChatPageState {
             child: Row(
               children: [
                 // 置顶图标
-                const Icon(Icons.push_pin, size: 16, color: AppColors.primary),
+                Icon(
+                  Icons.push_pin,
+                  size: 16,
+                  color: AppColors.primaryOf(context),
+                ),
                 const SizedBox(width: AppDimensions.spacingS),
                 // 消息内容预览
                 Expanded(
@@ -474,10 +484,10 @@ extension _ChatPageMessageListMethods on _ChatPageState {
                     children: [
                       Text(
                         msg.senderName,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
-                          color: AppColors.primary,
+                          color: AppColors.primaryOf(context),
                         ),
                       ),
                       Text(
@@ -504,16 +514,17 @@ extension _ChatPageMessageListMethods on _ChatPageState {
                         vertical: AppDimensions.spacingXS,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.1),
+                        color: AppColors.primaryOf(context)
+                            .withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(
                           AppDimensions.radiusL,
                         ),
                       ),
                       child: Text(
                         '${state.currentPinnedIndex + 1}/${state.pinnedMessages.length}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11,
-                          color: AppColors.primary,
+                          color: AppColors.primaryOf(context),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -599,7 +610,7 @@ extension _ChatPageMessageListMethods on _ChatPageState {
                 width: 3,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: AppColors.primary,
+                  color: AppColors.primaryOf(context),
                   borderRadius: BorderRadius.circular(1.5),
                 ),
               ),
@@ -610,9 +621,9 @@ extension _ChatPageMessageListMethods on _ChatPageState {
                   children: [
                     Text(
                       replyToText,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.primary,
+                        color: AppColors.primaryOf(context),
                         fontWeight: FontWeight.w500,
                       ),
                     ),

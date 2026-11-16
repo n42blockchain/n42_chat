@@ -250,7 +250,9 @@ class _DayDot extends StatelessWidget {
           style: TextStyle(
             fontSize: 11,
             fontWeight: isToday ? FontWeight.w600 : FontWeight.w400,
-            color: isToday ? AppColors.primary : context.textSecondary,
+            color: isToday
+                ? AppColors.primaryOf(context)
+                : context.textSecondary,
           ),
         ),
         const SizedBox(height: 6),
@@ -264,7 +266,7 @@ class _DayDot extends StatelessWidget {
                 ? const Color(0xFFFF6B35)
                 : ChatColors.of(context).chipBg,
             border: isToday
-                ? Border.all(color: AppColors.primary, width: 2)
+                ? Border.all(color: AppColors.primaryOf(context), width: 2)
                 : null,
           ),
           child: Center(

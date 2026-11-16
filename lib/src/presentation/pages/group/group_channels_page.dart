@@ -44,7 +44,7 @@ class _GroupChannelsPageState extends State<GroupChannelsPage> {
           floatingActionButton: canManage
               ? FloatingActionButton(
                   onPressed: () => _showCreateChannelDialog(context),
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: AppColors.primaryOf(context),
                   child: const Icon(Icons.add, color: Colors.white),
                 )
               : null,
@@ -81,8 +81,8 @@ class _GroupChannelsPageState extends State<GroupChannelsPage> {
   ) {
     return ListTile(
       leading: CircleAvatar(
-        backgroundColor: AppColors.primary.withValues(alpha: 0.12),
-        child: const Icon(Icons.tag, color: AppColors.primary, size: 18),
+        backgroundColor: AppColors.primaryOf(context).withValues(alpha: 0.12),
+        child: Icon(Icons.tag, color: AppColors.primaryOf(context), size: 18),
       ),
       title: Text(
         channel.name,
@@ -108,7 +108,7 @@ class _GroupChannelsPageState extends State<GroupChannelsPage> {
           ? Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: AppColors.primary,
+                color: AppColors.primaryOf(context),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Text(

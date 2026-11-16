@@ -105,7 +105,7 @@ class _ScheduledSendOption extends StatelessWidget {
 
     return ListTile(
       contentPadding: EdgeInsets.zero,
-      leading: Icon(icon, color: AppColors.primary),
+      leading: Icon(icon, color: AppColors.primaryOf(context)),
       title: Text(optionLabel),
       onTap: () async {
         if (!isCustom) {

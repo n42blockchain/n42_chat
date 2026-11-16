@@ -93,8 +93,10 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
           if (state.isSimilarityLoading ||
               (similarity == null &&
                   state.similarityStatus != SocialGraphStatus.error)) {
-            return const Center(
-              child: CircularProgressIndicator(color: AppColors.primary),
+            return Center(
+              child: CircularProgressIndicator(
+                color: AppColors.primaryOf(context),
+              ),
             );
           }
 
@@ -473,10 +475,10 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
           width: 36,
           height: 36,
           decoration: BoxDecoration(
-            color: AppColors.primary.withValues(alpha: 0.1),
+            color: AppColors.primaryOf(context).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(AppDimensions.radiusM),
           ),
-          child: Icon(icon, size: 18, color: AppColors.primary),
+          child: Icon(icon, size: 18, color: AppColors.primaryOf(context)),
         ),
         const SizedBox(width: AppDimensions.spacingM),
         Expanded(
@@ -555,7 +557,9 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
               },
               icon: const Icon(Icons.refresh, size: 18),
               label: const Text('Retry'),
-              style: TextButton.styleFrom(foregroundColor: AppColors.primary),
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.primaryOf(context),
+              ),
             ),
           ],
         ),
@@ -564,7 +568,7 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
   }
 
   Color _scoreColor(int percent) {
-    if (percent >= 60) return AppColors.primary;
+    if (percent >= 60) return AppColors.primaryOf(context);
     if (percent >= 30) return AppColors.warning;
     return AppColors.textSecondary;
   }

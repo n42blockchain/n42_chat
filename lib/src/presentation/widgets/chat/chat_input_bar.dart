@@ -887,12 +887,12 @@ class ChatInputBarState extends State<ChatInputBar> {
           color: _isRecording
               ? (_cancelRecording
                     ? AppColors.error.withValues(alpha: 0.1)
-                    : AppColors.primary.withValues(alpha: 0.1))
+                    : AppColors.primaryOf(context).withValues(alpha: 0.1))
               : context.surfaceColor,
           borderRadius: BorderRadius.circular(4),
           border: _isRecording
               ? Border.all(
-                  color: _cancelRecording ? AppColors.error : AppColors.primary,
+                  color: _cancelRecording ? AppColors.error : AppColors.primaryOf(context),
                   width: 1,
                 )
               : null,
@@ -910,7 +910,7 @@ class ChatInputBarState extends State<ChatInputBar> {
               fontSize: 16,
               fontWeight: FontWeight.w500,
               color: _isRecording
-                  ? (_cancelRecording ? AppColors.error : AppColors.primary)
+                  ? (_cancelRecording ? AppColors.error : AppColors.primaryOf(context))
                   : context.textPrimary,
             ),
           ),
@@ -945,8 +945,8 @@ class ChatInputBarState extends State<ChatInputBar> {
               Icons.send,
               size: 22,
               color: widget.enabled
-                  ? AppColors.primary
-                  : AppColors.primary.withValues(alpha: 0.4),
+                  ? AppColors.primaryOf(context)
+                  : AppColors.primaryOf(context).withValues(alpha: 0.4),
             ),
           ),
         ),

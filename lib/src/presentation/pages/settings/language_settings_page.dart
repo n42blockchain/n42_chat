@@ -304,7 +304,7 @@ class _LanguageItem extends StatelessWidget {
         color: bgColor,
         borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         border: isSelected
-            ? Border.all(color: AppColors.primary, width: 2)
+            ? Border.all(color: AppColors.primaryOf(context), width: 2)
             : null,
       ),
       child: Material(
@@ -325,7 +325,7 @@ class _LanguageItem extends StatelessWidget {
                   height: 40,
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? AppColors.primary.withValues(alpha: 0.1)
+                        ? AppColors.primaryOf(context).withValues(alpha: 0.1)
                         : context.pageBackground,
                     borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                   ),
@@ -335,7 +335,7 @@ class _LanguageItem extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: isSelected ? AppColors.primary : subtitleColor,
+                        color: isSelected ? AppColors.primaryOf(context) : subtitleColor,
                       ),
                     ),
                   ),
@@ -356,7 +356,7 @@ class _LanguageItem extends StatelessWidget {
                           fontWeight: isSelected
                               ? FontWeight.w600
                               : FontWeight.normal,
-                          color: isSelected ? AppColors.primary : textColor,
+                          color: isSelected ? AppColors.primaryOf(context) : textColor,
                         ),
                       ),
                       if (language.name != language.nativeName)
@@ -374,9 +374,9 @@ class _LanguageItem extends StatelessWidget {
                   ),
                 ),
                 if (isSelected)
-                  const Icon(
+                  Icon(
                     Icons.check_circle_rounded,
-                    color: AppColors.primary,
+                    color: AppColors.primaryOf(context),
                     size: 24,
                   ),
               ],

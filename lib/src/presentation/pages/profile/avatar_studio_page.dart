@@ -375,7 +375,7 @@ class _DecorationCard extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: isSelected ? AppColors.primary : context.dividerColor,
+              color: isSelected ? AppColors.primaryOf(context) : context.dividerColor,
               width: isSelected ? 2 : 1,
             ),
           ),

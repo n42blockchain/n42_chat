@@ -266,7 +266,7 @@ class SettingsPage extends StatelessWidget {
                   trailing: Switch(
                     value: isBiometricEnabled,
                     onChanged: onBiometricToggle,
-                    activeTrackColor: AppColors.primary,
+                    activeTrackColor: AppColors.primaryOf(context),
                   ),
                   onTap: onBiometricToggle != null
                       ? () => onBiometricToggle!(!isBiometricEnabled)
@@ -320,7 +320,7 @@ class SettingsPage extends StatelessWidget {
               children: [
                 _SettingsItem(
                   icon: Icons.switch_account_outlined,
-                  iconColor: AppColors.primary,
+                  iconColor: AppColors.primaryOf(context),
                   title:
                       S.of(context)?.settingsSwitchAccount ?? 'Switch Account',
                   onTap: () => _navigateToAccounts(context),

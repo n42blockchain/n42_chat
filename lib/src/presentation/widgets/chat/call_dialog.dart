@@ -150,8 +150,11 @@ class _ChatCallDialogState extends State<ChatCallDialog> {
               height: 120,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.primary.withValues(alpha: 0.3),
-                border: Border.all(color: AppColors.primary, width: 3),
+                color: AppColors.primaryOf(context).withValues(alpha: 0.3),
+                border: Border.all(
+                  color: AppColors.primaryOf(context),
+                  width: 3,
+                ),
               ),
               child: _buildAvatarPlaceholder(),
             ),

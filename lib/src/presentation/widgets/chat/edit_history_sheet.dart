@@ -173,14 +173,14 @@ class _EditHistorySheetState extends State<EditHistorySheet> {
                   ),
                   margin: const EdgeInsets.only(right: AppDimensions.spacingS),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
+                    color: AppColors.primaryOf(context).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                   ),
                   child: Text(
                     s?.chatOriginalMessage ?? 'Original',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 10,
-                      color: AppColors.primary,
+                      color: AppColors.primaryOf(context),
                       fontWeight: FontWeight.w500,
                     ),
                   ),

@@ -785,8 +785,8 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+            CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryOf(context)),
             ),
             const SizedBox(height: 16),
             Text(
@@ -846,7 +846,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                   ElevatedButton(
                     onPressed: _checkCameraPermission,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
+                      backgroundColor: AppColors.primaryOf(context),
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 24,
@@ -888,8 +888,8 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                             'Close Manual Input')
                       : (S.of(context)?.qrcodeManualInputUserId ??
                             'Manual Input User ID'),
-                  style: const TextStyle(
-                    color: AppColors.primary,
+                  style: TextStyle(
+                    color: AppColors.primaryOf(context),
                     fontSize: 14,
                   ),
                 ),
@@ -961,8 +961,8 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                               'Close Manual Input')
                         : (S.of(context)?.qrcodeManualInputUserId ??
                               'Manual Input User ID'),
-                    style: const TextStyle(
-                      color: AppColors.primary,
+                    style: TextStyle(
+                      color: AppColors.primaryOf(context),
                       fontSize: 14,
                     ),
                   ),
@@ -987,9 +987,9 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
         if (_isProcessing || _isPickingImage)
           Container(
             color: Colors.black54,
-            child: const Center(
+            child: Center(
               child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryOf(context)),
               ),
             ),
           ),
@@ -1041,17 +1041,17 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
       decoration: BoxDecoration(
         border: Border(
           top: isTop
-              ? const BorderSide(color: AppColors.primary, width: 3)
+              ? BorderSide(color: AppColors.primaryOf(context), width: 3)
               : BorderSide.none,
           bottom: isTop
               ? BorderSide.none
-              : const BorderSide(color: AppColors.primary, width: 3),
+              : BorderSide(color: AppColors.primaryOf(context), width: 3),
           left: isLeft
-              ? const BorderSide(color: AppColors.primary, width: 3)
+              ? BorderSide(color: AppColors.primaryOf(context), width: 3)
               : BorderSide.none,
           right: isLeft
               ? BorderSide.none
-              : const BorderSide(color: AppColors.primary, width: 3),
+              : BorderSide(color: AppColors.primaryOf(context), width: 3),
         ),
       ),
     );
@@ -1089,7 +1089,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                 ? null
                 : _submitManualInput,
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
+              backgroundColor: AppColors.primaryOf(context),
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),

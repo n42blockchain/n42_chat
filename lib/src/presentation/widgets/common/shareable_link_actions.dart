@@ -288,12 +288,13 @@ class _ShareableLinkQrPageState extends State<_ShareableLinkQrPage> {
                           width: 56,
                           height: 56,
                           decoration: BoxDecoration(
-                            color: AppColors.primary.withValues(alpha: 0.12),
+                            color: AppColors.primaryOf(context)
+                                .withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(18),
                           ),
                           child: Icon(
                             widget.presentation.icon,
-                            color: AppColors.primary,
+                            color: AppColors.primaryOf(context),
                           ),
                         ),
                         const SizedBox(height: AppDimensions.spacing),

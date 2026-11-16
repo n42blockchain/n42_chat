@@ -229,7 +229,7 @@ class _ChannelDiscoverPageState extends State<ChannelDiscoverPage> {
               label: Text(entry.value),
               selected: selected,
               onSelected: (_) => setState(() => _selectedCategory = entry.key),
-              selectedColor: AppColors.primary,
+              selectedColor: AppColors.primaryOf(context),
               labelStyle: TextStyle(
                 color: selected ? Colors.white : context.textPrimary,
                 fontSize: 13,

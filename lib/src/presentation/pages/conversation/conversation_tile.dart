@@ -260,12 +260,12 @@ class ConversationTile extends StatelessWidget {
                 children: [
                   // 聊天锁标识
                   if (isLocked)
-                    const Padding(
-                      padding: EdgeInsets.only(right: 4),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 4),
                       child: Icon(
                         Icons.lock_outline,
                         size: 14,
-                        color: AppColors.primary,
+                        color: AppColors.primaryOf(context),
                       ),
                     ),
                   // 加密标识

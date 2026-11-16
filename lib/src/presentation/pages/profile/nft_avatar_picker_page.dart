@@ -188,8 +188,8 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
         ),
         bottom: TabBar(
           controller: _tabController,
-          indicatorColor: AppColors.primary,
-          labelColor: AppColors.primary,
+          indicatorColor: AppColors.primaryOf(context),
+          labelColor: AppColors.primaryOf(context),
           unselectedLabelColor: context.textSecondary,
           tabs: [
             Tab(text: l10n?.nftPickerTabPopular ?? 'Popular'),
@@ -314,7 +314,7 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
                 contentPadding: const EdgeInsets.all(AppDimensions.spacingM),
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.paste_rounded, size: 18),
-                  color: AppColors.primary,
+                  color: AppColors.primaryOf(context),
                   onPressed: () async {
                     final data = await Clipboard.getData('text/plain');
                     if (!mounted) return;
@@ -410,7 +410,7 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
             child: ElevatedButton(
               onPressed: _isResolving ? null : _resolveNft,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
+                backgroundColor: AppColors.primaryOf(context),
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -555,8 +555,8 @@ class _NftPreview extends StatelessWidget {
           icon: const Icon(Icons.check_circle_outline, size: 18),
           label: Text(l10n?.nftPickerUseAsAvatar ?? 'Use as Avatar'),
           style: OutlinedButton.styleFrom(
-            foregroundColor: AppColors.primary,
-            side: const BorderSide(color: AppColors.primary),
+            foregroundColor: AppColors.primaryOf(context),
+            side: BorderSide(color: AppColors.primaryOf(context)),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
@@ -583,9 +583,9 @@ class _InfoBanner extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.08),
+        color: AppColors.primaryOf(context).withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+        border: Border.all(color: AppColors.primaryOf(context).withValues(alpha: 0.2)),
       ),
       child: Row(
         children: [
@@ -599,11 +599,11 @@ class _InfoBanner extends StatelessWidget {
                   l10n?.nftPickerInfoTitle ?? 'NFT Avatar — Verified On-Chain',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     height: 1.3,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.primary,
+                    color: AppColors.primaryOf(context),
                   ),
                 ),
                 const SizedBox(height: AppDimensions.spacingXS),
@@ -671,13 +671,13 @@ class _ChainSelector extends StatelessWidget {
               ),
               decoration: BoxDecoration(
                 color: selected
-                    ? AppColors.primary
+                    ? AppColors.primaryOf(context)
                     : ChatColors.of(
                         context,
-                      ).brandSelectedTint(AppColors.primary),
+                      ).brandSelectedTint(AppColors.primaryOf(context)),
                 borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                 border: Border.all(
-                  color: selected ? AppColors.primary : Colors.transparent,
+                  color: selected ? AppColors.primaryOf(context) : Colors.transparent,
                 ),
               ),
               child: Row(

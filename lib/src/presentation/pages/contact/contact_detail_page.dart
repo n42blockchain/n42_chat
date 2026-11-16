@@ -1561,7 +1561,7 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.primary,
+                  color: AppColors.primaryOf(context),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: _isSaving

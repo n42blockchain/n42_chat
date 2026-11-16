@@ -164,7 +164,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
             ElevatedButton(
               onPressed: _loadContacts,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
+                backgroundColor: AppColors.primaryOf(context),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppDimensions.spacingXXL,
@@ -265,9 +265,9 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
           color: context.surfaceColor,
           child: Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.check_circle,
-                color: AppColors.primary,
+                color: AppColors.primaryOf(context),
                 size: 20,
               ),
               const SizedBox(width: AppDimensions.spacingS),
@@ -320,7 +320,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
             child: Container(
               padding: const EdgeInsets.all(2),
               decoration: BoxDecoration(
-                color: AppColors.primary,
+                color: AppColors.primaryOf(context),
                 shape: BoxShape.circle,
                 border: Border.all(color: context.surfaceColor, width: 2),
               ),
@@ -369,8 +369,8 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
       trailing: OutlinedButton(
         onPressed: () => _startDirectChat(match.matrixUserId),
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.primary,
-          side: const BorderSide(color: AppColors.primary),
+          foregroundColor: AppColors.primaryOf(context),
+          side: BorderSide(color: AppColors.primaryOf(context)),
           padding: const EdgeInsets.symmetric(
             horizontal: AppDimensions.spacing,
           ),

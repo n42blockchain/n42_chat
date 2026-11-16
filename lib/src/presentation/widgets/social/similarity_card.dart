@@ -193,8 +193,8 @@ class SimilarityCard extends StatelessWidget {
       child: TextButton(
         onPressed: onConnect,
         style: TextButton.styleFrom(
-          backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-          foregroundColor: AppColors.primary,
+          backgroundColor: AppColors.primaryOf(context).withValues(alpha: 0.1),
+          foregroundColor: AppColors.primaryOf(context),
           padding: const EdgeInsets.symmetric(horizontal: 14),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),

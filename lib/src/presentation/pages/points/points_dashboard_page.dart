@@ -84,7 +84,7 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
 
           return RefreshIndicator(
             onRefresh: () async => _loadData(),
-            color: AppColors.primary,
+            color: AppColors.primaryOf(context),
             child: ListView(
               padding: const EdgeInsets.all(AppDimensions.spacing),
               children: [
@@ -132,15 +132,15 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
     return Container(
       padding: const EdgeInsets.all(AppDimensions.spacingL),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppColors.primary, AppColors.primaryDark],
+        gradient: LinearGradient(
+          colors: [AppColors.primaryOf(context), AppColors.primaryDark],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.3),
+            color: AppColors.primaryOf(context).withValues(alpha: 0.3),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -573,7 +573,7 @@ class _StatCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(icon, size: 28, color: AppColors.primary),
+          Icon(icon, size: 28, color: AppColors.primaryOf(context)),
           const SizedBox(width: AppDimensions.spacingM),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -632,7 +632,7 @@ class _ActionButton extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 20, color: AppColors.primary),
+            Icon(icon, size: 20, color: AppColors.primaryOf(context)),
             const SizedBox(width: AppDimensions.spacingS),
             Text(
               label,

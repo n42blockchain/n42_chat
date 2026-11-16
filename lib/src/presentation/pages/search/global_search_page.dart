@@ -175,7 +175,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
                   Icons.tune,
                   color: _messageFilter == null
                       ? context.textPrimary
-                      : AppColors.primary,
+                      : AppColors.primaryOf(context),
                 ),
                 if (_messageFilter != null)
                   Positioned(
@@ -184,8 +184,8 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
                     child: Container(
                       width: 8,
                       height: 8,
-                      decoration: const BoxDecoration(
-                        color: AppColors.primary,
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryOf(context),
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -356,7 +356,9 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
             vertical: 6,
           ),
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.primary : context.pageBackground,
+            color: isSelected
+                ? AppColors.primaryOf(context)
+                : context.pageBackground,
             borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
           ),
           child: Row(

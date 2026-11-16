@@ -142,8 +142,8 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                     child: ElevatedButton(
                       onPressed: isLoading ? null : _changePassword,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        disabledBackgroundColor: AppColors.primary.withValues(
+                        backgroundColor: AppColors.primaryOf(context),
+                        disabledBackgroundColor: AppColors.primaryOf(context).withValues(
                           alpha: 0.5,
                         ),
                         shape: RoundedRectangleBorder(
@@ -203,7 +203,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
       ),
       child: Row(
         children: [
-          const Icon(Icons.info_outline, color: AppColors.primary, size: 24),
+          Icon(Icons.info_outline, color: AppColors.primaryOf(context), size: 24),
           const SizedBox(width: AppDimensions.spacingM),
           Expanded(
             child: Text(

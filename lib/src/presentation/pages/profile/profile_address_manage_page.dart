@@ -156,7 +156,7 @@ class AddressManagePageState extends State<AddressManagePage> {
                       S.of(context)?.profileAddAddress ?? 'Add Address',
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
+                      backgroundColor: AppColors.primaryOf(context),
                       foregroundColor: Colors.white,
                     ),
                   ),
@@ -210,9 +210,8 @@ class AddressManagePageState extends State<AddressManagePage> {
                                   vertical: 2,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: AppColors.primary.withValues(
-                                    alpha: 0.1,
-                                  ),
+                                  color: AppColors.primaryOf(context)
+                                      .withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(
                                     AppDimensions.radiusS,
                                   ),
@@ -222,11 +221,11 @@ class AddressManagePageState extends State<AddressManagePage> {
                                       'Default',
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 12,
                                     height: 1.3,
                                     fontWeight: FontWeight.w500,
-                                    color: AppColors.primary,
+                                    color: AppColors.primaryOf(context),
                                   ),
                                 ),
                               ),

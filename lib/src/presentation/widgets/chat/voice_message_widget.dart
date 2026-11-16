@@ -261,7 +261,7 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final iconColor = widget.isSelf
         ? AppColors.sentText(isDark)
-        : AppColors.primary;
+        : AppColors.primaryOf(context);
     final textColor = widget.isSelf
         ? AppColors.sentText(isDark)
         : context.textPrimary;

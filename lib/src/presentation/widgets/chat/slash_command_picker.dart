@@ -115,7 +115,7 @@ class SlashCommandPicker extends StatelessWidget {
             color: Colors.transparent,
             child: ListTile(
               dense: true,
-              leading: Icon(item.icon, color: AppColors.primary, size: 20),
+              leading: Icon(item.icon, color: AppColors.primaryOf(context), size: 20),
               title: Text(
                 '/${item.command}',
                 style: TextStyle(

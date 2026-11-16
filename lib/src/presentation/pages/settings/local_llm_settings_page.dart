@@ -94,7 +94,7 @@ class _LocalLlmSettingsPageState extends State<LocalLlmSettingsPage> {
                 title: const Text('Use on-device AI'),
                 subtitle: const Text('Prefer local inference when ready'),
                 value: _service.enabled,
-                activeThumbColor: AppColors.primary,
+                activeThumbColor: AppColors.primaryOf(context),
                 onChanged: available
                     ? (v) => setState(() => _service.enabled = v)
                     : null,
@@ -107,7 +107,7 @@ class _LocalLlmSettingsPageState extends State<LocalLlmSettingsPage> {
                   ),
                   child: FilledButton.icon(
                     style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.primary,
+                      backgroundColor: AppColors.primaryOf(context),
                     ),
                     onPressed: () => _service.download(),
                     icon: const Icon(Icons.download),

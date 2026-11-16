@@ -165,8 +165,8 @@ class _QuickReplySheetState extends State<QuickReplySheet> {
                     },
                     child: Text(
                       l10n?.settingsManageQuickReplies ?? 'Manage',
-                      style: const TextStyle(
-                        color: AppColors.primary,
+                      style: TextStyle(
+                        color: AppColors.primaryOf(context),
                         fontSize: 14,
                       ),
                     ),
@@ -338,7 +338,11 @@ class _QuickReplySheetState extends State<QuickReplySheet> {
         ),
         child: Row(
           children: [
-            const Icon(Icons.auto_awesome, size: 18, color: AppColors.primary),
+            Icon(
+              Icons.auto_awesome,
+              size: 18,
+              color: AppColors.primaryOf(context),
+            ),
             const SizedBox(width: 10),
             Expanded(
               child: Text(

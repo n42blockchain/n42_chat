@@ -167,6 +167,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
       return;
     }
 
+    final brand = AppColors.primaryOf(context);
     _searchDebounce = Timer(const Duration(milliseconds: 500), () async {
       try {
         final geocoder = geocoding.Geocoding();
@@ -191,7 +192,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
               latitude: loc.latitude,
               longitude: loc.longitude,
               icon: Icons.location_on,
-              iconColor: AppColors.primary,
+              iconColor: brand,
             ),
           );
         }
@@ -227,7 +228,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
         latitude: position.latitude,
         longitude: position.longitude,
         icon: Icons.my_location,
-        iconColor: AppColors.primary,
+        iconColor: AppColors.primaryOf(context),
       ),
     ];
   }
@@ -312,7 +313,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
               S.of(context)?.chatSendButton ?? 'Send',
               style: TextStyle(
                 color: _currentPosition != null
-                    ? AppColors.primary
+                    ? AppColors.primaryOf(context)
                     : context.textTertiary,
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -406,9 +407,9 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
                           heroTag: 'relocate',
                           onPressed: _moveToCurrentLocation,
                           backgroundColor: Colors.white,
-                          child: const Icon(
+                          child: Icon(
                             Icons.my_location,
-                            color: AppColors.primary,
+                            color: AppColors.primaryOf(context),
                           ),
                         ),
                       ),
@@ -481,9 +482,9 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
                           ),
                         ),
                         trailing: isSelected
-                            ? const Icon(
+                            ? Icon(
                                 Icons.check_circle,
-                                color: AppColors.primary,
+                                color: AppColors.primaryOf(context),
                               )
                             : null,
                         onTap: () {
@@ -598,9 +599,9 @@ class _ChatLocationDetailPageState extends State<ChatLocationDetailPage> {
                                 ),
                               ],
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.location_on,
-                              color: AppColors.primary,
+                              color: AppColors.primaryOf(context),
                               size: 24,
                             ),
                           ),
@@ -693,12 +694,12 @@ class _ChatLocationDetailPageState extends State<ChatLocationDetailPage> {
                             width: 50,
                             height: 50,
                             decoration: BoxDecoration(
-                              color: AppColors.primary.withValues(alpha: 0.1),
+                              color: AppColors.primaryOf(context).withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.location_on,
-                              color: AppColors.primary,
+                              color: AppColors.primaryOf(context),
                               size: 28,
                             ),
                           ),
@@ -782,7 +783,7 @@ class _ChatLocationDetailPageState extends State<ChatLocationDetailPage> {
                                 S.of(context)?.chatMapPreview ?? 'Open in Maps',
                               ),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.primary,
+                                backgroundColor: AppColors.primaryOf(context),
                                 foregroundColor: Colors.white,
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 14,

@@ -272,7 +272,9 @@ class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
               .copyWith(
                 borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                 border: Border.all(
-                  color: isImage ? AppColors.primary : context.dividerColor,
+                  color: isImage
+                      ? AppColors.primaryOf(context)
+                      : context.dividerColor,
                   width: isImage ? 2 : 1,
                 ),
               ),
@@ -327,7 +329,9 @@ class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
           color: context.surfaceColor,
           borderRadius: BorderRadius.circular(AppDimensions.radiusL),
           border: Border.all(
-            color: isSelected ? AppColors.primary : context.dividerColor,
+            color: isSelected
+                ? AppColors.primaryOf(context)
+                : context.dividerColor,
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -363,7 +367,9 @@ class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
                 color: entry.value,
                 borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                 border: Border.all(
-                  color: isSelected ? AppColors.primary : Colors.transparent,
+                  color: isSelected
+                      ? AppColors.primaryOf(context)
+                      : Colors.transparent,
                   width: isSelected ? 2 : 0,
                 ),
               ),
@@ -409,7 +415,9 @@ class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
                 ),
                 borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                 border: Border.all(
-                  color: isSelected ? AppColors.primary : Colors.transparent,
+                  color: isSelected
+                      ? AppColors.primaryOf(context)
+                      : Colors.transparent,
                   width: isSelected ? 2 : 0,
                 ),
               ),

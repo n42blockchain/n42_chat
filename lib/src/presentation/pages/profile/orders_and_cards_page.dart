@@ -92,9 +92,9 @@ class _OrdersAndCardsPageState extends State<OrdersAndCardsPage> {
           ],
           centerTitle: true,
           bottom: TabBar(
-            labelColor: AppColors.primary,
+            labelColor: AppColors.primaryOf(context),
             unselectedLabelColor: context.textSecondary,
-            indicatorColor: AppColors.primary,
+            indicatorColor: AppColors.primaryOf(context),
             tabs: [
               Tab(text: S.of(context)?.profileOrders ?? 'Activity'),
               Tab(text: S.of(context)?.profileCardPack ?? 'Card Pack'),

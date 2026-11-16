@@ -476,7 +476,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
             width: 32,
             height: 32,
             decoration: BoxDecoration(
-              color: iconColor ?? AppColors.primary,
+              color: iconColor ?? AppColors.primaryOf(context),
               borderRadius: BorderRadius.circular(6),
             ),
             child: Icon(icon, color: Colors.white, size: 20),
@@ -513,7 +513,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeTrackColor: AppColors.primary,
+            activeTrackColor: AppColors.primaryOf(context),
           ),
         ],
       ),
@@ -542,7 +542,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: iconColor ?? AppColors.primary,
+                color: iconColor ?? AppColors.primaryOf(context),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Icon(icon, color: Colors.white, size: 20),
@@ -751,7 +751,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                 (seconds) => ListTile(
                   title: Text(_formatSelfDestructDuration(seconds)),
                   trailing: _settings.defaultSelfDestructSeconds == seconds
-                      ? const Icon(Icons.check, color: AppColors.primary)
+                      ? Icon(Icons.check, color: AppColors.primaryOf(context))
                       : null,
                   onTap: () => Navigator.pop(ctx, seconds ?? 'off'),
                 ),
@@ -933,7 +933,7 @@ class _VisibilityPickerSheet extends StatelessWidget {
               (level) => ListTile(
                 title: Text(_getLabel(context, level)),
                 trailing: currentValue == level
-                    ? const Icon(Icons.check, color: AppColors.primary)
+                    ? Icon(Icons.check, color: AppColors.primaryOf(context))
                     : null,
                 onTap: () => Navigator.pop(context, level),
               ),

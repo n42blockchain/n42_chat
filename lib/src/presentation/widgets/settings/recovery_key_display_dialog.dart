@@ -34,11 +34,11 @@ class RecoveryKeyDisplayDialog extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return AlertDialog(
-      title: const Row(
+      title: Row(
         children: [
-          Icon(Icons.key, color: AppColors.primary),
-          SizedBox(width: AppDimensions.spacingS),
-          Expanded(child: Text('Recovery Key', style: TextStyle(fontSize: 18))),
+          Icon(Icons.key, color: AppColors.primaryOf(context)),
+          const SizedBox(width: AppDimensions.spacingS),
+          const Expanded(child: Text('Recovery Key', style: TextStyle(fontSize: 18))),
         ],
       ),
       content: SingleChildScrollView(
@@ -110,8 +110,8 @@ class RecoveryKeyDisplayDialog extends StatelessWidget {
                     icon: const Icon(Icons.copy, size: 18),
                     label: const Text('Copy'),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.primary,
-                      side: const BorderSide(color: AppColors.primary),
+                      foregroundColor: AppColors.primaryOf(context),
+                      side: BorderSide(color: AppColors.primaryOf(context)),
                     ),
                   ),
                 ),
@@ -122,8 +122,8 @@ class RecoveryKeyDisplayDialog extends StatelessWidget {
                     icon: const Icon(Icons.save_alt, size: 18),
                     label: const Text('Save'),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.primary,
-                      side: const BorderSide(color: AppColors.primary),
+                      foregroundColor: AppColors.primaryOf(context),
+                      side: BorderSide(color: AppColors.primaryOf(context)),
                     ),
                   ),
                 ),

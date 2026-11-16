@@ -182,10 +182,11 @@ class _StoryMusicPickerState extends State<StoryMusicPicker> {
             Container(
               padding: const EdgeInsets.all(AppDimensions.spacingM),
               decoration: BoxDecoration(
-                color: ChatColors.of(context).brandTintSoft(AppColors.primary),
+                color: ChatColors.of(context)
+                    .brandTintSoft(AppColors.primaryOf(context)),
                 borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                 border: Border.all(
-                  color: AppColors.primary.withValues(alpha: 0.2),
+                  color: AppColors.primaryOf(context).withValues(alpha: 0.2),
                 ),
               ),
               child: Row(
@@ -196,8 +197,8 @@ class _StoryMusicPickerState extends State<StoryMusicPicker> {
                     child: Container(
                       width: 40,
                       height: 40,
-                      decoration: const BoxDecoration(
-                        color: AppColors.primary,
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryOf(context),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
@@ -230,11 +231,10 @@ class _StoryMusicPickerState extends State<StoryMusicPicker> {
                               ? _position.inMilliseconds /
                                     _duration.inMilliseconds
                               : 0,
-                          backgroundColor: AppColors.primary.withValues(
-                            alpha: 0.2,
-                          ),
-                          valueColor: const AlwaysStoppedAnimation(
-                            AppColors.primary,
+                          backgroundColor: AppColors.primaryOf(context)
+                              .withValues(alpha: 0.2),
+                          valueColor: AlwaysStoppedAnimation(
+                            AppColors.primaryOf(context),
                           ),
                         ),
                         const SizedBox(height: 2),
@@ -294,7 +294,7 @@ class _StoryMusicPickerState extends State<StoryMusicPicker> {
               child: ElevatedButton(
                 onPressed: _confirmSelection,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: AppColors.primaryOf(context),
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(
                     vertical: AppDimensions.spacingM,

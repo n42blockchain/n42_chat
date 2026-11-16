@@ -254,7 +254,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   }
 
   Widget _buildStepIndicator(bool isDark) {
-    const activeColor = AppColors.primary;
+    final activeColor = AppColors.primaryOf(context);
     final inactiveColor = context.dividerColor;
 
     return Row(
@@ -353,8 +353,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           child: ElevatedButton(
             onPressed: isLoading ? null : _sendVerificationCode,
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.5),
+              backgroundColor: AppColors.primaryOf(context),
+              disabledBackgroundColor: AppColors.primaryOf(context).withValues(alpha: 0.5),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               ),
@@ -465,7 +465,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           child: ElevatedButton(
             onPressed: _verifyCode,
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
+              backgroundColor: AppColors.primaryOf(context),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               ),
@@ -616,8 +616,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           child: ElevatedButton(
             onPressed: isLoading ? null : _resetPassword,
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.5),
+              backgroundColor: AppColors.primaryOf(context),
+              disabledBackgroundColor: AppColors.primaryOf(context).withValues(alpha: 0.5),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               ),

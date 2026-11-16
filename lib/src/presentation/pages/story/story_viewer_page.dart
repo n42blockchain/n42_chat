@@ -624,7 +624,7 @@ class _StoryContentState extends State<_StoryContent> {
       // 纯文字 Story：显示背景颜色
       final bgColor = story.backgroundColor != null
           ? Color(story.backgroundColor!)
-          : AppColors.primary;
+          : AppColors.primaryOf(context);
       return Container(color: bgColor);
     }
 

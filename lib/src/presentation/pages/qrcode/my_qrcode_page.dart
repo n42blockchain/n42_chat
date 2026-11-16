@@ -356,10 +356,10 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
+              color: AppColors.primaryOf(context).withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: AppColors.primary, size: 24),
+            child: Icon(icon, color: AppColors.primaryOf(context), size: 24),
           ),
           const SizedBox(height: AppDimensions.spacingS),
           Text(
@@ -465,7 +465,7 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
   Color _qrEyeColorFor(_QRCodeStyle style) {
     switch (style) {
       case _QRCodeStyle.n42:
-        return AppColors.primary;
+        return AppColors.primaryOf(context);
       case _QRCodeStyle.classic:
         return Colors.black;
       case _QRCodeStyle.ocean:
@@ -562,7 +562,7 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
                     ),
                     title: Text(_qrStyleLabel(style)),
                     trailing: _qrStyle == style
-                        ? const Icon(Icons.check, color: AppColors.primary)
+                        ? Icon(Icons.check, color: AppColors.primaryOf(context))
                         : null,
                     onTap: () {
                       Navigator.pop(sheetContext);

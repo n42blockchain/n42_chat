@@ -301,13 +301,13 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                           height: 24,
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
-                            color: AppColors.primary.withValues(alpha: 0.1),
+                            color: AppColors.primaryOf(context).withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
                             '${index + 1}',
-                            style: const TextStyle(
-                              color: AppColors.primary,
+                            style: TextStyle(
+                              color: AppColors.primaryOf(context),
                               fontWeight: FontWeight.w600,
                               fontSize: 12,
                             ),
@@ -357,7 +357,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                       S.of(context)?.chatAddOptionButton ?? 'Add Option',
                     ),
                     style: TextButton.styleFrom(
-                      foregroundColor: AppColors.primary,
+                      foregroundColor: AppColors.primaryOf(context),
                     ),
                   ),
 
@@ -447,7 +447,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                                 _isAnonymous = value;
                               });
                             },
-                            activeTrackColor: AppColors.primary,
+                            activeTrackColor: AppColors.primaryOf(context),
                           ),
                         ],
                       ),
@@ -469,7 +469,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                                 if (value) _maxSelections = 1; // Quiz 仅单选
                               });
                             },
-                            activeTrackColor: AppColors.primary,
+                            activeTrackColor: AppColors.primaryOf(context),
                           ),
                         ],
                       ),

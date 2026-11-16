@@ -1058,7 +1058,7 @@ class _ScheduledMessagesPageState extends State<ScheduledMessagesPage> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.1),
+        color: AppColors.primaryOf(context).withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppDimensions.radiusFull),
       ),
       child: Text(

@@ -109,7 +109,7 @@ class _ProposalsListPageState extends State<ProposalsListPage> {
 
                 return RefreshIndicator(
                   onRefresh: () async => _loadProposals(),
-                  color: AppColors.primary,
+                  color: AppColors.primaryOf(context),
                   child: ListView.builder(
                     controller: _scrollController,
                     padding: const EdgeInsets.symmetric(
@@ -147,7 +147,7 @@ class _ProposalsListPageState extends State<ProposalsListPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _navigateToCreate(),
-        backgroundColor: AppColors.primary,
+        backgroundColor: AppColors.primaryOf(context),
         child: const Icon(Icons.add, color: Colors.white),
       ),
     );
@@ -341,7 +341,7 @@ class _FilterChip extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: isSelected
-              ? AppColors.primary
+              ? AppColors.primaryOf(context)
               : AppColors.dividerThinOf(isDark),
           borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
         ),

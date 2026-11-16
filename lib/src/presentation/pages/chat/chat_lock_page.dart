@@ -117,13 +117,13 @@ class _ChatLockPageState extends State<ChatLockPage> {
                   width: 80,
                   height: 80,
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
+                    color: AppColors.primaryOf(context).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(40),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.lock,
                     size: 40,
-                    color: AppColors.primary,
+                    color: AppColors.primaryOf(context),
                   ),
                 ),
                 const SizedBox(height: AppDimensions.spacingXL),
@@ -202,7 +202,7 @@ class _ChatLockPageState extends State<ChatLockPage> {
                     child: ElevatedButton(
                       onPressed: _verifyPin,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
+                        backgroundColor: AppColors.primaryOf(context),
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(
                           vertical: AppDimensions.spacingM,
@@ -231,7 +231,7 @@ class _ChatLockPageState extends State<ChatLockPage> {
                     icon: const Icon(Icons.fingerprint),
                     label: Text(l10n?.chatLockUseBiometric ?? 'Use biometric'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
+                      backgroundColor: AppColors.primaryOf(context),
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppDimensions.spacingXL,

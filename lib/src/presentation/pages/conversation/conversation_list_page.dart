@@ -309,7 +309,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
 
               return RefreshIndicator(
                 onRefresh: _onRefresh,
-                color: AppColors.primary,
+                color: AppColors.primaryOf(context),
                 child: _buildConversationList(state, isDark),
               );
             },
@@ -679,7 +679,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
               _buildAddMenuItem(
                 ctx,
                 icon: Icons.group_add,
-                iconColor: AppColors.primary,
+                iconColor: AppColors.primaryOf(context),
                 title:
                     S.of(context)?.conversationStartGroup ?? 'Start Group Chat',
                 onTap: () => _navigateToCreateGroup(ctx),

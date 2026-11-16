@@ -52,9 +52,12 @@ class _AiLinkSummaryCardState extends State<AiLinkSummaryCard> {
       margin: const EdgeInsets.only(top: 6),
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: ChatColors.of(context).brandTintFaint(AppColors.primary),
+        color: ChatColors.of(context)
+            .brandTintFaint(AppColors.primaryOf(context)),
         borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.15)),
+        border: Border.all(
+          color: AppColors.primaryOf(context).withValues(alpha: 0.15),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -70,19 +73,19 @@ class _AiLinkSummaryCardState extends State<AiLinkSummaryCard> {
               onTap: () => setState(() => _isExpanded = !_isExpanded),
               child: Row(
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.auto_awesome,
                     size: 14,
-                    color: AppColors.primary,
+                    color: AppColors.primaryOf(context),
                   ),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
                       l10n?.aiLinkSummary ?? 'AI Summary',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.primary,
+                        color: AppColors.primaryOf(context),
                       ),
                     ),
                   ),
@@ -101,20 +104,20 @@ class _AiLinkSummaryCardState extends State<AiLinkSummaryCard> {
             if (widget.isLoading)
               Row(
                 children: [
-                  const SizedBox(
+                  SizedBox(
                     width: AppDimensions.spacingM,
                     height: 12,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: AppColors.primary,
+                      color: AppColors.primaryOf(context),
                     ),
                   ),
                   const SizedBox(width: AppDimensions.spacingS),
                   Text(
                     l10n?.aiLinkSummaryAnalyzing ?? 'Analyzing...',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
-                      color: AppColors.primary,
+                      color: AppColors.primaryOf(context),
                     ),
                   ),
                 ],
@@ -145,24 +148,27 @@ class _AiLinkSummaryCardState extends State<AiLinkSummaryCard> {
           margin: const EdgeInsets.only(top: 6),
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
-            color: ChatColors.of(context).brandTintFaint(AppColors.primary),
+            color: ChatColors.of(context)
+                .brandTintFaint(AppColors.primaryOf(context)),
             borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
-            border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+            border: Border.all(
+              color: AppColors.primaryOf(context).withValues(alpha: 0.2),
+            ),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(
+              Icon(
                 Icons.auto_awesome,
                 size: 12,
-                color: AppColors.primary,
+                color: AppColors.primaryOf(context),
               ),
               const SizedBox(width: AppDimensions.spacingXS),
               Text(
                 l10n?.aiLinkSummary ?? 'AI Summary',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 11,
-                  color: AppColors.primary,
+                  color: AppColors.primaryOf(context),
                   fontWeight: FontWeight.w500,
                 ),
               ),

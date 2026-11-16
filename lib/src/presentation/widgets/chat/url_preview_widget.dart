@@ -149,8 +149,8 @@ class _UrlPreviewWidgetState extends State<UrlPreviewWidget> {
           decoration: BoxDecoration(
             color: ChatColors.of(context).subtleFill,
             borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-            border: const Border(
-              left: BorderSide(color: AppColors.primary, width: 3),
+            border: Border(
+              left: BorderSide(color: AppColors.primaryOf(context), width: 3),
             ),
           ),
           child: Row(
@@ -171,9 +171,9 @@ class _UrlPreviewWidgetState extends State<UrlPreviewWidget> {
                           ),
                           child: Text(
                             data.siteName!,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 11,
-                              color: AppColors.primary,
+                              color: AppColors.primaryOf(context),
                               fontWeight: FontWeight.w500,
                             ),
                             maxLines: 1,

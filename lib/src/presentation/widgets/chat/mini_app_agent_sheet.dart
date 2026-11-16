@@ -89,7 +89,7 @@ class _MiniAppAgentSheetState extends State<MiniAppAgentSheet> {
         children: [
           Row(
             children: [
-              const Icon(Icons.auto_awesome, color: AppColors.primary),
+              Icon(Icons.auto_awesome, color: AppColors.primaryOf(context)),
               const SizedBox(width: AppDimensions.spacingS),
               Text(
                 'AI Assistant',
@@ -157,7 +157,7 @@ class _MiniAppAgentSheetState extends State<MiniAppAgentSheet> {
         children: [
           Row(
             children: [
-              const Icon(Icons.apps_rounded, color: AppColors.primary),
+              Icon(Icons.apps_rounded, color: AppColors.primaryOf(context)),
               const SizedBox(width: AppDimensions.spacingS),
               Expanded(
                 child: Text(

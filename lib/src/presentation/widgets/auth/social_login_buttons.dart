@@ -276,7 +276,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
           icon: Icons.account_balance_wallet,
           isLoading: _isWalletLoading,
           tooltip: 'Wallet',
-          backgroundColor: AppColors.primary,
+          backgroundColor: AppColors.primaryOf(context),
           iconColor: Colors.white,
         ),
     ];
@@ -426,13 +426,13 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
           ),
           child: Center(
             child: isLoading
-                ? const SizedBox(
+                ? SizedBox(
                     width: AppDimensions.spacingXL,
                     height: 24,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
                       valueColor: AlwaysStoppedAnimation<Color>(
-                        AppColors.primary,
+                        AppColors.primaryOf(context),
                       ),
                     ),
                   )
@@ -993,7 +993,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
       case SsoBrand.telegram:
         return (Icons.send, const Color(0xFF229ED9));
       case SsoBrand.generic:
-        return (Icons.login, AppColors.primary);
+        return (Icons.login, AppColors.primaryOf(context));
     }
   }
 

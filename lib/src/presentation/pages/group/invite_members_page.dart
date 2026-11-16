@@ -117,7 +117,7 @@ class _InviteMembersPageState extends State<InviteMembersPage> {
                           'Invite(${_selectedUserIds.length})',
                       style: TextStyle(
                         color: _selectedUserIds.isNotEmpty
-                            ? AppColors.primary
+                            ? AppColors.primaryOf(context)
                             : AppColors.textSecondary,
                       ),
                     ),

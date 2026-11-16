@@ -78,9 +78,9 @@ class _GroupMediaHubPageState extends State<GroupMediaHubPage>
         ),
         bottom: TabBar(
           controller: _tabController,
-          labelColor: AppColors.primary,
+          labelColor: AppColors.primaryOf(context),
           unselectedLabelColor: context.textSecondary,
-          indicatorColor: AppColors.primary,
+          indicatorColor: AppColors.primaryOf(context),
           tabs: [
             Tab(text: S.of(context)?.groupAlbum ?? 'Album'),
             Tab(text: S.of(context)?.groupFiles ?? 'Files'),
@@ -220,10 +220,10 @@ class _LinksTabState extends State<_LinksTab> {
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: AppColors.primary.withValues(alpha: 0.1),
+          color: AppColors.primaryOf(context).withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(AppDimensions.radiusM),
         ),
-        child: const Icon(Icons.link, color: AppColors.primary, size: 20),
+        child: Icon(Icons.link, color: AppColors.primaryOf(context), size: 20),
       ),
       title: Text(
         link.title ?? link.url,

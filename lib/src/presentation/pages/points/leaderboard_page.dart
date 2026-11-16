@@ -83,7 +83,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
 
           return RefreshIndicator(
             onRefresh: () async => _loadLeaderboard(),
-            color: AppColors.primary,
+            color: AppColors.primaryOf(context),
             child: ListView(
               padding: const EdgeInsets.all(AppDimensions.spacing),
               children: [
@@ -312,7 +312,9 @@ class _PodiumItem extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: rank == 1 ? 28 : 22,
-              backgroundColor: isCurrentUser ? AppColors.primary : medalColor,
+              backgroundColor: isCurrentUser
+                  ? AppColors.primaryOf(context)
+                  : medalColor,
               child: Text(
                 _shortName(balance.userId),
                 style: const TextStyle(
@@ -418,11 +420,13 @@ class _LeaderboardTile extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: isCurrentUser
-            ? AppColors.primary.withValues(alpha: 0.08)
+            ? AppColors.primaryOf(context).withValues(alpha: 0.08)
             : context.surfaceColor,
         borderRadius: BorderRadius.circular(10),
         border: isCurrentUser
-            ? Border.all(color: AppColors.primary.withValues(alpha: 0.3))
+            ? Border.all(
+                color: AppColors.primaryOf(context).withValues(alpha: 0.3),
+              )
             : null,
       ),
       child: Row(
@@ -445,7 +449,7 @@ class _LeaderboardTile extends StatelessWidget {
           CircleAvatar(
             radius: 18,
             backgroundColor: isCurrentUser
-                ? AppColors.primary
+                ? AppColors.primaryOf(context)
                 : AppColors.textTertiary,
             child: Text(
               _shortName(balance.userId),

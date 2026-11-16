@@ -320,10 +320,14 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
               width: 28,
               height: 28,
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.12),
+                color: AppColors.primaryOf(context).withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(6),
               ),
-              child: const Icon(Icons.apps, size: 16, color: AppColors.primary),
+              child: Icon(
+                Icons.apps,
+                size: 16,
+                color: AppColors.primaryOf(context),
+              ),
             ),
             const SizedBox(width: AppDimensions.spacingS),
             Expanded(
@@ -364,7 +368,7 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
                 child: LinearProgressIndicator(
                   value: _loadProgress / 100,
                   backgroundColor: Colors.transparent,
-                  color: AppColors.primary,
+                  color: AppColors.primaryOf(context),
                 ),
               )
             : null,

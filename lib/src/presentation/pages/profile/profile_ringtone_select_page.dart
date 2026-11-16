@@ -326,8 +326,8 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
             onPressed: _confirmSave,
             child: Text(
               s?.commonConfirm ?? 'Confirm',
-              style: const TextStyle(
-                color: AppColors.primary,
+              style: TextStyle(
+                color: AppColors.primaryOf(context),
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
@@ -382,7 +382,10 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
                     color: context.surfaceColor,
                     borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                     border: isSelected
-                        ? Border.all(color: AppColors.primary, width: 2)
+                        ? Border.all(
+                            color: AppColors.primaryOf(context),
+                            width: 2,
+                          )
                         : null,
                   ),
                   child: ListTile(
@@ -391,7 +394,8 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
                       height: 44,
                       decoration: BoxDecoration(
                         color: isPlaying
-                            ? AppColors.primary.withValues(alpha: 0.2)
+                            ? AppColors.primaryOf(context)
+                                  .withValues(alpha: 0.2)
                             : ChatColors.of(context).optionTileBg,
                         borderRadius: BorderRadius.circular(
                           AppDimensions.radiusM,
@@ -400,7 +404,7 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
                       child: Icon(
                         isPlaying ? Icons.pause : ringtone.icon,
                         color: isPlaying
-                            ? AppColors.primary
+                            ? AppColors.primaryOf(context)
                             : context.textSecondary,
                       ),
                     ),
@@ -425,7 +429,7 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
                               isPlaying
                                   ? Icons.stop
                                   : Icons.play_circle_outline,
-                              color: AppColors.primary,
+                              color: AppColors.primaryOf(context),
                             ),
                             onPressed: () {
                               if (isPlaying) {
@@ -437,9 +441,9 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
                           ),
                         // 选中标记
                         if (isSelected)
-                          const Icon(
+                          Icon(
                             Icons.check_circle,
-                            color: AppColors.primary,
+                            color: AppColors.primaryOf(context),
                           ),
                       ],
                     ),

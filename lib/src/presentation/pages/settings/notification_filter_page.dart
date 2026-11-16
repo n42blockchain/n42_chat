@@ -155,7 +155,7 @@ class _NotificationFilterPageState extends State<NotificationFilterPage> {
                   _buildKeywordSection(
                     title: 'Priority keywords',
                     icon: Icons.priority_high,
-                    iconColor: AppColors.primary,
+                    iconColor: AppColors.primaryOf(context),
                     entries: _rules.priorityKeywords,
                     hint: 'e.g. urgent',
                     onAdd: (v) => _apply(
@@ -218,7 +218,7 @@ class _NotificationFilterPageState extends State<NotificationFilterPage> {
                         style: TextStyle(color: context.textPrimary),
                       ),
                       value: _rules.caseSensitive,
-                      activeThumbColor: AppColors.primary,
+                      activeThumbColor: AppColors.primaryOf(context),
                       onChanged: (v) =>
                           _apply(_rules.copyWith(caseSensitive: v)),
                     ),
@@ -280,7 +280,7 @@ class _NotificationFilterPageState extends State<NotificationFilterPage> {
                 ),
                 IconButton(
                   tooltip: S.of(context)?.commonAdd ?? 'Add',
-                  icon: const Icon(Icons.add, color: AppColors.primary),
+                  icon: Icon(Icons.add, color: AppColors.primaryOf(context)),
                   onPressed: () =>
                       _promptAdd(title: title, hint: hint, onAdd: onAdd),
                 ),

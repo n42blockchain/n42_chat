@@ -319,7 +319,7 @@ class _ContentReportDialogState extends State<_ContentReportDialog> {
                       ),
                       value: reason,
                       enabled: !_submitting,
-                      activeColor: AppColors.primary,
+                      activeColor: AppColors.primaryOf(context),
                       contentPadding: EdgeInsets.zero,
                       dense: true,
                     ),

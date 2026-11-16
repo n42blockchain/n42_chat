@@ -141,7 +141,9 @@ class MessageReadReceipt extends StatelessWidget {
         Icon(
           allRead ? Icons.done_all : Icons.done,
           size: 14,
-          color: allRead ? AppColors.primary : AppColors.textTertiary,
+          color: allRead
+              ? AppColors.primaryOf(context)
+              : AppColors.textTertiary,
         ),
         const SizedBox(width: 2),
         Text(
@@ -150,7 +152,9 @@ class MessageReadReceipt extends StatelessWidget {
               : (l10n?.commonReadCount(readCount) ?? '$readCount read'),
           style: TextStyle(
             fontSize: 11,
-            color: allRead ? AppColors.primary : AppColors.textTertiary,
+            color: allRead
+                ? AppColors.primaryOf(context)
+                : AppColors.textTertiary,
           ),
         ),
       ],

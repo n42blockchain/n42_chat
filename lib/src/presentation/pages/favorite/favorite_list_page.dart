@@ -149,7 +149,7 @@ class _FavoriteListView extends StatelessWidget {
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? AppColors.primary.withValues(alpha: 0.1)
+                        ? AppColors.primaryOf(context).withValues(alpha: 0.1)
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(20),
                   ),
@@ -158,7 +158,7 @@ class _FavoriteListView extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13,
                       color: isSelected
-                          ? AppColors.primary
+                          ? AppColors.primaryOf(context)
                           : context.textSecondary,
                       fontWeight: isSelected
                           ? FontWeight.w600

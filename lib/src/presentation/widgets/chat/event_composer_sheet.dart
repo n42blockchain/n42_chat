@@ -98,7 +98,7 @@ class _EventComposerSheetState extends State<_EventComposerSheet> {
           children: [
             Row(
               children: [
-                const Icon(Icons.event, color: AppColors.primary),
+                Icon(Icons.event, color: AppColors.primaryOf(context)),
                 const SizedBox(width: AppDimensions.spacingS),
                 Text(
                   'New Event',

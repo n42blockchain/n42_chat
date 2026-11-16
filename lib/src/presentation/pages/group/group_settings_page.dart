@@ -174,8 +174,8 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                     bottom: 0,
                     child: Container(
                       padding: const EdgeInsets.all(AppDimensions.spacingXS),
-                      decoration: const BoxDecoration(
-                        color: AppColors.primary,
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryOf(context),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -369,7 +369,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                       vertical: 1,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.primary,
+                      color: AppColors.primaryOf(context),
                       borderRadius: BorderRadius.circular(
                         AppDimensions.radiusS,
                       ),

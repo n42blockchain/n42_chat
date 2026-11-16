@@ -97,7 +97,7 @@ class _GroupTopicsBody extends StatelessWidget {
                   ),
                   child: Text(
                     l10n?.commonEdit ?? 'Edit',
-                    style: const TextStyle(color: AppColors.primary),
+                    style: TextStyle(color: AppColors.primaryOf(context)),
                   ),
                 ),
             ],
@@ -105,7 +105,7 @@ class _GroupTopicsBody extends StatelessWidget {
           floatingActionButton: canManage
               ? FloatingActionButton(
                   onPressed: () => _showCreateTopicSheet(context),
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: AppColors.primaryOf(context),
                   tooltip: l10n?.groupChannelCreate ?? 'New Topic',
                   child: const Icon(Icons.add, color: Colors.white),
                 )
@@ -212,12 +212,14 @@ class _GroupTopicsBody extends StatelessWidget {
               decoration: BoxDecoration(
                 color: isPinned
                     ? AppColors.warning.withValues(alpha: 0.15)
-                    : AppColors.primary.withValues(alpha: 0.12),
+                    : AppColors.primaryOf(context).withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
                 isPinned ? Icons.campaign_outlined : Icons.tag,
-                color: isPinned ? AppColors.warning : AppColors.primary,
+                color: isPinned
+                    ? AppColors.warning
+                    : AppColors.primaryOf(context),
                 size: 22,
               ),
             ),
@@ -240,14 +242,15 @@ class _GroupTopicsBody extends StatelessWidget {
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.1),
+                      color: AppColors.primaryOf(context)
+                          .withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
                       channel.category!,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
-                        color: AppColors.primary,
+                        color: AppColors.primaryOf(context),
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -282,7 +285,7 @@ class _GroupTopicsBody extends StatelessWidget {
                       vertical: 3,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.primary,
+                      color: AppColors.primaryOf(context),
                       borderRadius: BorderRadius.circular(
                         AppDimensions.radiusL,
                       ),

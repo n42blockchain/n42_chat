@@ -189,7 +189,7 @@ class _ProfilePageState extends State<ProfilePage> {
               _buildMenuItem(
                 context,
                 icon: Icons.verified_outlined,
-                iconColor: AppColors.primary,
+                iconColor: AppColors.primaryOf(context),
                 title: S.of(context)?.profileServices ?? 'Services',
                 onTap: () => _openServices(context),
               ),
@@ -700,9 +700,9 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
               ListTile(
-                leading: const Icon(
+                leading: Icon(
                   Icons.photo_library_outlined,
-                  color: AppColors.primary,
+                  color: AppColors.primaryOf(context),
                 ),
                 title: Text(l10n?.profileChangeAvatar ?? 'Change Avatar'),
                 onTap: () {

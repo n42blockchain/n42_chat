@@ -293,15 +293,15 @@ class _RegisterPageState extends State<RegisterPage> {
               vertical: 14,
             ),
             suffixIcon: state.isCheckingHomeserver
-                ? const Padding(
-                    padding: EdgeInsets.all(12),
+                ? Padding(
+                    padding: const EdgeInsets.all(12),
                     child: SizedBox(
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
                         valueColor: AlwaysStoppedAnimation<Color>(
-                          AppColors.primary,
+                          AppColors.primaryOf(context),
                         ),
                       ),
                     ),
@@ -364,8 +364,8 @@ class _RegisterPageState extends State<RegisterPage> {
             _anonymousMode = value;
           });
         },
-        activeThumbColor: AppColors.primary,
-        activeTrackColor: AppColors.primary.withValues(alpha: 0.35),
+        activeThumbColor: AppColors.primaryOf(context),
+        activeTrackColor: AppColors.primaryOf(context).withValues(alpha: 0.35),
         title: Text(
           'Anonymous Registration',
           maxLines: 1,
@@ -636,7 +636,7 @@ class _RegisterPageState extends State<RegisterPage> {
               child: Checkbox(
                 value: _agreeToTerms,
                 onChanged: (_) {},
-                activeColor: AppColors.primary,
+                activeColor: AppColors.primaryOf(context),
                 checkColor: Colors.white,
                 side: BorderSide(color: textColor),
                 shape: RoundedRectangleBorder(
@@ -682,8 +682,8 @@ class _RegisterPageState extends State<RegisterPage> {
       child: ElevatedButton(
         onPressed: isEnabled ? _onRegister : null,
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.5),
+          backgroundColor: AppColors.primaryOf(context),
+          disabledBackgroundColor: AppColors.primaryOf(context).withValues(alpha: 0.5),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           elevation: 0,
         ),

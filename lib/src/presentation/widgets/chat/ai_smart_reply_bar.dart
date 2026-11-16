@@ -45,7 +45,7 @@ class AiSmartReplyBar extends StatelessWidget {
               Icon(
                 Icons.auto_awesome,
                 size: 16,
-                color: AppColors.primary.withValues(alpha: 0.9),
+                color: AppColors.primaryOf(context).withValues(alpha: 0.9),
               ),
               const SizedBox(width: 6),
               Text(
@@ -111,13 +111,14 @@ class AiSmartReplyBar extends StatelessWidget {
                               ? null
                               : () => onSelect!(suggestion),
                           backgroundColor: ChatColors.of(context)
-                              .brandChipTint(AppColors.primary),
+                              .brandChipTint(AppColors.primaryOf(context)),
                           labelStyle: TextStyle(
                             color: AppColors.textPrimaryOf(isDark),
                             fontSize: 13,
                           ),
                           side: BorderSide(
-                            color: AppColors.primary.withValues(alpha: 0.18),
+                            color: AppColors.primaryOf(context)
+                                .withValues(alpha: 0.18),
                           ),
                         ),
                       ),

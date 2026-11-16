@@ -73,7 +73,7 @@ class ChatFolderTabBar extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
         decoration: BoxDecoration(
           color: isSelected
-              ? AppColors.primary.withValues(alpha: 0.1)
+              ? AppColors.primaryOf(context).withValues(alpha: 0.1)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
         ),
@@ -90,7 +90,7 @@ class ChatFolderTabBar extends StatelessWidget {
                 fontSize: 13,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                 color: isSelected
-                    ? AppColors.primary
+                    ? AppColors.primaryOf(context)
                     : AppColors.textSecondaryOf(isDark),
               ),
             ),

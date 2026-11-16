@@ -273,7 +273,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
       ),
       child: Row(
         children: [
-          const Icon(Icons.email_outlined, color: AppColors.primary, size: 24),
+          Icon(Icons.email_outlined, color: AppColors.primaryOf(context), size: 24),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -488,8 +488,8 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
       child: ElevatedButton(
         onPressed: isLoading ? null : _requestCode,
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.5),
+          backgroundColor: AppColors.primaryOf(context),
+          disabledBackgroundColor: AppColors.primaryOf(context).withValues(alpha: 0.5),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           elevation: 0,
         ),
@@ -547,7 +547,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
               style: TextStyle(
                 fontSize: 14,
                 height: 1.3,
-                color: canResend ? AppColors.primary : textColor,
+                color: canResend ? AppColors.primaryOf(context) : textColor,
               ),
             ),
           ),
@@ -562,8 +562,8 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
       child: ElevatedButton(
         onPressed: isLoading ? null : _confirmChange,
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.5),
+          backgroundColor: AppColors.primaryOf(context),
+          disabledBackgroundColor: AppColors.primaryOf(context).withValues(alpha: 0.5),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           elevation: 0,
         ),

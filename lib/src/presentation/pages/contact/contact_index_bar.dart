@@ -80,7 +80,7 @@ class _ContactIndexBarState extends State<ContactIndexBar> {
                 width: 60,
                 height: 60,
                 decoration: BoxDecoration(
-                  color: AppColors.primary,
+                  color: AppColors.primaryOf(context),
                   borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                 ),
                 alignment: Alignment.center,
@@ -123,7 +123,7 @@ class _ContactIndexBarState extends State<ContactIndexBar> {
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         color: isActive
-                            ? AppColors.primary
+                            ? AppColors.primaryOf(context)
                             : Colors.transparent,
                         shape: BoxShape.circle,
                       ),

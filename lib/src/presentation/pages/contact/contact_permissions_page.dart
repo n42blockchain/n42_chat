@@ -234,7 +234,7 @@ class _ContactPermissionsPageState extends State<ContactPermissionsPage> {
           Switch(
             value: value,
             onChanged: _isLoading || _isSaving ? null : onChanged,
-            activeThumbColor: AppColors.primary,
+            activeThumbColor: AppColors.primaryOf(context),
           ),
         ],
       ),

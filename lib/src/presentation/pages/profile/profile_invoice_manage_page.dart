@@ -160,7 +160,7 @@ class InvoiceManagePageState extends State<InvoiceManagePage> {
                       S.of(context)?.profileAddInvoice ?? 'Add Invoice',
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
+                      backgroundColor: AppColors.primaryOf(context),
                       foregroundColor: Colors.white,
                     ),
                   ),
@@ -188,7 +188,8 @@ class InvoiceManagePageState extends State<InvoiceManagePage> {
                               ),
                               decoration: BoxDecoration(
                                 color: invoice.type == 'company'
-                                    ? AppColors.primary.withValues(alpha: 0.1)
+                                    ? AppColors.primaryOf(context)
+                                          .withValues(alpha: 0.1)
                                     : AppColors.warning.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(4),
                               ),
@@ -205,7 +206,7 @@ class InvoiceManagePageState extends State<InvoiceManagePage> {
                                   height: 1.3,
                                   fontWeight: FontWeight.w500,
                                   color: invoice.type == 'company'
-                                      ? AppColors.primary
+                                      ? AppColors.primaryOf(context)
                                       : AppColors.warning,
                                 ),
                               ),
@@ -231,9 +232,8 @@ class InvoiceManagePageState extends State<InvoiceManagePage> {
                                   vertical: 2,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: AppColors.primary.withValues(
-                                    alpha: 0.1,
-                                  ),
+                                  color: AppColors.primaryOf(context)
+                                      .withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
@@ -241,11 +241,11 @@ class InvoiceManagePageState extends State<InvoiceManagePage> {
                                       'Default',
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 12,
                                     height: 1.3,
                                     fontWeight: FontWeight.w500,
-                                    color: AppColors.primary,
+                                    color: AppColors.primaryOf(context),
                                   ),
                                 ),
                               ),

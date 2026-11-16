@@ -597,7 +597,7 @@ class _TransferPageState extends State<TransferPage> {
                 ),
                 decoration: BoxDecoration(
                   color: isSelected
-                      ? AppColors.primary.withValues(alpha: 0.1)
+                      ? AppColors.primaryOf(context).withValues(alpha: 0.1)
                       : Colors.transparent,
                   border: Border(
                     bottom: BorderSide(color: context.dividerColor, width: 0.5),
@@ -619,10 +619,10 @@ class _TransferPageState extends State<TransferPage> {
                             0,
                             token.symbol.length.clamp(0, 2),
                           ),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.primary,
+                            color: AppColors.primaryOf(context),
                           ),
                         ),
                       ),
@@ -706,9 +706,9 @@ class _TransferPageState extends State<TransferPage> {
                     const SizedBox(width: 8),
                     // 选中标记
                     if (isSelected)
-                      const Icon(
+                      Icon(
                         Icons.check_circle,
-                        color: AppColors.primary,
+                        color: AppColors.primaryOf(context),
                         size: 20,
                       ),
                   ],

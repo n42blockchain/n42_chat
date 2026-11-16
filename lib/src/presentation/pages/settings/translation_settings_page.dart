@@ -252,9 +252,9 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
                         ),
                       ),
                       trailing: isSelected
-                          ? const Icon(
+                          ? Icon(
                               Icons.check_rounded,
-                              color: AppColors.primary,
+                              color: AppColors.primaryOf(context),
                             )
                           : null,
                       onTap: _isSaving
@@ -424,7 +424,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
                             targetLanguage: _targetLanguage,
                             smartReplyTranslate: _smartReplyTranslate,
                           ),
-                    activeTrackColor: AppColors.primary,
+                    activeTrackColor: AppColors.primaryOf(context),
                   ),
                 ],
               ),
@@ -474,7 +474,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
                             targetLanguage: _targetLanguage,
                             smartReplyTranslate: value,
                           ),
-                    activeTrackColor: AppColors.primary,
+                    activeTrackColor: AppColors.primaryOf(context),
                   ),
                 ],
               ),

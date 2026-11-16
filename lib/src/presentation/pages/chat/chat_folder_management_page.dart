@@ -209,13 +209,16 @@ class ChatFolderManagementPage extends StatelessWidget {
                           height: 40,
                           decoration: BoxDecoration(
                             color: icon == selectedIcon
-                                ? AppColors.primary.withValues(alpha: 0.1)
+                                ? AppColors.primaryOf(context)
+                                      .withValues(alpha: 0.1)
                                 : Colors.transparent,
                             borderRadius: BorderRadius.circular(
                               AppDimensions.radiusM,
                             ),
                             border: icon == selectedIcon
-                                ? Border.all(color: AppColors.primary)
+                                ? Border.all(
+                                    color: AppColors.primaryOf(context),
+                                  )
                                 : null,
                           ),
                           child: Center(

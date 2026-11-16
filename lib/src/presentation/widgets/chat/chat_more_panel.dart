@@ -459,7 +459,7 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
         icon: Icons.poll_outlined,
         label: S.of(context)?.commonPoll ?? 'Poll',
         onTap: widget.onPollPressed,
-        iconColor: AppColors.primary,
+        iconColor: AppColors.primaryOf(context),
       ),
       _MoreItem(
         icon: Icons.event_outlined,
@@ -560,13 +560,13 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
         icon: widget.isViewOnce ? Icons.timer : Icons.timer_outlined,
         label: S.of(context)?.chatViewOnce ?? 'View Once',
         onTap: widget.onViewOncePressed,
-        iconColor: widget.isViewOnce ? AppColors.primary : null,
+        iconColor: widget.isViewOnce ? AppColors.primaryOf(context) : null,
       ),
       _MoreItem(
         icon: widget.isFaceBlur ? Icons.face_retouching_natural : Icons.face,
         label: S.of(context)?.chatAutoFaceBlur ?? 'Face Blur',
         onTap: widget.onFaceBlurPressed,
-        iconColor: widget.isFaceBlur ? AppColors.primary : null,
+        iconColor: widget.isFaceBlur ? AppColors.primaryOf(context) : null,
       ),
       _MoreItem(
         icon: Icons.share_location,
@@ -586,7 +586,7 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
         icon: Icons.schedule_outlined,
         label: S.of(context)?.scheduledMessageLabel ?? 'Scheduled',
         onTap: widget.onScheduledPressed,
-        iconColor: AppColors.primary,
+        iconColor: AppColors.primaryOf(context),
       ),
     ];
   }
@@ -778,9 +778,12 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
             if (selected)
               DecoratedBox(
                 decoration: BoxDecoration(
-                  border: Border.all(color: AppColors.primary, width: 3),
+                  border: Border.all(
+                    color: AppColors.primaryOf(context),
+                    width: 3,
+                  ),
                   borderRadius: BorderRadius.circular(5),
-                  color: AppColors.primary.withValues(alpha: 0.12),
+                  color: AppColors.primaryOf(context).withValues(alpha: 0.12),
                 ),
               ),
             if (item.isVideo)
@@ -811,7 +814,7 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: selected
-                      ? AppColors.primary
+                      ? AppColors.primaryOf(context)
                       : Colors.black.withValues(alpha: 0.35),
                   shape: BoxShape.circle,
                   border: Border.all(color: Colors.white, width: 1.5),

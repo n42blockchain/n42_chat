@@ -264,7 +264,7 @@ class _ForwardDialogState extends State<ForwardDialog> {
                     style: TextStyle(
                       color: _selectedIds.isEmpty
                           ? AppColors.textSecondary
-                          : AppColors.primary,
+                          : AppColors.primaryOf(context),
                     ),
                   ),
                 ),
@@ -302,7 +302,7 @@ class _ForwardDialogState extends State<ForwardDialog> {
                         }
                       });
                     },
-                    activeColor: AppColors.primary,
+                    activeColor: AppColors.primaryOf(context),
                   ),
                   onTap: () {
                     setState(() {

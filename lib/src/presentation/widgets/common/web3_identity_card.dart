@@ -185,17 +185,17 @@ class Web3IdentityCard extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.copy_rounded,
                           size: 14,
-                          color: AppColors.primary,
+                          color: AppColors.primaryOf(context),
                         ),
                         const SizedBox(width: AppDimensions.spacingXS),
                         Text(
                           l10n?.web3Copy ?? 'Copy',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
-                            color: AppColors.primary,
+                            color: AppColors.primaryOf(context),
                           ),
                         ),
                       ],
@@ -220,7 +220,7 @@ class Web3IdentityCard extends StatelessWidget {
                     style: const TextStyle(fontWeight: FontWeight.w500),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: AppColors.primaryOf(context),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -357,18 +357,18 @@ class _N42Badge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.1),
+        color: AppColors.primaryOf(context).withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppDimensions.radiusS),
         border: Border.all(
-          color: AppColors.primary.withValues(alpha: 0.4),
+          color: AppColors.primaryOf(context).withValues(alpha: 0.4),
           width: 0.5,
         ),
       ),
-      child: const Text(
+      child: Text(
         'N42',
         style: TextStyle(
           fontSize: 10,
-          color: AppColors.primary,
+          color: AppColors.primaryOf(context),
           fontWeight: FontWeight.w600,
         ),
       ),

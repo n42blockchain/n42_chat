@@ -352,9 +352,9 @@ class _SmartCleanupSection extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.auto_fix_high,
-                  color: AppColors.primary,
+                  color: AppColors.primaryOf(context),
                   size: 20,
                 ),
                 const SizedBox(width: AppDimensions.spacingS),
@@ -453,7 +453,7 @@ class _RecommendationTile extends StatelessWidget {
         child: Text(
           recommendation.formattedSize,
           style: TextStyle(
-            color: isCleaning ? secondaryColor : AppColors.primary,
+            color: isCleaning ? secondaryColor : AppColors.primaryOf(context),
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -566,7 +566,10 @@ class _RoomStorageSectionState extends State<_RoomStorageSection> {
                         .of(context)
                         ?.storageViewAllRooms(state.roomStorageList.length) ??
                     'View all ${state.roomStorageList.length} rooms',
-                style: const TextStyle(fontSize: 14, color: AppColors.primary),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: AppColors.primaryOf(context),
+                ),
                 textAlign: TextAlign.center,
               ),
               onTap: () {
@@ -630,7 +633,7 @@ class _StorageSettingsSection extends StatelessWidget {
               ),
             ),
             value: config.autoCleanupEnabled,
-            activeTrackColor: AppColors.primary,
+            activeTrackColor: AppColors.primaryOf(context),
             onChanged: (value) {
               context.read<StorageManagementBloc>().add(
                 UpdateStorageConfig(autoCleanupEnabled: value),
@@ -679,7 +682,7 @@ class _StorageSettingsSection extends StatelessWidget {
               ),
             ),
             value: config.preserveThumbnails,
-            activeTrackColor: AppColors.primary,
+            activeTrackColor: AppColors.primaryOf(context),
             onChanged: (value) {
               context.read<StorageManagementBloc>().add(
                 UpdateStorageConfig(preserveThumbnails: value),
@@ -706,7 +709,10 @@ class _ClearCacheButton extends StatelessWidget {
     return Material(
       color: cardColor,
       child: ListTile(
-        leading: const Icon(Icons.cleaning_services, color: AppColors.primary),
+        leading: Icon(
+          Icons.cleaning_services,
+          color: AppColors.primaryOf(context),
+        ),
         title: Text(
           S.of(context)?.clearCache ?? 'Clear Cache',
           maxLines: 1,

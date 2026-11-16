@@ -329,7 +329,7 @@ class _LoginPageState extends State<LoginPage> {
           width: 48,
           height: 48,
           decoration: BoxDecoration(
-            color: AppColors.primary,
+            color: AppColors.primaryOf(context),
             borderRadius: BorderRadius.circular(AppDimensions.radiusL),
           ),
           child: const Icon(
@@ -450,15 +450,15 @@ class _LoginPageState extends State<LoginPage> {
               vertical: 14,
             ),
             suffixIcon: state.isCheckingHomeserver
-                ? const Padding(
-                    padding: EdgeInsets.all(AppDimensions.spacingM),
+                ? Padding(
+                    padding: const EdgeInsets.all(AppDimensions.spacingM),
                     child: SizedBox(
                       width: AppDimensions.spacingL,
                       height: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
                         valueColor: AlwaysStoppedAnimation<Color>(
-                          AppColors.primary,
+                          AppColors.primaryOf(context),
                         ),
                       ),
                     ),
@@ -628,8 +628,9 @@ class _LoginPageState extends State<LoginPage> {
         key: const ValueKey<String>('chat_login_submit'),
         onPressed: isEnabled ? _onLogin : null,
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.5),
+          backgroundColor: AppColors.primaryOf(context),
+          disabledBackgroundColor: AppColors.primaryOf(context)
+              .withValues(alpha: 0.5),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppDimensions.radiusM),
           ),
@@ -687,7 +688,7 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primary,
+        backgroundColor: AppColors.primaryOf(context),
         foregroundColor: Colors.white,
         minimumSize: const Size(double.infinity, 52),
         shape: RoundedRectangleBorder(

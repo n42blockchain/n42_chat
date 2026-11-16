@@ -403,7 +403,9 @@ class _ListenPageState extends State<ListenPage> {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                color: selected ? AppColors.primary : context.textPrimary,
+                color: selected
+                    ? AppColors.primaryOf(context)
+                    : context.textPrimary,
                 fontWeight: FontWeight.w600,
               ),
             ),

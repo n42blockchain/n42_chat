@@ -5,9 +5,24 @@ import 'package:flutter/material.dart';
 abstract class AppColors {
   AppColors._();
 
-  /// Resolve interactive accents from the host, including saved custom presets.
-  static Color primaryOf(BuildContext context) =>
-      Theme.of(context).colorScheme.primary;
+  /// Resolve the brand accent from the host theme, including saved custom
+  /// presets. Falls back to [primary] when no host theme is configured,
+  /// i.e. the color scheme still carries Material's untouched default.
+  static Color primaryOf(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final fallback = scheme.brightness == Brightness.dark
+        ? _materialDefaultDark
+        : _materialDefaultLight;
+    return scheme.primary == fallback ? primary : scheme.primary;
+  }
+
+  // Material 3 defaults used by ThemeData() when an app sets no color scheme.
+  static final Color _materialDefaultLight = ThemeData(
+    brightness: Brightness.light,
+  ).colorScheme.primary;
+  static final Color _materialDefaultDark = ThemeData(
+    brightness: Brightness.dark,
+  ).colorScheme.primary;
 
   // ============================================
   // 主色调 - 品牌靛蓝 (AI-native, 与主 App 对齐 #5B6CFF)

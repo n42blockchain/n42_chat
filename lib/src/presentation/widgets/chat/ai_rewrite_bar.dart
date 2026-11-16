@@ -52,7 +52,9 @@ class AiRewriteBar extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surfaceOf(isDark),
         border: Border(
-          top: BorderSide(color: AppColors.primary.withValues(alpha: 0.3)),
+          top: BorderSide(
+            color: AppColors.primaryOf(context).withValues(alpha: 0.3),
+          ),
         ),
       ),
       child: Column(
@@ -64,19 +66,19 @@ class AiRewriteBar extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(12, 8, 8, 4),
             child: Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.auto_fix_high,
                   size: 16,
-                  color: AppColors.primary,
+                  color: AppColors.primaryOf(context),
                 ),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
                     l10n?.aiRewrite ?? 'AI Rewrite',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.primary,
+                      color: AppColors.primaryOf(context),
                     ),
                   ),
                 ),
@@ -125,12 +127,12 @@ class AiRewriteBar extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
               child: Row(
                 children: [
-                  const SizedBox(
+                  SizedBox(
                     width: 14,
                     height: 14,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: AppColors.primary,
+                      color: AppColors.primaryOf(context),
                     ),
                   ),
                   const SizedBox(width: AppDimensions.spacingS),
@@ -151,7 +153,8 @@ class AiRewriteBar extends StatelessWidget {
               ),
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: ChatColors.of(context).brandTintSoft(AppColors.primary),
+                color: ChatColors.of(context)
+                    .brandTintSoft(AppColors.primaryOf(context)),
                 borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               ),
               child: Text(
@@ -182,7 +185,7 @@ class AiRewriteBar extends StatelessWidget {
                   ElevatedButton(
                     onPressed: () => onAccept?.call(rewrittenText!),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
+                      backgroundColor: AppColors.primaryOf(context),
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppDimensions.spacingL,
@@ -235,7 +238,9 @@ class _ToneChip extends StatelessWidget {
           vertical: 6,
         ),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : AppColors.inputBgOf(isDark),
+          color: isSelected
+              ? AppColors.primaryOf(context)
+              : AppColors.inputBgOf(isDark),
           borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
           border: isSelected
               ? null
