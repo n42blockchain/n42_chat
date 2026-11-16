@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../data/models/social/social_similarity_model.dart';
 import '../../blocs/social/social_graph_bloc.dart';
@@ -252,7 +253,7 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
           child: CustomPaint(
             painter: _CircularScorePainter(
               score: animatedScore,
-              isDark: isDark,
+              trackColor: ChatColors.of(context).meterTrack,
             ),
             child: Center(
               child: Column(
@@ -401,9 +402,7 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
               borderRadius: BorderRadius.circular(3),
               child: LinearProgressIndicator(
                 value: value * _animController.value,
-                backgroundColor: isDark
-                    ? Colors.white.withValues(alpha: 0.08)
-                    : Colors.black.withValues(alpha: 0.06),
+                backgroundColor: ChatColors.of(context).meterTrack,
                 valueColor: AlwaysStoppedAnimation<Color>(color),
                 minHeight: 6,
               ),
@@ -618,9 +617,9 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
 /// Circular progress painter for the similarity score.
 class _CircularScorePainter extends CustomPainter {
   final double score;
-  final bool isDark;
+  final Color trackColor;
 
-  _CircularScorePainter({required this.score, required this.isDark});
+  _CircularScorePainter({required this.score, required this.trackColor});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -630,9 +629,7 @@ class _CircularScorePainter extends CustomPainter {
 
     // Background track
     final bgPaint = Paint()
-      ..color = isDark
-          ? Colors.white.withValues(alpha: 0.08)
-          : Colors.black.withValues(alpha: 0.06)
+      ..color = trackColor
       ..strokeWidth = strokeWidth
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
@@ -664,6 +661,6 @@ class _CircularScorePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _CircularScorePainter oldDelegate) {
-    return oldDelegate.score != score || oldDelegate.isDark != isDark;
+    return oldDelegate.score != score || oldDelegate.trackColor != trackColor;
   }
 }

@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../services/voip/incoming_call_ringtone_preference.dart';
 import '../../../services/ringtone/system_ringtone_service.dart';
 import '../../../core/utils/debug_log.dart';
@@ -391,9 +392,7 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
                       decoration: BoxDecoration(
                         color: isPlaying
                             ? AppColors.primary.withValues(alpha: 0.2)
-                            : (isDark
-                                  ? const Color(0xFF3D3D3D)
-                                  : const Color(0xFFF7F7F7)),
+                            : ChatColors.of(context).optionTileBg,
                         borderRadius: BorderRadius.circular(
                           AppDimensions.radiusM,
                         ),

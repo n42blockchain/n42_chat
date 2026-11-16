@@ -1518,9 +1518,7 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
     final bgColor = context.pageBackground;
-    final cardColor = isDark
-        ? AppColors.surfaceDark
-        : AppColors.inputBackground;
+    final cardColor = AppColors.inputBgOf(isDark);
     final textColor = context.textPrimary;
     final hintColor = context.textTertiary;
     final labelColor = context.textSecondary;

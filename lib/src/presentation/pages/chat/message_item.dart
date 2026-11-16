@@ -18,6 +18,7 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/remark_service.dart';
 import '../../../core/services/url_preview_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
 import '../../../core/utils/payment_request_status_utils.dart';
 import '../../../domain/entities/message_entity.dart';
@@ -180,7 +181,6 @@ class MessageItem extends StatelessWidget {
 
   Widget _buildMessageBubble(BuildContext context) {
     final status = _mapStatus(message.status);
-    final isDark = context.isDarkMode;
     final displayName = _getSenderDisplayName(context);
 
     // 是否显示发送者名称（群聊中非自己的消息）
@@ -204,7 +204,7 @@ class MessageItem extends StatelessWidget {
     Widget bubble = MessageBubble(
       isSelf: message.isFromMe,
       bubbleColor: message.type == MessageType.encrypted
-          ? (isDark ? AppColors.bubbleOtherDark : AppColors.bubbleOther)
+          ? ChatColors.of(context).bubbleOther
           : null,
       status: status,
       timestamp: message.timestamp,
@@ -239,9 +239,7 @@ class MessageItem extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12,
                       height: 1.3,
-                      color: isDark
-                          ? const Color(0xFF999999)
-                          : AppColors.textSecondary,
+                      color: ChatColors.of(context).senderNameText,
                     ),
                   ),
                 ),
@@ -488,9 +486,7 @@ class MessageItem extends StatelessWidget {
   Widget _buildReplyQuote(bool isDark, BuildContext context) {
     final bgColor = message.isFromMe
         ? Colors.black.withValues(alpha: 0.1)
-        : (isDark
-              ? Colors.white.withValues(alpha: 0.1)
-              : Colors.black.withValues(alpha: 0.05));
+        : ChatColors.of(context).subtleFill;
 
     final textColor = message.isFromMe
         ? AppColors.sentText(isDark).withValues(alpha: 0.8)
@@ -557,7 +553,7 @@ class MessageItem extends StatelessWidget {
     // 深色模式下，对方的灰色气泡文字是白色
     final textColor = message.isFromMe
         ? AppColors.sentText(isDark) // 黑色
-        : (isDark ? AppColors.textPrimaryDark : AppColors.messageTextReceived);
+        : ChatColors.of(context).receivedText;
 
     final richText = _buildRichTextWithAddresses(
       message.content,
@@ -784,7 +780,7 @@ class MessageItem extends StatelessWidget {
         decoration: BoxDecoration(
           color: message.isFromMe
               ? AppColors.selfBubble(isDark)
-              : (isDark ? AppColors.bubbleOtherDark : AppColors.bubbleOther),
+              : ChatColors.of(context).bubbleOther,
           borderRadius: BorderRadius.circular(4),
         ),
         child: Column(
@@ -814,9 +810,7 @@ class MessageItem extends StatelessWidget {
                             fontWeight: FontWeight.w500,
                             color: message.isFromMe
                                 ? AppColors.sentText(isDark)
-                                : (isDark
-                                      ? AppColors.textPrimaryDark
-                                      : AppColors.messageTextReceived),
+                                : ChatColors.of(context).receivedText,
                           ),
                         ),
                         const SizedBox(height: 2),
@@ -848,9 +842,7 @@ class MessageItem extends StatelessWidget {
                   top: BorderSide(
                     color: message.isFromMe
                         ? Colors.black.withValues(alpha: 0.1)
-                        : (isDark
-                              ? Colors.white.withValues(alpha: 0.1)
-                              : Colors.black.withValues(alpha: 0.05)),
+                        : ChatColors.of(context).subtleFill,
                     width: 0.5,
                   ),
                 ),
@@ -864,9 +856,7 @@ class MessageItem extends StatelessWidget {
                   height: 1.3,
                   color: message.isFromMe
                       ? AppColors.sentText(isDark).withValues(alpha: 0.5)
-                      : (isDark
-                            ? AppColors.textSecondaryDark
-                            : AppColors.textTertiary),
+                      : ChatColors.of(context).captionText,
                 ),
               ),
             ),
@@ -1444,9 +1434,7 @@ class MessageItem extends StatelessWidget {
                       height: 1.35,
                       color: message.isFromMe
                           ? AppColors.sentText(isDark)
-                          : (isDark
-                                ? AppColors.textPrimaryDark
-                                : AppColors.messageTextReceived),
+                          : ChatColors.of(context).receivedText,
                     ),
                   ),
                   if (size != null)
@@ -1541,9 +1529,7 @@ class MessageItem extends StatelessWidget {
               decoration: BoxDecoration(
                 color: message.isFromMe
                     ? AppColors.messageSent
-                    : (isDark
-                          ? AppColors.messageReceivedDark
-                          : AppColors.messageReceived),
+                    : ChatColors.of(context).bubbleOther,
                 borderRadius: const BorderRadius.vertical(
                   bottom: Radius.circular(8),
                 ),
@@ -1580,9 +1566,7 @@ class MessageItem extends StatelessWidget {
                             fontWeight: FontWeight.w500,
                             color: message.isFromMe
                                 ? AppColors.sentText(isDark)
-                                : (isDark
-                                      ? AppColors.textPrimaryDark
-                                      : AppColors.messageTextReceived),
+                                : ChatColors.of(context).receivedText,
                           ),
                         ),
                         if (latitude != null && longitude != null)
@@ -1791,9 +1775,7 @@ class MessageItem extends StatelessWidget {
           decoration: BoxDecoration(
             color: message.isFromMe
                 ? AppColors.messageSent
-                : (isDark
-                      ? AppColors.messageReceivedDark
-                      : AppColors.messageReceived),
+                : ChatColors.of(context).bubbleOther,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
@@ -1916,9 +1898,7 @@ class MessageItem extends StatelessWidget {
       decoration: BoxDecoration(
         color: message.isFromMe
             ? AppColors.messageSent
-            : (isDark
-                  ? AppColors.messageReceivedDark
-                  : AppColors.messageReceived),
+            : ChatColors.of(context).bubbleOther,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -2025,9 +2005,7 @@ class MessageItem extends StatelessWidget {
       decoration: BoxDecoration(
         color: message.isFromMe
             ? AppColors.messageSent
-            : (isDark
-                  ? AppColors.messageReceivedDark
-                  : AppColors.messageReceived),
+            : ChatColors.of(context).bubbleOther,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -2100,9 +2078,7 @@ class MessageItem extends StatelessWidget {
               fontWeight: FontWeight.w600,
               color: message.isFromMe
                   ? AppColors.sentText(isDark)
-                  : (isDark
-                        ? AppColors.textPrimaryDark
-                        : AppColors.messageTextReceived),
+                  : ChatColors.of(context).receivedText,
             ),
           ),
           const SizedBox(height: 12),
@@ -2231,9 +2207,7 @@ class MessageItem extends StatelessWidget {
                             borderRadius: BorderRadius.circular(2),
                             child: LinearProgressIndicator(
                               value: percentage / 100,
-                              backgroundColor: isDark
-                                  ? Colors.grey[700]
-                                  : Colors.grey[300],
+                              backgroundColor: ChatColors.of(context).pollTrack,
                               valueColor: AlwaysStoppedAnimation<Color>(
                                 isSelected ? AppColors.primary : Colors.grey,
                               ),
@@ -2403,7 +2377,7 @@ class MessageItem extends StatelessWidget {
     // on the light bubble, so the label keeps the bubble's text color.
     final textColor = (message.isFromMe
         ? AppColors.sentText(isDark)
-        : (isDark ? AppColors.textPrimaryDark : AppColors.messageTextReceived));
+        : ChatColors.of(context).receivedText);
 
     final iconColor = isMissed && !message.isFromMe
         ? AppColors.error

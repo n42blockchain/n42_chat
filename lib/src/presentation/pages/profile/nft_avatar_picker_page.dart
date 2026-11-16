@@ -6,6 +6,7 @@ import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/nft_metadata_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../integration/wallet_bridge.dart';
 import '../../../core/theme/app_dimensions.dart';
@@ -671,9 +672,9 @@ class _ChainSelector extends StatelessWidget {
               decoration: BoxDecoration(
                 color: selected
                     ? AppColors.primary
-                    : (isDark
-                          ? Colors.white10
-                          : AppColors.primary.withValues(alpha: 0.08)),
+                    : ChatColors.of(
+                        context,
+                      ).brandSelectedTint(AppColors.primary),
                 borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                 border: Border.all(
                   color: selected ? AppColors.primary : Colors.transparent,
@@ -693,9 +694,7 @@ class _ChainSelector extends StatelessWidget {
                       fontWeight: FontWeight.w500,
                       color: selected
                           ? Colors.white
-                          : (isDark
-                                ? AppColors.textSecondaryDark
-                                : AppColors.textPrimary),
+                          : ChatColors.of(context).chipLabelText,
                     ),
                   ),
                 ],
@@ -778,7 +777,7 @@ class _WalletConnectHint extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.grey[100],
+        color: ChatColors.of(context).placeholderTile,
         borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       ),
       child: Row(

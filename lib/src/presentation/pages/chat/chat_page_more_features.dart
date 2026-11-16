@@ -5,7 +5,6 @@ part of 'chat_page.dart';
 extension _ChatPageMoreFeaturesMethods on _ChatPageState {
   /// 显示位置选项菜单（微信风格）
   Future<void> _sendLocation() async {
-    final isDark = context.isDarkMode;
     unawaited(
       showModalBottomSheet<void>(
         context: context,
@@ -119,9 +118,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
                   child: TextButton(
                     onPressed: () => Navigator.pop(context),
                     style: TextButton.styleFrom(
-                      backgroundColor: isDark
-                          ? AppColors.backgroundDark
-                          : AppColors.inputBackground,
+                      backgroundColor: ChatColors.of(context).recessedFill,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(

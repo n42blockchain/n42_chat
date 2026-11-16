@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../domain/entities/points/redemption_item.dart';
 import '../../blocs/points/points_bloc.dart';
 import '../../blocs/points/points_event.dart';
@@ -490,9 +491,7 @@ class _RedemptionCard extends StatelessWidget {
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: isDisabled
-                            ? (isDark
-                                  ? const Color(0xFF2A2A2A)
-                                  : const Color(0xFFE0E0E0))
+                            ? ChatColors.of(context).disabledFill
                             : AppColors.primary,
                         foregroundColor: isDisabled
                             ? AppColors.textDisabled

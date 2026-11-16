@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../widgets/common/slide_to_pay_button.dart';
 import '../../../core/theme/app_dimensions.dart';
@@ -175,9 +176,7 @@ class _SendTransferPageState extends State<SendTransferPage> {
                 children: [
                   CircleAvatar(
                     radius: 24,
-                    backgroundColor: isDark
-                        ? Colors.grey[700]
-                        : Colors.grey[200],
+                    backgroundColor: ChatColors.of(context).avatarPlaceholderBg,
                     backgroundImage: widget.receiverAvatar != null
                         ? NetworkImage(widget.receiverAvatar!)
                         : null,
@@ -187,9 +186,7 @@ class _SendTransferPageState extends State<SendTransferPage> {
                                 ? widget.receiverName[0]
                                 : '?',
                             style: TextStyle(
-                              color: isDark
-                                  ? Colors.grey[300]
-                                  : Colors.grey[600],
+                              color: ChatColors.of(context).avatarPlaceholderFg,
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),

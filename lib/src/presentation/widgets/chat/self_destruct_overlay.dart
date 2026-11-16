@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/self_destruct_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../domain/entities/message_entity.dart';
 import '../../../core/theme/app_dimensions.dart';
 
@@ -141,22 +142,15 @@ class _SelfDestructOverlayState extends State<SelfDestructOverlay> {
   }
 
   Widget _buildDestroyedPlaceholder(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppDimensions.spacing,
         vertical: 10,
       ),
       decoration: BoxDecoration(
-        color: isDark
-            ? Colors.grey.shade800.withValues(alpha: 0.5)
-            : Colors.grey.shade200.withValues(alpha: 0.7),
+        color: ChatColors.of(context).selfDestructBg,
         borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-        border: Border.all(
-          color: isDark
-              ? Colors.grey.shade700.withValues(alpha: 0.3)
-              : Colors.grey.shade300.withValues(alpha: 0.5),
-        ),
+        border: Border.all(color: ChatColors.of(context).selfDestructBorder),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

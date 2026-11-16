@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
 
 /// 恢复密钥展示对话框
@@ -69,7 +70,7 @@ class RecoveryKeyDisplayDialog extends StatelessWidget {
                       'Store this key safely. It is the only way to recover your encrypted messages if you lose access to all devices.',
                       style: TextStyle(
                         fontSize: 12,
-                        color: isDark ? Colors.orange[200] : Colors.orange[800],
+                        color: ChatColors.of(context).warningText,
                         height: 1.4,
                       ),
                     ),

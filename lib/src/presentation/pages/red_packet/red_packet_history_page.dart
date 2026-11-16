@@ -5,6 +5,7 @@ import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/red_packet_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../domain/entities/red_packet_entity.dart';
 import 'red_packet_detail_page.dart';
 import '../../../core/theme/app_dimensions.dart';
@@ -113,7 +114,7 @@ class _RedPacketHistoryPageState extends State<RedPacketHistoryPage>
             Icon(
               Icons.card_giftcard_outlined,
               size: 48,
-              color: isDark ? Colors.white24 : Colors.grey.shade300,
+              color: ChatColors.of(context).emptyStateIcon,
             ),
             const SizedBox(height: AppDimensions.spacingM),
             Text(

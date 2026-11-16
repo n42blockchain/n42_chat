@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../domain/entities/avatar_decoration_preset.dart';
 import '../../../domain/entities/user_entity.dart';
@@ -160,9 +161,7 @@ class _AvatarStudioPageState extends State<AvatarStudioPage> {
               vertical: 6,
             ),
             decoration: BoxDecoration(
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.06)
-                  : Colors.black.withValues(alpha: 0.05),
+              color: ChatColors.of(context).cardFillSubtle,
               borderRadius: BorderRadius.circular(AppDimensions.radiusFull),
             ),
             child: Text(

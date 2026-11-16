@@ -6,6 +6,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/conversation_entity.dart';
@@ -217,9 +218,9 @@ class _SpaceDetailScaffold extends StatelessWidget {
                           padding: EdgeInsets.zero,
                           materialTapTargetSize:
                               MaterialTapTargetSize.shrinkWrap,
-                          backgroundColor: isDark
-                              ? AppColors.primary.withValues(alpha: 0.2)
-                              : AppColors.primary.withValues(alpha: 0.1),
+                          backgroundColor: ChatColors.of(
+                            context,
+                          ).brandTintStrong(AppColors.primary),
                         ),
                       )
                       .toList(),
@@ -330,7 +331,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
     return SliverAppBar(
       expandedHeight: 200,
       pinned: true,
-      backgroundColor: isDark ? AppColors.surfaceDark : AppColors.primary,
+      backgroundColor: ChatColors.of(context).brandHeaderBg(AppColors.primary),
       actions: [
         // 治理提案入口：GovernanceBloc/三页面/数据层此前全部就位，但全仓
         // 零导航入口（附录 C 误标 ✅，2026-08-15 复核发现）——在此接线。

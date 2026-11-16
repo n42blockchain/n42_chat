@@ -38,6 +38,7 @@ export 'src/presentation/blocs/auth/auth_state.dart';
 // ============================================
 export 'src/core/theme/n42_chat_theme.dart';
 export 'src/core/theme/app_colors.dart';
+export 'src/core/theme/chat_colors.dart';
 export 'src/core/theme/app_text_styles.dart';
 
 // ============================================

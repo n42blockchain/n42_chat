@@ -9,6 +9,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/moment_entity.dart';
 import '../../blocs/contact/contact_bloc.dart';
@@ -282,9 +283,10 @@ class _MomentListViewState extends State<_MomentListView> {
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: isDark
-                  ? [const Color(0xFF2C3E50), const Color(0xFF1A252F)]
-                  : [const Color(0xFF667eea), const Color(0xFF764ba2)],
+              colors: [
+                ChatColors.of(context).momentCoverStart,
+                ChatColors.of(context).momentCoverEnd,
+              ],
             ),
           ),
         ),

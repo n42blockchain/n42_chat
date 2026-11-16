@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../common/common_widgets.dart';
 import '../../../core/theme/app_dimensions.dart';
 
@@ -205,7 +206,7 @@ class SettingsHubChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
+        color: ChatColors.of(context).subtleFill,
         borderRadius: BorderRadius.circular(AppDimensions.radiusFull),
       ),
       child: Text(

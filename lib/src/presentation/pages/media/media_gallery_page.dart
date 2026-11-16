@@ -9,6 +9,7 @@ import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/download_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../core/utils/matrix_utils.dart' as mx_utils;
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/media_folder_entity.dart';
@@ -260,7 +261,7 @@ class _MediaGalleryPageState extends State<MediaGalleryPage>
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: isDark ? Colors.white70 : AppColors.textPrimary,
+                  color: ChatColors.of(context).dateHeaderText,
                 ),
               ),
             ),
@@ -380,7 +381,7 @@ class _MediaGalleryPageState extends State<MediaGalleryPage>
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: isDark ? Colors.white70 : AppColors.textPrimary,
+                  color: ChatColors.of(context).dateHeaderText,
                 ),
               ),
             ),
@@ -402,9 +403,7 @@ class _MediaGalleryPageState extends State<MediaGalleryPage>
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.08)
-              : Colors.grey[100],
+          color: ChatColors.of(context).placeholderTile,
           borderRadius: BorderRadius.circular(AppDimensions.radiusM),
         ),
         child: Icon(icon, color: AppColors.primary),

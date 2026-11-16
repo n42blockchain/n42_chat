@@ -7,6 +7,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../domain/entities/ai_assistant_entity.dart';
 import '../../../domain/repositories/ai_repository.dart';
 import '../../blocs/ai_assistant/ai_assistant_bloc.dart';
@@ -309,7 +310,6 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
     String label,
     IconData icon,
   ) {
-    final isDark = context.isDarkMode;
     return ActionChip(
       avatar: Icon(icon, size: 16, color: AppColors.primary),
       label: Text(
@@ -318,9 +318,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
         overflow: TextOverflow.ellipsis,
         style: TextStyle(fontSize: 13, height: 1.3, color: context.textPrimary),
       ),
-      backgroundColor: isDark
-          ? AppColors.primary.withValues(alpha: 0.15)
-          : AppColors.primary.withValues(alpha: 0.08),
+      backgroundColor: ChatColors.of(context).brandTint(AppColors.primary),
       side: BorderSide(color: AppColors.primary.withValues(alpha: 0.2)),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       onPressed: () {
@@ -387,18 +385,12 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
                           ),
                           code: TextStyle(
                             fontSize: 13,
-                            color: isDark
-                                ? Colors.greenAccent.shade200
-                                : Colors.green.shade800,
-                            backgroundColor: isDark
-                                ? Colors.black26
-                                : Colors.grey.shade100,
+                            color: ChatColors.of(context).codeText,
+                            backgroundColor: ChatColors.of(context).codeBlockBg,
                             fontFamily: 'monospace',
                           ),
                           codeblockDecoration: BoxDecoration(
-                            color: isDark
-                                ? Colors.black26
-                                : Colors.grey.shade100,
+                            color: ChatColors.of(context).codeBlockBg,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           listBullet: TextStyle(

@@ -7,6 +7,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../domain/entities/avatar_decoration_preset.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
@@ -449,9 +450,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 vertical: 4,
                               ),
                               decoration: BoxDecoration(
-                                color: isDark
-                                    ? Colors.white.withValues(alpha: 0.1)
-                                    : Colors.black.withValues(alpha: 0.05),
+                                color: ChatColors.of(context).subtleFill,
                                 borderRadius: BorderRadius.circular(14),
                               ),
                               child: Row(

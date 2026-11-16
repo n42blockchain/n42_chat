@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
 
 class AiSmartReplyBar extends StatelessWidget {
@@ -109,9 +110,8 @@ class AiSmartReplyBar extends StatelessWidget {
                           onPressed: onSelect == null
                               ? null
                               : () => onSelect!(suggestion),
-                          backgroundColor: AppColors.primary.withValues(
-                            alpha: isDark ? 0.16 : 0.10,
-                          ),
+                          backgroundColor: ChatColors.of(context)
+                              .brandChipTint(AppColors.primary),
                           labelStyle: TextStyle(
                             color: AppColors.textPrimaryOf(isDark),
                             fontSize: 13,

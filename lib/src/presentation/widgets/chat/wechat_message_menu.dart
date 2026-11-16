@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../core/utils/a11y_l10n.dart';
 import '../../../domain/entities/message_entity.dart';
 import 'message_reaction_bar.dart';
@@ -664,7 +665,7 @@ class _RecallConfirmSheet extends StatelessWidget {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 20,
-                        color: isDark ? Colors.white : const Color(0xFF007AFF),
+                        color: ChatColors.of(context).menuAccentText,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -688,7 +689,6 @@ class RecalledMessageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
     final textColor = context.textTertiary;
     final s = S.of(context);
 
@@ -713,9 +713,7 @@ class RecalledMessageWidget extends StatelessWidget {
                   s?.commonReEdit ?? 'Re-edit',
                   style: TextStyle(
                     fontSize: 12,
-                    color: isDark
-                        ? const Color(0xFF57A5FF)
-                        : const Color(0xFF576B95),
+                    color: ChatColors.of(context).menuLinkText,
                   ),
                 ),
               ),

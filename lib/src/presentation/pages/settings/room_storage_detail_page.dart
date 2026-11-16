@@ -5,6 +5,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/storage_manager_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../data/datasources/local/media_metadata_database.dart';
 import '../../blocs/storage/storage_management_bloc.dart';
@@ -340,7 +341,6 @@ class _MediaFileTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
     final textColor = context.textPrimary;
     final secondaryColor = context.textSecondary;
 
@@ -412,9 +412,7 @@ class _MediaFileTile extends StatelessWidget {
       ),
       onTap: onTap,
       selected: isSelected,
-      selectedTileColor: isDark
-          ? Colors.white.withValues(alpha: 0.05)
-          : Colors.black.withValues(alpha: 0.03),
+      selectedTileColor: ChatColors.of(context).selectedTileFill,
     );
   }
 

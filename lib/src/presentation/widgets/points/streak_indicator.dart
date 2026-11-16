@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
 
 /// Streak indicator widget showing consecutive active days.
@@ -261,7 +262,7 @@ class _DayDot extends StatelessWidget {
             shape: BoxShape.circle,
             color: isActive
                 ? const Color(0xFFFF6B35)
-                : (isDark ? const Color(0xFF2A2A2A) : const Color(0xFFF7F7F7)),
+                : ChatColors.of(context).chipBg,
             border: isToday
                 ? Border.all(color: AppColors.primary, width: 2)
                 : null,

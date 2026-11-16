@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../core/theme/app_dimensions.dart';
 
@@ -220,9 +221,7 @@ class _N42BeanPageState extends State<N42BeanPage> {
                 child: ElevatedButton(
                   onPressed: () => Navigator.pop(context),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: isDark
-                        ? AppColors.surfaceDark.withValues(alpha: 0.5)
-                        : const Color(0xFFF7F7F7),
+                    backgroundColor: ChatColors.of(context).secondaryButtonBg,
                     foregroundColor: context.textPrimary,
                     elevation: 0,
                     padding: const EdgeInsets.symmetric(vertical: 14),

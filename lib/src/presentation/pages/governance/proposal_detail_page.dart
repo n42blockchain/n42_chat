@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../domain/entities/governance/proposal_entity.dart';
 import '../../../domain/entities/governance/vote_entity.dart';
 import '../../blocs/governance/governance_bloc.dart';
@@ -385,7 +386,6 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
   // -- Voting section: choice selection + cast vote button --
 
   Widget _buildVotingSection(ProposalEntity proposal, GovernanceState state) {
-    final isDark = context.isDarkMode;
     final isVoting = _voteInFlight && state.status == GovernanceStatus.voting;
 
     return Container(
@@ -455,9 +455,8 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
                   : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
-                disabledBackgroundColor: isDark
-                    ? AppColors.dividerDark
-                    : const Color(0xFFE0E0E0),
+                disabledBackgroundColor: ChatColors.of(context)
+                    .buttonDisabledBg,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppDimensions.radiusM),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../core/utils/a11y_l10n.dart';
 import '../../../core/theme/app_dimensions.dart';
 
@@ -51,7 +52,7 @@ class _AiLinkSummaryCardState extends State<AiLinkSummaryCard> {
       margin: const EdgeInsets.only(top: 6),
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: isDark ? 0.08 : 0.04),
+        color: ChatColors.of(context).brandTintFaint(AppColors.primary),
         borderRadius: BorderRadius.circular(AppDimensions.radiusM),
         border: Border.all(color: AppColors.primary.withValues(alpha: 0.15)),
       ),
@@ -144,7 +145,7 @@ class _AiLinkSummaryCardState extends State<AiLinkSummaryCard> {
           margin: const EdgeInsets.only(top: 6),
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
-            color: AppColors.primary.withValues(alpha: isDark ? 0.08 : 0.04),
+            color: ChatColors.of(context).brandTintFaint(AppColors.primary),
             borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
             border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
           ),

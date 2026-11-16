@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../domain/entities/conversation_entity.dart';
 import '../../../domain/repositories/conversation_repository.dart';
 import '../../../core/utils/debug_log.dart';
@@ -148,9 +149,7 @@ class _MultiForwardSheetState extends State<MultiForwardSheet> {
                 hintStyle: TextStyle(color: subtextColor),
                 prefixIcon: Icon(Icons.search, color: subtextColor),
                 filled: true,
-                fillColor: widget.isDark
-                    ? Colors.white.withValues(alpha: 0.1)
-                    : Colors.grey[200],
+                fillColor: ChatColors.of(context).searchFieldFill,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                   borderSide: BorderSide.none,

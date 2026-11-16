@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
 import '../../../core/theme/app_text_styles.dart';
 
@@ -209,10 +210,7 @@ class N42MutedIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final fallback = isDark
-        ? AppColors.textTertiaryDark
-        : AppColors.muted;
+    final fallback = ChatColors.of(context).mutedBadge;
     return Icon(
       Icons.notifications_off_outlined,
       size: size,

@@ -8,6 +8,7 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/services/voice_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/a11y_l10n.dart';
@@ -810,9 +811,7 @@ class ChatInputBarState extends State<ChatInputBar> {
         color: context.surfaceColor,
         borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
         border: Border.all(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.06)
-              : Colors.black.withValues(alpha: 0.06),
+          color: ChatColors.of(context).subtleFillWeak,
           width: 1,
         ),
       ),

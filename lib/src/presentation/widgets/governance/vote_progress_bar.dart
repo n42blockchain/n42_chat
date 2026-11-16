@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
 
 /// A reusable progress bar widget for displaying vote results.
@@ -49,19 +50,16 @@ class VoteProgressBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final barColor = isWinner
         ? AppColors.primary
         : isSelected
         ? AppColors.info
-        : (isDark ? const Color(0xFF3D3D3D) : const Color(0xFFE0E0E0));
+        : ChatColors.of(context).trackBg;
 
     final textColor = context.textPrimary;
     final secondaryTextColor = context.textSecondary;
-    final trackColor = isDark
-        ? const Color(0xFF2A2A2A)
-        : const Color(0xFFF7F7F7);
+    final trackColor = ChatColors.of(context).chipBg;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),

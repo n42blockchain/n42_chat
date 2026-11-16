@@ -4,6 +4,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/ai_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
 
 /// AI 消息改写建议栏
@@ -150,7 +151,7 @@ class AiRewriteBar extends StatelessWidget {
               ),
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: isDark ? 0.1 : 0.05),
+                color: ChatColors.of(context).brandTintSoft(AppColors.primary),
                 borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               ),
               child: Text(

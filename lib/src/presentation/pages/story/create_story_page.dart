@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../domain/entities/story_entity.dart';
 import '../../blocs/story/story_bloc.dart';
 import '../../blocs/story/story_event.dart';
@@ -380,9 +381,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
                   ),
                 ),
                 filled: true,
-                fillColor: isDark
-                    ? AppColors.backgroundDark
-                    : AppColors.inputBackground,
+                fillColor: ChatColors.of(context).recessedFill,
                 counterStyle: TextStyle(color: context.textSecondary),
               ),
             ),

@@ -320,16 +320,13 @@ extension _ChatPageMessageListMethods on _ChatPageState {
   }) {
     final isRedacted = message.type == MessageType.redacted;
     final isSelected = !isRedacted && _selectedMessageIds.contains(message.id);
-    final isDark = context.isDarkMode;
 
     return GestureDetector(
       onTap: isRedacted ? null : () => _toggleMessageSelection(message.id),
       child: Container(
         key: messageKey,
         color: isSelected
-            ? (isDark
-                  ? Colors.white.withValues(alpha: 0.1)
-                  : AppColors.info.withValues(alpha: 0.1))
+            ? ChatColors.of(context).messageSelectedBg
             : Colors.transparent,
         child: Row(
           children: [

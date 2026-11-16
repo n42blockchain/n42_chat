@@ -10,6 +10,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../domain/entities/avatar_decoration_preset.dart';
 import '../../../domain/repositories/auth_repository.dart';
@@ -155,7 +156,7 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
     final bgColor = AppColors.bgOf(isDark);
-    final cardColor = _qrCardColor(isDark);
+    final cardColor = _qrCardColor(ChatColors.of(context));
     final textColor = AppColors.textPrimaryOf(isDark);
     final subtitleColor = AppColors.textSecondaryOf(isDark);
 
@@ -432,16 +433,16 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
     );
   }
 
-  Color _qrCardColor(bool isDark) {
+  Color _qrCardColor(ChatColors colors) {
     switch (_qrStyle) {
       case _QRCodeStyle.n42:
-        return isDark ? const Color(0xFF2A2A2A) : Colors.white;
+        return colors.qrPresetN42;
       case _QRCodeStyle.classic:
-        return isDark ? const Color(0xFF181818) : Colors.white;
+        return colors.qrPresetClassic;
       case _QRCodeStyle.ocean:
-        return isDark ? const Color(0xFF1A252F) : const Color(0xFFE3EFFD);
+        return colors.qrPresetOcean;
       case _QRCodeStyle.berry:
-        return isDark ? const Color(0xFF2A1727) : const Color(0xFFF7F7F7);
+        return colors.qrPresetBerry;
     }
   }
 

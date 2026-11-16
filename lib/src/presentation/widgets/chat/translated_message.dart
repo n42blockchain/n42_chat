@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
 
 /// 翻译结果显示组件（微信风格）
@@ -54,9 +55,7 @@ class TranslatedMessageWidget extends StatelessWidget {
         vertical: AppDimensions.spacingS,
       ),
       decoration: BoxDecoration(
-        color: isDark
-            ? Colors.white.withValues(alpha: 0.08)
-            : Colors.black.withValues(alpha: 0.04),
+        color: ChatColors.of(context).insetFill,
         borderRadius: BorderRadius.circular(AppDimensions.radiusM),
       ),
       child: Column(
@@ -69,9 +68,7 @@ class TranslatedMessageWidget extends StatelessWidget {
             translatedText,
             style: TextStyle(
               fontSize: 15,
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.9)
-                  : AppColors.textPrimary,
+              color: ChatColors.of(context).translatedText,
               height: 1.4,
             ),
           ),
@@ -84,10 +81,8 @@ class TranslatedMessageWidget extends StatelessWidget {
                 isOriginalDisplay ? Icons.edit : Icons.check_circle,
                 size: 12,
                 color: isOriginalDisplay
-                    ? (AppColors.textTertiaryOf(isDark))
-                    : (isDark
-                          ? const Color(0xFF66BB6A)
-                          : const Color(0xFF43A047)),
+                    ? AppColors.textTertiaryOf(isDark)
+                    : ChatColors.of(context).translatedAccent,
               ),
               const SizedBox(width: AppDimensions.spacingXS),
               Text(

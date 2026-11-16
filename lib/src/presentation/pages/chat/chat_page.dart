@@ -60,6 +60,7 @@ import '../../../domain/entities/red_packet_entity.dart';
 import '../media/media_editor_page.dart';
 import '../../../core/services/remark_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../domain/entities/contact_entity.dart';

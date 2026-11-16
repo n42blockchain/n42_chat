@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../services/voip/livekit_service.dart';
 import '../../../services/voip/voip_config.dart';
 import '../../../services/voip/webrtc_service.dart';
@@ -235,7 +236,7 @@ class _CallEnhancementSheetState extends State<CallEnhancementSheet> {
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
     final backgroundColor = context.surfaceColor;
-    final dividerColor = Colors.white.withValues(alpha: isDark ? 0.10 : 0.08);
+    final dividerColor = ChatColors.of(context).sheetDivider;
     final subtitleColor = AppColors.textSecondaryOf(isDark);
     final audioConfig = _controller.audioProcessingConfig;
     final canToggleBackgroundBlur =
@@ -395,9 +396,7 @@ class _SwitchTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
-    final tileColor = isDark
-        ? Colors.white.withValues(alpha: 0.04)
-        : Colors.black.withValues(alpha: 0.03);
+    final tileColor = ChatColors.of(context).tileFillFaint;
     final subtitleColor = AppColors.textSecondaryOf(isDark);
 
     return Container(
@@ -449,9 +448,7 @@ class _ActionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
-    final tileColor = isDark
-        ? Colors.white.withValues(alpha: 0.04)
-        : Colors.black.withValues(alpha: 0.03);
+    final tileColor = ChatColors.of(context).tileFillFaint;
     final subtitleColor = AppColors.textSecondaryOf(isDark);
 
     return Container(

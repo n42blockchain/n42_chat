@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
 
 /// 联系人字母索引条
@@ -107,9 +108,7 @@ class _ContactIndexBarState extends State<ContactIndexBar> {
             ),
             decoration: BoxDecoration(
               color: _isDragging
-                  ? (isDark
-                        ? Colors.white.withValues(alpha: 0.1)
-                        : Colors.black.withValues(alpha: 0.05))
+                  ? ChatColors.of(context).subtleFill
                   : Colors.transparent,
               borderRadius: BorderRadius.circular(10),
             ),
@@ -137,9 +136,7 @@ class _ContactIndexBarState extends State<ContactIndexBar> {
                               : FontWeight.w500,
                           color: isActive
                               ? Colors.white
-                              : (isDark
-                                    ? AppColors.textSecondaryDark
-                                    : AppColors.textSecondary),
+                              : AppColors.textSecondaryOf(isDark),
                         ),
                       ),
                     ),

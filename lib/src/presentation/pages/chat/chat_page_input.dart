@@ -11,7 +11,7 @@ extension _ChatPageInputMethods on _ChatPageState {
       return Container(
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
         decoration: BoxDecoration(
-          color: isDark ? AppColors.surfaceDark : AppColors.background,
+          color: AppColors.inputBgOf(isDark),
           border: Border(
             top: BorderSide(color: context.dividerColor, width: 0.5),
           ),

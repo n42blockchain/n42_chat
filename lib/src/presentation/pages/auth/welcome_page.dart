@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -32,7 +33,7 @@ class WelcomePage extends StatelessWidget {
 
     return Scaffold(
       key: const ValueKey<String>('chat_welcome_page'),
-      backgroundColor: isDark ? AppColors.backgroundDark : Colors.white,
+      backgroundColor: ChatColors.of(context).welcomeBg,
       body: SafeArea(
         child: Column(
           children: [

@@ -5,6 +5,7 @@ import '../../../core/theme/app_dimensions.dart';
 
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../core/utils/a11y_l10n.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import 'message_status_indicator.dart';
@@ -156,7 +157,7 @@ class MessageBubble extends StatelessWidget {
                             constraints: BoxConstraints(maxWidth: maxWidth),
                             child: noBubble
                                 ? _buildNoBubbleContent()
-                                : _buildBubble(isDark),
+                                : _buildBubble(context, isDark),
                           ),
                         ),
                       ],
@@ -263,12 +264,12 @@ class MessageBubble extends StatelessWidget {
     );
   }
 
-  Widget _buildBubble(bool isDark) {
+  Widget _buildBubble(BuildContext context, bool isDark) {
     final bgColor =
         bubbleColor ??
         (isSelf
             ? AppColors.selfBubble(isDark)
-            : (isDark ? AppColors.bubbleOtherDark : AppColors.bubbleOther));
+            : ChatColors.of(context).bubbleOther);
 
     // 微信风格气泡圆角
     final borderRadius = isSelf

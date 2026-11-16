@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../core/utils/date_utils.dart';
 import '../../../core/theme/app_dimensions.dart';
 
@@ -17,7 +18,6 @@ class TimeSeparator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacing),
       child: Center(
@@ -25,7 +25,7 @@ class TimeSeparator extends StatelessWidget {
           customText ?? N42DateUtils.formatMessageTime(dateTime),
           style: TextStyle(
             fontSize: 12,
-            color: isDark ? const Color(0xFF888888) : const Color(0xFF999999),
+            color: ChatColors.of(context).timeSeparatorText,
           ),
         ),
       ),

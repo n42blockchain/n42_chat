@@ -4,6 +4,7 @@ import 'package:get_it/get_it.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../core/utils/debug_log.dart';
 import '../../../data/datasources/local/preferences_datasource.dart';
@@ -312,9 +313,7 @@ class _AutoDownloadSettingsPageState extends State<AutoDownloadSettingsPage> {
       margin: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing),
       padding: const EdgeInsets.all(AppDimensions.spacing),
       decoration: BoxDecoration(
-        color: isDark
-            ? AppColors.surfaceDark.withValues(alpha: 0.85)
-            : AppColors.primary.withValues(alpha: 0.08),
+        color: ChatColors.of(context).brandBannerTint(AppColors.primary),
         borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
         border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
       ),

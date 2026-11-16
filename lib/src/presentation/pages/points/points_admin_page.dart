@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../domain/entities/points/points_config.dart';
 import '../../../domain/entities/points/reward_rule.dart';
 import '../../blocs/points/points_bloc.dart';
@@ -384,7 +385,6 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
     TextInputType? keyboardType,
     List<TextInputFormatter>? inputFormatters,
   }) {
-    final isDark = context.isDarkMode;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -415,9 +415,7 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
             hintText: hint,
             hintStyle: TextStyle(color: context.textTertiary),
             filled: true,
-            fillColor: isDark
-                ? AppColors.dividerThinDark
-                : const Color(0xFFF7F7F7),
+            fillColor: ChatColors.of(context).formFieldFill,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               borderSide: BorderSide.none,

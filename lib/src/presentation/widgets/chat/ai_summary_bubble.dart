@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 
 /// AI 摘要气泡组件
 ///
@@ -169,7 +170,6 @@ class AiSummarizeButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
     final l10n = S.of(context);
 
     return GestureDetector(
@@ -178,7 +178,7 @@ class AiSummarizeButton extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 40, vertical: 8),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: AppColors.primary.withValues(alpha: isDark ? 0.15 : 0.08),
+          color: ChatColors.of(context).brandTint(AppColors.primary),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
         ),

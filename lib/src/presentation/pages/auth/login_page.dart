@@ -10,6 +10,7 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/router/routes.dart';
 import '../../../core/services/biometric_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../data/datasources/local/secure_storage_datasource.dart';
 import '../../../n42_chat.dart';
@@ -724,9 +725,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildAgreement(bool isDark) {
-    final textColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textTertiary;
+    final textColor = ChatColors.of(context).captionText;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing),

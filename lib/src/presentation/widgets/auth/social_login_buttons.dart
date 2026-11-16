@@ -14,6 +14,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../core/utils/sso_brand.dart';
 import '../../../integration/wallet_bridge.dart';
 import '../../../n42_chat.dart' show N42Chat;
@@ -1071,7 +1072,6 @@ class AppleSignInButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return ElevatedButton.icon(
       onPressed: isLoading ? null : onPressed,
@@ -1081,13 +1081,13 @@ class AppleSignInButton extends StatelessWidget {
               height: 20,
               child: CircularProgressIndicator(strokeWidth: 2),
             )
-          : Icon(Icons.apple, color: isDark ? Colors.black : Colors.white),
+          : Icon(Icons.apple, color: ChatColors.of(context).appleButtonFg),
       label: Text(
         S.of(context)?.commonAppleLogin ?? 'Sign in with Apple',
-        style: TextStyle(color: isDark ? Colors.black : Colors.white),
+        style: TextStyle(color: ChatColors.of(context).appleButtonFg),
       ),
       style: ElevatedButton.styleFrom(
-        backgroundColor: isDark ? Colors.white : Colors.black,
+        backgroundColor: ChatColors.of(context).appleButtonBg,
         minimumSize: const Size(double.infinity, 48),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppDimensions.radiusM),

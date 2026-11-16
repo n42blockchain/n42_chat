@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../domain/entities/message_entity.dart';
 import '../../../core/theme/app_dimensions.dart';
 
@@ -95,7 +96,7 @@ class ChatDeleteConfirmSheet extends StatelessWidget {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 20,
-                        color: isDark ? Colors.white : const Color(0xFF007AFF),
+                        color: ChatColors.of(context).menuAccentText,
                         fontWeight: FontWeight.w600,
                       ),
                     ),

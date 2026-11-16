@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../core/theme/app_icons.dart';
 
 class SendRedPacketPage extends StatefulWidget {
@@ -269,7 +270,6 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
-    final isDark = context.isDarkMode;
     final bgColor = context.pageBackground;
     final textColor = context.textPrimary;
     final secondaryTextColor = context.textSecondary;
@@ -365,11 +365,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: isDark
-                                  ? AppColors.dividerThinDark
-                                  : AppColors.dividerThin.withValues(
-                                      alpha: 0.05,
-                                    ),
+                              color: ChatColors.of(context).redPacketFieldBg,
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Row(
@@ -609,13 +605,11 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                             : null,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFFE85D04),
-                          disabledBackgroundColor: isDark
-                              ? const Color(0xFF4A3020)
-                              : const Color(0xFFE8D0C0),
+                          disabledBackgroundColor:
+                              ChatColors.of(context).redPacketDisabledBg,
                           foregroundColor: Colors.white,
-                          disabledForegroundColor: isDark
-                              ? Colors.white38
-                              : Colors.white60,
+                          disabledForegroundColor:
+                              ChatColors.of(context).redPacketDisabledFg,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -753,7 +747,6 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
     bool selected,
     VoidCallback onTap,
   ) {
-    final isDark = context.isDarkMode;
     final secondaryTextColor = context.textSecondary;
 
     return GestureDetector(
@@ -763,9 +756,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
         decoration: BoxDecoration(
           color: selected
               ? const Color(0xFFE85D04)
-              : (isDark
-                    ? AppColors.dividerThinDark
-                    : AppColors.dividerThin.withValues(alpha: 0.05)),
+              : ChatColors.of(context).redPacketFieldBg,
           borderRadius: BorderRadius.circular(4),
         ),
         child: Text(
@@ -832,7 +823,6 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
 
   /// 显示表情选择器
   void _showEmojiPicker() {
-    final isDark = context.isDarkMode;
     final surfaceColor = context.surfaceColor;
     final textColor = context.textPrimary;
 
@@ -898,9 +888,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                         },
                         child: Container(
                           decoration: BoxDecoration(
-                            color: isDark
-                                ? AppColors.dividerThinDark
-                                : AppColors.dividerThin.withValues(alpha: 0.05),
+                            color: ChatColors.of(context).redPacketFieldBg,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Center(

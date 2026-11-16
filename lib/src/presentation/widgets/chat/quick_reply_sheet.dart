@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../data/datasources/local/preferences_datasource.dart';
 import '../../../domain/entities/quick_reply_entity.dart';
 import '../../../core/theme/app_dimensions.dart';
@@ -310,9 +311,7 @@ class _QuickReplySheetState extends State<QuickReplySheet> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: isDark
-                      ? Colors.white12
-                      : Colors.black.withValues(alpha: 0.05),
+                  color: ChatColors.of(context).chipFill,
                   borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                 ),
                 child: Text(

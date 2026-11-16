@@ -6,6 +6,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/remark_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../core/utils/a11y_l10n.dart';
 import '../../../core/utils/bridge_detection_utils.dart';
 import '../../../core/utils/date_utils.dart';
@@ -348,7 +349,7 @@ class ConversationTile extends StatelessWidget {
                 child: Icon(
                   Icons.notifications_off,
                   size: 16,
-                  color: isDark ? Colors.white24 : AppColors.muted,
+                  color: ChatColors.of(context).mutedIcon,
                 ),
               ),
           ],

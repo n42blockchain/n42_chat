@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../domain/entities/social/social_recommendation.dart';
 
 /// Simple force-directed-style graph visualization widget.
@@ -81,6 +82,7 @@ class _SocialGraphVisualizationState extends State<SocialGraphVisualization>
                   recommendations: widget.recommendations,
                   selectedIndex: widget.selectedIndex ?? -1,
                   isDark: isDark,
+                  edgeColor: ChatColors.of(context).graphEdge,
                   animationValue: _scaleAnim.value,
                 ),
               ),
@@ -119,6 +121,7 @@ class _GraphPainter extends CustomPainter {
   final List<SocialRecommendation> recommendations;
   final int selectedIndex;
   final bool isDark;
+  final Color edgeColor;
   final double animationValue;
 
   _GraphPainter({
@@ -126,6 +129,7 @@ class _GraphPainter extends CustomPainter {
     required this.recommendations,
     required this.selectedIndex,
     required this.isDark,
+    required this.edgeColor,
     required this.animationValue,
   });
 
@@ -145,7 +149,7 @@ class _GraphPainter extends CustomPainter {
       final score = recommendations[i].similarityScore;
 
       final linePaint = Paint()
-        ..color = (isDark ? Colors.white24 : Colors.black12)
+        ..color = edgeColor
         ..strokeWidth = 1.0 + score * 3.0
         ..style = PaintingStyle.stroke;
 
@@ -299,6 +303,7 @@ class _GraphPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _GraphPainter oldDelegate) {
     return oldDelegate.selectedIndex != selectedIndex ||
+        oldDelegate.edgeColor != edgeColor ||
         oldDelegate.animationValue != animationValue ||
         oldDelegate.recommendations.length != recommendations.length;
   }

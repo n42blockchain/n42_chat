@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/url_preview_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../core/utils/a11y_l10n.dart';
 import '../../../core/theme/app_dimensions.dart';
 
@@ -89,7 +90,7 @@ class _UrlPreviewWidgetState extends State<UrlPreviewWidget> {
       margin: const EdgeInsets.only(top: AppDimensions.spacingS),
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
+        color: ChatColors.of(context).subtleFill,
         borderRadius: BorderRadius.circular(AppDimensions.radiusM),
       ),
       child: Row(
@@ -146,9 +147,7 @@ class _UrlPreviewWidgetState extends State<UrlPreviewWidget> {
         child: Container(
           margin: const EdgeInsets.only(top: AppDimensions.spacingS),
           decoration: BoxDecoration(
-            color: isDark
-                ? Colors.white10
-                : Colors.black.withValues(alpha: 0.05),
+            color: ChatColors.of(context).subtleFill,
             borderRadius: BorderRadius.circular(AppDimensions.radiusM),
             border: const Border(
               left: BorderSide(color: AppColors.primary, width: 3),

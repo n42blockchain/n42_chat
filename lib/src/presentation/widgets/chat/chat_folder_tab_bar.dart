@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../domain/entities/chat_folder_entity.dart';
 import '../../../core/theme/app_dimensions.dart';
 
@@ -42,11 +43,7 @@ class ChatFolderTabBar extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surfaceOf(isDark),
         border: Border(
-          bottom: BorderSide(
-            color: isDark
-                ? Colors.white.withValues(alpha: 0.06)
-                : Colors.black.withValues(alpha: 0.06),
-          ),
+          bottom: BorderSide(color: ChatColors.of(context).subtleFillWeak),
         ),
       ),
       child: ListView.builder(

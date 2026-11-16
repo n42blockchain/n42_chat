@@ -9,6 +9,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
 
 class ShareableLinkPresentation {
@@ -339,9 +340,7 @@ class _ShareableLinkQrPageState extends State<_ShareableLinkQrPage> {
                             vertical: 12,
                           ),
                           decoration: BoxDecoration(
-                            color: isDark
-                                ? Colors.white.withValues(alpha: 0.06)
-                                : const Color(0xFFF7F7F7),
+                            color: ChatColors.of(context).linkFieldFill,
                             borderRadius: BorderRadius.circular(14),
                           ),
                           child: Text(

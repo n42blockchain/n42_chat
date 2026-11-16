@@ -4,6 +4,7 @@ import 'package:matrix/encryption/utils/key_verification.dart' as kv;
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_dimensions.dart';
+import '../../../core/theme/chat_colors.dart';
 
 /// SAS Emoji 验证展示组件
 ///
@@ -58,9 +59,7 @@ class EmojiVerificationWidget extends StatelessWidget {
             width: 56,
             height: 56,
             decoration: BoxDecoration(
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.08)
-                  : Colors.grey.withValues(alpha: 0.1),
+              color: ChatColors.of(context).verificationCellBg,
               borderRadius: BorderRadius.circular(AppDimensions.radiusL),
             ),
             child: Center(
@@ -93,7 +92,6 @@ class NumberVerificationWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -117,9 +115,7 @@ class NumberVerificationWidget extends StatelessWidget {
                 vertical: AppDimensions.spacingM,
               ),
               decoration: BoxDecoration(
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.08)
-                    : Colors.grey.withValues(alpha: 0.1),
+                color: ChatColors.of(context).verificationCellBg,
                 borderRadius: BorderRadius.circular(AppDimensions.radiusL),
               ),
               child: Text(

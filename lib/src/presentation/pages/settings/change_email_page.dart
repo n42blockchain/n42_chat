@@ -262,12 +262,8 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
 
   Widget _buildCurrentEmailCard(bool isDark, String email) {
     final cardBgColor = context.surfaceColor;
-    final textColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
-    final labelColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
+    final textColor = AppColors.textSecondaryOf(isDark);
+    final labelColor = AppColors.textPrimaryOf(isDark);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -311,16 +307,10 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
   }
 
   Widget _buildPasswordField(bool isDark) {
-    final labelColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+    final labelColor = AppColors.textSecondaryOf(isDark);
     final inputBgColor = context.surfaceColor;
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
-    final hintColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+    final textColor = AppColors.textPrimaryOf(isDark);
+    final hintColor = AppColors.textSecondaryOf(isDark);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -386,16 +376,10 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
   }
 
   Widget _buildNewEmailField(bool isDark) {
-    final labelColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+    final labelColor = AppColors.textSecondaryOf(isDark);
     final inputBgColor = context.surfaceColor;
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
-    final hintColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+    final textColor = AppColors.textPrimaryOf(isDark);
+    final hintColor = AppColors.textSecondaryOf(isDark);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -441,16 +425,10 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
   }
 
   Widget _buildCodeField(bool isDark) {
-    final labelColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+    final labelColor = AppColors.textSecondaryOf(isDark);
     final inputBgColor = context.surfaceColor;
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimary;
-    final hintColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+    final textColor = AppColors.textPrimaryOf(isDark);
+    final hintColor = AppColors.textSecondaryOf(isDark);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -542,9 +520,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
 
   Widget _buildResendButton(bool isDark, bool isLoading) {
     final canResend = _countdown == 0 && !isLoading;
-    final textColor = isDark
-        ? AppColors.textSecondaryDark
-        : AppColors.textSecondary;
+    final textColor = AppColors.textSecondaryOf(isDark);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -616,9 +592,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
   }
 
   Widget _buildSecurityNote(bool isDark) {
-    final textColor = isDark
-        ? AppColors.textTertiaryDark
-        : AppColors.textTertiary;
+    final textColor = AppColors.textTertiaryOf(isDark);
 
     return Container(
       padding: const EdgeInsets.all(12),

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../core/utils/debug_log.dart';
 import '../../../core/theme/app_dimensions.dart';
 
@@ -181,7 +182,7 @@ class _StoryMusicPickerState extends State<StoryMusicPicker> {
             Container(
               padding: const EdgeInsets.all(AppDimensions.spacingM),
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: isDark ? 0.1 : 0.05),
+                color: ChatColors.of(context).brandTintSoft(AppColors.primary),
                 borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                 border: Border.all(
                   color: AppColors.primary.withValues(alpha: 0.2),

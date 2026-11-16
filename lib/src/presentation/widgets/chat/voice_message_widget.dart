@@ -392,9 +392,7 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
                   fontSize: 14,
                   color: widget.isSelf
                       ? AppColors.sentText(isDark)
-                      : (isDark
-                            ? AppColors.textPrimaryDark
-                            : AppColors.textPrimary),
+                      : AppColors.textPrimaryOf(isDark),
                   height: 1.4,
                 ),
               ),

@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../domain/entities/custom_emoji.dart';
 import '../../../core/utils/message_markdown_utils.dart';
 import 'custom_emoji_text.dart';
@@ -33,7 +34,7 @@ class MarkdownMessageWidget extends StatelessWidget {
     final displayText = sanitizeMarkdownDisplayText(text);
     final textColor = isSelf
         ? AppColors.sentText(isDark)
-        : (isDark ? AppColors.textPrimaryDark : AppColors.messageTextReceived);
+        : ChatColors.of(context).receivedText;
 
     final linkColor = isSelf ? Colors.blue[800]! : Colors.blue;
 
@@ -64,16 +65,10 @@ class MarkdownMessageWidget extends StatelessWidget {
           fontFamily: 'monospace',
           height: 1.45,
         ),
-        keywordColor: isDark
-            ? const Color(0xFF8AB4F8)
-            : const Color(0xFF1A73E8),
-        stringColor: isDark ? const Color(0xFFF28B82) : const Color(0xFFC5221F),
-        commentColor: isDark
-            ? const Color(0xFF81C995)
-            : const Color(0xFF188038),
-        literalColor: isDark
-            ? const Color(0xFFFDD663)
-            : const Color(0xFFB06000),
+        keywordColor: ChatColors.of(context).codeKeyword,
+        stringColor: ChatColors.of(context).codeString,
+        commentColor: ChatColors.of(context).codeComment,
+        literalColor: ChatColors.of(context).codeLiteral,
       ),
       styleSheet: MarkdownStyleSheet(
         // 基础文字样式
@@ -113,16 +108,12 @@ class MarkdownMessageWidget extends StatelessWidget {
         code: TextStyle(
           fontSize: fontSize - 1,
           color: textColor,
-          backgroundColor: isDark
-              ? Colors.white.withValues(alpha: 0.1)
-              : Colors.black.withValues(alpha: 0.06),
+          backgroundColor: ChatColors.of(context).codeInlineBg,
           fontFamily: 'monospace',
         ),
         // 代码块
         codeblockDecoration: BoxDecoration(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.08)
-              : Colors.black.withValues(alpha: 0.04),
+          color: ChatColors.of(context).insetFill,
           borderRadius: BorderRadius.circular(AppDimensions.radiusM),
         ),
         codeblockPadding: const EdgeInsets.all(AppDimensions.spacingM),

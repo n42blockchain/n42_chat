@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../domain/entities/on_chain_notification_entity.dart';
 import '../../blocs/on_chain_notification/on_chain_notification_bloc.dart';
 import '../../blocs/on_chain_notification/on_chain_notification_event.dart';
@@ -223,9 +224,7 @@ class _OnChainNotificationItem extends StatelessWidget {
       onTap: onTap,
       child: Container(
         color: unread
-            ? (isDark
-                  ? AppColors.primary.withValues(alpha: 0.08)
-                  : AppColors.primary.withValues(alpha: 0.04))
+            ? ChatColors.of(context).brandTintFaint(AppColors.primary)
             : null,
         padding: const EdgeInsets.symmetric(
           horizontal: AppDimensions.spacing,

@@ -11,6 +11,7 @@ import '../../blocs/conversation/conversation_bloc.dart';
 import '../../widgets/common/n42_avatar.dart';
 import '../../../core/utils/debug_log.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
 
 /// 转发朋友圈动态到聊天的底部弹窗
@@ -219,7 +220,7 @@ class _MomentForwardSheetState extends State<MomentForwardSheet> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: isDark ? Colors.grey[600] : Colors.grey[300],
+                  color: ChatColors.of(context).dragHandle,
                   borderRadius: BorderRadius.circular(AppDimensions.radiusXS),
                 ),
               ),

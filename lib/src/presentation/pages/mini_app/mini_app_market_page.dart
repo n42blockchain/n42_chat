@@ -276,9 +276,7 @@ class _AppListTile extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
-                              color: isDark
-                                  ? Colors.white
-                                  : AppColors.textPrimary,
+                              color: AppColors.textPrimaryOf(isDark),
                             ),
                           ),
                         ),
@@ -402,9 +400,7 @@ class _FeaturedCard extends StatelessWidget {
               app.category.label,
               style: TextStyle(
                 fontSize: 10,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color: AppColors.textSecondaryOf(isDark),
               ),
             ),
           ],
