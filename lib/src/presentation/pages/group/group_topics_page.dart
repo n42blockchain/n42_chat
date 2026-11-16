@@ -250,7 +250,7 @@ class _GroupTopicsBody extends StatelessWidget {
                       channel.category!,
                       style: TextStyle(
                         fontSize: 11,
-                        color: AppColors.primaryOf(context),
+                        color: AppColors.primaryOnTintOf(context),
                         fontWeight: FontWeight.w600,
                       ),
                     ),

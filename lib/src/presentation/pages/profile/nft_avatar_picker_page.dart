@@ -603,7 +603,7 @@ class _InfoBanner extends StatelessWidget {
                     fontSize: 13,
                     height: 1.3,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.primaryOf(context),
+                    color: AppColors.primaryOnTintOf(context),
                   ),
                 ),
                 const SizedBox(height: AppDimensions.spacingXS),

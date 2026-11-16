@@ -207,7 +207,7 @@ class _ExpressionPanelState extends State<ExpressionPanel> {
                     icon,
                     size: 20,
                     color: selected
-                        ? AppColors.primaryOf(context)
+                        ? AppColors.primaryOnTintOf(context)
                         : context.textSecondary,
                   ),
                   const SizedBox(height: 2),
@@ -218,7 +218,7 @@ class _ExpressionPanelState extends State<ExpressionPanel> {
                     style: TextStyle(
                       fontSize: 12,
                       color: selected
-                          ? AppColors.primaryOf(context)
+                          ? AppColors.primaryOnTintOf(context)
                           : context.textSecondary,
                     ),
                   ),

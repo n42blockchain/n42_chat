@@ -331,7 +331,7 @@ extension _ChatPageInputMethods on _ChatPageState {
       color: AppColors.primaryOf(context).withValues(alpha: 0.1),
       child: Row(
         children: [
-          Icon(Icons.timer, size: 16, color: AppColors.primaryOf(context)),
+          Icon(Icons.timer, size: 16, color: AppColors.primaryOnTintOf(context)),
           const SizedBox(width: AppDimensions.spacingS),
           Expanded(
             child: Text(
@@ -341,7 +341,7 @@ extension _ChatPageInputMethods on _ChatPageState {
               style: TextStyle(
                 fontSize: 13,
                 height: 1.3,
-                color: AppColors.primaryOf(context),
+                color: AppColors.primaryOnTintOf(context),
                 fontWeight: FontWeight.w500,
               ),
             ),

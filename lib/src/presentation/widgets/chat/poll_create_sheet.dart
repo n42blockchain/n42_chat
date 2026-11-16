@@ -307,7 +307,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                           child: Text(
                             '${index + 1}',
                             style: TextStyle(
-                              color: AppColors.primaryOf(context),
+                              color: AppColors.primaryOnTintOf(context),
                               fontWeight: FontWeight.w600,
                               fontSize: 12,
                             ),

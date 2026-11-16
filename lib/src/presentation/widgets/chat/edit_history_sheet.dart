@@ -180,7 +180,7 @@ class _EditHistorySheetState extends State<EditHistorySheet> {
                     s?.chatOriginalMessage ?? 'Original',
                     style: TextStyle(
                       fontSize: 10,
-                      color: AppColors.primaryOf(context),
+                      color: AppColors.primaryOnTintOf(context),
                       fontWeight: FontWeight.w500,
                     ),
                   ),

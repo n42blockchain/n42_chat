@@ -332,7 +332,7 @@ class _StickerStorePageState extends State<StickerStorePage>
                   fontSize: 13,
                   height: 1.3,
                   color: isSelected
-                      ? AppColors.primaryOf(context)
+                      ? AppColors.primaryOnTintOf(context)
                       : context.textPrimary,
                 ),
               ),

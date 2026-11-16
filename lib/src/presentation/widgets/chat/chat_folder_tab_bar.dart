@@ -90,7 +90,7 @@ class ChatFolderTabBar extends StatelessWidget {
                 fontSize: 13,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                 color: isSelected
-                    ? AppColors.primaryOf(context)
+                    ? AppColors.primaryOnTintOf(context)
                     : AppColors.textSecondaryOf(isDark),
               ),
             ),

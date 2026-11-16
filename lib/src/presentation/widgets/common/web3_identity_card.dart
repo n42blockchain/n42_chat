@@ -368,7 +368,7 @@ class _N42Badge extends StatelessWidget {
         'N42',
         style: TextStyle(
           fontSize: 10,
-          color: AppColors.primaryOf(context),
+          color: AppColors.primaryOnTintOf(context),
           fontWeight: FontWeight.w600,
         ),
       ),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'chat_contrast.dart';
+
 /// Default Apple semantic palette. Host-aware components use Theme colors;
 /// constants remain available for const/decorative content.
 abstract class AppColors {
@@ -14,6 +16,19 @@ abstract class AppColors {
         ? _materialDefaultDark
         : _materialDefaultLight;
     return scheme.primary == fallback ? primary : scheme.primary;
+  }
+
+  /// Brand-colored label on a brand tint (up to 15% alpha): the host
+  /// accent with lightness shifted until it reaches 4.5:1 on the tint over
+  /// the page, card and [over] backgrounds. Plain brand on its 10-15% tint
+  /// measures about 3.0-3.5:1.
+  static Color primaryOnTintOf(BuildContext context, {Color? over}) {
+    final theme = Theme.of(context);
+    return ChatContrast.onTint(primaryOf(context), [
+      theme.scaffoldBackgroundColor,
+      theme.colorScheme.surface,
+      ?over,
+    ], dark: theme.brightness == Brightness.dark);
   }
 
   // Material 3 defaults used by ThemeData() when an app sets no color scheme.

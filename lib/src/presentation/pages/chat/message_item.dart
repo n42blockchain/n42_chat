@@ -140,6 +140,17 @@ class MessageItem extends StatelessWidget {
     this.showLinkPreview = true,
   });
 
+  /// Brand accent for labels, links and chips inside a bubble. On the
+  /// brand-colored own bubble the brand would vanish, so the bubble text
+  /// color is used; on incoming bubbles the brand shade reaches 4.5:1 on a
+  /// brand tint over the bubble.
+  Color _bubbleAccent(BuildContext context) => message.isFromMe
+      ? AppColors.messageTextSent
+      : AppColors.primaryOnTintOf(
+          context,
+          over: ChatColors.of(context).bubbleOther,
+        );
+
   @override
   Widget build(BuildContext context) {
     // 系统消息
@@ -262,7 +273,7 @@ class MessageItem extends StatelessWidget {
                         fontSize: 9,
                         height: 1.2,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.primaryOf(context),
+                        color: AppColors.primaryOnTintOf(context),
                         letterSpacing: 0.5,
                       ),
                     ),
@@ -1944,7 +1955,7 @@ class MessageItem extends StatelessWidget {
                   Icon(
                     Icons.calendar_today,
                     size: 14,
-                    color: AppColors.primaryOf(context),
+                    color: _bubbleAccent(context),
                   ),
                   SizedBox(width: 4),
                   Text(
@@ -1952,7 +1963,7 @@ class MessageItem extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
-                      color: AppColors.primaryOf(context),
+                      color: _bubbleAccent(context),
                     ),
                   ),
                 ],
@@ -2023,7 +2034,7 @@ class MessageItem extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.poll, size: 12, color: AppColors.primaryOf(context)),
+                    Icon(Icons.poll, size: 12, color: _bubbleAccent(context)),
                     const SizedBox(width: 4),
                     Text(
                       maxSelections == 1
@@ -2034,7 +2045,7 @@ class MessageItem extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 10,
                         height: 1.3,
-                        color: AppColors.primaryOf(context),
+                        color: _bubbleAccent(context),
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -2437,7 +2448,7 @@ class MessageItem extends StatelessWidget {
                       Icon(
                         isVideo ? Icons.videocam : Icons.phone,
                         size: 14,
-                        color: AppColors.primaryOf(context),
+                        color: _bubbleAccent(context),
                       ),
                       const SizedBox(width: 4),
                       Text(
@@ -2447,7 +2458,7 @@ class MessageItem extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 12,
                           height: 1.3,
-                          color: AppColors.primaryOf(context),
+                          color: _bubbleAccent(context),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
