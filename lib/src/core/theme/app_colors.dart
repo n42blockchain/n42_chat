@@ -295,6 +295,36 @@ abstract class AppColors {
   static const Color timeSeparator = Color(0xFF808080);
 
   // ============================================
+  // Media overlays (fixed: they sit on photos, video frames and colored
+  // placeholders, so they never follow the light/dark theme)
+  // ============================================
+
+  /// Foreground on media / colored placeholders (play icons, durations).
+  static const Color onMedia = Color(0xFFFFFFFF);
+
+  /// Scrim base for labels over media; apply alpha at the call site.
+  static const Color mediaScrim = Color(0xFF000000);
+
+  /// Video thumbnail placeholder gradient.
+  static const Color videoPlaceholderTop = Color(0xFF424242);
+  static const Color videoPlaceholderBottom = Color(0xFF212121);
+
+  /// Expired / unavailable media placeholder gradient.
+  static const Color mediaUnavailableTop = Color(0xFFBDBDBD);
+  static const Color mediaUnavailableBottom = Color(0xFF757575);
+
+  /// Static map placeholder tile and its pin.
+  static const Color mapPlaceholder = Color(0xFFE8EEF0);
+  static const Color mapPlaceholderIcon = Color(0xFFB0BEC5);
+
+  /// Inset fill (quotes, link previews) inside the own brand bubble.
+  static const Color selfBubbleInset = Color(0x1A000000);
+
+  /// Gift card gradient.
+  static const Color giftGradientStart = Color(0xFFFF6B9D);
+  static const Color giftGradientEnd = Color(0xFFFF9A56);
+
+  // ============================================
   // 主题解析器 (Theme resolvers)
   // 设计文档 §3：消除散落的 `isDark ? light : dark` 三元，统一走命名令牌解析。
   // 暗色采用设计系统既定档（如主文字 #E5E5E5 而非纯白、辅助文字 #6B6B6B），

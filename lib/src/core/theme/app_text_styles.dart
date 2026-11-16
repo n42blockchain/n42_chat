@@ -321,3 +321,19 @@ extension TextStyleExtension on TextStyle {
         : AppColors.textPrimary,
   );
 }
+
+/// Point sizes of the chat type scale (iOS text styles), for call sites
+/// that build their own `const TextStyle`. 11pt is the smallest size.
+abstract final class AppFontSize {
+  static const double caption2 = 11;
+  static const double caption1 = 12;
+  static const double footnote = 13;
+  static const double subheadline = 15;
+  static const double callout = 16;
+  static const double body = 17;
+  static const double title3 = 20;
+  static const double title2 = 22;
+
+  /// Large single-emoji messages.
+  static const double emojiLarge = 40;
+}
