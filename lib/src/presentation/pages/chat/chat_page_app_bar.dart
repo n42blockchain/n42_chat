@@ -1,6 +1,10 @@
 // ignore_for_file: invalid_use_of_protected_member
 part of 'chat_page.dart';
 
+/// Below this logical width the full action row leaves too little room for the
+/// title, so secondary actions move into an overflow menu.
+const double _chatAppBarCompactWidth = 360;
+
 /// AppBar 构建相关方法
 extension _ChatPageAppBarMethods on _ChatPageState {
   PreferredSizeWidget _buildAppBar() {
@@ -15,6 +19,7 @@ extension _ChatPageAppBarMethods on _ChatPageState {
     );
     final memberCount =
         _groupMemberCountOverride ?? widget.conversation.memberCount;
+    final compact = MediaQuery.sizeOf(context).width < _chatAppBarCompactWidth;
 
     return N42AppBar(
       titleWidget: BlocBuilder<ChatBloc, ChatState>(
@@ -80,85 +85,155 @@ extension _ChatPageAppBarMethods on _ChatPageState {
       ),
       showBackButton: widget.onBack != null,
       onBackPressed: widget.onBack ?? () => Navigator.of(context).pop(),
-      actions: [
-        if (widget.conversation.isGroup)
-          IconButton(
-            icon: const Icon(Icons.mark_chat_unread_outlined),
-            tooltip: S.of(context)!.chatCatchUp,
-            onPressed: () async {
-              final id = await showModalBottomSheet<String>(
-                context: context,
-                isScrollControlled: true,
-                builder: (_) => BlocProvider.value(
-                  value: context.read<ChatBloc>(),
-                  child: ChatCatchUpSheet(
-                    roomId: widget.conversation.id,
-                    userId: _currentUserId,
-                    onShareHistory: getIt.isRegistered<IChatCatchUpRepository>() ? () {
-                      Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => HistorySharePage(
+      actions: compact
+          ? _buildCompactAppBarActions()
+          : _buildFullAppBarActions(),
+    );
+  }
+
+  List<Widget> _buildFullAppBarActions() {
+    return [
+      if (widget.conversation.isGroup)
+        IconButton(
+          icon: const Icon(Icons.mark_chat_unread_outlined),
+          tooltip: S.of(context)!.chatCatchUp,
+          onPressed: _openCatchUp,
+        ),
+      // 私聊显示通话按钮
+      if (!widget.conversation.isGroup) ...[
+        IconButton(
+          icon: const Icon(Icons.phone_outlined),
+          onPressed: _startVoiceCall,
+          tooltip: S.of(context)?.commonVoiceCall ?? 'Voice Call',
+        ),
+        IconButton(
+          icon: const Icon(Icons.videocam_outlined),
+          onPressed: _startVideoCall,
+          tooltip: S.of(context)?.chatVideoCall ?? 'Video Call',
+        ),
+      ],
+      // 群聊：话题按钮（如果有子频道）
+      if (widget.conversation.isGroup)
+        IconButton(
+          icon: const Icon(Icons.forum_outlined),
+          tooltip: S.of(context)?.groupTopics ?? 'Topics',
+          onPressed: _openGroupTopics,
+        ),
+      if (getIt.isRegistered<IAiRepository>())
+        IconButton(
+          icon: const Icon(Icons.auto_awesome_outlined),
+          onPressed: _onAiAppBarPressed,
+          tooltip: S.of(context)?.aiAssistant ?? 'AI Assistant',
+        ),
+      IconButton(
+        icon: const Icon(Icons.search),
+        onPressed: _toggleSearch,
+        tooltip: S.of(context)?.commonSearch ?? 'Search',
+      ),
+      IconButton(
+        icon: const Icon(Icons.more_horiz),
+        onPressed: widget.onMorePressed ?? _openChatSettings,
+        tooltip: S.of(context)?.commonMore ?? 'More',
+      ),
+    ];
+  }
+
+  /// Narrow screens keep one primary action, search and an overflow menu.
+  List<Widget> _buildCompactAppBarActions() {
+    final isGroup = widget.conversation.isGroup;
+    final s = S.of(context);
+    return [
+      if (isGroup)
+        IconButton(
+          icon: const Icon(Icons.mark_chat_unread_outlined),
+          tooltip: s!.chatCatchUp,
+          onPressed: _openCatchUp,
+        )
+      else
+        IconButton(
+          icon: const Icon(Icons.phone_outlined),
+          onPressed: _startVoiceCall,
+          tooltip: s?.commonVoiceCall ?? 'Voice Call',
+        ),
+      IconButton(
+        icon: const Icon(Icons.search),
+        onPressed: _toggleSearch,
+        tooltip: s?.commonSearch ?? 'Search',
+      ),
+      PopupMenuButton<VoidCallback>(
+        icon: const Icon(Icons.more_horiz),
+        // 24pt icon + 2 x 10pt padding keeps the 44pt minimum hit area.
+        padding: const EdgeInsets.all(10),
+        tooltip: s?.commonMore ?? 'More',
+        onSelected: (action) => action(),
+        itemBuilder: (context) => [
+          if (isGroup)
+            PopupMenuItem<VoidCallback>(
+              value: _openGroupTopics,
+              child: Text(s?.groupTopics ?? 'Topics'),
+            )
+          else
+            PopupMenuItem<VoidCallback>(
+              value: _startVideoCall,
+              child: Text(s?.chatVideoCall ?? 'Video Call'),
+            ),
+          if (getIt.isRegistered<IAiRepository>())
+            PopupMenuItem<VoidCallback>(
+              value: _onAiAppBarPressed,
+              child: Text(s?.aiAssistant ?? 'AI Assistant'),
+            ),
+          PopupMenuItem<VoidCallback>(
+            value: widget.onMorePressed ?? _openChatSettings,
+            child: Text(s?.commonSettings ?? 'Settings'),
+          ),
+        ],
+      ),
+    ];
+  }
+
+  Future<void> _openCatchUp() async {
+    final id = await showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => BlocProvider.value(
+        value: context.read<ChatBloc>(),
+        child: ChatCatchUpSheet(
+          roomId: widget.conversation.id,
+          userId: _currentUserId,
+          onShareHistory: getIt.isRegistered<IChatCatchUpRepository>()
+              ? () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => HistorySharePage(
                         roomId: widget.conversation.id,
                         messages: context.read<ChatBloc>().state.messages,
                         repository: getIt<IChatCatchUpRepository>(),
                         conversations: getIt<IConversationRepository>(),
-                      )));
-                    } : null,
-                  ),
-                ),
-              );
-              if (mounted && id != null) await _scrollToMessage(id);
-            },
-          ),
-        // 私聊显示通话按钮
-        if (!widget.conversation.isGroup) ...[
-          IconButton(
-            icon: const Icon(Icons.phone_outlined),
-            onPressed: _startVoiceCall,
-            tooltip: S.of(context)?.commonVoiceCall ?? 'Voice Call',
-          ),
-          IconButton(
-            icon: const Icon(Icons.videocam_outlined),
-            onPressed: _startVideoCall,
-            tooltip: S.of(context)?.chatVideoCall ?? 'Video Call',
-          ),
-        ],
-        // 群聊：话题按钮（如果有子频道）
-        if (widget.conversation.isGroup)
-          IconButton(
-            icon: const Icon(Icons.forum_outlined),
-            tooltip: S.of(context)?.groupTopics ?? 'Topics',
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (_) =>
-                      GroupTopicsPage(roomId: widget.conversation.id),
-                ),
-              );
-            },
-          ),
-        if (getIt.isRegistered<IAiRepository>())
-          IconButton(
-            icon: const Icon(Icons.auto_awesome_outlined),
-            onPressed: () {
-              if (_inputController.text.trim().isNotEmpty) {
-                _showAiRewriteBar();
-              } else {
-                _openAiAssistant();
-              }
-            },
-            tooltip: S.of(context)?.aiAssistant ?? 'AI Assistant',
-          ),
-        IconButton(
-          icon: const Icon(Icons.search),
-          onPressed: _toggleSearch,
-          tooltip: S.of(context)?.commonSearch ?? 'Search',
+                      ),
+                    ),
+                  );
+                }
+              : null,
         ),
-        IconButton(
-          icon: const Icon(Icons.more_horiz),
-          onPressed: widget.onMorePressed ?? _openChatSettings,
-          tooltip: S.of(context)?.commonMore ?? 'More',
-        ),
-      ],
+      ),
     );
+    if (mounted && id != null) await _scrollToMessage(id);
+  }
+
+  void _openGroupTopics() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => GroupTopicsPage(roomId: widget.conversation.id),
+      ),
+    );
+  }
+
+  void _onAiAppBarPressed() {
+    if (_inputController.text.trim().isNotEmpty) {
+      _showAiRewriteBar();
+    } else {
+      _openAiAssistant();
+    }
   }
 
   /// 构建多选模式下的 AppBar
