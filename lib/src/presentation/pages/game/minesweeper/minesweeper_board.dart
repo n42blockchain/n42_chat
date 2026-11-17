@@ -110,14 +110,15 @@ class MinesweeperBoard extends StatelessWidget {
 
   Color _numberColor(int n) {
     switch (n) {
-      case 1: return Colors.blue;
-      case 2: return Colors.green;
-      case 3: return Colors.red;
+      // Darker shades keep the bold digits >= 3:1 on the grey[200] cell.
+      case 1: return Colors.blue.shade800;
+      case 2: return Colors.green.shade800;
+      case 3: return Colors.red.shade800;
       case 4: return Colors.purple;
       case 5: return Colors.brown;
-      case 6: return Colors.teal;
+      case 6: return Colors.teal.shade800;
       case 7: return Colors.black;
-      case 8: return Colors.grey;
+      case 8: return Colors.grey.shade700;
       default: return Colors.black;
     }
   }

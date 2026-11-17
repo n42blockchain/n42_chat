@@ -6,6 +6,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/router/routes.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../domain/entities/voice_room_entity.dart';
 import '../../../domain/repositories/voice_room_repository.dart';
 import '../../../services/voip/voice_room_service.dart';
@@ -42,6 +43,7 @@ class _VoiceRoomListView extends StatelessWidget {
       appBar: AppBar(title: Text(s?.voiceRoomTitle ?? 'Voice Rooms')),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showCreateDialog(context),
+        tooltip: s?.voiceRoomCreate ?? 'Create Voice Room',
         child: const Icon(Icons.add),
       ),
       body: BlocBuilder<VoiceRoomBloc, VoiceRoomState>(
@@ -64,7 +66,7 @@ class _VoiceRoomListView extends StatelessWidget {
                   Text(
                     s?.voiceRoomNoActive ?? 'No active voice rooms',
                     style: TextStyle(
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                   ),
                 ],
@@ -270,7 +272,8 @@ class _VoiceRoomCard extends StatelessWidget {
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.success,
+                      // Darkened green keeps the white label at 4.5:1.
+                      color: ChatContrast.fillForWhiteText(AppColors.success),
                       borderRadius: BorderRadius.circular(
                         AppDimensions.radiusS,
                       ),
@@ -314,28 +317,28 @@ class _VoiceRoomCard extends StatelessWidget {
                   Icon(
                     Icons.people_outline,
                     size: 16,
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                   const SizedBox(width: AppDimensions.spacingXS),
                   Text(
                     '${room.participantCount}',
                     style: TextStyle(
                       fontSize: 13,
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                   ),
                   const SizedBox(width: AppDimensions.spacing),
                   Icon(
                     Icons.mic,
                     size: 16,
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                   const SizedBox(width: AppDimensions.spacingXS),
                   Text(
                     '${room.speakers.length + room.hosts.length}',
                     style: TextStyle(
                       fontSize: 13,
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                   ),
                   const Spacer(),
@@ -343,7 +346,7 @@ class _VoiceRoomCard extends StatelessWidget {
                     s?.voiceRoomJoin ?? 'Join',
                     style: TextStyle(
                       fontSize: 13,
-                      color: theme.colorScheme.primary,
+                      color: AppColors.primaryOnTintOf(context),
                       fontWeight: FontWeight.w600,
                     ),
                   ),

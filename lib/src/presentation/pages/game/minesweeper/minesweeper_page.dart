@@ -106,10 +106,8 @@ class _MinesweeperPageState extends State<MinesweeperPage> {
               setState(() {});
             },
             showSelectedIcon: false,
-            style: const ButtonStyle(
-              visualDensity: VisualDensity.compact,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
+            // Padded tap target: 32pt compact visual, 48pt hit height.
+            style: const ButtonStyle(visualDensity: VisualDensity.compact),
           ),
           // Timer
           Row(

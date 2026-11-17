@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../domain/entities/ai_assistant_entity.dart';
 import '../../blocs/ai_assistant/ai_assistant_bloc.dart';
 import '../../blocs/ai_assistant/ai_assistant_state.dart';
@@ -171,7 +172,15 @@ class AiAssistantSettingsPage extends StatelessWidget {
         subtitle,
         style: TextStyle(
           fontSize: 14,
-          color: subtitleColor ?? context.textSecondary,
+          // Status colors are shaded to 4.5:1 on the card.
+          color: subtitleColor == null
+              ? context.textSecondary
+              : ChatContrast.onTint(
+                  subtitleColor,
+                  [context.surfaceColor],
+                  dark: isDark,
+                  alpha: 0,
+                ),
         ),
       ),
     );

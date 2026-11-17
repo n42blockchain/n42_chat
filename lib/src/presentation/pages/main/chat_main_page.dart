@@ -540,7 +540,7 @@ class _ChatMainPageState extends State<ChatMainPage> {
   /// 右侧面板：如果有选中会话则显示 ChatPage，否则显示占位
   Widget _buildRightPanel() {
     if (_selectedConversation == null || _splitChatBloc == null) {
-      final placeholderColor = context.textTertiary;
+      final placeholderColor = context.textSecondary;
       return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,

@@ -187,7 +187,10 @@ class _CallEnhancementSheetState extends State<CallEnhancementSheet> {
       }
     } catch (e) {
       if (mounted) {
-        context.showErrorSnackBar('Failed to update call settings: $e');
+        context.showErrorSnackBar(
+          S.of(context)?.ui3CallSettingsUpdateFailed('$e') ??
+              'Failed to update call settings: $e',
+        );
       }
     } finally {
       if (mounted) {
@@ -211,7 +214,9 @@ class _CallEnhancementSheetState extends State<CallEnhancementSheet> {
 
       if (started) {
         widget.onChanged();
-        context.showSuccessSnackBar('Recording started');
+        context.showSuccessSnackBar(
+          S.of(context)?.ui3CallRecordingStarted ?? 'Recording started',
+        );
       } else {
         final s = S.of(context);
         context.showSnackBar(
@@ -221,7 +226,10 @@ class _CallEnhancementSheetState extends State<CallEnhancementSheet> {
       }
     } catch (e) {
       if (mounted) {
-        context.showErrorSnackBar('Failed to start recording: $e');
+        context.showErrorSnackBar(
+          S.of(context)?.commonStartRecordingFailed('$e') ??
+              'Failed to start recording: $e',
+        );
       }
     } finally {
       if (mounted) {
@@ -234,6 +242,7 @@ class _CallEnhancementSheetState extends State<CallEnhancementSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final s = S.of(context);
     final isDark = context.isDarkMode;
     final backgroundColor = context.surfaceColor;
     final dividerColor = ChatColors.of(context).sheetDivider;
@@ -274,40 +283,49 @@ class _CallEnhancementSheetState extends State<CallEnhancementSheet> {
             ),
             const SizedBox(height: AppDimensions.spacing),
             Text(
-              widget.title ?? 'Call tools',
+              widget.title ?? s?.ui3CallTools ?? 'Call tools',
               style: Theme.of(
                 context,
               ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: AppDimensions.spacingXS),
             Text(
-              'Tune audio and video quality without leaving the call.',
+              s?.ui3CallToolsSubtitle ??
+                  'Tune audio and video quality without leaving the call.',
               style: Theme.of(
                 context,
               ).textTheme.bodyMedium?.copyWith(color: subtitleColor),
             ),
             const SizedBox(height: AppDimensions.spacingXL),
-            const _SectionTitle(title: 'Audio enhancement'),
+            _SectionTitle(
+              title: s?.ui3CallAudioEnhancement ?? 'Audio enhancement',
+            ),
             _SwitchTile(
               icon: Icons.graphic_eq,
-              title: 'Noise suppression',
-              subtitle: 'Reduce keyboard and background noise.',
+              title: s?.ui3CallNoiseSuppression ?? 'Noise suppression',
+              subtitle:
+                  s?.ui3CallNoiseSuppressionDesc ??
+                  'Reduce keyboard and background noise.',
               value: audioConfig.noiseSuppression,
               enabled: !_isBusy,
               onChanged: (_) => _runAction(_controller.toggleNoiseSuppression),
             ),
             _SwitchTile(
               icon: Icons.hearing,
-              title: 'Echo cancellation',
-              subtitle: 'Prevent speaker feedback from re-entering the mic.',
+              title: s?.ui3CallEchoCancellation ?? 'Echo cancellation',
+              subtitle:
+                  s?.ui3CallEchoCancellationDesc ??
+                  'Prevent speaker feedback from re-entering the mic.',
               value: audioConfig.echoCancellation,
               enabled: !_isBusy,
               onChanged: (_) => _runAction(_controller.toggleEchoCancellation),
             ),
             _SwitchTile(
               icon: Icons.mic,
-              title: 'Auto gain control',
-              subtitle: 'Keep microphone volume more stable.',
+              title: s?.ui3CallAutoGainControl ?? 'Auto gain control',
+              subtitle:
+                  s?.ui3CallAutoGainControlDesc ??
+                  'Keep microphone volume more stable.',
               value: audioConfig.autoGainControl,
               enabled: !_isBusy,
               onChanged: (_) => _runAction(_controller.toggleAutoGainControl),
@@ -315,23 +333,28 @@ class _CallEnhancementSheetState extends State<CallEnhancementSheet> {
             if (_controller.supportsEnhancedAudio)
               _SwitchTile(
                 icon: Icons.auto_awesome,
-                title: 'Enhanced voice isolation',
-                subtitle: 'Use a stronger noise reduction profile.',
+                title: s?.ui3CallVoiceIsolation ?? 'Enhanced voice isolation',
+                subtitle:
+                    s?.ui3CallVoiceIsolationDesc ??
+                    'Use a stronger noise reduction profile.',
                 value: _controller.isEnhancedAudioEnabled,
                 enabled: !_isBusy,
                 onChanged: (_) => _runAction(_controller.toggleEnhancedAudio),
               ),
             if (_controller.supportsBackgroundBlur) ...[
               const SizedBox(height: AppDimensions.spacingL),
-              const _SectionTitle(title: 'Video'),
+              _SectionTitle(title: s?.ui3CallVideoSection ?? 'Video'),
               _SwitchTile(
                 icon: Icons.blur_on,
-                title: 'Background blur (beta)',
+                title: s?.ui3CallBackgroundBlur ?? 'Background blur (beta)',
                 subtitle: _controller.canUseBackgroundBlur
-                    ? 'Preference is wired. Visual blur still depends on the video processor rollout.'
+                    ? (s?.ui3CallBlurDescReady ??
+                          'Preference is wired. Visual blur still depends on the video processor rollout.')
                     : _controller.isBackgroundBlurEnabled
-                    ? 'Blur preference is saved and will apply when camera processing is available.'
-                    : 'Turn on your camera after background processing is available.',
+                    ? (s?.ui3CallBlurDescSaved ??
+                          'Blur preference is saved and will apply when camera processing is available.')
+                    : (s?.ui3CallBlurDescCameraOff ??
+                          'Turn on your camera after background processing is available.'),
                 value: _controller.isBackgroundBlurEnabled,
                 enabled: canToggleBackgroundBlur,
                 onChanged: (_) => _runAction(_controller.toggleBackgroundBlur),
@@ -339,12 +362,15 @@ class _CallEnhancementSheetState extends State<CallEnhancementSheet> {
             ],
             if (_controller.supportsRecording) ...[
               const SizedBox(height: AppDimensions.spacingL),
-              const _SectionTitle(title: 'Recording'),
+              _SectionTitle(
+                title: s?.ui3CallRecordingSection ?? 'Recording',
+              ),
               _ActionTile(
                 icon: Icons.fiber_manual_record,
                 iconColor: Colors.redAccent,
                 title: _controller.recordingFeatureName,
                 subtitle:
+                    s?.ui3CallRecordingDesc ??
                     'Requires server-side egress before recordings can be saved.',
                 enabled: !_isBusy,
                 onTap: _handleRecordingTap,
@@ -399,29 +425,31 @@ class _SwitchTile extends StatelessWidget {
     final tileColor = ChatColors.of(context).tileFillFaint;
     final subtitleColor = AppColors.textSecondaryOf(isDark);
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      decoration: BoxDecoration(
+    // Tile fill on the Material keeps the pressed ink visible.
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Material(
         color: tileColor,
         borderRadius: BorderRadius.circular(18),
-      ),
-      child: SwitchListTile.adaptive(
-        value: value,
-        onChanged: enabled ? onChanged : null,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: AppDimensions.spacing,
-          vertical: AppDimensions.spacingS,
-        ),
-        secondary: Icon(
-          icon,
-          color: enabled ? AppColors.primaryOf(context) : subtitleColor,
-        ),
-        title: Text(title),
-        subtitle: Text(
-          subtitle,
-          style: Theme.of(
-            context,
-          ).textTheme.bodySmall?.copyWith(color: subtitleColor),
+        clipBehavior: Clip.antiAlias,
+        child: SwitchListTile.adaptive(
+          value: value,
+          onChanged: enabled ? onChanged : null,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.spacing,
+            vertical: AppDimensions.spacingS,
+          ),
+          secondary: Icon(
+            icon,
+            color: enabled ? AppColors.primaryOf(context) : subtitleColor,
+          ),
+          title: Text(title),
+          subtitle: Text(
+            subtitle,
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: subtitleColor),
+          ),
         ),
       ),
     );
@@ -451,11 +479,11 @@ class _ActionTile extends StatelessWidget {
     final tileColor = ChatColors.of(context).tileFillFaint;
     final subtitleColor = AppColors.textSecondaryOf(isDark);
 
-    return Container(
-      decoration: BoxDecoration(
-        color: tileColor,
-        borderRadius: BorderRadius.circular(18),
-      ),
+    // Tile fill on the Material keeps the pressed ink visible.
+    return Material(
+      color: tileColor,
+      borderRadius: BorderRadius.circular(18),
+      clipBehavior: Clip.antiAlias,
       child: ListTile(
         enabled: enabled,
         contentPadding: const EdgeInsets.symmetric(

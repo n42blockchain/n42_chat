@@ -14,6 +14,7 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../services/voip/livekit_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../widgets/chat/in_call_chat_panel.dart';
 import '../../widgets/call/call_enhancement_sheet.dart';
@@ -618,6 +619,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                     Icons.arrow_back_rounded,
                     color: Colors.white,
                   ),
+                  tooltip: S.of(context)?.a11yBack ?? 'Back',
                   onPressed: () => _showLeaveDialog(),
                 ),
 
@@ -695,6 +697,9 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                         : Icons.fullscreen,
                     color: Colors.white,
                   ),
+                  tooltip: _focusedParticipant != null
+                      ? (S.of(context)?.a11yCallGridView ?? 'Grid view')
+                      : (S.of(context)?.a11yCallFocusView ?? 'Focus view'),
                   onPressed: () {
                     setState(() {
                       if (_focusedParticipant != null) {
@@ -709,12 +714,16 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                 if (_state == MeetingState.connected)
                   IconButton(
                     icon: const Icon(Icons.tune, color: Colors.white),
+                    tooltip:
+                        S.of(context)?.ui3CallMeetingTools ?? 'Meeting tools',
                     onPressed: _openCallEnhancementTools,
                   ),
 
                 // 参与者列表
                 IconButton(
                   icon: const Icon(Icons.people, color: Colors.white),
+                  tooltip:
+                      S.of(context)?.callParticipantsLabel ?? 'Participants',
                   onPressed: () {
                     setState(() {
                       _showParticipantsList = !_showParticipantsList;
@@ -855,18 +864,23 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  width: _controlButtonCircleSize,
-                  height: _controlButtonCircleSize,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color:
-                        backgroundColor ??
-                        (isActive
-                            ? (activeColor ?? Colors.white)
-                            : Colors.white.withValues(alpha: 0.2)),
+                // Fill on the Material so the pressed ripple stays visible.
+                Material(
+                  color:
+                      backgroundColor ??
+                      (isActive
+                          ? (activeColor ?? Colors.white)
+                          : Colors.white.withValues(alpha: 0.2)),
+                  shape: const CircleBorder(),
+                  child: InkWell(
+                    onTap: onPressed,
+                    customBorder: const CircleBorder(),
+                    child: SizedBox(
+                      width: _controlButtonCircleSize,
+                      height: _controlButtonCircleSize,
+                      child: Icon(icon, color: Colors.white, size: 23),
+                    ),
                   ),
-                  child: Icon(icon, color: Colors.white, size: 23),
                 ),
                 const SizedBox(height: _controlButtonGap),
                 SizedBox(
@@ -948,7 +962,14 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: AppColors.primaryOf(context),
+                        // Panel is always near-black: lift the brand shade
+                        // to 4.5:1 on its 20% tint.
+                        color: ChatContrast.onTint(
+                          AppColors.primaryOf(context),
+                          const [Colors.black],
+                          dark: true,
+                          alpha: 0.2,
+                        ),
                         fontSize: 14,
                         height: 1.3,
                         fontWeight: FontWeight.w500,
@@ -1130,7 +1151,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
     await showCallEnhancementSheet(
       context: context,
       controller: _enhancementController,
-      title: 'Meeting tools',
+      title: S.of(context)?.ui3CallMeetingTools ?? 'Meeting tools',
       onChanged: () {
         if (!mounted) return;
         setState(() {
@@ -1159,7 +1180,14 @@ class _GroupCallScreenState extends State<GroupCallScreen> {
               Navigator.of(ctx).pop();
               _leaveMeeting();
             },
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            style: TextButton.styleFrom(
+              foregroundColor: ChatContrast.onTint(
+                AppColors.error,
+                [Theme.of(ctx).colorScheme.surface],
+                dark: Theme.of(ctx).brightness == Brightness.dark,
+                alpha: 0,
+              ),
+            ),
             child: Text(S.of(context)?.callLeaveLabel ?? 'Leave'),
           ),
         ],

@@ -8,6 +8,7 @@ import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/chat_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../domain/entities/ai_assistant_entity.dart';
 import '../../../domain/repositories/ai_repository.dart';
 import '../../blocs/ai_assistant/ai_assistant_bloc.dart';
@@ -153,10 +154,12 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
             actions: [
               IconButton(
                 icon: const Icon(Icons.settings_outlined, size: 22),
+                tooltip: l10n?.aiAssistantSettings ?? 'AI Settings',
                 onPressed: () => _openSettings(context),
               ),
               IconButton(
                 icon: const Icon(Icons.delete_outline, size: 22),
+                tooltip: l10n?.aiAssistantClearHistory ?? 'Clear chat history',
                 onPressed: () => _confirmClearHistory(context, l10n),
               ),
             ],
@@ -259,10 +262,16 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
                   textAlign: TextAlign.center,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     height: 1.4,
-                    color: AppColors.warning,
+                    // Orange shade that reaches 4.5:1 on its 10% tint.
+                    color: ChatContrast.onTint(
+                      AppColors.warning,
+                      [context.pageBackground],
+                      dark: isDark,
+                      alpha: 0.1,
+                    ),
                   ),
                 ),
               ),
@@ -354,8 +363,9 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
+                // Fill shade keeps the white user text at 4.5:1.
                 color: isUser
-                    ? AppColors.primaryOf(context)
+                    ? AppColors.primaryFillOf(context)
                     : context.surfaceColor,
                 borderRadius: BorderRadius.circular(16).copyWith(
                   topLeft: isUser ? null : const Radius.circular(4),
@@ -518,7 +528,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
                 enabled: state.isAvailable && !state.isGenerating,
                 decoration: InputDecoration(
                   hintText: l10n?.aiAssistantWelcome ?? 'Ask anything...',
-                  hintStyle: TextStyle(color: context.textTertiary),
+                  hintStyle: TextStyle(color: context.textSecondary),
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -537,6 +547,7 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
           const SizedBox(width: 8),
           if (state.isGenerating)
             IconButton(
+              tooltip: l10n?.aiAssistantStopGenerating ?? 'Stop generating',
               onPressed: () =>
                   context.read<AiAssistantBloc>().add(const StopAiGeneration()),
               icon: Container(
@@ -551,12 +562,15 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
             )
           else
             IconButton(
+              tooltip: l10n?.commonSend ?? 'Send',
               onPressed: canSend ? _sendMessage : null,
               icon: Container(
                 width: 32,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: canSend ? AppColors.primaryOf(context) : Colors.grey,
+                  color: canSend
+                      ? AppColors.primaryFillOf(context)
+                      : Colors.grey,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: const Icon(
@@ -615,7 +629,14 @@ class _AiAssistantViewState extends State<_AiAssistantView> {
             },
             child: Text(
               l10n?.commonDelete ?? 'Delete',
-              style: const TextStyle(color: AppColors.error),
+              style: TextStyle(
+                color: ChatContrast.onTint(
+                  AppColors.error,
+                  [Theme.of(dialogContext).colorScheme.surface],
+                  dark: Theme.of(dialogContext).brightness == Brightness.dark,
+                  alpha: 0,
+                ),
+              ),
             ),
           ),
         ],

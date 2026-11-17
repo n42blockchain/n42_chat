@@ -33,7 +33,7 @@ class LeaderboardWidget extends StatelessWidget {
               padding: const EdgeInsets.all(AppDimensions.spacingXXL),
               child: Text(
                 l10n?.gameNoScores ?? 'No scores yet',
-                style: TextStyle(fontSize: 16, color: context.textTertiary),
+                style: TextStyle(fontSize: 16, color: context.textSecondary),
               ),
             ),
           );
@@ -72,7 +72,10 @@ class LeaderboardWidget extends StatelessWidget {
                   ),
                   trailing: Text(
                     _formatDate(s.playedAt),
-                    style: TextStyle(fontSize: 12, color: context.textTertiary),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: context.textSecondary,
+                    ),
                   ),
                 ),
               );

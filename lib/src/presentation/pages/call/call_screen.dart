@@ -16,6 +16,7 @@ import '../../../services/voip/call_manager.dart';
 import '../../../services/voip/webrtc_service.dart';
 import '../../widgets/call/call_enhancement_sheet.dart';
 import '../../widgets/common/n42_avatar.dart';
+import '../../widgets/common/n42_tap_area.dart';
 import '../../../core/utils/debug_log.dart';
 import '../../../core/theme/app_dimensions.dart';
 
@@ -341,7 +342,8 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                 bottom: 0,
                 left: 0,
                 right: 0,
-                height: 200,
+                // Covers both control rows so their white labels stay legible.
+                height: 320,
                 child: Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
@@ -377,6 +379,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
           // 最小化按钮
           _buildTopActionButton(
             icon: Icons.keyboard_arrow_down,
+            tooltip: S.of(context)?.a11yCallMinimize ?? 'Minimize',
             onTap: () => Navigator.of(context).pop(),
             backgroundColor: _controlBgColor,
           ),
@@ -384,6 +387,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
           if (_state == CallState.connected)
             _buildTopActionButton(
               icon: Icons.tune,
+              tooltip: S.of(context)?.ui3CallTools ?? 'Call tools',
               onTap: _openCallEnhancementTools,
               backgroundColor: _controlBgColor,
               iconSize: 20,
@@ -395,12 +399,16 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
 
   Widget _buildTopActionButton({
     required IconData icon,
+    required String tooltip,
     required VoidCallback onTap,
     required Color backgroundColor,
     double iconSize = 24,
   }) {
-    return GestureDetector(
+    // 44pt hit area around the unchanged 36pt circle.
+    return N42TapArea(
       onTap: onTap,
+      tooltip: tooltip,
+      customBorder: const CircleBorder(),
       child: Container(
         width: 36,
         height: 36,
@@ -503,7 +511,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
           // 拒绝
           _buildWeChatActionButton(
             icon: Icons.call_end,
-            label: l10n?.callDecline ?? '拒绝',
+            label: l10n?.callDecline ?? 'Decline',
             color: _hangupColor,
             onTap: _rejectCall,
           ),
@@ -511,7 +519,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
           // 接听
           _buildWeChatActionButton(
             icon: Icons.call,
-            label: l10n?.callAnswer ?? '接听',
+            label: l10n?.callAnswer ?? 'Answer',
             color: _answerColor,
             onTap: _answerCall,
           ),
@@ -526,18 +534,15 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     bool isActive = false,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
+    return _CallButtonTap(
       onTap: onTap,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: isActive ? _controlActiveBgColor : _controlBgColor,
-            ),
+          _CallButtonCircle(
+            size: 60,
+            color: isActive ? _controlActiveBgColor : _controlBgColor,
+            onTap: onTap,
             child: Icon(
               icon,
               color: isActive ? _bgColor : Colors.white,
@@ -559,18 +564,15 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
 
   Widget _buildWeChatHangupButton() {
     final l10n = S.of(context);
-    return GestureDetector(
+    return _CallButtonTap(
       onTap: _hangup,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: 70,
-            height: 70,
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              color: _hangupColor,
-            ),
+          _CallButtonCircle(
+            size: 70,
+            color: _hangupColor,
+            onTap: _hangup,
             child: const Icon(Icons.call_end, color: Colors.white, size: 32),
           ),
           const SizedBox(height: 10),
@@ -589,15 +591,15 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     required Color color,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
+    return _CallButtonTap(
       onTap: onTap,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: 70,
-            height: 70,
-            decoration: BoxDecoration(shape: BoxShape.circle, color: color),
+          _CallButtonCircle(
+            size: 70,
+            color: color,
+            onTap: onTap,
             child: Icon(icon, color: Colors.white, size: 32),
           ),
           const SizedBox(height: 10),
@@ -673,6 +675,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
           // 返回按钮
           _buildTopActionButton(
             icon: Icons.keyboard_arrow_down,
+            tooltip: l10n?.a11yCallMinimize ?? 'Minimize',
             onTap: () => Navigator.of(context).pop(),
             backgroundColor: Colors.black.withValues(alpha: 0.3),
           ),
@@ -705,6 +708,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
           if (_state == CallState.connected)
             _buildTopActionButton(
               icon: Icons.tune,
+              tooltip: l10n?.ui3CallTools ?? 'Call tools',
               onTap: _openCallEnhancementTools,
               backgroundColor: Colors.black.withValues(alpha: 0.3),
               iconSize: 20,
@@ -785,23 +789,23 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     final l10n = S.of(context);
     switch (_state) {
       case CallState.ringing:
-        return l10n?.chatCalling ?? '正在呼叫...';
+        return l10n?.chatCalling ?? 'Calling...';
       case CallState.incoming:
         return _isVideoCall
-            ? (l10n?.callIncomingVideoCall ?? '视频通话邀请')
-            : (l10n?.callIncomingVoiceCall ?? '语音通话邀请');
+            ? (l10n?.callIncomingVideoCall ?? 'Incoming video call')
+            : (l10n?.callIncomingVoiceCall ?? 'Incoming voice call');
       case CallState.connecting:
-        return l10n?.chatConnectingCall ?? '连接中...';
+        return l10n?.chatConnectingCall ?? 'Connecting...';
       case CallState.connected:
         return _isVideoCall
-            ? (l10n?.callVideoCallInProgress ?? '视频通话中')
-            : (l10n?.callVoiceCallInProgress ?? '语音通话中');
+            ? (l10n?.callVideoCallInProgress ?? 'Video call in progress')
+            : (l10n?.callVoiceCallInProgress ?? 'Voice call in progress');
       case CallState.reconnecting:
-        return l10n?.callReconnectingCall ?? '重新连接中...';
+        return l10n?.callReconnectingCall ?? 'Reconnecting...';
       case CallState.ended:
-        return l10n?.callEnded ?? '通话已结束';
+        return l10n?.callEnded ?? 'Call ended';
       case CallState.failed:
-        return l10n?.callFailed ?? '通话失败';
+        return l10n?.callFailed ?? 'Call failed';
       case CallState.idle:
         return '';
     }
@@ -851,7 +855,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     await showCallEnhancementSheet(
       context: context,
       controller: _enhancementController,
-      title: 'Call tools',
+      title: S.of(context)?.ui3CallTools ?? 'Call tools',
       onChanged: () {
         if (!mounted) return;
         setState(() {
@@ -880,5 +884,47 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
 
   void _backToChat() {
     Navigator.of(context).maybePop();
+  }
+}
+
+/// Whole button (circle + label) is tappable; semantics merge into one
+/// labeled button.
+class _CallButtonTap extends StatelessWidget {
+  const _CallButtonTap({required this.onTap, required this.child});
+
+  final VoidCallback onTap;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return MergeSemantics(child: GestureDetector(onTap: onTap, child: child));
+  }
+}
+
+/// Filled call control circle with a visible pressed ripple.
+class _CallButtonCircle extends StatelessWidget {
+  const _CallButtonCircle({
+    required this.size,
+    required this.color,
+    required this.onTap,
+    required this.child,
+  });
+
+  final double size;
+  final Color color;
+  final VoidCallback onTap;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: color,
+      shape: const CircleBorder(),
+      child: InkWell(
+        onTap: onTap,
+        customBorder: const CircleBorder(),
+        child: SizedBox(width: size, height: size, child: Center(child: child)),
+      ),
+    );
   }
 }

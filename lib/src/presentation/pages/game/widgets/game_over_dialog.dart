@@ -4,6 +4,7 @@ import '../../../../../l10n/app_localizations.dart';
 import '../../../../core/extensions/context_extension.dart';
 import '../services/game_score_service.dart';
 import '../../../../core/theme/app_dimensions.dart';
+import '../../../../core/theme/chat_contrast.dart';
 
 class GameOverDialog extends StatefulWidget {
   final String gameId;
@@ -77,7 +78,7 @@ class _GameOverDialogState extends State<GameOverDialog> {
                 const SizedBox(height: AppDimensions.spacingS),
                 Text(
                   '${l10n?.gameHighScore ?? 'Best'}: $highScore',
-                  style: TextStyle(fontSize: 16, color: context.textTertiary),
+                  style: TextStyle(fontSize: 16, color: context.textSecondary),
                 ),
               ],
               if (highScore != null && _isNewRecord(highScore)) ...[
@@ -93,8 +94,14 @@ class _GameOverDialogState extends State<GameOverDialog> {
                   ),
                   child: Text(
                     '🏆 ${l10n?.gameNewRecord ?? 'New Record!'}',
-                    style: const TextStyle(
-                      color: Colors.amber,
+                    style: TextStyle(
+                      // Amber shade that reaches 4.5:1 on its 20% tint.
+                      color: ChatContrast.onTint(
+                        Colors.amber,
+                        [context.surfaceColor],
+                        dark: context.isDarkMode,
+                        alpha: 0.2,
+                      ),
                       fontWeight: FontWeight.bold,
                     ),
                   ),

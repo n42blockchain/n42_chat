@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../domain/entities/voice_room_entity.dart';
 import '../../blocs/voice_room/voice_room_bloc.dart';
 import '../../blocs/voice_room/voice_room_event.dart';
@@ -77,7 +78,11 @@ class _VoiceRoomView extends StatelessWidget {
                           Text(s?.voiceRoomConnecting ?? 'Connecting...'),
                         ],
                       )
-                    : Text(state.error ?? 'Room not found'),
+                    : Text(
+                        state.error ??
+                            s?.ui3VoiceRoomNotFound ??
+                            'Room not found',
+                      ),
               ),
             );
           }
@@ -109,7 +114,8 @@ class _VoiceRoomView extends StatelessWidget {
                     vertical: AppDimensions.spacingXS,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.success,
+                    // Darkened green keeps the white LIVE label at 4.5:1.
+                    color: ChatContrast.fillForWhiteText(AppColors.success),
                     borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                   ),
                   child: Row(
@@ -144,6 +150,15 @@ class _VoiceRoomView extends StatelessWidget {
                   child: ParticipantGrid(
                     room: room,
                     myRole: state.myRole,
+                    // Tap mirrors the long-press menu so hosts are not
+                    // limited to a hidden gesture.
+                    onParticipantTap: state.isHost
+                        ? (participant) => _showParticipantOptions(
+                            context,
+                            participant,
+                            state,
+                          )
+                        : null,
                     onParticipantLongPress: state.isHost
                         ? (participant) => _showParticipantOptions(
                             context,
@@ -257,24 +272,38 @@ class _VoiceRoomView extends StatelessWidget {
   }) {
     final theme = Theme.of(context);
     final effectiveColor = color ?? theme.colorScheme.onSurface;
+    // Shade of the accent that reaches 4.5:1 on its 10% tint and on the bar.
+    final foreground = ChatContrast.onTint(
+      effectiveColor,
+      [theme.colorScheme.surface],
+      dark: theme.brightness == Brightness.dark,
+      alpha: 0.1,
+    );
 
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 52,
-            height: 52,
-            decoration: BoxDecoration(
+    return MergeSemantics(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Tint on the Material so the pressed ripple is visible.
+            Material(
               color: effectiveColor.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
+              shape: const CircleBorder(),
+              child: InkWell(
+                onTap: onTap,
+                customBorder: const CircleBorder(),
+                child: SizedBox(
+                  width: 52,
+                  height: 52,
+                  child: Icon(icon, color: foreground, size: 24),
+                ),
+              ),
             ),
-            child: Icon(icon, color: effectiveColor, size: 24),
-          ),
-          const SizedBox(height: AppDimensions.spacingXS),
-          Text(label, style: TextStyle(fontSize: 10, color: effectiveColor)),
-        ],
+            const SizedBox(height: AppDimensions.spacingXS),
+            Text(label, style: TextStyle(fontSize: 10, color: foreground)),
+          ],
+        ),
       ),
     );
   }
@@ -335,7 +364,10 @@ class _VoiceRoomView extends StatelessWidget {
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(s?.voiceRoomEnd ?? 'End Room'),
-        content: const Text('Are you sure you want to end this voice room?'),
+        content: Text(
+          s?.ui3VoiceRoomEndConfirm ??
+              'Are you sure you want to end this voice room?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
@@ -348,7 +380,10 @@ class _VoiceRoomView extends StatelessWidget {
               context.read<VoiceRoomBloc>().add(const EndVoiceRoom());
               Navigator.pop(dialogContext);
             },
-            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.errorFill,
+              foregroundColor: Colors.white,
+            ),
             child: Text(s?.voiceRoomEnd ?? 'End Room'),
           ),
         ],

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../core/di/injection.dart';
@@ -76,6 +77,18 @@ class _BlockDropPageState extends State<BlockDropPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = S.of(context);
+    // Swipes are the only move input: expose them as screen-reader /
+    // switch-control actions.
+    final moveLeft = CustomSemanticsAction(
+      label: l10n?.a11yGameMoveLeft ?? 'Move left',
+    );
+    final moveRight = CustomSemanticsAction(
+      label: l10n?.a11yGameMoveRight ?? 'Move right',
+    );
+    final rotate = CustomSemanticsAction(
+      label: l10n?.a11yGameRotate ?? 'Rotate',
+    );
+    final drop = CustomSemanticsAction(label: l10n?.a11yGameDrop ?? 'Drop');
 
     return GameScaffold(
       title: l10n?.gameBlockDrop ?? 'Block Drop',
@@ -84,38 +97,60 @@ class _BlockDropPageState extends State<BlockDropPage> {
       onPause: _togglePause,
       isPaused: _isPaused,
       topWidget: _buildInfoBar(l10n),
-      child: GestureDetector(
-        onHorizontalDragEnd: (d) {
-          if (_isPaused || _logic.isGameOver) return;
-          if (d.primaryVelocity == null) return;
-          setState(() {
-            if (d.primaryVelocity! > 0) {
-              _logic.moveRight();
-            } else {
-              _logic.moveLeft();
-            }
-          });
+      child: Semantics(
+        customSemanticsActions: {
+          moveLeft: () => _semanticMove(_logic.moveLeft),
+          moveRight: () => _semanticMove(_logic.moveRight),
+          rotate: () => _semanticMove(_logic.rotate),
+          drop: _semanticDrop,
         },
-        onVerticalDragEnd: (d) {
-          if (_isPaused || _logic.isGameOver) return;
-          if (d.primaryVelocity == null) return;
-          if (d.primaryVelocity! > 100) {
-            setState(() => _logic.hardDrop());
-            if (_logic.isGameOver) {
-              _dropTimer?.cancel();
-              _showGameOver();
+        child: GestureDetector(
+          onHorizontalDragEnd: (d) {
+            if (_isPaused || _logic.isGameOver) return;
+            if (d.primaryVelocity == null) return;
+            setState(() {
+              if (d.primaryVelocity! > 0) {
+                _logic.moveRight();
+              } else {
+                _logic.moveLeft();
+              }
+            });
+          },
+          onVerticalDragEnd: (d) {
+            if (_isPaused || _logic.isGameOver) return;
+            if (d.primaryVelocity == null) return;
+            if (d.primaryVelocity! > 100) {
+              setState(() => _logic.hardDrop());
+              if (_logic.isGameOver) {
+                _dropTimer?.cancel();
+                _showGameOver();
+              }
+            } else if (d.primaryVelocity! < -100) {
+              setState(() => _logic.rotate());
             }
-          } else if (d.primaryVelocity! < -100) {
+          },
+          onTap: () {
+            if (_isPaused || _logic.isGameOver) return;
             setState(() => _logic.rotate());
-          }
-        },
-        onTap: () {
-          if (_isPaused || _logic.isGameOver) return;
-          setState(() => _logic.rotate());
-        },
-        child: BlockDropBoard(logic: _logic),
+          },
+          child: BlockDropBoard(logic: _logic),
+        ),
       ),
     );
+  }
+
+  void _semanticMove(bool Function() move) {
+    if (_isPaused || _logic.isGameOver) return;
+    setState(() => move());
+  }
+
+  void _semanticDrop() {
+    if (_isPaused || _logic.isGameOver) return;
+    setState(() => _logic.hardDrop());
+    if (_logic.isGameOver) {
+      _dropTimer?.cancel();
+      _showGameOver();
+    }
   }
 
   Widget _buildInfoBar(S? l10n) {
@@ -131,7 +166,7 @@ class _BlockDropPageState extends State<BlockDropPage> {
             children: [
               Text(
                 l10n?.gameLevel ?? 'Level',
-                style: TextStyle(fontSize: 12, color: context.textTertiary),
+                style: TextStyle(fontSize: 12, color: context.textSecondary),
               ),
               Text(
                 '${_logic.level}',
@@ -146,7 +181,7 @@ class _BlockDropPageState extends State<BlockDropPage> {
             children: [
               Text(
                 l10n?.gameNext ?? 'Next',
-                style: TextStyle(fontSize: 12, color: context.textTertiary),
+                style: TextStyle(fontSize: 12, color: context.textSecondary),
               ),
               const SizedBox(height: AppDimensions.spacingXS),
               NextPieceWidget(piece: _logic.nextPiece),
@@ -156,7 +191,7 @@ class _BlockDropPageState extends State<BlockDropPage> {
             children: [
               Text(
                 l10n?.gameLines ?? 'Lines',
-                style: TextStyle(fontSize: 12, color: context.textTertiary),
+                style: TextStyle(fontSize: 12, color: context.textSecondary),
               ),
               Text(
                 '${_logic.totalLines}',

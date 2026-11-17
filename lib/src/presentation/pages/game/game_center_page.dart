@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
+import '../../../core/theme/chat_contrast.dart';
 import 'services/game_score_service.dart';
 import 'game_2048/game_2048_page.dart';
 import 'minesweeper/minesweeper_page.dart';
@@ -82,11 +83,11 @@ class _GameCenterPageState extends State<GameCenterPage> {
       body: Padding(
         padding: const EdgeInsets.all(AppDimensions.spacing),
         child: GridView.builder(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
             crossAxisSpacing: 12,
             mainAxisSpacing: 12,
-            childAspectRatio: 0.85,
+            childAspectRatio: _cardAspectRatio(context),
           ),
           itemCount: games.length,
           itemBuilder: (context, index) {
@@ -98,6 +99,17 @@ class _GameCenterPageState extends State<GameCenterPage> {
         ),
       ),
     );
+  }
+
+  /// 0.85 by default; taller cards when narrow screens or large text would
+  /// clip the icon + name + two-line description + best score column.
+  double _cardAspectRatio(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    final cardWidth = (width - AppDimensions.spacing * 2 - 12) / 2;
+    // 56 icon + 22 gaps + 32 padding + 8 slack; ~61pt of text at 100%.
+    final needed = 118 + MediaQuery.textScalerOf(context).scale(61);
+    final ratio = cardWidth / needed;
+    return ratio < 0.85 ? ratio : 0.85;
   }
 
   Widget _buildGameCard(
@@ -146,7 +158,7 @@ class _GameCenterPageState extends State<GameCenterPage> {
               Text(
                 game.desc,
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 11, color: context.textTertiary),
+                style: TextStyle(fontSize: 11, color: context.textSecondary),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -156,7 +168,13 @@ class _GameCenterPageState extends State<GameCenterPage> {
                   '${l10n?.gameHighScore ?? 'Best'}: $highScore',
                   style: TextStyle(
                     fontSize: 12,
-                    color: game.color,
+                    // Game accent shaded to 4.5:1 on the card.
+                    color: ChatContrast.onTint(
+                      game.color,
+                      [Theme.of(context).cardColor],
+                      dark: context.isDarkMode,
+                      alpha: 0,
+                    ),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
