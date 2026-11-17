@@ -173,7 +173,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
       messenger.showSnackBar(
         SnackBar(
           content: Text(saveFailedMessage),
-          backgroundColor: AppColors.error,
+          backgroundColor: AppColors.errorFill,
         ),
       );
     }
@@ -187,11 +187,10 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (ctx) => Container(
-        decoration: BoxDecoration(
-          color: context.surfaceColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-        ),
+      builder: (ctx) => Material(
+        // Material (not a decorated Container) keeps the ListTile ink visible.
+        color: context.surfaceColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
         child: SafeArea(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -347,7 +346,7 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
                       Expanded(
                         child: Text(
                           l10n?.settingsTranslateTextTo ?? 'Translate text to',
-                          maxLines: 1,
+                          maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 16,
@@ -458,7 +457,8 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
                 children: [
                   Expanded(
                     child: Text(
-                      'Smart reply translation',
+                      l10n?.ui3SmartReplyTranslation ??
+                          'Smart reply translation',
                       style: TextStyle(
                         fontSize: 16,
                         color: context.textPrimary,
@@ -488,7 +488,8 @@ class _TranslationSettingsPageState extends State<TranslationSettingsPage> {
               vertical: AppDimensions.spacingS,
             ),
             child: Text(
-              'Automatically translate your messages to match the recipient\'s language before sending.',
+              l10n?.ui3SmartReplyTranslationDesc ??
+                  'Automatically translate your messages to match the recipient\'s language before sending.',
               style: TextStyle(fontSize: 13, color: context.textSecondary),
             ),
           ),

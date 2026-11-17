@@ -238,7 +238,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 context,
                 icon: Icons.workspace_premium_outlined,
                 iconColor: const Color(0xFF9B59B6),
-                title: 'Subscriptions',
+                title:
+                    S.of(context)?.ui3ProfileSubscriptions ?? 'Subscriptions',
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute<void>(
                     builder: (_) => const SubscriptionPage(),
@@ -253,7 +254,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   context,
                   icon: Icons.account_balance_outlined,
                   iconColor: const Color(0xFF2ECC71),
-                  title: 'Buy / Sell crypto',
+                  title:
+                      S.of(context)?.ui3ProfileBuySellCrypto ??
+                      'Buy / Sell crypto',
                   onTap: () => Navigator.of(context).push(
                     MaterialPageRoute<void>(
                       builder: (_) => const FiatRampPage(),
@@ -278,7 +281,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 context,
                 icon: Icons.memory,
                 iconColor: const Color(0xFF34A853),
-                title: 'On-device AI',
+                title: S.of(context)?.ui3ProfileOnDeviceAi ?? 'On-device AI',
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute<void>(
                     builder: (_) => const LocalLlmSettingsPage(),
@@ -321,7 +324,7 @@ class _ProfilePageState extends State<ProfilePage> {
     final n42Id = rawId.isEmpty
         ? '--'
         : FriendlyDisplayName.isOpaque(rawId, userId: _userId)
-        ? 'Set a username'
+        ? (S.of(context)?.ui3ProfileSetAUsername ?? 'Set a username')
         : rawId;
 
     return Container(
@@ -380,12 +383,14 @@ class _ProfilePageState extends State<ProfilePage> {
                           color: subtitleColor,
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      // The 44pt tap area below adds ~9.5pt above the pill,
+                      // replacing the former 10pt spacer.
                       // 状态和好友
                       Row(
                         children: [
                           // + 状态 按钮
-                          GestureDetector(
+                          N42TapArea(
+                            borderRadius: BorderRadius.circular(14),
                             onTap: () => _showStatusPicker(context, isDark),
                             onLongPress: _statusText != null
                                 ? () {
@@ -490,15 +495,17 @@ class _ProfilePageState extends State<ProfilePage> {
                 // 右侧二维码图标和箭头
                 Column(
                   children: [
-                    GestureDetector(
+                    N42TapArea(
                       onTap: () => _openMyQRCode(context),
+                      tooltip: S.of(context)?.commonMyQrCode ?? 'My QR Code',
                       child: Icon(
                         Icons.qr_code_2,
                         size: 20,
                         color: subtitleColor,
                       ),
                     ),
-                    const SizedBox(height: 30),
+                    // 44pt tap area above keeps the chevron in place.
+                    const SizedBox(height: 6),
                     Icon(AppIcons.chevron, color: subtitleColor, size: 24),
                   ],
                 ),
@@ -716,9 +723,10 @@ class _ProfilePageState extends State<ProfilePage> {
                   Icons.auto_awesome,
                   color: Color(0xFFFFD700),
                 ),
-                title: const Text('Avatar Studio'),
+                title: Text(l10n?.ui3ProfileAvatarStudio ?? 'Avatar Studio'),
                 subtitle: Text(
-                  'NFT Avatar / Decorations',
+                  l10n?.ui3ProfileAvatarStudioSubtitle ??
+                      'NFT Avatar / Decorations',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(

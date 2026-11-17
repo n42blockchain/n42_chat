@@ -60,6 +60,7 @@ class _OrdersAndCardsPageState extends State<OrdersAndCardsPage> {
           elevation: 0,
           leading: IconButton(
             icon: Icon(AppIcons.back, color: context.textPrimary, size: 20),
+            tooltip: MaterialLocalizations.of(context).backButtonTooltip,
             onPressed: () => Navigator.of(context).pop(),
           ),
           title: Text(
@@ -78,7 +79,12 @@ class _OrdersAndCardsPageState extends State<OrdersAndCardsPage> {
                 final userId = widget.userId ?? N42Chat.currentUser?.userId;
                 if (userId == null || userId.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Sign in to view history')),
+                    SnackBar(
+                      content: Text(
+                        S.of(context)?.ui3SignInToViewRedPacketHistory ??
+                            'Sign in to view red packet history',
+                      ),
+                    ),
                   );
                   return;
                 }
@@ -123,8 +129,11 @@ class _OrdersAndCardsPageState extends State<OrdersAndCardsPage> {
             final userId = widget.userId ?? N42Chat.currentUser?.userId;
             if (userId == null || userId.isEmpty) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Sign in to view red packet history'),
+                SnackBar(
+                  content: Text(
+                    S.of(context)?.ui3SignInToViewRedPacketHistory ??
+                        'Sign in to view red packet history',
+                  ),
                 ),
               );
               return;
@@ -178,14 +187,15 @@ class _OrdersAndCardsPageState extends State<OrdersAndCardsPage> {
                         ),
                         title: Text(
                           packet.greeting.isEmpty
-                              ? 'Red Packet'
+                              ? (S.of(context)?.profileRedPacket ??
+                                    'Red Packet')
                               : packet.greeting,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                         subtitle: Text(
                           '${_statusLabel(packet.lifecycle)} · '
-                          '${packet.claimedCount}/${packet.totalCount} claimed',
+                          '${S.of(context)?.redPacketStats(packet.claimedCount, packet.totalCount) ?? '${packet.claimedCount}/${packet.totalCount} claimed'}',
                         ),
                         trailing: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -230,7 +240,7 @@ class _OrdersAndCardsPageState extends State<OrdersAndCardsPage> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Cards and passes',
+              S.of(context)?.ui3CardsAndPasses ?? 'Cards and passes',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -239,7 +249,8 @@ class _OrdersAndCardsPageState extends State<OrdersAndCardsPage> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Wallet cards, coupons, and passes are managed by the main app.',
+              S.of(context)?.ui3CardsAndPassesDesc ??
+                  'Wallet cards, coupons, and passes are managed by the main app.',
               textAlign: TextAlign.center,
               style: TextStyle(color: context.textSecondary),
             ),
@@ -248,13 +259,16 @@ class _OrdersAndCardsPageState extends State<OrdersAndCardsPage> {
               onPressed: () {
                 if (N42Chat.invokeOpenCardPack()) return;
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Card Pack requires the main app'),
+                  SnackBar(
+                    content: Text(
+                      S.of(context)?.ui3CardPackRequiresMainApp ??
+                          'Card Pack requires the main app',
+                    ),
                   ),
                 );
               },
               icon: const Icon(Icons.account_balance_wallet_outlined),
-              label: const Text('Open Card Pack'),
+              label: Text(S.of(context)?.ui3OpenCardPack ?? 'Open Card Pack'),
             ),
           ],
         ),
@@ -293,9 +307,11 @@ class _OrdersAndCardsPageState extends State<OrdersAndCardsPage> {
   }
 
   String _statusLabel(RedPacketLifecycle lifecycle) => switch (lifecycle) {
-    RedPacketLifecycle.active => 'Active',
-    RedPacketLifecycle.completed => 'Completed',
-    RedPacketLifecycle.expired => 'Expired',
+    RedPacketLifecycle.active => S.of(context)?.ui3RedPacketActive ?? 'Active',
+    RedPacketLifecycle.completed =>
+      S.of(context)?.ui3RedPacketCompleted ?? 'Completed',
+    RedPacketLifecycle.expired =>
+      S.of(context)?.redPacketExpired ?? 'Expired',
   };
 
   String _dateLabel(DateTime value) =>

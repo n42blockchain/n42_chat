@@ -147,17 +147,19 @@ class _NotificationFilterPageState extends State<NotificationFilterPage> {
                 children: [
                   const SizedBox(height: 12),
                   _buildHeaderNote(
-                    'Priority rules always notify (bypassing mute, '
-                    'mentions-only and Do Not Disturb). Muted keywords '
-                    'suppress notifications.',
+                    S.of(context)?.ui3NotificationFilterNote ??
+                        'Priority rules always notify (bypassing mute, mentions-only and Do Not Disturb). Muted keywords suppress notifications.',
                   ),
                   const SizedBox(height: 8),
                   _buildKeywordSection(
-                    title: 'Priority keywords',
+                    title:
+                        S.of(context)?.ui3PriorityKeywords ??
+                        'Priority keywords',
                     icon: Icons.priority_high,
                     iconColor: AppColors.primaryOf(context),
                     entries: _rules.priorityKeywords,
-                    hint: 'e.g. urgent',
+                    hint:
+                        S.of(context)?.ui3PriorityKeywordHint ?? 'e.g. urgent',
                     onAdd: (v) => _apply(
                       _rules.copyWith(
                         priorityKeywords: _addEntry(_rules.priorityKeywords, v),
@@ -172,11 +174,11 @@ class _NotificationFilterPageState extends State<NotificationFilterPage> {
                     ),
                   ),
                   _buildKeywordSection(
-                    title: 'Muted keywords',
+                    title: S.of(context)?.ui3MutedKeywords ?? 'Muted keywords',
                     icon: Icons.notifications_off_outlined,
                     iconColor: AppColors.warning,
                     entries: _rules.mutedKeywords,
-                    hint: 'e.g. spam',
+                    hint: S.of(context)?.ui3MutedKeywordHint ?? 'e.g. spam',
                     onAdd: (v) => _apply(
                       _rules.copyWith(
                         mutedKeywords: _addEntry(_rules.mutedKeywords, v),
@@ -191,7 +193,8 @@ class _NotificationFilterPageState extends State<NotificationFilterPage> {
                     ),
                   ),
                   _buildKeywordSection(
-                    title: 'Priority senders',
+                    title:
+                        S.of(context)?.ui3PrioritySenders ?? 'Priority senders',
                     icon: Icons.person_outline,
                     iconColor: AppColors.info,
                     entries: _rules.prioritySenders,
@@ -214,7 +217,7 @@ class _NotificationFilterPageState extends State<NotificationFilterPage> {
                     color: context.surfaceColor,
                     child: SwitchListTile(
                       title: Text(
-                        'Case sensitive',
+                        S.of(context)?.ui3CaseSensitive ?? 'Case sensitive',
                         style: TextStyle(color: context.textPrimary),
                       ),
                       value: _rules.caseSensitive,
@@ -291,8 +294,12 @@ class _NotificationFilterPageState extends State<NotificationFilterPage> {
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
             child: entries.isEmpty
                 ? Text(
-                    'None',
-                    style: TextStyle(color: context.textTertiary, fontSize: 13),
+                    S.of(context)?.ui3None ?? 'None',
+                    // textTertiary is decorative only (1.7:1 on white).
+                    style: TextStyle(
+                      color: context.textSecondary,
+                      fontSize: 13,
+                    ),
                   )
                 : Wrap(
                     spacing: 8,

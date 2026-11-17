@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../core/utils/a11y_l10n.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/auth/auth_event.dart';
@@ -77,7 +78,10 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                   S.of(context)?.settingsPasswordChanged ??
                       'Password changed successfully. Please login with your new password.',
                 ),
-                backgroundColor: AppColors.success,
+                // Darkened green so the white label reaches 4.5:1.
+                backgroundColor: ChatContrast.fillForWhiteText(
+                  AppColors.success,
+                ),
               ),
             );
             // 修改成功后会自动登出，返回登录页
@@ -94,7 +98,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                       (S.of(context)?.settingsChangePasswordFailed ??
                           'Change password failed'),
                 ),
-                backgroundColor: AppColors.error,
+                backgroundColor: AppColors.errorFill,
               ),
             );
           }
@@ -142,7 +146,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                     child: ElevatedButton(
                       onPressed: isLoading ? null : _changePassword,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primaryOf(context),
+                        backgroundColor: AppColors.primaryFillOf(context),
                         disabledBackgroundColor: AppColors.primaryOf(context).withValues(
                           alpha: 0.5,
                         ),
@@ -209,8 +213,6 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
             child: Text(
               S.of(context)?.settingsChangePasswordInfo ??
                   'After changing password, you will be logged out and need to login with the new password.',
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
               style: TextStyle(fontSize: 14, height: 1.4, color: textColor),
             ),
           ),
@@ -442,7 +444,8 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   }
 
   Widget _buildPasswordRequirements() {
-    final textColor = context.textTertiary;
+    // textTertiary is decorative only (about 1.7:1); these lines are content.
+    final textColor = context.textSupporting;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -457,8 +460,6 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
         const SizedBox(height: AppDimensions.spacingXS),
         Text(
           '• ${S.of(context)?.commonPasswordMinLength ?? 'At least 8 characters'}',
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
           style: TextStyle(fontSize: 12, height: 1.3, color: textColor),
         ),
       ],
@@ -466,7 +467,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   }
 
   Widget _buildSecurityNote() {
-    final textColor = context.textTertiary;
+    final textColor = context.textSupporting;
 
     return Container(
       padding: const EdgeInsets.all(AppDimensions.spacingM),
@@ -482,8 +483,6 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
             child: Text(
               S.of(context)?.settingsSecurityNote ??
                   'For security, you will need to re-login on all devices after changing password.',
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
               style: TextStyle(fontSize: 12, height: 1.4, color: textColor),
             ),
           ),

@@ -218,6 +218,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       AppIcons.back,
                       color: context.textPrimary,
                     ),
+                    tooltip: MaterialLocalizations.of(
+                      context,
+                    ).backButtonTooltip,
                     onPressed: () => Navigator.pop(context),
                   ),
                   const Spacer(),
@@ -226,6 +229,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       Icons.more_horiz,
                       color: context.textPrimary,
                     ),
+                    tooltip: S.of(context)?.commonMore ?? 'More',
                     onPressed: _showMoreOptions,
                   ),
                 ],
@@ -284,8 +288,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           color: context.textPrimary,
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      GestureDetector(
+                      // 44pt copy target; its centering replaces the 4pt
+                      // spacer above the ID line.
+                      N42TapArea(
                         onTap: () {
                           Clipboard.setData(
                             ClipboardData(text: contact.userId),
@@ -763,8 +768,12 @@ class _UserProfilePageState extends State<UserProfilePage> {
         entityName: contact.effectiveDisplayName,
         linkLabel: contact.userId,
         qrCodeTitle: S.of(context)?.profileQrCode ?? 'QR Code',
-        qrCodeSubtitle: 'Scan to open this profile or start a chat',
-        errorPrefix: 'Failed to generate user QR code',
+        qrCodeSubtitle:
+            S.of(context)?.ui3ProfileQrSubtitle ??
+            'Scan to open this profile or start a chat',
+        errorPrefix:
+            S.of(context)?.transferQrCodeGenerateFailed ??
+            'QR code generation failed',
         copySuccessMessage:
             S.of(context)?.commonCopiedToClipboard ?? 'Copied to clipboard',
         icon: Icons.person_outline,

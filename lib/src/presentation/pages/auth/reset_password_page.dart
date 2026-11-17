@@ -68,7 +68,15 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     });
   }
 
+  bool get _isRequestInFlight {
+    final status = context.read<AuthBloc>().state.passwordResetStatus;
+    return status == PasswordResetStatus.sendingCode ||
+        status == PasswordResetStatus.resetting;
+  }
+
   void _sendVerificationCode() {
+    // Keyboard submit and the resend link bypass the disabled button.
+    if (_isRequestInFlight) return;
     if (_emailController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -123,6 +131,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   }
 
   void _resetPassword() {
+    if (_isRequestInFlight) return;
     if (_formKey.currentState?.validate() ?? false) {
       context.read<AuthBloc>().add(
         AuthConfirmPasswordResetRequested(
@@ -254,7 +263,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   }
 
   Widget _buildStepIndicator(bool isDark) {
-    final activeColor = AppColors.primaryOf(context);
+    // Fill shade: the active dots carry white digits.
+    final activeColor = AppColors.primaryFillOf(context);
     final inactiveColor = context.dividerColor;
 
     return Row(
@@ -290,7 +300,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
         child: Text(
           '${step + 1}',
           style: TextStyle(
-            color: isActive ? Colors.white : AppColors.textTertiary,
+            color: isActive ? Colors.white : context.textPrimary,
             fontSize: 12,
             fontWeight: FontWeight.bold,
           ),
@@ -353,7 +363,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           child: ElevatedButton(
             onPressed: isLoading ? null : _sendVerificationCode,
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryOf(context),
+              backgroundColor: AppColors.primaryFillOf(context),
               disabledBackgroundColor: AppColors.primaryOf(context).withValues(alpha: 0.5),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppDimensions.radiusM),
@@ -399,8 +409,6 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           S.of(context)?.authResetCodeSent(_emailController.text.trim()) ??
               'Reset code sent to ${_emailController.text.trim()}',
           textAlign: TextAlign.center,
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
           style: TextStyle(fontSize: 16, height: 1.4, color: textColor),
         ),
         const SizedBox(height: AppDimensions.spacingXL),
@@ -439,7 +447,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
         // 重新发送按钮
         Center(
           child: TextButton(
-            onPressed: _resendCountdown > 0
+            onPressed: _resendCountdown > 0 || isLoading
                 ? null
                 : () {
                     _sendVerificationCode();
@@ -465,7 +473,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           child: ElevatedButton(
             onPressed: _verifyCode,
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryOf(context),
+              backgroundColor: AppColors.primaryFillOf(context),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppDimensions.radiusM),
               ),
@@ -534,6 +542,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                 _obscurePassword ? Icons.visibility_off : Icons.visibility,
                 color: hintColor,
               ),
+              tooltip: _obscurePassword
+                  ? (S.of(context)?.a11yShowPassword ?? 'Show password')
+                  : (S.of(context)?.a11yHidePassword ?? 'Hide password'),
               onPressed: () {
                 setState(() {
                   _obscurePassword = !_obscurePassword;
@@ -588,6 +599,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                     : Icons.visibility,
                 color: hintColor,
               ),
+              tooltip: _obscureConfirmPassword
+                  ? (S.of(context)?.a11yShowPassword ?? 'Show password')
+                  : (S.of(context)?.a11yHidePassword ?? 'Hide password'),
               onPressed: () {
                 setState(() {
                   _obscureConfirmPassword = !_obscureConfirmPassword;
@@ -616,7 +630,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           child: ElevatedButton(
             onPressed: isLoading ? null : _resetPassword,
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryOf(context),
+              backgroundColor: AppColors.primaryFillOf(context),
               disabledBackgroundColor: AppColors.primaryOf(context).withValues(alpha: 0.5),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppDimensions.radiusM),

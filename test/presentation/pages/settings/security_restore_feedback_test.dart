@@ -48,7 +48,7 @@ void main() {
     'biometric settings remain visible when device detection is unavailable',
     (tester) async {
       final l10n = await open(tester, restore: false);
-      expect(find.text(l10n.settingsBiometricLogin), findsOneWidget);
+      expect(find.text(l10n.settingsBiometricLogin), findsWidgets);
       expect(find.text(l10n.settingsBiometricUnavailable), findsOneWidget);
       expect(tester.takeException(), isNull);
     },

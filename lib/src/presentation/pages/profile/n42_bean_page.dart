@@ -109,7 +109,8 @@ class _N42BeanPageState extends State<N42BeanPage> {
                     style: TextStyle(
                       fontSize: 16,
                       height: 1.3,
-                      color: Colors.white.withValues(alpha: 0.7),
+                      // 0.9 keeps 4.5:1 on the green gradient (0.7 was 3.4:1).
+                      color: Colors.white.withValues(alpha: 0.9),
                     ),
                   ),
                 ],
@@ -172,8 +173,6 @@ class _N42BeanPageState extends State<N42BeanPage> {
             Text(
               s?.profileN42BeanDescription ??
                   'N42 Bean is a token used to redeem virtual items and services in N42. Currently available for:',
-              maxLines: 4,
-              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -353,10 +352,10 @@ class _BeanDetailSheet extends StatelessWidget {
                     s?.profileNoN42BeanRecords ?? 'No N42 Bean records',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       height: 1.3,
-                      color: AppColors.textSecondary,
+                      color: context.textSecondary,
                     ),
                   ),
                 ],

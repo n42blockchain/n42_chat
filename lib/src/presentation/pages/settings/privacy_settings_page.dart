@@ -88,7 +88,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
       messenger.showSnackBar(
         SnackBar(
           content: Text(saveFailedMessage),
-          backgroundColor: AppColors.error,
+          backgroundColor: AppColors.errorFill,
         ),
       );
     } finally {
@@ -137,7 +137,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                   l10n?.settingsWhoCanSee ?? 'Who can see',
                   isDark,
                 ),
-                Container(
+                Material(
                   color: context.surfaceColor,
                   child: Column(
                     children: [
@@ -179,14 +179,18 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
 
                 const SizedBox(height: AppDimensions.spacing),
 
-                _buildSectionHeader('Privacy Hardening', isDark),
-                Container(
+                _buildSectionHeader(
+                  l10n?.ui3PrivacyHardening ?? 'Privacy Hardening',
+                  isDark,
+                ),
+                Material(
                   color: context.surfaceColor,
                   child: Column(
                     children: [
                       _buildSwitchTile(
-                        title: 'Hide Phone Number',
+                        title: l10n?.ui3HidePhoneNumber ?? 'Hide Phone Number',
                         subtitle:
+                            l10n?.ui3HidePhoneNumberDesc ??
                             'Mask any bound phone number in profile-level surfaces on this device',
                         icon: Icons.phone_disabled_outlined,
                         value: _settings.hidePhoneNumber,
@@ -197,8 +201,11 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                       ),
                       _buildDivider(isDark),
                       _buildSwitchTile(
-                        title: 'Encrypt New Chats By Default',
+                        title:
+                            l10n?.ui3EncryptNewChatsByDefault ??
+                            'Encrypt New Chats By Default',
                         subtitle:
+                            l10n?.ui3EncryptNewChatsByDefaultDesc ??
                             'Start new direct chats and private rooms with E2EE enabled',
                         icon: Icons.enhanced_encryption_outlined,
                         value: _settings.defaultEncryptNewChats,
@@ -209,8 +216,9 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                       ),
                       _buildDivider(isDark),
                       _buildSwitchTile(
-                        title: 'Private Chat Mode',
+                        title: l10n?.ui3PrivateChatMode ?? 'Private Chat Mode',
                         subtitle:
+                            l10n?.ui3PrivateChatModeDesc ??
                             'Temporarily enable screenshot blocking when viewing private or encrypted chats',
                         icon: Icons.lock_person_outlined,
                         value: _settings.privateChatMode,
@@ -221,8 +229,11 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                       ),
                       _buildDivider(isDark),
                       _buildValueItem(
-                        title: 'Default Auto-Destruct Timer',
+                        title:
+                            l10n?.ui3DefaultSelfDestructTimer ??
+                            'Default Auto-Destruct Timer',
                         subtitle:
+                            l10n?.ui3DefaultSelfDestructTimerDesc ??
                             'Apply a default self-destruct timer to newly sent messages',
                         icon: Icons.timer_outlined,
                         value: _formatSelfDestructDuration(
@@ -237,14 +248,18 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
 
                 const SizedBox(height: AppDimensions.spacing),
 
-                _buildSectionHeader('Network Privacy', isDark),
-                Container(
+                _buildSectionHeader(
+                  l10n?.ui3NetworkPrivacy ?? 'Network Privacy',
+                  isDark,
+                ),
+                Material(
                   color: context.surfaceColor,
                   child: Column(
                     children: [
                       _buildSwitchTile(
-                        title: 'Link Previews',
+                        title: l10n?.ui3LinkPreviews ?? 'Link Previews',
                         subtitle:
+                            l10n?.ui3LinkPreviewsDesc ??
                             'Fetch titles, descriptions, and thumbnails when messages contain URLs',
                         icon: Icons.link_outlined,
                         value: _settings.showLinkPreviews,
@@ -255,8 +270,11 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                       ),
                       _buildDivider(isDark),
                       _buildSwitchTile(
-                        title: 'IP Address Protection',
+                        title:
+                            l10n?.ui3IpAddressProtection ??
+                            'IP Address Protection',
                         subtitle:
+                            l10n?.ui3IpAddressProtectionDesc ??
                             'Route Matrix and link-preview requests through your configured HTTP privacy proxy when available',
                         icon: Icons.shield_outlined,
                         value: _settings.protectIpAddress,
@@ -267,8 +285,11 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                       ),
                       _buildDivider(isDark),
                       _buildSwitchTile(
-                        title: 'Use Tor / Privoxy HTTP Proxy',
+                        title:
+                            l10n?.ui3UseTorProxy ??
+                            'Use Tor / Privoxy HTTP Proxy',
                         subtitle:
+                            l10n?.ui3UseTorProxyDesc ??
                             'Use a local HTTP proxy endpoint such as Privoxy on 127.0.0.1:8118. Native SOCKS5 Tor routing is not supported here.',
                         icon: Icons.travel_explore_outlined,
                         value: _settings.useTor,
@@ -284,8 +305,9 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                       ),
                       _buildDivider(isDark),
                       _buildSwitchTile(
-                        title: 'Custom Proxy',
+                        title: l10n?.ui3CustomProxy ?? 'Custom Proxy',
                         subtitle:
+                            l10n?.ui3CustomProxyDesc ??
                             'Use a custom HTTP or HTTPS proxy for Matrix traffic and link previews',
                         icon: Icons.route_outlined,
                         value: _settings.proxyEnabled,
@@ -297,8 +319,9 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                       if (_settings.proxyEnabled) ...[
                         _buildDivider(isDark),
                         _buildValueItem(
-                          title: 'Proxy Endpoint',
+                          title: l10n?.ui3ProxyEndpoint ?? 'Proxy Endpoint',
                           subtitle:
+                              l10n?.ui3ProxyEndpointDesc ??
                               'HTTP/HTTPS proxy address (SOCKS not supported)',
                           icon: Icons.dns_outlined,
                           value: _settings.proxyUrl?.trim().isNotEmpty == true
@@ -306,8 +329,9 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                                       _settings,
                                     )
                                     ? _settings.proxyUrl!.trim()
-                                    : 'Invalid endpoint')
-                              : 'Not set',
+                                    : l10n?.ui3InvalidEndpoint ??
+                                          'Invalid endpoint')
+                              : l10n?.commonNotSet ?? 'Not set',
                           onTap: _editProxyUrl,
                           isDark: isDark,
                         ),
@@ -320,7 +344,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
 
                 // 隐藏聊天入口
                 _buildSectionHeader(l10n?.commonChat ?? 'Chat', isDark),
-                Container(
+                Material(
                   color: context.surfaceColor,
                   child: Column(
                     children: [
@@ -342,7 +366,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                   l10n?.settingsMessagesLabel ?? 'Messages',
                   isDark,
                 ),
-                Container(
+                Material(
                   color: context.surfaceColor,
                   child: Column(
                     children: [
@@ -488,7 +512,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
               children: [
                 Text(
                   title,
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 16,
@@ -554,7 +578,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
                 children: [
                   Text(
                     title,
-                    maxLines: 1,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 16,
@@ -806,7 +830,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
       return await showDialog<String>(
         context: context,
         builder: (ctx) => AlertDialog(
-          title: const Text('Proxy Endpoint'),
+          title: Text(S.of(context)?.ui3ProxyEndpoint ?? 'Proxy Endpoint'),
           content: TextField(
             controller: controller,
             decoration: const InputDecoration(
@@ -849,9 +873,10 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
       );
       if (enableProxyAfterSave && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text(
-              'Custom proxy stays off until you set a valid endpoint',
+              S.of(context)?.ui3CustomProxyStaysOff ??
+                  'Custom proxy stays off until you set a valid endpoint',
             ),
           ),
         );
@@ -880,7 +905,7 @@ class _PrivacySettingsPageState extends State<PrivacySettingsPage> {
 
   String _formatSelfDestructDuration(int? seconds) {
     if (seconds == null || seconds <= 0) {
-      return 'Off';
+      return S.of(context)?.chatTimerOff ?? 'Off';
     }
     if (seconds < 60) {
       return '${seconds}s';
@@ -908,11 +933,10 @@ class _VisibilityPickerSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = S.of(context);
 
-    return Container(
-      decoration: BoxDecoration(
-        color: context.surfaceColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-      ),
+    return Material(
+      // Material (not a decorated Container) keeps the ListTile ink visible.
+      color: context.surfaceColor,
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
       child: SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,

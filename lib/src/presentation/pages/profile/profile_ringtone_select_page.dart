@@ -184,7 +184,7 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
               s?.profilePlayFailed(ringtone.name) ??
                   'Failed to play: ${ringtone.name}',
             ),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.errorFill,
             duration: const Duration(seconds: 1),
           ),
         );
@@ -236,7 +236,7 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
               s?.profilePlayFailed(ringtone.name) ??
                   'Failed to play: ${ringtone.name}',
             ),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.errorFill,
             duration: const Duration(seconds: 1),
           ),
         );
@@ -310,6 +310,7 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back_rounded, color: context.textPrimary),
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           onPressed: () => Navigator.pop(context), // 取消不保存
         ),
         title: Text(
@@ -388,73 +389,86 @@ class RingtoneSelectPageState extends State<RingtoneSelectPage> {
                           )
                         : null,
                   ),
-                  child: ListTile(
-                    leading: Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: isPlaying
-                            ? AppColors.primaryOf(context)
-                                  .withValues(alpha: 0.2)
-                            : ChatColors.of(context).optionTileBg,
+                  // Transparent Material above the Container color keeps
+                  // the ListTile ripple visible.
+                  child: Material(
+                    type: MaterialType.transparency,
+                    child: ListTile(
+                      shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(
                           AppDimensions.radiusM,
                         ),
                       ),
-                      child: Icon(
-                        isPlaying ? Icons.pause : ringtone.icon,
-                        color: isPlaying
-                            ? AppColors.primaryOf(context)
-                            : context.textSecondary,
+                      leading: Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: isPlaying
+                              ? AppColors.primaryOf(context)
+                                    .withValues(alpha: 0.2)
+                              : ChatColors.of(context).optionTileBg,
+                          borderRadius: BorderRadius.circular(
+                            AppDimensions.radiusM,
+                          ),
+                        ),
+                        child: Icon(
+                          isPlaying ? Icons.pause : ringtone.icon,
+                          color: isPlaying
+                              ? AppColors.primaryOf(context)
+                              : context.textSecondary,
+                        ),
                       ),
-                    ),
-                    title: Text(
-                      ringtone.name,
-                      style: TextStyle(
-                        color: context.textPrimary,
-                        fontWeight: isSelected
-                            ? FontWeight.w600
-                            : FontWeight.normal,
+                      title: Text(
+                        ringtone.name,
+                        style: TextStyle(
+                          color: context.textPrimary,
+                          fontWeight: isSelected
+                              ? FontWeight.w600
+                              : FontWeight.normal,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // 试听按钮
-                        if (ringtone.uri != null || ringtone.key == 'vibrate')
-                          IconButton(
-                            icon: Icon(
-                              isPlaying
-                                  ? Icons.stop
-                                  : Icons.play_circle_outline,
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // 试听按钮
+                          if (ringtone.uri != null || ringtone.key == 'vibrate')
+                            IconButton(
+                              icon: Icon(
+                                isPlaying
+                                    ? Icons.stop
+                                    : Icons.play_circle_outline,
+                                color: AppColors.primaryOf(context),
+                              ),
+                              tooltip: isPlaying
+                                  ? (s?.profileStop ?? 'Stop')
+                                  : (s?.nftPickerPreview ?? 'Preview'),
+                              onPressed: () {
+                                if (isPlaying) {
+                                  _stopRingtone();
+                                } else {
+                                  _playRingtone(ringtone);
+                                }
+                              },
+                            ),
+                          // 选中标记
+                          if (isSelected)
+                            Icon(
+                              Icons.check_circle,
                               color: AppColors.primaryOf(context),
                             ),
-                            onPressed: () {
-                              if (isPlaying) {
-                                _stopRingtone();
-                              } else {
-                                _playRingtone(ringtone);
-                              }
-                            },
-                          ),
-                        // 选中标记
-                        if (isSelected)
-                          Icon(
-                            Icons.check_circle,
-                            color: AppColors.primaryOf(context),
-                          ),
-                      ],
+                        ],
+                      ),
+                      onTap: () {
+                        setState(() {
+                          _selectedRingtone = ringtone.name;
+                          _selectedRingtoneKey = ringtone.key;
+                        });
+                        // 选中后自动试听
+                        _playRingtone(ringtone);
+                      },
                     ),
-                    onTap: () {
-                      setState(() {
-                        _selectedRingtone = ringtone.name;
-                        _selectedRingtoneKey = ringtone.key;
-                      });
-                      // 选中后自动试听
-                      _playRingtone(ringtone);
-                    },
                   ),
                 );
               },

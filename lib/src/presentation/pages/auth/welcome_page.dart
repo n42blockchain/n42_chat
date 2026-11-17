@@ -7,6 +7,7 @@ import '../../../core/theme/chat_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../widgets/common/n42_tap_area.dart';
 
 /// 欢迎页面
 ///
@@ -181,7 +182,7 @@ class WelcomePage extends StatelessWidget {
             key: const ValueKey<String>('chat_welcome_login'),
             onPressed: onLogin,
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryOf(context),
+              backgroundColor: AppColors.primaryFillOf(context),
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(25),
@@ -231,8 +232,9 @@ class WelcomePage extends StatelessWidget {
   }
 
   Widget _buildAgreement(BuildContext context) {
-    final tertiaryColor = context.textTertiary;
-    final linkColor = AppColors.link.withValues(alpha: 0.85);
+    // textTertiary measured 1.56:1 on the page; links drop the alpha.
+    final tertiaryColor = context.textSecondary;
+    const linkColor = AppColors.link;
     final textStyle = AppTextStyles.captionSmall.copyWith(fontSize: 12);
 
     return Wrap(
@@ -243,9 +245,8 @@ class WelcomePage extends StatelessWidget {
           S.of(context)?.authAgreeTerms ?? 'By logging in, you agree to ',
           style: textStyle.copyWith(color: tertiaryColor),
         ),
-        GestureDetector(
+        N42TapArea(
           onTap: onTermsOfService,
-          behavior: HitTestBehavior.opaque,
           child: Text(
             S.of(context)?.authTermsOfService ?? 'Terms of Service',
             style: textStyle.copyWith(color: linkColor),
@@ -255,9 +256,8 @@ class WelcomePage extends StatelessWidget {
           ' ${S.of(context)?.authAnd ?? 'and'} ',
           style: textStyle.copyWith(color: tertiaryColor),
         ),
-        GestureDetector(
+        N42TapArea(
           onTap: onPrivacyPolicy,
-          behavior: HitTestBehavior.opaque,
           child: Text(
             S.of(context)?.authPrivacyPolicy ?? 'Privacy Policy',
             style: textStyle.copyWith(color: linkColor),

@@ -6,6 +6,7 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/storage_manager_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/chat_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../data/datasources/local/media_metadata_database.dart';
 import '../../blocs/storage/storage_management_bloc.dart';
@@ -68,6 +69,17 @@ class _RoomStorageDetailPageState extends State<RoomStorageDetailPage>
     super.dispose();
   }
 
+  /// Localized labels for [_tabs] (same order).
+  List<String> _tabLabels(BuildContext context) {
+    final l10n = S.of(context);
+    return [
+      l10n?.mediaAll ?? _tabs[0],
+      l10n?.mediaImages ?? _tabs[1],
+      l10n?.mediaVideos ?? _tabs[2],
+      l10n?.mediaFiles ?? _tabs[3],
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -94,10 +106,11 @@ class _RoomStorageDetailPageState extends State<RoomStorageDetailPage>
         ),
         bottom: TabBar(
           controller: _tabController,
-          labelColor: AppColors.primaryOf(context),
+          // Brand label text needs the 4.5:1 shade on the app bar.
+          labelColor: AppColors.primaryOnTintOf(context),
           unselectedLabelColor: context.textSecondary,
           indicatorColor: AppColors.primaryOf(context),
-          tabs: _tabs.map((t) => Tab(text: t)).toList(),
+          tabs: _tabLabels(context).map((t) => Tab(text: t)).toList(),
         ),
       ),
       body: BlocConsumer<StorageManagementBloc, StorageManagementState>(
@@ -119,7 +132,10 @@ class _RoomStorageDetailPageState extends State<RoomStorageDetailPage>
           });
           if (error != null) {
             messenger.showSnackBar(
-              SnackBar(content: Text(error), backgroundColor: AppColors.error),
+              SnackBar(
+                content: Text(error),
+                backgroundColor: AppColors.errorFill,
+              ),
             );
             return;
           }
@@ -127,10 +143,18 @@ class _RoomStorageDetailPageState extends State<RoomStorageDetailPage>
             messenger.showSnackBar(
               SnackBar(
                 content: Text(
-                  'Freed ${StorageInfo.formatSize(cleanupResult.bytesFreed)} '
-                  '(${cleanupResult.filesDeleted} files)',
+                  S
+                          .of(context)
+                          ?.storageFreed(
+                            StorageInfo.formatSize(cleanupResult.bytesFreed),
+                            cleanupResult.filesDeleted,
+                          ) ??
+                      'Freed ${StorageInfo.formatSize(cleanupResult.bytesFreed)} (${cleanupResult.filesDeleted} files)',
                 ),
-                backgroundColor: AppColors.success,
+                // Darkened green keeps the white label at 4.5:1.
+                backgroundColor: ChatContrast.fillForWhiteText(
+                  AppColors.success,
+                ),
               ),
             );
           }
@@ -178,8 +202,8 @@ class _RoomStorageDetailPageState extends State<RoomStorageDetailPage>
       builder: (dialogContext) => AlertDialog(
         title: Text(S.of(context)?.commonDelete ?? 'Delete'),
         content: Text(
-          'Delete ${_selectedFiles.length} selected files? '
-          'They can be re-downloaded from the server.',
+          S.of(context)?.storageDeleteSelected(_selectedFiles.length) ??
+              'Delete ${_selectedFiles.length} selected files? They can be re-downloaded from the server.',
         ),
         actions: [
           TextButton(
@@ -200,7 +224,12 @@ class _RoomStorageDetailPageState extends State<RoomStorageDetailPage>
             },
             child: Text(
               S.of(context)?.commonDelete ?? 'Delete',
-              style: const TextStyle(color: AppColors.error),
+              // System red is 3.55:1 on a white dialog; errorFill is 4.5:1.
+              style: TextStyle(
+                color: context.isDarkMode
+                    ? AppColors.error
+                    : AppColors.errorFill,
+              ),
             ),
           ),
         ],
@@ -232,19 +261,19 @@ class _RoomStorageHeader extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _StatItem(
-            label: 'Total',
+            label: S.of(context)?.groupTotal ?? 'Total',
             value: StorageInfo.formatSize(stats.totalSize),
           ),
           _StatItem(
-            label: 'Images',
+            label: S.of(context)?.mediaImages ?? 'Images',
             value: StorageInfo.formatSize(stats.imageSize),
           ),
           _StatItem(
-            label: 'Videos',
+            label: S.of(context)?.mediaVideos ?? 'Videos',
             value: StorageInfo.formatSize(stats.videoSize),
           ),
           _StatItem(
-            label: 'Files',
+            label: S.of(context)?.mediaFiles ?? 'Files',
             value: StorageInfo.formatSize(stats.documentSize),
           ),
         ],
@@ -298,7 +327,7 @@ class _MediaFileList extends StatelessWidget {
     if (files.isEmpty) {
       return Center(
         child: Text(
-          'No files found',
+          S.of(context)?.storageNoFiles ?? 'No files found',
           style: TextStyle(color: context.textSecondary),
         ),
       );
@@ -407,7 +436,7 @@ class _MediaFileTile extends StatelessWidget {
       ),
       subtitle: Text(
         '$fileSize  ${_formatDate(file.downloadedAt)}'
-        '${file.isPinned ? '  Pinned' : ''}',
+        '${file.isPinned ? '  ${S.of(context)?.storageFilePinned ?? 'Pinned'}' : ''}',
         style: TextStyle(fontSize: 12, color: secondaryColor),
       ),
       onTap: onTap,
@@ -448,7 +477,9 @@ class _SelectionActionBar extends StatelessWidget {
           children: [
             TextButton(
               onPressed: onClearSelection,
-              child: Text('Cancel ($selectedCount)'),
+              child: Text(
+                '${S.of(context)?.commonCancel ?? 'Cancel'} ($selectedCount)',
+              ),
             ),
             const Spacer(),
             if (isCleaning)
@@ -461,9 +492,10 @@ class _SelectionActionBar extends StatelessWidget {
               ElevatedButton.icon(
                 onPressed: onDelete,
                 icon: const Icon(Icons.delete_outline, size: 18),
-                label: const Text('Delete'),
+                label: Text(S.of(context)?.commonDelete ?? 'Delete'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.error,
+                  // White label needs the darkened red to reach 4.5:1.
+                  backgroundColor: AppColors.errorFill,
                   foregroundColor: Colors.white,
                 ),
               ),

@@ -78,7 +78,7 @@ class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
       messenger.showSnackBar(
         SnackBar(
           content: Text(saveFailedMessage),
-          backgroundColor: AppColors.error,
+          backgroundColor: AppColors.errorFill,
         ),
       );
     } finally {
@@ -155,7 +155,7 @@ class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
 
                 // 自定义照片背景（对标 iMessage iOS 26）
                 Text(
-                  'From Photos',
+                  S.of(context)?.ui3FromPhotos ?? 'From Photos',
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
@@ -248,7 +248,7 @@ class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
       messenger.showSnackBar(
         SnackBar(
           content: Text(saveFailedMessage),
-          backgroundColor: AppColors.error,
+          backgroundColor: AppColors.errorFill,
         ),
       );
     }
@@ -259,14 +259,19 @@ class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
     final decoration = isImage
         ? ChatBackgroundPresets.resolveDecoration(_selectedBackground)
         : null;
+    final label = isImage
+        ? S.of(context)?.ui3ChangePhoto ?? 'Change photo'
+        : S.of(context)?.profileChooseFromGallery ?? 'Choose from gallery';
 
     return Semantics(
       button: true,
-      label: 'Choose photo background',
+      label: label,
       excludeSemantics: true,
-      child: GestureDetector(
+      // InkWell + Ink keeps the pressed state visible over the card fill.
+      child: InkWell(
         onTap: _isSaving ? null : _pickImageBackground,
-        child: Container(
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+        child: Ink(
           height: 80,
           decoration: (decoration ?? BoxDecoration(color: context.surfaceColor))
               .copyWith(
@@ -286,7 +291,8 @@ class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
               ),
               decoration: isImage
                   ? BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.45),
+                      // 60% keeps the white label >= 4.5:1 over any photo.
+                      color: Colors.black.withValues(alpha: 0.6),
                       borderRadius: BorderRadius.circular(
                         AppDimensions.radiusM,
                       ),
@@ -302,7 +308,7 @@ class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
                   ),
                   const SizedBox(width: AppDimensions.spacingS),
                   Text(
-                    isImage ? 'Change photo' : 'Choose from gallery',
+                    label,
                     style: TextStyle(
                       color: isImage ? Colors.white : context.textPrimary,
                       fontSize: 15,
@@ -321,9 +327,10 @@ class _ChatBackgroundPageState extends State<ChatBackgroundPage> {
     final isSelected =
         _selectedBackground == null || _selectedBackground == 'default';
 
-    return GestureDetector(
+    return InkWell(
       onTap: _isSaving ? null : () => _selectBackground('default'),
-      child: Container(
+      borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+      child: Ink(
         height: 80,
         decoration: BoxDecoration(
           color: context.surfaceColor,

@@ -4,6 +4,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../core/utils/debug_log.dart';
 
@@ -160,7 +161,7 @@ class InvoiceManagePageState extends State<InvoiceManagePage> {
                       S.of(context)?.profileAddInvoice ?? 'Add Invoice',
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryOf(context),
+                      backgroundColor: AppColors.primaryFillOf(context),
                       foregroundColor: Colors.white,
                     ),
                   ),
@@ -205,9 +206,16 @@ class InvoiceManagePageState extends State<InvoiceManagePage> {
                                   fontSize: 12,
                                   height: 1.3,
                                   fontWeight: FontWeight.w500,
+                                  // Text-safe shades on the 10% tints
+                                  // (orange on its tint was 2.0:1).
                                   color: invoice.type == 'company'
-                                      ? AppColors.primaryOf(context)
-                                      : AppColors.warning,
+                                      ? AppColors.primaryOnTintOf(context)
+                                      : ChatContrast.onTint(
+                                          AppColors.warning,
+                                          [context.surfaceColor],
+                                          dark: context.isDarkMode,
+                                          alpha: 0.1,
+                                        ),
                                 ),
                               ),
                             ),
@@ -245,7 +253,7 @@ class InvoiceManagePageState extends State<InvoiceManagePage> {
                                     fontSize: 12,
                                     height: 1.3,
                                     fontWeight: FontWeight.w500,
-                                    color: AppColors.primaryOf(context),
+                                    color: AppColors.primaryOnTintOf(context),
                                   ),
                                 ),
                               ),
@@ -277,7 +285,12 @@ class InvoiceManagePageState extends State<InvoiceManagePage> {
                               onPressed: () => _deleteInvoice(index),
                               child: Text(
                                 S.of(context)?.commonDelete ?? 'Delete',
-                                style: const TextStyle(color: AppColors.error),
+                                // errorFill keeps 4.5:1 on light surfaces.
+                                style: TextStyle(
+                                  color: context.isDarkMode
+                                      ? AppColors.error
+                                      : AppColors.errorFill,
+                                ),
                               ),
                             ),
                           ],
@@ -397,7 +410,11 @@ class InvoiceManagePageState extends State<InvoiceManagePage> {
             },
             child: Text(
               S.of(context)?.commonDelete ?? 'Delete',
-              style: const TextStyle(color: AppColors.error),
+              style: TextStyle(
+                color: context.isDarkMode
+                    ? AppColors.error
+                    : AppColors.errorFill,
+              ),
             ),
           ),
         ],

@@ -4,6 +4,7 @@ import 'package:matrix/encryption/utils/key_verification.dart' as kv;
 import '../../../core/encryption/e2ee_manager.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../widgets/common/common_widgets.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'emoji_verification_widget.dart';
@@ -68,6 +69,9 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
   List<kv.KeyVerificationEmoji>? _emojis;
   List<int>? _numbers;
   String? _errorMessage;
+
+  /// True while a "they don't match" answer is being sent.
+  bool _responding = false;
 
   @override
   void initState() {
@@ -200,7 +204,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
 
   /// 用户确认 SAS 匹配
   Future<void> _onConfirm() async {
-    if (_verification == null) return;
+    if (_verification == null || _responding) return;
 
     setState(() => _step = SasVerificationStep.waitingForPartner);
 
@@ -217,8 +221,11 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
 
   /// 用户拒绝 SAS（不匹配）
   Future<void> _onReject() async {
-    if (_verification == null) return;
+    if (_verification == null || _responding) return;
 
+    // Single flight: both answer buttons stay disabled until the reject
+    // request returns.
+    setState(() => _responding = true);
     try {
       await widget.e2eeManager.rejectSas(_verification!);
     } catch (e) {
@@ -228,6 +235,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
     if (!mounted) return;
 
     setState(() {
+      _responding = false;
       _step = SasVerificationStep.failed;
       _errorMessage =
           S.of(context)?.securityEmojiMismatchRejected ??
@@ -324,6 +332,19 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
   }
 
   Widget _buildShowingSas(bool isDark) {
+    // Scrolls when large text or a short screen cannot fit the emoji grid
+    // and the answer buttons; otherwise the Spacers fill the height.
+    return CustomScrollView(
+      slivers: [
+        SliverFillRemaining(
+          hasScrollBody: false,
+          child: _buildShowingSasContent(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildShowingSasContent() {
     return Column(
       children: [
         const Spacer(),
@@ -371,9 +392,15 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
             // 不匹配按钮
             Expanded(
               child: OutlinedButton(
-                onPressed: _onReject,
+                onPressed: _responding ? null : _onReject,
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.error,
+                  // Red shade that reads at 4.5:1 on the page background.
+                  foregroundColor: ChatContrast.onTint(
+                    AppColors.error,
+                    [context.pageBackground],
+                    dark: context.isDarkMode,
+                    alpha: 0,
+                  ),
                   side: const BorderSide(color: AppColors.error),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
@@ -382,8 +409,9 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
                 ),
                 child: Text(
                   S.of(context)?.securityEmojiDontMatch ?? 'They don\'t match',
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
                   style: const TextStyle(fontSize: 16, height: 1.3),
                 ),
               ),
@@ -392,9 +420,9 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
             // 匹配按钮
             Expanded(
               child: ElevatedButton(
-                onPressed: _onConfirm,
+                onPressed: _responding ? null : _onConfirm,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryOf(context),
+                  backgroundColor: AppColors.primaryFillOf(context),
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
@@ -403,8 +431,9 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
                 ),
                 child: Text(
                   S.of(context)?.securityEmojiMatch ?? 'They match',
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
                   style: const TextStyle(fontSize: 16, height: 1.3),
                 ),
               ),
@@ -483,7 +512,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
         ElevatedButton(
           onPressed: () => Navigator.pop(context, true),
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primaryOf(context),
+            backgroundColor: AppColors.primaryFillOf(context),
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 14),
             shape: RoundedRectangleBorder(
@@ -564,7 +593,7 @@ class _SasVerificationPageState extends State<SasVerificationPage> {
                 _startVerification();
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryOf(context),
+                backgroundColor: AppColors.primaryFillOf(context),
                 foregroundColor: Colors.white,
               ),
               child: Text(S.of(context)?.commonTryAgain ?? 'Try Again'),

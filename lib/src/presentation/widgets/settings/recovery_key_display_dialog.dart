@@ -7,7 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/chat_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../core/theme/app_dimensions.dart';
 
 /// 恢复密钥展示对话框
@@ -38,7 +38,12 @@ class RecoveryKeyDisplayDialog extends StatelessWidget {
         children: [
           Icon(Icons.key, color: AppColors.primaryOf(context)),
           const SizedBox(width: AppDimensions.spacingS),
-          const Expanded(child: Text('Recovery Key', style: TextStyle(fontSize: 18))),
+          Expanded(
+            child: Text(
+              l10n?.settingsRecoveryKey ?? 'Recovery Key',
+              style: const TextStyle(fontSize: 18),
+            ),
+          ),
         ],
       ),
       content: SingleChildScrollView(
@@ -67,10 +72,17 @@ class RecoveryKeyDisplayDialog extends StatelessWidget {
                   const SizedBox(width: AppDimensions.spacingS),
                   Expanded(
                     child: Text(
-                      'Store this key safely. It is the only way to recover your encrypted messages if you lose access to all devices.',
+                      l10n?.ui3RecoveryKeyStoreWarning ??
+                          'Store this key safely. It is the only way to recover your encrypted messages if you lose access to all devices.',
                       style: TextStyle(
                         fontSize: 12,
-                        color: ChatColors.of(context).warningText,
+                        // Orange shade that reads at 4.5:1 on the 10% tint.
+                        color: ChatContrast.onTint(
+                          AppColors.warning,
+                          [context.surfaceColor],
+                          dark: isDark,
+                          alpha: 0.1,
+                        ),
                         height: 1.4,
                       ),
                     ),
@@ -108,9 +120,9 @@ class RecoveryKeyDisplayDialog extends StatelessWidget {
                   child: OutlinedButton.icon(
                     onPressed: () => _copyToClipboard(context),
                     icon: const Icon(Icons.copy, size: 18),
-                    label: const Text('Copy'),
+                    label: Text(l10n?.chatCopy ?? 'Copy'),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.primaryOf(context),
+                      foregroundColor: AppColors.primaryOnTintOf(context),
                       side: BorderSide(color: AppColors.primaryOf(context)),
                     ),
                   ),
@@ -120,9 +132,9 @@ class RecoveryKeyDisplayDialog extends StatelessWidget {
                   child: OutlinedButton.icon(
                     onPressed: () => _saveToFile(context),
                     icon: const Icon(Icons.save_alt, size: 18),
-                    label: const Text('Save'),
+                    label: Text(l10n?.commonSave ?? 'Save'),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.primaryOf(context),
+                      foregroundColor: AppColors.primaryOnTintOf(context),
                       side: BorderSide(color: AppColors.primaryOf(context)),
                     ),
                   ),
@@ -145,9 +157,11 @@ class RecoveryKeyDisplayDialog extends StatelessWidget {
     await Clipboard.setData(ClipboardData(text: recoveryKey));
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Recovery key copied to clipboard'),
-          duration: Duration(seconds: 2),
+        SnackBar(
+          content: Text(
+            S.of(context)?.commonCopiedToClipboard ?? 'Copied to clipboard',
+          ),
+          duration: const Duration(seconds: 2),
         ),
       );
     }
@@ -168,7 +182,9 @@ class RecoveryKeyDisplayDialog extends StatelessWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Saved: ${file.path}'),
+            content: Text(
+              S.of(context)?.ui3SavedToPath(file.path) ?? 'Saved: ${file.path}',
+            ),
             duration: const Duration(seconds: 3),
           ),
         );
@@ -177,8 +193,10 @@ class RecoveryKeyDisplayDialog extends StatelessWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to save: $e'),
-            backgroundColor: AppColors.error,
+            content: Text(
+              '${S.of(context)?.commonFailedToSave ?? 'Failed to save'}: $e',
+            ),
+            backgroundColor: AppColors.errorFill,
           ),
         );
       }

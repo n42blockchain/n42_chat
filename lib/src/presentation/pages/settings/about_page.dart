@@ -92,7 +92,8 @@ class AboutPage extends StatelessWidget {
 
           // 检查更新
           if (onCheckUpdate != null) ...[
-            Container(
+            // Material (not Container) so the ListTile ink stays visible.
+            Material(
               color: context.surfaceColor,
               child: ListTile(
                 title: Text(

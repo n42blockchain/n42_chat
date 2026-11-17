@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/local_llm_service.dart';
@@ -24,23 +25,27 @@ class _LocalLlmSettingsPageState extends State<LocalLlmSettingsPage> {
   }
 
   String _statusLabel(LocalLlmState s) {
+    final l10n = S.of(context);
     switch (s) {
       case LocalLlmState.unavailable:
-        return 'Not supported on this device';
+        return l10n?.ui3LocalLlmUnavailable ?? 'Not supported on this device';
       case LocalLlmState.notDownloaded:
-        return 'Model not downloaded';
+        return l10n?.ui3LocalLlmNotDownloaded ?? 'Model not downloaded';
       case LocalLlmState.downloading:
-        return 'Downloading…';
+        return l10n?.downloading ?? 'Downloading…';
       case LocalLlmState.ready:
-        return 'Ready (on-device)';
+        return l10n?.ui3LocalLlmReady ?? 'Ready (on-device)';
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = S.of(context);
     return Scaffold(
       backgroundColor: context.pageBackground,
-      appBar: AppBar(title: const Text('On-device AI')),
+      appBar: AppBar(
+        title: Text(l10n?.ui3ProfileOnDeviceAi ?? 'On-device AI'),
+      ),
       body: ValueListenableBuilder<LocalLlmState>(
         valueListenable: _service.stateNotifier,
         builder: (ctx, state, _) {
@@ -77,9 +82,8 @@ class _LocalLlmSettingsPageState extends State<LocalLlmSettingsPage> {
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        'When enabled and ready, AI features (summarize, rewrite, '
-                        'translate, replies) run fully on-device — data never '
-                        'leaves your phone. Otherwise they use the cloud provider.',
+                        l10n?.ui3LocalLlmDescription ??
+                            'When enabled and ready, AI features (summarize, rewrite, translate, replies) run fully on-device — data never leaves your phone. Otherwise they use the cloud provider.',
                         style: TextStyle(
                           color: context.textSecondary,
                           fontSize: 12.5,
@@ -91,8 +95,11 @@ class _LocalLlmSettingsPageState extends State<LocalLlmSettingsPage> {
               ),
               const SizedBox(height: AppDimensions.spacingM),
               SwitchListTile(
-                title: const Text('Use on-device AI'),
-                subtitle: const Text('Prefer local inference when ready'),
+                title: Text(l10n?.ui3UseOnDeviceAi ?? 'Use on-device AI'),
+                subtitle: Text(
+                  l10n?.ui3UseOnDeviceAiDesc ??
+                      'Prefer local inference when ready',
+                ),
                 value: _service.enabled,
                 activeThumbColor: AppColors.primaryOf(context),
                 onChanged: available
@@ -106,12 +113,13 @@ class _LocalLlmSettingsPageState extends State<LocalLlmSettingsPage> {
                     vertical: AppDimensions.spacingS,
                   ),
                   child: FilledButton.icon(
+                    // White label needs the 4.5:1 brand fill.
                     style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.primaryOf(context),
+                      backgroundColor: AppColors.primaryFillOf(context),
                     ),
                     onPressed: () => _service.download(),
                     icon: const Icon(Icons.download),
-                    label: const Text('Download model'),
+                    label: Text(l10n?.ui3DownloadModel ?? 'Download model'),
                   ),
                 ),
               if (state == LocalLlmState.downloading)
@@ -123,10 +131,13 @@ class _LocalLlmSettingsPageState extends State<LocalLlmSettingsPage> {
                 Padding(
                   padding: const EdgeInsets.all(AppDimensions.spacing),
                   child: Text(
-                    'On-device inference requires the native runtime '
-                    '(Android MediaPipe / iOS Core ML). It will activate '
-                    'automatically once the platform handler is available.',
-                    style: TextStyle(color: context.textTertiary, fontSize: 12),
+                    l10n?.ui3LocalLlmRuntimeRequired ??
+                        'On-device inference requires the native runtime (Android MediaPipe / iOS Core ML). It will activate automatically once the platform handler is available.',
+                    // textTertiary is decorative only (1.7:1 on white).
+                    style: TextStyle(
+                      color: context.textSecondary,
+                      fontSize: 12,
+                    ),
                   ),
                 ),
             ],

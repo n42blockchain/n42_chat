@@ -203,8 +203,11 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
         return;
       }
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Security settings require an active session'),
+        SnackBar(
+          content: Text(
+            S.of(context)?.ui3SecuritySessionRequired ??
+                'Security settings require an active session',
+          ),
         ),
       );
       return;
@@ -227,7 +230,12 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
   Future<void> _openUsername() async {
     if (!_hasActiveSession) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Username requires an active session')),
+        SnackBar(
+          content: Text(
+            S.of(context)?.ui3UsernameSessionRequired ??
+                'Username requires an active session',
+          ),
+        ),
       );
       return;
     }
@@ -247,17 +255,19 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
     final overviewTitle = _username?.trim().isNotEmpty == true
         ? '@${_username!.trim()}'
         : (_currentUserId?.split(':').first.replaceFirst('@', '') ??
+              l10n?.settingsPrivacySecurity ??
               'Privacy & Security');
 
     return Scaffold(
       backgroundColor: context.pageBackground,
       appBar: N42AppBar(
-        title: 'Privacy & Security',
+        title: l10n?.settingsPrivacySecurity ?? 'Privacy & Security',
         showBackButton: true,
         onBackPressed: () => Navigator.of(context).pop(),
         actions: [
           IconButton(
             onPressed: _isLoading ? null : _loadSummary,
+            tooltip: l10n?.a11yRefresh ?? 'Refresh',
             icon: const Icon(Icons.refresh),
           ),
         ],
@@ -275,7 +285,8 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                       status: _e2eeStatus,
                       backupInfo: _backupInfo,
                     )
-                  : 'End-to-end encryption, screenshot protection, and proxy controls',
+                  : (l10n?.ui3PrivacySecurityOverview ??
+                        'End-to-end encryption, screenshot protection, and proxy controls'),
               avatarName: overviewTitle,
               chips: _buildOverviewChips(),
             ),
@@ -286,7 +297,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                 SettingsHubActionTile(
                   icon: Icons.privacy_tip_outlined,
                   iconColor: Colors.blue,
-                  title: 'Conversation Privacy',
+                  title: l10n?.ui3ConversationPrivacy ?? 'Conversation Privacy',
                   subtitle: PrivacySecuritySummaryHelper.conversationSummary(
                     settings: _settings,
                     screenshotProtectionEnabled: _screenshotProtection,
@@ -296,7 +307,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                 SettingsHubActionTile(
                   icon: Icons.shield_outlined,
                   iconColor: Colors.deepPurple,
-                  title: 'Network Privacy',
+                  title: l10n?.ui3NetworkPrivacy ?? 'Network Privacy',
                   subtitle: PrivacySecuritySummaryHelper.networkSummary(
                     _settings,
                   ),
@@ -305,7 +316,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                 SettingsHubActionTile(
                   icon: Icons.alternate_email_outlined,
                   iconColor: Colors.orange,
-                  title: 'Identity Privacy',
+                  title: l10n?.ui3IdentityPrivacy ?? 'Identity Privacy',
                   subtitle: PrivacySecuritySummaryHelper.identitySummary(
                     settings: _settings,
                     username: _username,
@@ -328,7 +339,8 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                 SettingsHubActionTile(
                   icon: Icons.enhanced_encryption_outlined,
                   iconColor: Colors.teal,
-                  title: 'Encryption & Key Backup',
+                  title:
+                      l10n?.ui3EncryptionKeyBackup ?? 'Encryption & Key Backup',
                   subtitle: PrivacySecuritySummaryHelper.encryptionSummary(
                     status: _e2eeStatus,
                     backupInfo: _backupInfo,
@@ -338,7 +350,8 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                 SettingsHubActionTile(
                   icon: Icons.verified_user_outlined,
                   iconColor: Colors.green,
-                  title: 'Devices & Verification',
+                  title:
+                      l10n?.ui3DevicesVerification ?? 'Devices & Verification',
                   subtitle:
                       PrivacySecuritySummaryHelper.deviceVerificationSummary(
                         deviceCount: _deviceCount,
@@ -356,28 +369,31 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
   }
 
   List<String> _buildOverviewChips() {
+    final l10n = S.of(context);
     final chips = <String>[];
 
     chips.add(
-      _settings.defaultEncryptNewChats ? 'E2EE default' : 'Manual E2EE',
+      _settings.defaultEncryptNewChats
+          ? (l10n?.ui3ChipE2eeDefault ?? 'E2EE default')
+          : (l10n?.ui3ChipManualE2ee ?? 'Manual E2EE'),
     );
     if (_settings.defaultSelfDestructSeconds != null &&
         _settings.defaultSelfDestructSeconds! > 0) {
-      chips.add('Self-destruct');
+      chips.add(l10n?.ui3ChipSelfDestruct ?? 'Self-destruct');
     }
     if (_screenshotProtection || _settings.privateChatMode) {
-      chips.add('Screenshot guard');
+      chips.add(l10n?.ui3ChipScreenshotGuard ?? 'Screenshot guard');
     }
     if (_settings.protectIpAddress ||
         _settings.useTor ||
         _settings.proxyEnabled) {
-      chips.add('IP / proxy');
+      chips.add(l10n?.ui3ChipIpProxy ?? 'IP / proxy');
     }
     if (!_settings.showLinkPreviews) {
-      chips.add('Link previews off');
+      chips.add(l10n?.ui3ChipLinkPreviewsOff ?? 'Link previews off');
     }
     if (_username?.trim().isNotEmpty == true) {
-      chips.add('Public handle');
+      chips.add(l10n?.ui3ChipPublicHandle ?? 'Public handle');
     }
     return chips;
   }

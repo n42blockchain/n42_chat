@@ -10,7 +10,6 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/router/routes.dart';
 import '../../../core/services/biometric_service.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/chat_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../data/datasources/local/secure_storage_datasource.dart';
 import '../../../n42_chat.dart';
@@ -467,6 +466,8 @@ class _LoginPageState extends State<LoginPage> {
                 ? const Icon(Icons.check_circle, color: AppColors.success)
                 : IconButton(
                     icon: Icon(Icons.refresh, color: hintColor),
+                    tooltip:
+                        S.of(context)?.a11yCheckServer ?? 'Check server',
                     onPressed: _checkHomeserver,
                   ),
           ),
@@ -595,6 +596,9 @@ class _LoginPageState extends State<LoginPage> {
                 _obscurePassword ? Icons.visibility_off : Icons.visibility,
                 color: hintColor,
               ),
+              tooltip: _obscurePassword
+                  ? (S.of(context)?.a11yShowPassword ?? 'Show password')
+                  : (S.of(context)?.a11yHidePassword ?? 'Hide password'),
               onPressed: () {
                 setState(() {
                   _obscurePassword = !_obscurePassword;
@@ -628,7 +632,7 @@ class _LoginPageState extends State<LoginPage> {
         key: const ValueKey<String>('chat_login_submit'),
         onPressed: isEnabled ? _onLogin : null,
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primaryOf(context),
+          backgroundColor: AppColors.primaryFillOf(context),
           disabledBackgroundColor: AppColors.primaryOf(context)
               .withValues(alpha: 0.5),
           shape: RoundedRectangleBorder(
@@ -688,7 +692,7 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primaryOf(context),
+        backgroundColor: AppColors.primaryFillOf(context),
         foregroundColor: Colors.white,
         minimumSize: const Size(double.infinity, 52),
         shape: RoundedRectangleBorder(
@@ -726,7 +730,8 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildAgreement(bool isDark) {
-    final textColor = ChatColors.of(context).captionText;
+    // captionText is textTertiary in light mode (1.56:1 on the page).
+    final textColor = context.textSecondary;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing),
@@ -739,7 +744,7 @@ class _LoginPageState extends State<LoginPage> {
           children: [
             TextSpan(
               text: S.of(context)?.authTermsOfService ?? 'Terms of Service',
-              style: TextStyle(color: AppColors.link.withValues(alpha: 0.8)),
+              style: const TextStyle(color: AppColors.link),
               recognizer: TapGestureRecognizer()
                 ..onTap = () async {
                   final url = Uri.parse(
@@ -753,7 +758,7 @@ class _LoginPageState extends State<LoginPage> {
             TextSpan(text: S.of(context)?.authAnd ?? ' and '),
             TextSpan(
               text: S.of(context)?.authPrivacyPolicy ?? 'Privacy Policy',
-              style: TextStyle(color: AppColors.link.withValues(alpha: 0.8)),
+              style: const TextStyle(color: AppColors.link),
               recognizer: TapGestureRecognizer()
                 ..onTap = () async {
                   final url = Uri.parse(

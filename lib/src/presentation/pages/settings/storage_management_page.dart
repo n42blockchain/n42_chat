@@ -12,6 +12,7 @@ import '../../../core/services/storage_manager_service.dart';
 import '../../../core/services/storage_monitor_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../blocs/storage/storage_management_bloc.dart';
 import '../../blocs/storage/storage_management_event.dart';
 import '../../blocs/storage/storage_management_state.dart';
@@ -78,10 +79,18 @@ class _StorageManagementView extends StatelessWidget {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
-                  'Freed ${StorageInfo.formatSize(result.bytesFreed)} '
-                  '(${result.filesDeleted} files)',
+                  S
+                          .of(context)
+                          ?.storageFreed(
+                            StorageInfo.formatSize(result.bytesFreed),
+                            result.filesDeleted,
+                          ) ??
+                      'Freed ${StorageInfo.formatSize(result.bytesFreed)} (${result.filesDeleted} files)',
                 ),
-                backgroundColor: AppColors.success,
+                // Darkened green keeps the white label at 4.5:1.
+                backgroundColor: ChatContrast.fillForWhiteText(
+                  AppColors.success,
+                ),
               ),
             );
           }
@@ -89,7 +98,7 @@ class _StorageManagementView extends StatelessWidget {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.error!),
-                backgroundColor: AppColors.error,
+                backgroundColor: AppColors.errorFill,
               ),
             );
           }
@@ -315,14 +324,18 @@ class _StorageWarningBanner extends StatelessWidget {
           Expanded(
             child: Text(
               isCritical
-                  ? 'Storage is critically low. Please clean up to free space.'
-                  : 'Storage usage is high. Consider cleaning up old files.',
-              maxLines: 2,
+                  ? S.of(context)?.storageWarningCritical ??
+                        'Storage is critically low. Please clean up to free space.'
+                  : S.of(context)?.storageWarningHigh ??
+                        'Storage usage is high. Consider cleaning up old files.',
+              maxLines: 3,
               overflow: TextOverflow.ellipsis,
+              // Orange/red text on its own 10% tint is below 4.5:1; the
+              // colored icon and border carry the severity.
               style: TextStyle(
                 fontSize: 13,
                 height: 1.4,
-                color: isCritical ? AppColors.error : AppColors.warning,
+                color: context.textPrimary,
               ),
             ),
           ),
@@ -359,7 +372,7 @@ class _SmartCleanupSection extends StatelessWidget {
                 ),
                 const SizedBox(width: AppDimensions.spacingS),
                 Text(
-                  'Smart Cleanup',
+                  S.of(context)?.storageSmartCleanup ?? 'Smart Cleanup',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
@@ -445,20 +458,33 @@ class _RecommendationTile extends StatelessWidget {
         style: TextStyle(fontSize: 12, height: 1.4, color: secondaryColor),
       ),
       trailing: TextButton(
-        onPressed: isCleaning
-            ? null
-            : () => context.read<StorageManagementBloc>().add(
-                ExecuteCleanup(recommendation),
-              ),
+        onPressed: isCleaning ? null : () => _confirmCleanup(context),
         child: Text(
           recommendation.formattedSize,
           style: TextStyle(
-            color: isCleaning ? secondaryColor : AppColors.primaryOf(context),
+            // Plain brand text is about 4.0:1 on white; use the 4.5:1 shade.
+            color: isCleaning
+                ? secondaryColor
+                : AppColors.primaryOnTintOf(context),
             fontWeight: FontWeight.w600,
           ),
         ),
       ),
     );
+  }
+
+  /// Cleanup deletes local files, so ask before running it.
+  Future<void> _confirmCleanup(BuildContext context) async {
+    final bloc = context.read<StorageManagementBloc>();
+    final confirmed = await context.showConfirmDialog(
+      title: recommendation.title,
+      content: recommendation.description,
+      confirmText: S.of(context)?.commonDelete ?? 'Delete',
+      isDanger: true,
+    );
+    if (confirmed) {
+      bloc.add(ExecuteCleanup(recommendation));
+    }
   }
 }
 
@@ -518,7 +544,8 @@ class _RoomStorageSectionState extends State<_RoomStorageSection> {
                     ),
                   ),
                   subtitle: Text(
-                    '${room.mediaCount} files',
+                    S.of(context)?.mediaItemsCount(room.mediaCount) ??
+                        '${room.mediaCount} files',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
@@ -568,7 +595,7 @@ class _RoomStorageSectionState extends State<_RoomStorageSection> {
                     'View all ${state.roomStorageList.length} rooms',
                 style: TextStyle(
                   fontSize: 14,
-                  color: AppColors.primaryOf(context),
+                  color: AppColors.primaryOnTintOf(context),
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -604,7 +631,7 @@ class _StorageSettingsSection extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Text(
-              'Storage Settings',
+              S.of(context)?.storageSettings ?? 'Storage Settings',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
@@ -617,13 +644,14 @@ class _StorageSettingsSection extends StatelessWidget {
           ),
           SwitchListTile(
             title: Text(
-              'Auto Cleanup',
+              S.of(context)?.storageAutoCleanup ?? 'Auto Cleanup',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(fontSize: 15, height: 1.3, color: textColor),
             ),
             subtitle: Text(
-              'Automatically clean files older than ${config.autoCleanupDays} days',
+              S.of(context)?.storageAutoCleanupDesc(config.autoCleanupDays) ??
+                  'Automatically clean files older than ${config.autoCleanupDays} days',
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
@@ -643,7 +671,7 @@ class _StorageSettingsSection extends StatelessWidget {
           Divider(height: 1, indent: 16, color: context.dividerColor),
           ListTile(
             title: Text(
-              'Cleanup Period',
+              S.of(context)?.storageCleanupPeriod ?? 'Cleanup Period',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(fontSize: 15, height: 1.3, color: textColor),
@@ -652,7 +680,12 @@ class _StorageSettingsSection extends StatelessWidget {
               value: config.autoCleanupDays,
               underline: const SizedBox.shrink(),
               items: [30, 60, 90, 180, 365].map((days) {
-                return DropdownMenuItem(value: days, child: Text('$days days'));
+                return DropdownMenuItem(
+                  value: days,
+                  child: Text(
+                    S.of(context)?.storageDays(days) ?? '$days days',
+                  ),
+                );
               }).toList(),
               onChanged: (days) {
                 if (days != null) {
@@ -666,13 +699,14 @@ class _StorageSettingsSection extends StatelessWidget {
           Divider(height: 1, indent: 16, color: context.dividerColor),
           SwitchListTile(
             title: Text(
-              'Preserve Thumbnails',
+              S.of(context)?.storagePreserveThumbnails ?? 'Preserve Thumbnails',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(fontSize: 15, height: 1.3, color: textColor),
             ),
             subtitle: Text(
-              'Keep image thumbnails during cleanup',
+              S.of(context)?.storagePreserveThumbnailsDesc ??
+                  'Keep image thumbnails during cleanup',
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
@@ -759,7 +793,15 @@ class _ClearCacheButton extends StatelessWidget {
               Navigator.pop(dialogContext);
               context.read<StorageManagementBloc>().add(const ClearCache());
             },
-            child: Text(S.of(context)?.commonConfirm ?? 'OK'),
+            child: Text(
+              S.of(context)?.commonConfirm ?? 'OK',
+              // System red is 3.55:1 on a white dialog; errorFill is 4.5:1.
+              style: TextStyle(
+                color: context.isDarkMode
+                    ? AppColors.error
+                    : AppColors.errorFill,
+              ),
+            ),
           ),
         ],
       ),

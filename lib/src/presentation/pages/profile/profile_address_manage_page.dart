@@ -156,7 +156,7 @@ class AddressManagePageState extends State<AddressManagePage> {
                       S.of(context)?.profileAddAddress ?? 'Add Address',
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryOf(context),
+                      backgroundColor: AppColors.primaryFillOf(context),
                       foregroundColor: Colors.white,
                     ),
                   ),
@@ -225,7 +225,7 @@ class AddressManagePageState extends State<AddressManagePage> {
                                     fontSize: 12,
                                     height: 1.3,
                                     fontWeight: FontWeight.w500,
-                                    color: AppColors.primaryOf(context),
+                                    color: AppColors.primaryOnTintOf(context),
                                   ),
                                 ),
                               ),
@@ -253,7 +253,12 @@ class AddressManagePageState extends State<AddressManagePage> {
                               onPressed: () => _deleteAddress(index),
                               child: Text(
                                 S.of(context)?.commonDelete ?? 'Delete',
-                                style: const TextStyle(color: AppColors.error),
+                                // errorFill keeps 4.5:1 on light surfaces.
+                                style: TextStyle(
+                                  color: context.isDarkMode
+                                      ? AppColors.error
+                                      : AppColors.errorFill,
+                                ),
                               ),
                             ),
                           ],
@@ -369,7 +374,11 @@ class AddressManagePageState extends State<AddressManagePage> {
             },
             child: Text(
               S.of(context)?.commonDelete ?? 'Delete',
-              style: const TextStyle(color: AppColors.error),
+              style: TextStyle(
+                color: context.isDarkMode
+                    ? AppColors.error
+                    : AppColors.errorFill,
+              ),
             ),
           ),
         ],

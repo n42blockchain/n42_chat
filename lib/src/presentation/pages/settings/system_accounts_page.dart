@@ -176,7 +176,12 @@ class _SystemAccountsPageState extends State<SystemAccountsPage> {
         return;
       }
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Username requires an active session')),
+        SnackBar(
+          content: Text(
+            S.of(context)?.ui3UsernameSessionRequired ??
+                'Username requires an active session',
+          ),
+        ),
       );
       return;
     }
@@ -204,8 +209,11 @@ class _SystemAccountsPageState extends State<SystemAccountsPage> {
         return;
       }
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Security settings require an active session'),
+        SnackBar(
+          content: Text(
+            S.of(context)?.ui3SecuritySessionRequired ??
+                'Security settings require an active session',
+          ),
         ),
       );
       return;
@@ -232,8 +240,11 @@ class _SystemAccountsPageState extends State<SystemAccountsPage> {
         return;
       }
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Connected accounts require an active session'),
+        SnackBar(
+          content: Text(
+            S.of(context)?.ui3ConnectedAccountsSessionRequired ??
+                'Connected accounts require an active session',
+          ),
         ),
       );
       return;
@@ -254,14 +265,14 @@ class _SystemAccountsPageState extends State<SystemAccountsPage> {
     return Scaffold(
       backgroundColor: context.pageBackground,
       appBar: N42AppBar(
-        title: 'System & Accounts',
+        title: l10n?.ui3SystemAccounts ?? 'System & Accounts',
         showBackButton: true,
         onBackPressed: () => Navigator.of(context).pop(),
         actions: [
           IconButton(
             onPressed: _isLoading ? null : _loadSummary,
             icon: const Icon(Icons.refresh_rounded),
-            tooltip: 'Refresh',
+            tooltip: l10n?.a11yRefresh ?? 'Refresh',
           ),
         ],
       ),
@@ -274,12 +285,12 @@ class _SystemAccountsPageState extends State<SystemAccountsPage> {
             _buildOverviewCard(),
             const SizedBox(height: AppDimensions.spacing),
             SettingsHubSection(
-              title: 'Account & Identity',
+              title: l10n?.ui3AccountIdentity ?? 'Account & Identity',
               children: [
                 SettingsHubActionTile(
                   icon: Icons.manage_accounts_outlined,
                   iconColor: Colors.indigo,
-                  title: 'Accounts',
+                  title: l10n?.ui3Accounts ?? 'Accounts',
                   subtitle: SystemAccountSummaryHelper.accountSummary(
                     _accounts,
                   ),
@@ -288,7 +299,7 @@ class _SystemAccountsPageState extends State<SystemAccountsPage> {
                 SettingsHubActionTile(
                   icon: Icons.devices_outlined,
                   iconColor: Colors.teal,
-                  title: 'Devices & Sessions',
+                  title: l10n?.ui3DevicesSessions ?? 'Devices & Sessions',
                   subtitle: SystemAccountSummaryHelper.deviceSummary(
                     deviceCount: _deviceCount,
                     currentDeviceId: _currentDeviceId,
@@ -298,7 +309,7 @@ class _SystemAccountsPageState extends State<SystemAccountsPage> {
                 SettingsHubActionTile(
                   icon: Icons.alternate_email,
                   iconColor: Colors.orange,
-                  title: 'Username',
+                  title: l10n?.usernameTitle ?? 'Username',
                   subtitle: SystemAccountSummaryHelper.usernameSummary(
                     _username,
                   ),
@@ -325,13 +336,14 @@ class _SystemAccountsPageState extends State<SystemAccountsPage> {
             ),
             const SizedBox(height: AppDimensions.spacing),
             SettingsHubSection(
-              title: 'Integrations',
+              title: l10n?.ui3Integrations ?? 'Integrations',
               children: [
                 SettingsHubActionTile(
                   icon: Icons.hub_outlined,
                   iconColor: Colors.deepPurple,
-                  title: 'Connected Accounts',
+                  title: l10n?.ui3ConnectedAccounts ?? 'Connected Accounts',
                   subtitle:
+                      l10n?.ui3ConnectedAccountsDesc ??
                       'Telegram, WhatsApp, Discord, and API bridge integrations',
                   onTap: _isLoading ? null : _openBridges,
                 ),
@@ -345,6 +357,7 @@ class _SystemAccountsPageState extends State<SystemAccountsPage> {
   }
 
   Widget _buildOverviewCard() {
+    final l10n = S.of(context);
     final effectiveDeviceCount = _deviceCount > 0
         ? _deviceCount
         : (_currentUserId == null ? 0 : 1);
@@ -359,6 +372,7 @@ class _SystemAccountsPageState extends State<SystemAccountsPage> {
       title:
           currentAccount?.effectiveDisplayName ??
           (_currentUserId?.split(':').first.replaceFirst('@', '') ??
+              l10n?.ui3SystemOverview ??
               'System overview'),
       subtitle: SystemAccountSummaryHelper.currentAccountLabel(
         userId: _currentUserId,
@@ -366,9 +380,11 @@ class _SystemAccountsPageState extends State<SystemAccountsPage> {
       ),
       chips: [
         _isLoading
-            ? 'Loading...'
-            : '${_accounts.length} account${_accounts.length == 1 ? '' : 's'}',
-        '$effectiveDeviceCount device${effectiveDeviceCount == 1 ? '' : 's'}',
+            ? (l10n?.commonLoading ?? 'Loading...')
+            : (l10n?.ui3AccountCount(_accounts.length) ??
+                  '${_accounts.length} account${_accounts.length == 1 ? '' : 's'}'),
+        l10n?.ui3DeviceCount(effectiveDeviceCount) ??
+            '$effectiveDeviceCount device${effectiveDeviceCount == 1 ? '' : 's'}',
         if ((_username?.trim().isNotEmpty ?? false)) '@${_username!.trim()}',
       ],
     );

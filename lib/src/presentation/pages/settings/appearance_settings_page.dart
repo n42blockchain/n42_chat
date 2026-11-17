@@ -305,6 +305,8 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
             max: 3,
             divisions: 3,
             label: labels[sliderValue.round()],
+            // Announce the size name instead of a percentage.
+            semanticFormatterCallback: (value) => labels[value.round()],
             activeColor: AppColors.primaryOf(context),
             onChanged: (value) {
               setState(

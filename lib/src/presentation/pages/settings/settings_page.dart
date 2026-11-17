@@ -594,7 +594,12 @@ class SettingsPage extends StatelessWidget {
             },
             child: Text(
               S.of(context)?.commonLogout ?? 'Log Out',
-              style: const TextStyle(color: AppColors.error),
+              // System red is 3.55:1 on a white dialog; errorFill is 4.5:1.
+              style: TextStyle(
+                color: context.isDarkMode
+                    ? AppColors.error
+                    : AppColors.errorFill,
+              ),
             ),
           ),
         ],

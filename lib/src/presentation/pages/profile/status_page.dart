@@ -188,7 +188,9 @@ class _StatusPageState extends State<StatusPage> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFF8B9A6B), Color(0xFFB5A87A)],
+            // Darkened from 0xFF8B9A6B / 0xFFB5A87A so white labels on the
+            // 15% white cards reach 4.5:1 (was 2.0-2.5:1).
+            colors: [Color(0xFF4F583C), Color(0xFF5D5434)],
           ),
         ),
         child: SafeArea(
@@ -255,7 +257,7 @@ class _StatusPageState extends State<StatusPage> {
                   style: TextStyle(
                     fontSize: 12,
                     height: 1.3,
-                    color: Colors.white.withValues(alpha: 0.8),
+                    color: Colors.white.withValues(alpha: 0.9),
                   ),
                 ),
               ],
@@ -270,39 +272,46 @@ class _StatusPageState extends State<StatusPage> {
   Widget _buildCustomInput() {
     return Container(
       margin: const EdgeInsets.all(AppDimensions.spacing),
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppDimensions.spacingL,
-        vertical: AppDimensions.spacingXL,
-      ),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       ),
-      child: GestureDetector(
-        onTap: () => _showCustomStatusDialog(),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.6),
-                  width: 2,
+      // The whole card is the target (was only the 40pt row inside it).
+      child: Material(
+        type: MaterialType.transparency,
+        child: InkWell(
+          onTap: () => _showCustomStatusDialog(),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppDimensions.spacingL,
+              vertical: AppDimensions.spacingXL,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.6),
+                      width: 2,
+                    ),
+                  ),
                 ),
-              ),
+                const SizedBox(width: AppDimensions.spacingM),
+                Text(
+                  S.of(context)?.profileWriteStatus ?? 'Write Status',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white.withValues(alpha: 0.9),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: AppDimensions.spacingM),
-            Text(
-              S.of(context)?.profileWriteStatus ?? 'Write Status',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.white.withValues(alpha: 0.8),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -324,7 +333,7 @@ class _StatusPageState extends State<StatusPage> {
               category.title,
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.white.withValues(alpha: 0.7),
+                color: Colors.white.withValues(alpha: 0.9),
               ),
             ),
           ),
@@ -346,43 +355,50 @@ class _StatusPageState extends State<StatusPage> {
   Widget _buildStatusItem(StatusItem item) {
     final isSelected = widget.currentStatus == item.text;
 
-    return GestureDetector(
-      onTap: () {
-        Navigator.pop(context, item.text);
-      },
-      child: Container(
-        width: (MediaQuery.of(context).size.width - 32 - 16) / 5,
-        padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingS),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: isSelected
-                  ? BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.3),
-                      borderRadius: BorderRadius.circular(
-                        AppDimensions.radiusM,
-                      ),
-                    )
-                  : null,
-              child: Icon(item.icon, color: Colors.white, size: 28),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              item.text,
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 12,
-                height: 1.3,
-                fontWeight: FontWeight.w500,
-                color: Colors.white,
+    // Transparent Material so the ink shows above the gradient.
+    return Material(
+      type: MaterialType.transparency,
+      child: InkWell(
+        onTap: () {
+          Navigator.pop(context, item.text);
+        },
+        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+        child: Container(
+          width: (MediaQuery.of(context).size.width - 32 - 16) / 5,
+          padding: const EdgeInsets.symmetric(
+            vertical: AppDimensions.spacingS,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: isSelected
+                    ? BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.3),
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusM,
+                        ),
+                      )
+                    : null,
+                child: Icon(item.icon, color: Colors.white, size: 28),
               ),
-            ),
-          ],
+              const SizedBox(height: 6),
+              Text(
+                item.text,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 12,
+                  height: 1.3,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

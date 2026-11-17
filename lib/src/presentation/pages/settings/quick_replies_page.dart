@@ -83,7 +83,7 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
       messenger.showSnackBar(
         SnackBar(
           content: Text(saveFailedMessage),
-          backgroundColor: AppColors.error,
+          backgroundColor: AppColors.errorFill,
         ),
       );
     } finally {
@@ -108,7 +108,10 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(l10n?.settingsDeleteQuickReply ?? 'Delete Quick Reply'),
-        content: Text('Delete "${reply.content}"?'),
+        content: Text(
+          l10n?.ui3DeleteQuickReplyConfirm(reply.content) ??
+              'Delete "${reply.content}"?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
@@ -122,7 +125,12 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
                 return current;
               });
             },
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            // System red is 3.55:1 on a white dialog; errorFill is 4.5:1.
+            style: TextButton.styleFrom(
+              foregroundColor: context.isDarkMode
+                  ? AppColors.error
+                  : AppColors.errorFill,
+            ),
             child: Text(l10n?.commonDelete ?? 'Delete'),
           ),
         ],
@@ -198,9 +206,10 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Reset to Defaults'),
-        content: const Text(
-          'This will remove all custom quick replies and restore defaults. Continue?',
+        title: Text(l10n?.ui3ResetToDefaults ?? 'Reset to Defaults'),
+        content: Text(
+          l10n?.ui3ResetQuickRepliesMessage ??
+              'This will remove all custom quick replies and restore defaults. Continue?',
         ),
         actions: [
           TextButton(
@@ -214,8 +223,12 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
                 (_) => QuickReplyEntity.createDefaultReplies(),
               );
             },
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text('Reset'),
+            style: TextButton.styleFrom(
+              foregroundColor: context.isDarkMode
+                  ? AppColors.error
+                  : AppColors.errorFill,
+            ),
+            child: Text(l10n?.settingsReset ?? 'Reset'),
           ),
         ],
       ),
@@ -246,9 +259,9 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
               }
             },
             itemBuilder: (ctx) => [
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'reset',
-                child: Text('Reset to Defaults'),
+                child: Text(l10n?.ui3ResetToDefaults ?? 'Reset to Defaults'),
               ),
             ],
           ),
@@ -307,7 +320,8 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
           ignoring: _isSaving,
           child: ReorderableDragStartListener(
             index: index,
-            child: Icon(Icons.drag_handle, color: context.textTertiary),
+            // textTertiary is 1.7:1; icons that carry meaning need 3:1.
+            child: Icon(Icons.drag_handle, color: context.textSecondary),
           ),
         ),
         title: Text(
@@ -322,13 +336,13 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
         ),
         subtitle: reply.isSystem
             ? Text(
-                'Default',
+                S.of(context)?.profileDefaultLabel ?? 'Default',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 12,
                   height: 1.3,
-                  color: context.textTertiary,
+                  color: context.textSecondary,
                 ),
               )
             : null,
@@ -338,15 +352,12 @@ class _QuickRepliesPageState extends State<QuickRepliesPage> {
             if (!reply.isSystem)
               IconButton(
                 tooltip: S.of(context)?.commonEdit ?? 'Edit',
-                icon: Icon(Icons.edit_outlined, color: context.textTertiary),
+                icon: Icon(Icons.edit_outlined, color: context.textSecondary),
                 onPressed: _isSaving ? null : () => _editReply(reply),
               ),
             IconButton(
               tooltip: S.of(context)?.commonDelete ?? 'Delete',
-              icon: Icon(
-                Icons.delete_outline,
-                color: AppColors.error.withValues(alpha: 0.7),
-              ),
+              icon: const Icon(Icons.delete_outline, color: AppColors.error),
               onPressed: _isSaving ? null : () => _deleteReply(reply),
             ),
           ],

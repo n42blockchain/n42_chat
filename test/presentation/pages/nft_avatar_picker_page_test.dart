@@ -164,6 +164,9 @@ void main() {
     expect(find.text('Preview'), findsOneWidget);
     expect(find.byIcon(Icons.image_outlined), findsOneWidget);
 
+    // The taller, untruncated layout can push the button below the fold.
+    await tester.ensureVisible(find.text('Use as Avatar'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Use as Avatar'));
     await tester.pumpAndSettle();
     expect(confirmed, {

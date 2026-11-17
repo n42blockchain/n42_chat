@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/totp_2fa_store.dart';
@@ -27,6 +28,7 @@ class _Totp2faSetupPageState extends State<Totp2faSetupPage> {
   final TextEditingController _codeController = TextEditingController();
 
   bool _loading = true;
+  bool _busy = false;
   bool _enabled = false;
   String _secret = '';
   String? _error;
@@ -64,12 +66,21 @@ class _Totp2faSetupPageState extends State<Totp2faSetupPage> {
   int get _nowSeconds => DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
   Future<void> _enable() async {
+    if (_busy) return;
     final code = _codeController.text.trim();
     if (!Totp.verify(_secret, code, unixSeconds: _nowSeconds)) {
-      setState(() => _error = 'Incorrect code, try again');
+      setState(
+        () => _error =
+            S.of(context)?.ui3TotpIncorrectCode ?? 'Incorrect code, try again',
+      );
       return;
     }
-    await _store.enable(_secret);
+    setState(() => _busy = true);
+    try {
+      await _store.enable(_secret);
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
     if (!mounted) return;
     setState(() {
       _enabled = true;
@@ -77,19 +88,48 @@ class _Totp2faSetupPageState extends State<Totp2faSetupPage> {
       _codeController.clear();
     });
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Two-factor authentication enabled')),
+      SnackBar(
+        content: Text(
+          S.of(context)?.ui3TwoFactorEnabled ??
+              'Two-factor authentication enabled',
+        ),
+      ),
     );
   }
 
   Future<void> _disable() async {
-    await _store.disable();
+    if (_busy) return;
+    final l10n = S.of(context);
+    // Turning 2FA off weakens account security: confirm first.
+    final confirmed = await context.showConfirmDialog(
+      title:
+          l10n?.ui3TwoFactorTurnOffTitle ??
+          'Turn off two-factor authentication?',
+      content:
+          l10n?.ui3TwoFactorTurnOffMessage ??
+          'Your authenticator app will no longer be required. You can set it up again later with a new key.',
+      confirmText: l10n?.ui3TurnOff ?? 'Turn off',
+      isDanger: true,
+    );
+    if (!confirmed || !mounted) return;
+    setState(() => _busy = true);
+    try {
+      await _store.disable();
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
     if (!mounted) return;
     setState(() {
       _enabled = false;
       _secret = Totp.randomSecret();
     });
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Two-factor authentication disabled')),
+      SnackBar(
+        content: Text(
+          S.of(context)?.ui3TwoFactorDisabled ??
+              'Two-factor authentication disabled',
+        ),
+      ),
     );
   }
 
@@ -98,7 +138,7 @@ class _Totp2faSetupPageState extends State<Totp2faSetupPage> {
     return Scaffold(
       backgroundColor: context.pageBackground,
       appBar: N42AppBar(
-        title: 'Two-Factor (TOTP)',
+        title: S.of(context)?.ui3TwoFactorTotpTitle ?? 'Two-Factor (TOTP)',
         showBackButton: true,
         onBackPressed: () => Navigator.pop(context),
       ),
@@ -120,7 +160,9 @@ class _Totp2faSetupPageState extends State<Totp2faSetupPage> {
             const Icon(Icons.verified_user, size: 64, color: AppColors.success),
             const SizedBox(height: AppDimensions.spacing),
             Text(
-              'Two-factor authentication is on',
+              S.of(context)?.ui3TwoFactorIsOn ??
+                  'Two-factor authentication is on',
+              textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -129,14 +171,16 @@ class _Totp2faSetupPageState extends State<Totp2faSetupPage> {
             ),
             const SizedBox(height: AppDimensions.spacingS),
             Text(
-              'A code from your authenticator app is required.',
+              S.of(context)?.ui3TwoFactorCodeRequired ??
+                  'A code from your authenticator app is required.',
               textAlign: TextAlign.center,
               style: TextStyle(color: context.textSecondary),
             ),
             const SizedBox(height: AppDimensions.spacingXXL),
             N42Button(
-              text: 'Turn off',
+              text: S.of(context)?.ui3TurnOff ?? 'Turn off',
               type: N42ButtonType.secondary,
+              isLoading: _busy,
               onPressed: _disable,
             ),
           ],
@@ -155,8 +199,9 @@ class _Totp2faSetupPageState extends State<Totp2faSetupPage> {
       padding: const EdgeInsets.all(AppDimensions.spacingXL),
       children: [
         Text(
-          '1. Scan this QR with an authenticator app (Google Authenticator, '
-          'Authy, 1Password…), or enter the key manually.',
+          S.of(context)?.ui3TotpStepScan ??
+              '1. Scan this QR with an authenticator app (Google Authenticator, '
+                  'Authy, 1Password…), or enter the key manually.',
           style: TextStyle(color: context.textSecondary, height: 1.4),
         ),
         const SizedBox(height: AppDimensions.spacing),
@@ -176,38 +221,51 @@ class _Totp2faSetupPageState extends State<Totp2faSetupPage> {
           ),
         ),
         const SizedBox(height: AppDimensions.spacing),
-        InkWell(
-          onTap: () {
-            Clipboard.setData(ClipboardData(text: _secret));
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(const SnackBar(content: Text('Key copied')));
-          },
-          child: Container(
-            padding: const EdgeInsets.all(AppDimensions.spacingM),
-            decoration: BoxDecoration(
-              color: context.surfaceColor,
-              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: SelectableText(
-                    _secret,
-                    style: const TextStyle(
-                      fontFamily: 'monospace',
-                      letterSpacing: 1.5,
-                    ),
+        // Surface color on the Material (not a child Container) so the
+        // ink ripple stays visible; row keeps a 44pt minimum height.
+        Material(
+          color: context.surfaceColor,
+          borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: () {
+              Clipboard.setData(ClipboardData(text: _secret));
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    S.of(context)?.ui3TotpKeyCopied ?? 'Key copied',
                   ),
                 ),
-                const Icon(Icons.copy, size: 18),
-              ],
+              );
+            },
+            child: Container(
+              constraints: const BoxConstraints(minHeight: 44),
+              padding: const EdgeInsets.all(AppDimensions.spacingM),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: SelectableText(
+                      _secret,
+                      style: const TextStyle(
+                        fontFamily: 'monospace',
+                        letterSpacing: 1.5,
+                      ),
+                    ),
+                  ),
+                  Icon(
+                    Icons.copy,
+                    size: 18,
+                    semanticLabel: S.of(context)?.chatCopy ?? 'Copy',
+                  ),
+                ],
+              ),
             ),
           ),
         ),
         const SizedBox(height: AppDimensions.spacingXL),
         Text(
-          '2. Enter the 6-digit code to confirm.',
+          S.of(context)?.ui3TotpStepConfirm ??
+              '2. Enter the 6-digit code to confirm.',
           style: TextStyle(color: context.textSecondary),
         ),
         const SizedBox(height: AppDimensions.spacingM),
@@ -228,7 +286,11 @@ class _Totp2faSetupPageState extends State<Totp2faSetupPage> {
           },
         ),
         const SizedBox(height: AppDimensions.spacingXL),
-        N42Button(text: 'Enable', onPressed: _enable),
+        N42Button(
+          text: S.of(context)?.ui3Enable ?? 'Enable',
+          isLoading: _busy,
+          onPressed: _enable,
+        ),
       ],
     );
   }

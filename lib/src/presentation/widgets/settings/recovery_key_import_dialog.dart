@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/encryption/key_backup_service.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
@@ -46,16 +47,24 @@ class _RecoveryKeyImportDialogState extends State<RecoveryKeyImportDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = S.of(context);
     final client = MatrixClientManager.instance.client;
-    final accountId = client?.userID ?? 'Unknown account';
-    final homeserver = client?.homeserver?.host ?? 'Unknown homeserver';
+    final accountId =
+        client?.userID ?? l10n?.ui3UnknownAccount ?? 'Unknown account';
+    final homeserver =
+        client?.homeserver?.host ??
+        l10n?.ui3UnknownHomeserver ??
+        'Unknown homeserver';
     return AlertDialog(
       title: Row(
         children: [
           Icon(Icons.key, color: AppColors.primaryOf(context)),
           const SizedBox(width: AppDimensions.spacingS),
-          const Expanded(
-            child: Text('Import Recovery Key', style: TextStyle(fontSize: 18)),
+          Expanded(
+            child: Text(
+              l10n?.ui3ImportRecoveryKey ?? 'Import Recovery Key',
+              style: const TextStyle(fontSize: 18),
+            ),
           ),
         ],
       ),
@@ -66,19 +75,21 @@ class _RecoveryKeyImportDialogState extends State<RecoveryKeyImportDialog> {
           children: [
             // 说明文字
             Text(
-              'Enter or paste your recovery key to restore room keys for encrypted message history.',
+              l10n?.ui3ImportRecoveryKeyDesc ??
+                  'Enter or paste your recovery key to restore room keys for encrypted message history.',
               style: TextStyle(
                 fontSize: 13,
-                color: context.textTertiary,
+                color: context.textSupporting,
                 height: 1.4,
               ),
             ),
             const SizedBox(height: AppDimensions.spacing),
             Text(
-              'Account: $accountId\nHomeserver: $homeserver',
+              l10n?.ui3RecoveryKeyAccountInfo(accountId, homeserver) ??
+                  'Account: $accountId\nHomeserver: $homeserver',
               style: TextStyle(
                 fontSize: 12,
-                color: context.textTertiary,
+                color: context.textSupporting,
                 height: 1.35,
               ),
             ),
@@ -108,7 +119,7 @@ class _RecoveryKeyImportDialogState extends State<RecoveryKeyImportDialog> {
                 ),
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.paste, size: 20),
-                  tooltip: 'Paste',
+                  tooltip: l10n?.a11yPaste ?? 'Paste',
                   onPressed: _pasteFromClipboard,
                 ),
               ),
@@ -122,7 +133,13 @@ class _RecoveryKeyImportDialogState extends State<RecoveryKeyImportDialog> {
               const SizedBox(height: AppDimensions.spacingS),
               Text(
                 _error!,
-                style: const TextStyle(fontSize: 12, color: AppColors.error),
+                style: TextStyle(
+                  fontSize: 12,
+                  // errorFill reads at 4.5:1 on the light dialog surface.
+                  color: context.isDarkMode
+                      ? AppColors.error
+                      : AppColors.errorFill,
+                ),
               ),
             ],
           ],
@@ -131,7 +148,7 @@ class _RecoveryKeyImportDialogState extends State<RecoveryKeyImportDialog> {
       actions: [
         TextButton(
           onPressed: _isLoading ? null : () => Navigator.of(context).pop(false),
-          child: const Text('Cancel'),
+          child: Text(l10n?.commonCancel ?? 'Cancel'),
         ),
         FilledButton(
           onPressed: _isLoading ? null : _importKey,
@@ -144,7 +161,7 @@ class _RecoveryKeyImportDialogState extends State<RecoveryKeyImportDialog> {
                     color: Colors.white,
                   ),
                 )
-              : const Text('Import'),
+              : Text(l10n?.ui3Import ?? 'Import'),
         ),
       ],
     );
@@ -164,13 +181,21 @@ class _RecoveryKeyImportDialogState extends State<RecoveryKeyImportDialog> {
   Future<void> _importKey() async {
     final key = _controller.text.trim();
     if (key.isEmpty) {
-      setState(() => _error = 'Please enter a recovery key');
+      setState(
+        () => _error =
+            S.of(context)?.settingsEnterRecoveryKey ??
+            'Please enter a recovery key',
+      );
       return;
     }
 
     // 基本格式验证：恢复密钥通常以 "Es" 开头并由空格分隔的 4 字符块组成
     if (key.length < 20 || !key.startsWith('Es')) {
-      setState(() => _error = 'Invalid recovery key format');
+      setState(
+        () => _error =
+            S.of(context)?.ui3InvalidRecoveryKeyFormat ??
+            'Invalid recovery key format',
+      );
       return;
     }
 
@@ -188,16 +213,29 @@ class _RecoveryKeyImportDialogState extends State<RecoveryKeyImportDialog> {
           setState(() {
             _isLoading = false;
             _error =
+                S
+                    .of(context)
+                    ?.ui3RecoveryKeyPartialRestore(
+                      report.restoredSessions,
+                      report.totalSessions,
+                      report.failures.length,
+                    ) ??
                 'Restored ${report.restoredSessions} of ${report.totalSessions} keys. '
-                '${report.failures.length} keys failed. Check the account, '
-                'network, and backup, then retry. Some history may remain unreadable.';
+                    '${report.failures.length} keys failed. Check the account, '
+                    'network, and backup, then retry. Some history may remain unreadable.';
           });
           return;
         }
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Restored ${report.restoredSessions} of ${report.totalSessions} keys successfully',
+              S
+                      .of(context)
+                      ?.ui3RecoveryKeyRestoreSuccess(
+                        report.restoredSessions,
+                        report.totalSessions,
+                      ) ??
+                  'Restored ${report.restoredSessions} of ${report.totalSessions} keys successfully',
             ),
             duration: const Duration(seconds: 3),
           ),
@@ -208,8 +246,10 @@ class _RecoveryKeyImportDialogState extends State<RecoveryKeyImportDialog> {
       if (mounted) {
         setState(() {
           _isLoading = false;
+          final reason = e.toString().replaceFirst('Exception: ', '');
           _error =
-              'Import failed: ${e.toString().replaceFirst('Exception: ', '')}';
+              S.of(context)?.ui3ImportFailed(reason) ??
+              'Import failed: $reason';
         });
       }
     }

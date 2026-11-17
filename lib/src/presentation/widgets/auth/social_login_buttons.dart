@@ -275,7 +275,7 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
           onTap: isAnyLoading ? null : _handleWalletSignIn,
           icon: Icons.account_balance_wallet,
           isLoading: _isWalletLoading,
-          tooltip: 'Wallet',
+          tooltip: S.of(context)?.profileWallet ?? 'Wallet',
           backgroundColor: AppColors.primaryOf(context),
           iconColor: Colors.white,
         ),
@@ -409,7 +409,8 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-        child: Container(
+        // Ink paints the fill below the splash so the pressed state shows.
+        child: Ink(
           width: 56,
           height: 56,
           decoration: BoxDecoration(
@@ -610,7 +611,8 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
                   vertical: AppDimensions.spacingS,
                 ),
                 child: Text(
-                  'Choose login method',
+                  S.of(context)?.ui3AuthChooseLoginMethod ??
+                      'Choose login method',
                   style: Theme.of(ctx).textTheme.titleMedium,
                 ),
               ),
@@ -652,7 +654,10 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
       );
       if (!launched && mounted) {
         _setProviderLoading(sso: false);
-        widget.onError?.call('Failed to open SSO login page');
+        widget.onError?.call(
+          S.of(context)?.ui3AuthSsoOpenFailed ??
+              'Failed to open SSO login page',
+        );
       }
     } catch (e) {
       if (mounted) {
@@ -935,7 +940,9 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
       return;
     }
     if (!getIt.isRegistered<IWalletBridge>()) {
-      widget.onError?.call('Wallet is not available');
+      widget.onError?.call(
+        S.of(context)?.ui3AuthWalletUnavailable ?? 'Wallet is not available',
+      );
       return;
     }
 
@@ -945,7 +952,10 @@ class _SocialLoginButtonsState extends State<SocialLoginButtons> {
       final address = bridge.walletAddress;
       if (address == null || address.isEmpty) {
         _setWalletLoading(false);
-        widget.onError?.call('Please connect your wallet first');
+        widget.onError?.call(
+          S.of(context)?.transferPleaseConnectWallet ??
+              'Please connect your wallet first',
+        );
         return;
       }
       if (!mounted) return;

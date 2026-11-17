@@ -72,7 +72,8 @@ class EmojiVerificationWidget extends StatelessWidget {
             emoji.name,
             style: TextStyle(fontSize: 11, color: context.textSecondary),
             textAlign: TextAlign.center,
-            maxLines: 1,
+            // Two lines so long names stay readable at larger text sizes.
+            maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
         ],

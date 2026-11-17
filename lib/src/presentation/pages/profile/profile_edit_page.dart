@@ -154,7 +154,9 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   _buildDivider(),
 
                   _buildListTile(
-                    title: 'Avatar Studio',
+                    title:
+                        S.of(context)?.ui3ProfileAvatarStudio ??
+                        'Avatar Studio',
                     value: _avatarStudioLabel(user),
                     onTap: _openAvatarStudio,
                   ),
@@ -309,8 +311,9 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   }
 
   Widget _buildSection({required List<Widget> children}) {
-    return Container(
-      decoration: BoxDecoration(color: context.surfaceColor),
+    // Material (not a colored Container) so row InkWells show their ink.
+    return Material(
+      color: context.surfaceColor,
       child: Column(children: children),
     );
   }
@@ -409,7 +412,9 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
             .displayName,
     ];
 
-    return parts.isEmpty ? 'Customize' : parts.join(' · ');
+    return parts.isEmpty
+        ? (S.of(context)?.ui3ProfileCustomize ?? 'Customize')
+        : parts.join(' · ');
   }
 
   void _dispatchProfileOperation({
@@ -564,7 +569,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       if (!mounted) return;
       _dispatchProfileOperation(
         operation: _PendingProfileOperation.displayName,
-        errorFallback: 'Update nickname failed',
+        errorFallback: S.of(context)?.chatUpdateFailed ?? 'Update failed',
         dispatch: (bloc) => bloc.add(UpdateDisplayName(nextDisplayName)),
       );
     }
@@ -614,7 +619,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         successMessage:
             S.of(context)?.profileGenderSetTo(genderText) ??
             'Gender set to: $genderText',
-        errorFallback: 'Update profile failed',
+        errorFallback: S.of(context)?.chatUpdateFailed ?? 'Update failed',
         dispatch: (bloc) => bloc.add(UpdateUserProfile(gender: result)),
       );
     }
@@ -737,7 +742,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
             successMessage:
                 S.of(context)?.profileRegionSetTo(city) ??
                 'Region set to: $city',
-            errorFallback: 'Update profile failed',
+            errorFallback: S.of(context)?.chatUpdateFailed ?? 'Update failed',
             dispatch: (bloc) => bloc.add(UpdateUserProfile(region: city)),
           );
         }
@@ -879,7 +884,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
             ? (S.of(context)?.profilePokeCleared ?? 'Poke cleared')
             : (S.of(context)?.profilePokeSetTo(result) ??
                   'Poke set to: poked me$result'),
-        errorFallback: 'Update profile failed',
+        errorFallback: S.of(context)?.chatUpdateFailed ?? 'Update failed',
         dispatch: (bloc) => bloc.add(UpdateUserProfile(pokeText: result)),
       );
     }
@@ -926,7 +931,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         successMessage: result.isEmpty
             ? (S.of(context)?.profileSignatureCleared ?? 'Signature cleared')
             : (S.of(context)?.profileSignatureUpdated ?? 'Signature updated'),
-        errorFallback: 'Update profile failed',
+        errorFallback: S.of(context)?.chatUpdateFailed ?? 'Update failed',
         dispatch: (bloc) => bloc.add(UpdateUserProfile(signature: result)),
       );
     }
@@ -1010,7 +1015,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         successMessage:
             S.of(context)?.profileRingtoneSetTo(result) ??
             'Ringtone set to: $result',
-        errorFallback: 'Update profile failed',
+        errorFallback: S.of(context)?.chatUpdateFailed ?? 'Update failed',
         dispatch: (bloc) => bloc.add(UpdateUserProfile(ringtone: result)),
       );
     }

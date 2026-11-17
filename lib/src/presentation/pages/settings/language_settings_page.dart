@@ -4,6 +4,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../core/utils/debug_log.dart';
 import '../../../data/datasources/local/preferences_datasource.dart';
 import '../../../n42_chat.dart';
@@ -192,7 +193,8 @@ class _LanguageSettingsPageState extends State<LanguageSettingsPage> {
       messenger.showSnackBar(
         SnackBar(
           content: Text(successMessage),
-          backgroundColor: AppColors.success,
+          // Darkened green keeps the white label at 4.5:1.
+          backgroundColor: ChatContrast.fillForWhiteText(AppColors.success),
           duration: const Duration(seconds: 2),
         ),
       );
@@ -205,7 +207,7 @@ class _LanguageSettingsPageState extends State<LanguageSettingsPage> {
       messenger.showSnackBar(
         SnackBar(
           content: Text(saveFailedMessage),
-          backgroundColor: AppColors.error,
+          backgroundColor: AppColors.errorFill,
         ),
       );
     } finally {
@@ -335,7 +337,10 @@ class _LanguageItem extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: isSelected ? AppColors.primaryOf(context) : subtitleColor,
+                        // Brand label on the brand tint needs the 4.5:1 shade.
+                        color: isSelected
+                            ? AppColors.primaryOnTintOf(context)
+                            : subtitleColor,
                       ),
                     ),
                   ),
@@ -356,7 +361,9 @@ class _LanguageItem extends StatelessWidget {
                           fontWeight: isSelected
                               ? FontWeight.w600
                               : FontWeight.normal,
-                          color: isSelected ? AppColors.primaryOf(context) : textColor,
+                          color: isSelected
+                              ? AppColors.primaryOnTintOf(context)
+                              : textColor,
                         ),
                       ),
                       if (language.name != language.nativeName)

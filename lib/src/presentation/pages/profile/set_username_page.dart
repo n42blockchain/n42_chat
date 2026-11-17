@@ -101,7 +101,8 @@ class _SetUsernamePageState extends State<SetUsernamePage> {
 
   Future<void> _saveUsername() async {
     final username = _controller.text.trim();
-    if (username.isEmpty || !_isAvailable) return;
+    // Keyboard submit bypasses the disabled Save button.
+    if (username.isEmpty || !_isAvailable || _isSaving) return;
 
     setState(() => _isSaving = true);
 
@@ -119,15 +120,21 @@ class _SetUsernamePageState extends State<SetUsernamePage> {
         Navigator.of(context).pop(username);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to save username')),
+          SnackBar(
+            content: Text(S.of(context)?.commonSaveFailed ?? 'Save failed'),
+          ),
         );
       }
     } catch (e) {
       if (!mounted) return;
       setState(() => _isSaving = false);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Failed to save username: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            '${S.of(context)?.commonSaveFailed ?? 'Save failed'}: $e',
+          ),
+        ),
+      );
     }
   }
 
@@ -152,7 +159,7 @@ class _SetUsernamePageState extends State<SetUsernamePage> {
                     height: 20,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                : const Text('Save'),
+                : Text(s?.commonSave ?? 'Save'),
           ),
         ],
       ),
@@ -211,7 +218,8 @@ class _SetUsernamePageState extends State<SetUsernamePage> {
               style: TextStyle(
                 fontSize: 12,
                 height: 1.4,
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                // 0.5 measured 3.95:1 on white; 0.6 reaches 5.7:1.
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ),
             if (_isAvailable && _controller.text.trim().isNotEmpty) ...[

@@ -7,6 +7,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/utils/a11y_l10n.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/auth/auth_event.dart';
 import '../../blocs/auth/auth_state.dart';
@@ -99,7 +100,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
               S.of(context)?.commonEnterVerificationCode ??
                   'Please enter verification code',
             ),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.errorFill,
           ),
         );
       return;
@@ -167,7 +168,10 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
                     S.of(context)?.settingsEmailVerificationSent ??
                         'Verification email sent',
                   ),
-                  backgroundColor: AppColors.success,
+                  // Darkened green so the white label reaches 4.5:1.
+                  backgroundColor: ChatContrast.fillForWhiteText(
+                    AppColors.success,
+                  ),
                 ),
               );
           } else if (_pendingAction == _ChangeEmailAction.confirmChange &&
@@ -183,7 +187,10 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
                     S.of(context)?.settingsEmailChangedSuccess ??
                         'Email changed successfully',
                   ),
-                  backgroundColor: AppColors.success,
+                  // Darkened green so the white label reaches 4.5:1.
+                  backgroundColor: ChatContrast.fillForWhiteText(
+                    AppColors.success,
+                  ),
                 ),
               );
             Navigator.pop(context);
@@ -201,7 +208,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
                         : (S.of(context)?.settingsChangeEmailFailed ??
                               'Change email failed'),
                   ),
-                  backgroundColor: AppColors.error,
+                  backgroundColor: AppColors.errorFill,
                 ),
               );
           }
@@ -447,8 +454,6 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
         const SizedBox(height: 8),
         Text(
           '${S.of(context)?.settingsCodeSentTo ?? 'Verification code sent to'} ${_emailController.text}',
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
           style: TextStyle(fontSize: 12, height: 1.3, color: hintColor),
         ),
         const SizedBox(height: 8),
@@ -488,7 +493,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
       child: ElevatedButton(
         onPressed: isLoading ? null : _requestCode,
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primaryOf(context),
+          backgroundColor: AppColors.primaryFillOf(context),
           disabledBackgroundColor: AppColors.primaryOf(context).withValues(alpha: 0.5),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           elevation: 0,
@@ -547,7 +552,10 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
               style: TextStyle(
                 fontSize: 14,
                 height: 1.3,
-                color: canResend ? AppColors.primaryOf(context) : textColor,
+                // primaryOnTintOf: brand text at 4.5:1 on the page background.
+                color: canResend
+                    ? AppColors.primaryOnTintOf(context)
+                    : textColor,
               ),
             ),
           ),
@@ -562,7 +570,7 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
       child: ElevatedButton(
         onPressed: isLoading ? null : _confirmChange,
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primaryOf(context),
+          backgroundColor: AppColors.primaryFillOf(context),
           disabledBackgroundColor: AppColors.primaryOf(context).withValues(alpha: 0.5),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           elevation: 0,
@@ -592,7 +600,8 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
   }
 
   Widget _buildSecurityNote(bool isDark) {
-    final textColor = AppColors.textTertiaryOf(isDark);
+    // textTertiary is decorative only (about 1.7:1); this note is content.
+    final textColor = context.textSupporting;
 
     return Container(
       padding: const EdgeInsets.all(12),
@@ -608,8 +617,6 @@ class _ChangeEmailPageState extends State<ChangeEmailPage> {
             child: Text(
               S.of(context)?.settingsEmailSecurityNote ??
                   'Your email is used for password recovery. Please keep it secure.',
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
               style: TextStyle(fontSize: 12, height: 1.4, color: textColor),
             ),
           ),

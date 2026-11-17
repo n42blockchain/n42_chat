@@ -55,13 +55,15 @@ class _AvatarStudioPageState extends State<AvatarStudioPage> {
             ).showSnackBar(SnackBar(content: Text(successMessage)));
           }
         } else if (state.status == AuthStatus.error) {
-          final error = state.errorMessage ?? 'Update avatar studio failed';
+          final error =
+              state.errorMessage ??
+              (S.of(context)?.chatUpdateFailed ?? 'Update failed');
           setState(() {
             _pendingOperation = null;
             _pendingSuccessMessage = null;
           });
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(error), backgroundColor: AppColors.error),
+            SnackBar(content: Text(error), backgroundColor: AppColors.errorFill),
           );
         }
       },
@@ -71,7 +73,7 @@ class _AvatarStudioPageState extends State<AvatarStudioPage> {
         return Scaffold(
           backgroundColor: backgroundColor,
           appBar: N42AppBar(
-            title: 'Avatar Studio',
+            title: S.of(context)?.ui3ProfileAvatarStudio ?? 'Avatar Studio',
             backgroundColor: context.surfaceColor,
           ),
           body: ListView(
@@ -113,7 +115,7 @@ class _AvatarStudioPageState extends State<AvatarStudioPage> {
           ),
           const SizedBox(height: 14),
           Text(
-            user?.effectiveDisplayName ?? 'Me',
+            user?.effectiveDisplayName ?? (S.of(context)?.commonMe ?? 'Me'),
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w600,
@@ -141,8 +143,9 @@ class _AvatarStudioPageState extends State<AvatarStudioPage> {
     required UserEntity? user,
     required Color subtitleColor,
   }) {
+    final l10n = S.of(context);
     final labels = <String>[
-      if (user?.hasNftAvatar ?? false) 'NFT Avatar',
+      if (user?.hasNftAvatar ?? false) l10n?.web3NftAvatar ?? 'NFT Avatar',
       if ((user?.avatarDecorationPreset ?? AvatarDecorationPreset.none) !=
           AvatarDecorationPreset.none)
         (user?.avatarDecorationPreset ?? AvatarDecorationPreset.none)
@@ -150,7 +153,7 @@ class _AvatarStudioPageState extends State<AvatarStudioPage> {
       if (!(user?.hasNftAvatar ?? false) &&
           (user?.avatarDecorationPreset ?? AvatarDecorationPreset.none) ==
               AvatarDecorationPreset.none)
-        'Photo Avatar',
+        l10n?.ui3PhotoAvatar ?? 'Photo Avatar',
     ];
 
     return labels
@@ -187,7 +190,7 @@ class _AvatarStudioPageState extends State<AvatarStudioPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Avatar Styles',
+            S.of(context)?.ui3AvatarStyles ?? 'Avatar Styles',
             style: TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.w600,
@@ -196,7 +199,8 @@ class _AvatarStudioPageState extends State<AvatarStudioPage> {
           ),
           const SizedBox(height: 6),
           Text(
-            'Reuse one decoration selector for profile and avatar entry points.',
+            S.of(context)?.ui3AvatarStylesDesc ??
+                'Reuse one decoration selector for profile and avatar entry points.',
             style: TextStyle(fontSize: 13, color: context.textSecondary),
           ),
           const SizedBox(height: AppDimensions.spacing),
@@ -204,11 +208,14 @@ class _AvatarStudioPageState extends State<AvatarStudioPage> {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: AvatarDecorationPreset.values.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            // Height follows the text scale: a fixed aspect ratio clipped
+            // the label at 320pt width and at 130% text size.
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 3,
               mainAxisSpacing: 12,
               crossAxisSpacing: 12,
-              childAspectRatio: 0.84,
+              mainAxisExtent:
+                  84 + MediaQuery.textScalerOf(context).scale(12) * 2.4,
             ),
             itemBuilder: (context, index) {
               final preset = AvatarDecorationPreset.values[index];
@@ -230,6 +237,7 @@ class _AvatarStudioPageState extends State<AvatarStudioPage> {
 
   Widget _buildNftSection(BuildContext context, UserEntity? user) {
     final surfaceColor = context.surfaceColor;
+    final l10n = S.of(context);
 
     return Container(
       decoration: BoxDecoration(
@@ -242,9 +250,11 @@ class _AvatarStudioPageState extends State<AvatarStudioPage> {
             context,
             icon: Icons.token_outlined,
             title: user?.hasNftAvatar ?? false
-                ? 'Replace NFT Avatar'
-                : (S.of(context)?.profileBindNftAvatar ?? 'Bind NFT Avatar'),
-            subtitle: 'Use an on-chain collectible as your avatar.',
+                ? (l10n?.ui3ReplaceNftAvatar ?? 'Replace NFT Avatar')
+                : (l10n?.profileBindNftAvatar ?? 'Bind NFT Avatar'),
+            subtitle:
+                l10n?.ui3NftAvatarDesc ??
+                'Use an on-chain collectible as your avatar.',
             iconColor: const Color(0xFFF9A825),
             onTap: _openNftPicker,
           ),
@@ -253,8 +263,10 @@ class _AvatarStudioPageState extends State<AvatarStudioPage> {
             _buildActionTile(
               context,
               icon: Icons.restart_alt,
-              title: 'Use Photo Avatar',
-              subtitle: 'Keep your uploaded avatar and clear the NFT binding.',
+              title: l10n?.ui3UsePhotoAvatar ?? 'Use Photo Avatar',
+              subtitle:
+                  l10n?.ui3UsePhotoAvatarDesc ??
+                  'Keep your uploaded avatar and clear the NFT binding.',
               iconColor: AppColors.error,
               onTap: _clearNftAvatar,
             ),
@@ -289,7 +301,9 @@ class _AvatarStudioPageState extends State<AvatarStudioPage> {
 
     _dispatchUpdate(
       operation: _AvatarStudioOperation.decoration,
-      successMessage: 'Avatar style set to: ${preset.displayName}',
+      successMessage:
+          S.of(context)?.ui3AvatarStyleSet(preset.displayName) ??
+          'Avatar style set to: ${preset.displayName}',
       event: UpdateUserProfile(avatarDecorationPreset: preset.storageKey),
     );
   }
@@ -310,7 +324,9 @@ class _AvatarStudioPageState extends State<AvatarStudioPage> {
                 }) {
                   _dispatchUpdate(
                     operation: _AvatarStudioOperation.bindNft,
-                    successMessage: 'NFT avatar updated',
+                    successMessage:
+                        S.of(context)?.ui3NftAvatarUpdated ??
+                        'NFT avatar updated',
                     event: UpdateUserProfile(
                       nftContractAddress: contractAddress,
                       nftTokenId: tokenId,
@@ -325,10 +341,21 @@ class _AvatarStudioPageState extends State<AvatarStudioPage> {
     );
   }
 
-  void _clearNftAvatar() {
+  Future<void> _clearNftAvatar() async {
+    final l10n = S.of(context);
+    // Unbinding the NFT is a destructive account change: confirm first.
+    final confirmed = await context.showConfirmDialog(
+      title: l10n?.ui3UsePhotoAvatar ?? 'Use Photo Avatar',
+      content:
+          l10n?.ui3UsePhotoAvatarDesc ??
+          'Keep your uploaded avatar and clear the NFT binding.',
+      isDanger: true,
+    );
+    if (!confirmed || !mounted) return;
     _dispatchUpdate(
       operation: _AvatarStudioOperation.clearNft,
-      successMessage: 'Switched back to photo avatar',
+      successMessage:
+          l10n?.ui3SwitchedToPhotoAvatar ?? 'Switched back to photo avatar',
       event: const UpdateUserProfile(clearNftAvatar: true),
     );
   }
@@ -338,6 +365,8 @@ class _AvatarStudioPageState extends State<AvatarStudioPage> {
     required String successMessage,
     required UpdateUserProfile event,
   }) {
+    // Ignore taps while a profile update is in flight.
+    if (_pendingOperation != null) return;
     setState(() {
       _pendingOperation = operation;
       _pendingSuccessMessage = successMessage;

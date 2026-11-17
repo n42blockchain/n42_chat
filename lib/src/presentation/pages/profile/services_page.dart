@@ -124,7 +124,12 @@ class ServicesPage extends StatelessWidget {
     } catch (_) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Unable to open a chat for this contact')),
+        SnackBar(
+          content: Text(
+            l10n?.ui3UnableToOpenChat ??
+                'Unable to open a chat for this contact',
+          ),
+        ),
       );
     }
   }
@@ -186,11 +191,16 @@ class ServicesPage extends StatelessWidget {
       appBar: N42AppBar(title: S.of(context)?.profileServices ?? 'Services'),
       body: Padding(
         padding: const EdgeInsets.all(AppDimensions.spacing),
-        child: GridView.count(
-          crossAxisCount: 4,
-          mainAxisSpacing: 16,
-          crossAxisSpacing: 16,
-          childAspectRatio: 0.85,
+        child: GridView(
+          // Row height follows the text scale; a fixed aspect ratio
+          // overflowed the label at 320pt width and 130% text size.
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 4,
+            mainAxisSpacing: 16,
+            crossAxisSpacing: 16,
+            mainAxisExtent:
+                72 + MediaQuery.textScalerOf(context).scale(12) * 1.2,
+          ),
           children: [
             _buildServiceItem(
               context,
@@ -252,9 +262,12 @@ class ServicesPage extends StatelessWidget {
                 if (N42Chat.invokeOpenWallet()) return;
                 // 宿主未注册 handler（例如 chat 独立运行时），降级为信息提示
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Wallet is managed in the main app'),
-                    duration: Duration(seconds: 2),
+                  SnackBar(
+                    content: Text(
+                      S.of(context)?.ui3WalletManagedInMainApp ??
+                          'Wallet is managed in the main app',
+                    ),
+                    duration: const Duration(seconds: 2),
                   ),
                 );
               },
@@ -269,9 +282,12 @@ class ServicesPage extends StatelessWidget {
               onTap: () {
                 if (N42Chat.invokeOpenCardPack()) return;
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Card Pack is managed in the main app'),
-                    duration: Duration(seconds: 2),
+                  SnackBar(
+                    content: Text(
+                      S.of(context)?.ui3CardPackRequiresMainApp ??
+                          'Card Pack is managed in the main app',
+                    ),
+                    duration: const Duration(seconds: 2),
                   ),
                 );
               },
@@ -291,8 +307,11 @@ class ServicesPage extends StatelessWidget {
     required Color textColor,
     VoidCallback? onTap,
   }) {
-    return GestureDetector(
+    // InkWell (not GestureDetector): whole cell is the hit area and the
+    // press shows a ripple.
+    return InkWell(
       onTap: onTap,
+      borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

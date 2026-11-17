@@ -7,6 +7,7 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/nft_metadata_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/chat_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../integration/wallet_bridge.dart';
 import '../../../core/theme/app_dimensions.dart';
@@ -314,6 +315,7 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
                 contentPadding: const EdgeInsets.all(AppDimensions.spacingM),
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.paste_rounded, size: 18),
+                  tooltip: MaterialLocalizations.of(context).pasteButtonLabel,
                   color: AppColors.primaryOf(context),
                   onPressed: () async {
                     final data = await Clipboard.getData('text/plain');
@@ -376,8 +378,14 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
                 _errorText!,
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: AppColors.error,
+                style: TextStyle(
+                  // Plain red on its 10% tint is 2.8:1 in light mode.
+                  color: ChatContrast.onTint(
+                    AppColors.error,
+                    [context.pageBackground],
+                    dark: isDark,
+                    alpha: 0.1,
+                  ),
                   fontSize: 13,
                   height: 1.4,
                 ),
@@ -410,7 +418,7 @@ class _NftAvatarPickerPageState extends State<NftAvatarPickerPage>
             child: ElevatedButton(
               onPressed: _isResolving ? null : _resolveNft,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryOf(context),
+                backgroundColor: AppColors.primaryFillOf(context),
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -597,7 +605,7 @@ class _InfoBanner extends StatelessWidget {
               children: [
                 Text(
                   l10n?.nftPickerInfoTitle ?? 'NFT Avatar — Verified On-Chain',
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 13,
@@ -610,8 +618,6 @@ class _InfoBanner extends StatelessWidget {
                 Text(
                   l10n?.nftPickerInfoDesc ??
                       'Bind an NFT you own as your avatar. Anyone can verify ownership on-chain. Displayed with a gold ring across N42.',
-                  maxLines: 4,
-                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 12,
                     color: context.textSecondary,
@@ -652,7 +658,8 @@ class _ChainSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 40,
+      // 44pt row; each chip keeps its 40pt visual via a 2pt margin.
+      height: 44,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: _chains.length,
@@ -661,23 +668,27 @@ class _ChainSelector extends StatelessWidget {
         itemBuilder: (context, i) {
           final chain = _chains[i];
           final selected = chain.id == selectedChainId;
-          return GestureDetector(
+          return InkWell(
             onTap: () => onChanged(chain.id),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusM),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 150),
+              margin: const EdgeInsets.symmetric(vertical: 2),
               padding: const EdgeInsets.symmetric(
                 horizontal: AppDimensions.spacingM,
                 vertical: AppDimensions.spacingS,
               ),
               decoration: BoxDecoration(
                 color: selected
-                    ? AppColors.primaryOf(context)
+                    ? AppColors.primaryFillOf(context)
                     : ChatColors.of(
                         context,
                       ).brandSelectedTint(AppColors.primaryOf(context)),
                 borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                 border: Border.all(
-                  color: selected ? AppColors.primaryOf(context) : Colors.transparent,
+                  color: selected
+                      ? AppColors.primaryFillOf(context)
+                      : Colors.transparent,
                 ),
               ),
               child: Row(
@@ -722,9 +733,11 @@ class _CollectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return InkWell(
       onTap: onTap,
-      child: Container(
+      borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+      // Ink (not Container) so the card fill does not hide the ripple.
+      child: Ink(
         decoration: BoxDecoration(
           color: context.surfaceColor,
           borderRadius: BorderRadius.circular(AppDimensions.radiusL),

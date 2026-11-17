@@ -18,6 +18,7 @@ import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/auth/auth_event.dart';
 import '../../blocs/auth/auth_state.dart';
 import '../main/chat_main_page.dart';
+import '../../widgets/common/n42_tap_area.dart';
 import '../../helpers/bloc_message_helper.dart';
 
 /// 注册页面
@@ -310,6 +311,8 @@ class _RegisterPageState extends State<RegisterPage> {
                 ? const Icon(Icons.check_circle, color: AppColors.success)
                 : IconButton(
                     icon: Icon(Icons.refresh, color: hintColor),
+                    tooltip:
+                        S.of(context)?.a11yCheckServer ?? 'Check server',
                     onPressed: _checkHomeserver,
                   ),
           ),
@@ -367,7 +370,8 @@ class _RegisterPageState extends State<RegisterPage> {
         activeThumbColor: AppColors.primaryOf(context),
         activeTrackColor: AppColors.primaryOf(context).withValues(alpha: 0.35),
         title: Text(
-          'Anonymous Registration',
+          S.of(context)?.ui3AuthAnonymousRegistration ??
+              'Anonymous Registration',
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
@@ -378,9 +382,8 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
         ),
         subtitle: Text(
-          'Create an account without binding phone or email. A username will be generated automatically.',
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
+          S.of(context)?.ui3AuthAnonymousRegistrationDesc ??
+              'Create an account without binding phone or email. A username will be generated automatically.',
           style: TextStyle(color: subtitleColor, fontSize: 12, height: 1.4),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 12),
@@ -404,7 +407,7 @@ class _RegisterPageState extends State<RegisterPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Anonymous mode is on',
+            S.of(context)?.ui3AuthAnonymousModeOn ?? 'Anonymous mode is on',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
@@ -416,9 +419,8 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
           const SizedBox(height: 6),
           Text(
-            'The app will create a random Matrix username for you. You can still sign in later with your generated account and password.',
-            maxLines: 3,
-            overflow: TextOverflow.ellipsis,
+            S.of(context)?.ui3AuthAnonymousModeOnDesc ??
+                'The app will create a random Matrix username for you. You can still sign in later with your generated account and password.',
             style: TextStyle(color: subtitleColor, fontSize: 13, height: 1.4),
           ),
         ],
@@ -526,6 +528,9 @@ class _RegisterPageState extends State<RegisterPage> {
                 _obscurePassword ? Icons.visibility_off : Icons.visibility,
                 color: hintColor,
               ),
+              tooltip: _obscurePassword
+                  ? (S.of(context)?.a11yShowPassword ?? 'Show password')
+                  : (S.of(context)?.a11yHidePassword ?? 'Hide password'),
               onPressed: () {
                 setState(() {
                   _obscurePassword = !_obscurePassword;
@@ -590,6 +595,9 @@ class _RegisterPageState extends State<RegisterPage> {
                     : Icons.visibility,
                 color: hintColor,
               ),
+              tooltip: _obscureConfirmPassword
+                  ? (S.of(context)?.a11yShowPassword ?? 'Show password')
+                  : (S.of(context)?.a11yHidePassword ?? 'Hide password'),
               onPressed: () {
                 setState(() {
                   _obscureConfirmPassword = !_obscureConfirmPassword;
@@ -622,8 +630,9 @@ class _RegisterPageState extends State<RegisterPage> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        GestureDetector(
-          behavior: HitTestBehavior.opaque,
+        // 44pt hit area around the unchanged 24pt checkbox; the checkbox's
+        // own onChanged serves screen-reader activation.
+        N42TapArea(
           onTap: () {
             setState(() {
               _agreeToTerms = !_agreeToTerms;
@@ -635,7 +644,11 @@ class _RegisterPageState extends State<RegisterPage> {
               height: 24,
               child: Checkbox(
                 value: _agreeToTerms,
-                onChanged: (_) {},
+                onChanged: (value) {
+                  setState(() {
+                    _agreeToTerms = value ?? false;
+                  });
+                },
                 activeColor: AppColors.primaryOf(context),
                 checkColor: Colors.white,
                 side: BorderSide(color: textColor),
@@ -646,27 +659,32 @@ class _RegisterPageState extends State<RegisterPage> {
             ),
           ),
         ),
-        const SizedBox(width: 8),
         Expanded(
-          child: Text.rich(
-            TextSpan(
-              text:
-                  S.of(context)?.authIHaveReadAndAgree ??
-                  'I have read and agree to ',
-              style: TextStyle(fontSize: 13, color: textColor),
-              children: [
-                TextSpan(
-                  text: S.of(context)?.authTermsOfService ?? 'Terms of Service',
-                  style: const TextStyle(color: AppColors.link),
-                  recognizer: _termsRecognizer,
-                ),
-                TextSpan(text: S.of(context)?.authAnd ?? ' and '),
-                TextSpan(
-                  text: S.of(context)?.authPrivacyPolicy ?? 'Privacy Policy',
-                  style: const TextStyle(color: AppColors.link),
-                  recognizer: _privacyRecognizer,
-                ),
-              ],
+          // Keeps the first text line centered on the checkbox, which now
+          // sits inside a 44pt tap area.
+          child: Padding(
+            padding: const EdgeInsets.only(top: 12),
+            child: Text.rich(
+              TextSpan(
+                text:
+                    S.of(context)?.authIHaveReadAndAgree ??
+                    'I have read and agree to ',
+                style: TextStyle(fontSize: 13, color: textColor),
+                children: [
+                  TextSpan(
+                    text:
+                        S.of(context)?.authTermsOfService ?? 'Terms of Service',
+                    style: const TextStyle(color: AppColors.link),
+                    recognizer: _termsRecognizer,
+                  ),
+                  TextSpan(text: S.of(context)?.authAnd ?? ' and '),
+                  TextSpan(
+                    text: S.of(context)?.authPrivacyPolicy ?? 'Privacy Policy',
+                    style: const TextStyle(color: AppColors.link),
+                    recognizer: _privacyRecognizer,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -682,7 +700,7 @@ class _RegisterPageState extends State<RegisterPage> {
       child: ElevatedButton(
         onPressed: isEnabled ? _onRegister : null,
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primaryOf(context),
+          backgroundColor: AppColors.primaryFillOf(context),
           disabledBackgroundColor: AppColors.primaryOf(context).withValues(alpha: 0.5),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           elevation: 0,

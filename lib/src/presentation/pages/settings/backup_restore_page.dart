@@ -12,6 +12,7 @@ import '../../../core/services/chat_backup_service.dart';
 import '../../../core/services/legacy_archive_recovery_service.dart';
 import 'legacy_archive_recovery_section.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../blocs/backup/backup_bloc.dart';
 import '../../blocs/backup/backup_event.dart';
 import '../../blocs/backup/backup_state.dart';
@@ -52,7 +53,7 @@ class _BackupRestoreView extends StatelessWidget {
     return Scaffold(
       backgroundColor: context.pageBackground,
       appBar: N42AppBar(
-        title: 'Backup & Restore',
+        title: S.of(context)?.backupRestore ?? 'Backup & Restore',
         showBackButton: true,
         onBackPressed: () => Navigator.pop(context),
       ),
@@ -62,7 +63,10 @@ class _BackupRestoreView extends StatelessWidget {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.successMessage!),
-                backgroundColor: AppColors.success,
+                // Darkened green so the white label reaches 4.5:1.
+                backgroundColor: ChatContrast.fillForWhiteText(
+                  AppColors.success,
+                ),
               ),
             );
           }
@@ -70,7 +74,7 @@ class _BackupRestoreView extends StatelessWidget {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.error!),
-                backgroundColor: AppColors.error,
+                backgroundColor: AppColors.errorFill,
               ),
             );
           }
@@ -135,7 +139,7 @@ class _BackupSectionState extends State<_BackupSection> {
                 Icon(Icons.backup, color: AppColors.primaryOf(context), size: 20),
                 const SizedBox(width: AppDimensions.spacingS),
                 Text(
-                  'Create Backup',
+                  S.of(context)?.backupCreate ?? 'Create Backup',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
@@ -153,8 +157,9 @@ class _BackupSectionState extends State<_BackupSection> {
               horizontal: AppDimensions.spacing,
             ),
             child: Text(
-              'Backup your local chat settings. '
-              'Messages will be restored from server after re-login.',
+              S.of(context)?.ui3BackupSettingsDesc ??
+                  'Backup your local chat settings. '
+                      'Messages will be restored from server after re-login.',
               style: TextStyle(
                 fontSize: 13,
                 height: 1.4,
@@ -166,15 +171,13 @@ class _BackupSectionState extends State<_BackupSection> {
           ListTile(
             leading: const Icon(Icons.key_outlined, color: AppColors.warning),
             title: Text(
-              'Encryption keys are managed separately',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+              S.of(context)?.ui3BackupKeysSeparate ??
+                  'Encryption keys are managed separately',
               style: TextStyle(fontSize: 15, height: 1.3, color: textColor),
             ),
             subtitle: Text(
-              'Use Security > Recovery Key to back up encrypted message access.',
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
+              S.of(context)?.ui3BackupKeysSeparateHint ??
+                  'Use Security > Recovery Key to back up encrypted message access.',
               style: TextStyle(
                 fontSize: 12,
                 height: 1.4,
@@ -184,7 +187,7 @@ class _BackupSectionState extends State<_BackupSection> {
           ),
           CheckboxListTile(
             title: Text(
-              'Password protect',
+              S.of(context)?.backupPasswordProtect ?? 'Password protect',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(fontSize: 15, height: 1.3, color: textColor),
@@ -202,7 +205,9 @@ class _BackupSectionState extends State<_BackupSection> {
                 controller: _passwordController,
                 obscureText: true,
                 decoration: InputDecoration(
-                  hintText: 'Enter backup password',
+                  hintText:
+                      S.of(context)?.backupEnterPassword ??
+                      'Enter backup password',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                   ),
@@ -232,7 +237,7 @@ class _BackupSectionState extends State<_BackupSection> {
                         );
                       },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryOf(context),
+                  backgroundColor: AppColors.primaryFillOf(context),
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(
                     vertical: AppDimensions.spacingM,
@@ -250,7 +255,7 @@ class _BackupSectionState extends State<_BackupSection> {
                           color: Colors.white,
                         ),
                       )
-                    : const Text('Create Backup'),
+                    : Text(S.of(context)?.backupCreate ?? 'Create Backup'),
               ),
             ),
           ),
@@ -280,7 +285,7 @@ class _BackupHistorySection extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Text(
-              'Backup History',
+              S.of(context)?.backupHistory ?? 'Backup History',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
@@ -295,7 +300,7 @@ class _BackupHistorySection extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(AppDimensions.spacing),
               child: Text(
-                'No backups yet',
+                S.of(context)?.backupNoBackups ?? 'No backups yet',
                 style: TextStyle(
                   fontSize: 14,
                   height: 1.3,
@@ -326,7 +331,13 @@ class _BackupHistorySection extends StatelessWidget {
                   style: TextStyle(fontSize: 15, height: 1.3, color: textColor),
                 ),
                 subtitle: Text(
-                  '${backup.roomCount} rooms  ${backup.formattedSize}',
+                  S
+                          .of(context)
+                          ?.ui3BackupRoomsSize(
+                            backup.roomCount,
+                            backup.formattedSize,
+                          ) ??
+                      '${backup.roomCount} rooms  ${backup.formattedSize}',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
@@ -349,23 +360,27 @@ class _BackupHistorySection extends StatelessWidget {
                     PopupMenuItem(
                       enabled: !state.isRestoring,
                       value: 'restore',
-                      child: const Row(
+                      child: Row(
                         children: [
-                          Icon(Icons.restore, size: 18),
-                          SizedBox(width: AppDimensions.spacingS),
-                          Text('Restore'),
+                          const Icon(Icons.restore, size: 18),
+                          const SizedBox(width: AppDimensions.spacingS),
+                          Text(S.of(context)?.backupRestore2 ?? 'Restore'),
                         ],
                       ),
                     ),
-                    const PopupMenuItem(
+                    PopupMenuItem(
                       value: 'delete',
                       child: Row(
                         children: [
-                          Icon(Icons.delete, size: 18, color: AppColors.error),
-                          SizedBox(width: AppDimensions.spacingS),
+                          const Icon(
+                            Icons.delete,
+                            size: 18,
+                            color: AppColors.error,
+                          ),
+                          const SizedBox(width: AppDimensions.spacingS),
                           Text(
-                            'Delete',
-                            style: TextStyle(color: AppColors.error),
+                            S.of(context)?.backupDelete ?? 'Delete',
+                            style: TextStyle(color: _errorText(context)),
                           ),
                         ],
                       ),
@@ -411,7 +426,7 @@ class _BackupHistorySection extends StatelessWidget {
             },
             child: Text(
               labels?.backupDelete ?? 'Delete',
-              style: const TextStyle(color: AppColors.error),
+              style: TextStyle(color: _errorText(context)),
             ),
           ),
         ],
@@ -419,6 +434,11 @@ class _BackupHistorySection extends StatelessWidget {
     );
   }
 }
+
+/// Destructive label color that reads at 4.5:1 on light and dark
+/// surfaces (system red measures 3.55:1 on white).
+Color _errorText(BuildContext context) =>
+    context.isDarkMode ? AppColors.error : AppColors.errorFill;
 
 /// 恢复区域
 class _RestoreSection extends StatelessWidget {
@@ -444,7 +464,7 @@ class _RestoreSection extends StatelessWidget {
                 const Icon(Icons.restore, color: AppColors.warning, size: 20),
                 const SizedBox(width: AppDimensions.spacingS),
                 Text(
-                  'Restore from File',
+                  S.of(context)?.backupRestoreFromFile ?? 'Restore from File',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
@@ -462,8 +482,9 @@ class _RestoreSection extends StatelessWidget {
               horizontal: AppDimensions.spacing,
             ),
             child: Text(
-              'Import a .n42backup file from another device or previous backup. '
-              'Encryption keys are restored separately with your Recovery Key.',
+              S.of(context)?.ui3BackupRestoreFromFileDesc ??
+                  'Import a .n42backup file from another device or previous backup. '
+                      'Encryption keys are restored separately with your Recovery Key.',
               style: TextStyle(
                 fontSize: 13,
                 height: 1.4,
@@ -487,7 +508,10 @@ class _RestoreSection extends StatelessWidget {
                       )
                     : const Icon(Icons.file_open),
                 label: Text(
-                  state.isRestoring ? 'Restoring...' : 'Choose Backup File',
+                  state.isRestoring
+                      ? (S.of(context)?.backupRestoring ?? 'Restoring...')
+                      : (S.of(context)?.backupChooseFile ??
+                            'Choose Backup File'),
                 ),
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
@@ -604,7 +628,18 @@ class _RestoreSection extends StatelessWidget {
                     for (final warning in preview.warnings)
                       Padding(
                         padding: const EdgeInsets.only(top: 12),
-                        child: Text(warning, style: const TextStyle(color: AppColors.warning)),
+                        child: Text(
+                          warning,
+                          style: TextStyle(
+                            // Orange shade that reads at 4.5:1 on the dialog.
+                            color: ChatContrast.onTint(
+                              AppColors.warning,
+                              [context.surfaceColor],
+                              dark: context.isDarkMode,
+                              alpha: 0,
+                            ),
+                          ),
+                        ),
                       ),
                   ],
                 ),
@@ -628,8 +663,11 @@ class _RestoreSection extends StatelessWidget {
       if (context.mounted && current()) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to pick file: $e'),
-            backgroundColor: AppColors.error,
+            content: Text(
+              S.of(context)?.chatPickFileFailed(e.toString()) ??
+                  'Failed to pick file: $e',
+            ),
+            backgroundColor: AppColors.errorFill,
           ),
         );
       }

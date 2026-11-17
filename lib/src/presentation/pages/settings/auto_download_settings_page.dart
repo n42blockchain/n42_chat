@@ -120,7 +120,7 @@ class _AutoDownloadSettingsPageState extends State<AutoDownloadSettingsPage> {
       messenger.showSnackBar(
         SnackBar(
           content: Text(saveFailedMessage),
-          backgroundColor: AppColors.error,
+          backgroundColor: AppColors.errorFill,
         ),
       );
     } finally {
@@ -239,8 +239,11 @@ class _AutoDownloadSettingsPageState extends State<AutoDownloadSettingsPage> {
                   context,
                   isDark: isDark,
                   icon: Icons.info_outline,
-                  title: 'Roaming uses Mobile Data rules',
+                  title:
+                      S.of(context)?.ui3RoamingUsesMobileData ??
+                      'Roaming uses Mobile Data rules',
                   message:
+                      S.of(context)?.ui3RoamingUsesMobileDataDesc ??
                       'Dedicated roaming detection is not available yet, so roaming currently follows the Mobile Data auto-download settings.',
                 ),
               ],
@@ -328,7 +331,7 @@ class _AutoDownloadSettingsPageState extends State<AutoDownloadSettingsPage> {
               children: [
                 Text(
                   title,
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 14,
@@ -340,7 +343,7 @@ class _AutoDownloadSettingsPageState extends State<AutoDownloadSettingsPage> {
                 const SizedBox(height: AppDimensions.spacingXS),
                 Text(
                   message,
-                  maxLines: 3,
+                  maxLines: 6,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 13,

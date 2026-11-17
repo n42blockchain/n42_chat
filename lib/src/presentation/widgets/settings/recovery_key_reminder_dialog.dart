@@ -8,6 +8,8 @@ import '../../../core/encryption/key_backup_service.dart';
 import '../../pages/settings/security_settings_page.dart';
 import '../../../core/utils/debug_log.dart';
 import '../../../core/theme/app_dimensions.dart';
+import '../../../core/theme/chat_contrast.dart';
+import '../common/common_widgets.dart';
 
 /// 恢复密钥提醒 Banner
 ///
@@ -120,8 +122,13 @@ class _RecoveryKeyReminderBannerState extends State<RecoveryKeyReminderBanner> {
           vertical: AppDimensions.spacingM,
         ),
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Color(0xFF6C63FF), Color(0xFF9B59B6)],
+          // Start stop darkened so white labels keep 4.5:1 across the
+          // gradient (0xFF6C63FF measured 4.3:1).
+          gradient: LinearGradient(
+            colors: [
+              ChatContrast.fillForWhiteText(const Color(0xFF6C63FF)),
+              const Color(0xFF9B59B6),
+            ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -155,7 +162,7 @@ class _RecoveryKeyReminderBannerState extends State<RecoveryKeyReminderBanner> {
                   Text(
                     l10n?.recoveryKeyReminderDesc ??
                         'Create a recovery key to sync encrypted messages across devices',
-                    style: const TextStyle(color: Colors.white70, fontSize: 12),
+                    style: const TextStyle(color: Colors.white, fontSize: 12),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -181,7 +188,8 @@ class _RecoveryKeyReminderBannerState extends State<RecoveryKeyReminderBanner> {
                       ),
                     ),
                     minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    // Padded: 48pt hit area around the unchanged pill.
+                    tapTargetSize: MaterialTapTargetSize.padded,
                   ),
                   child: Text(
                     l10n?.recoveryKeySetupNow ?? 'Set up',
@@ -192,12 +200,12 @@ class _RecoveryKeyReminderBannerState extends State<RecoveryKeyReminderBanner> {
                     ),
                   ),
                 ),
-                const SizedBox(height: AppDimensions.spacingXS),
-                GestureDetector(
+                N42TapArea(
                   onTap: _dismissFor7Days,
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                   child: Text(
                     l10n?.recoveryKeyRemindLater ?? 'Later',
-                    style: const TextStyle(color: Colors.white54, fontSize: 11),
+                    style: const TextStyle(color: Colors.white, fontSize: 11),
                   ),
                 ),
               ],

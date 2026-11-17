@@ -74,7 +74,8 @@ class _HiddenChatsPageState extends State<HiddenChatsPage> {
   ) {
     final l10n = S.of(context);
 
-    return Container(
+    // Material (not Container) so the ListTile ink is painted visibly.
+    return Material(
       color: context.surfaceColor,
       child: ListTile(
         leading: N42Avatar(
@@ -112,7 +113,7 @@ class _HiddenChatsPageState extends State<HiddenChatsPage> {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              color: AppColors.primaryOf(context),
+              color: AppColors.primaryOnTintOf(context),
               fontSize: 14,
               fontWeight: FontWeight.w500,
               height: 1.3,
