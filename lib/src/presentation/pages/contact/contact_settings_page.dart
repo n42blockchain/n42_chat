@@ -8,6 +8,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../domain/repositories/contact_repository.dart';
 import '../../../domain/repositories/message_repository.dart';
@@ -196,7 +197,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.errorMessage ?? ''),
-              backgroundColor: AppColors.error,
+              backgroundColor: AppColors.errorFill,
             ),
           );
         }
@@ -208,6 +209,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
           elevation: 0,
           leading: IconButton(
             icon: Icon(AppIcons.back, color: textColor, size: 20),
+            tooltip: MaterialLocalizations.of(context).backButtonTooltip,
             onPressed: () => Navigator.of(context).pop(),
           ),
           title: Text(
@@ -338,9 +340,9 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
                           child: Text(
                             S.of(context)?.contactDeleteContact ??
                                 'Delete Contact',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 16,
-                              color: AppColors.error,
+                              color: AppColors.errorTextOf(context),
                             ),
                           ),
                         ),
@@ -377,7 +379,12 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
           bottom: BorderSide(color: dividerColor, width: 0.5),
         ),
       ),
-      child: Column(children: children),
+      // Ink needs a Material at the card color; on the decorated
+      // Container it would paint underneath and stay invisible.
+      child: Material(
+        color: cardColor,
+        child: Column(children: children),
+      ),
     );
   }
 
@@ -393,8 +400,12 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Row(
           children: [
-            Text(title, style: TextStyle(fontSize: 16, color: textColor)),
-            const Spacer(),
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(fontSize: 16, color: textColor),
+              ),
+            ),
             Icon(AppIcons.chevron, color: secondaryTextColor, size: 20),
           ],
         ),
@@ -412,8 +423,12 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         children: [
-          Text(title, style: TextStyle(fontSize: 16, color: textColor)),
-          const Spacer(),
+          Expanded(
+            child: Text(
+              title,
+              style: TextStyle(fontSize: 16, color: textColor),
+            ),
+          ),
           Switch(
             value: value,
             onChanged: onChanged,
@@ -520,7 +535,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
             l10n?.contactRecommendedCardTo(displayName, targetDisplayName) ??
                 'Recommended $displayName\'s card to $targetDisplayName',
           ),
-          backgroundColor: AppColors.success,
+          backgroundColor: ChatContrast.fillForWhiteText(AppColors.success),
         ),
       );
     } catch (e) {
@@ -536,7 +551,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
                 : (l10n?.contactRecommendFailed(e.toString()) ??
                       'Recommend failed: $e'),
           ),
-          backgroundColor: AppColors.error,
+          backgroundColor: AppColors.errorFill,
         ),
       );
     }
@@ -594,7 +609,7 @@ class _ContactSettingsPageState extends State<ContactSettingsPage> {
             },
             child: Text(
               S.of(context)?.commonDelete ?? 'Delete',
-              style: const TextStyle(color: AppColors.error),
+              style: TextStyle(color: AppColors.errorTextOf(context)),
             ),
           ),
         ],

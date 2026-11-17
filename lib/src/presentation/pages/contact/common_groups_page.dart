@@ -127,6 +127,7 @@ class _CommonGroupsPageState extends State<CommonGroupsPage> {
         ),
         leading: IconButton(
           icon: Icon(Icons.arrow_back_rounded, color: textColor),
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           onPressed: () => Navigator.pop(context),
         ),
       ),

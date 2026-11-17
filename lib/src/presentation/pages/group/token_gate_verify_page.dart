@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../domain/entities/token_gate_entity.dart';
 import '../../blocs/group/group_bloc.dart';
 import '../../blocs/group/group_event.dart';
@@ -87,6 +88,7 @@ class _TokenGateVerifyPageState extends State<TokenGateVerifyPage> {
   }
 
   Widget _buildResult(TokenGateVerificationResult result, S? s, bool isDark) {
+    final statusColor = _statusTextColor(context, result.passed);
     return Padding(
       padding: const EdgeInsets.all(AppDimensions.spacingXL),
       child: Column(
@@ -95,7 +97,7 @@ class _TokenGateVerifyPageState extends State<TokenGateVerifyPage> {
           Icon(
             result.passed ? Icons.check_circle : Icons.cancel,
             size: 80,
-            color: result.passed ? AppColors.success : AppColors.error,
+            color: statusColor,
           ),
           const SizedBox(height: AppDimensions.spacing),
           Text(
@@ -105,7 +107,7 @@ class _TokenGateVerifyPageState extends State<TokenGateVerifyPage> {
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: result.passed ? AppColors.success : AppColors.error,
+              color: statusColor,
             ),
           ),
           const SizedBox(height: AppDimensions.spacingS),
@@ -196,13 +198,15 @@ class _RuleResultCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final rule = ruleResult.rule;
     final s = S.of(context);
+    final statusColor = _statusTextColor(context, ruleResult.passed);
+    final errorColor = _statusTextColor(context, false);
 
     return Card(
       margin: const EdgeInsets.only(bottom: AppDimensions.spacingS),
       child: ListTile(
         leading: Icon(
           ruleResult.passed ? Icons.check_circle : Icons.cancel,
-          color: ruleResult.passed ? AppColors.success : AppColors.error,
+          color: statusColor,
         ),
         title: Text(
           rule.symbol ?? _getTokenStandardLabel(rule.tokenStandard),
@@ -214,14 +218,12 @@ class _RuleResultCard extends StatelessWidget {
             Text('${s?.tokenGateRequired ?? 'Required'}: ${rule.minBalance}'),
             Text(
               '${s?.tokenGateYourBalance ?? 'Your balance'}: ${ruleResult.actualBalance}',
-              style: TextStyle(
-                color: ruleResult.passed ? AppColors.success : AppColors.error,
-              ),
+              style: TextStyle(color: statusColor),
             ),
             if (ruleResult.errorMessage != null)
               Text(
                 ruleResult.errorMessage!,
-                style: const TextStyle(color: AppColors.error, fontSize: 12),
+                style: TextStyle(color: errorColor, fontSize: 12),
               ),
           ],
         ),
@@ -229,4 +231,16 @@ class _RuleResultCard extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Success / error shade that reaches 4.5:1 on the page and card surfaces
+/// (system green is 2.2:1 and red 3.55:1 on white).
+Color _statusTextColor(BuildContext context, bool passed) {
+  final theme = Theme.of(context);
+  return ChatContrast.onTint(
+    passed ? AppColors.success : AppColors.error,
+    [theme.scaffoldBackgroundColor, theme.colorScheme.surface],
+    dark: theme.brightness == Brightness.dark,
+    alpha: 0,
+  );
 }

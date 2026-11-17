@@ -4,6 +4,7 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../domain/entities/contact_entity.dart';
 import '../../widgets/common/common_widgets.dart';
 
@@ -115,12 +116,13 @@ class ContactTile extends StatelessWidget {
               ),
 
               if (contact.isStarred)
-                const Padding(
-                  padding: EdgeInsets.only(right: AppDimensions.spacingS),
+                Padding(
+                  padding: const EdgeInsets.only(right: AppDimensions.spacingS),
                   child: Icon(
                     Icons.star,
                     size: AppDimensions.iconSizeSmall,
-                    color: AppColors.warning,
+                    // warning orange is 2.2:1 on white; icons need 3:1.
+                    color: ChatColors.of(context).warningText,
                   ),
                 ),
               // 右侧附加内容

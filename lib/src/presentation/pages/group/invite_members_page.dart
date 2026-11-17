@@ -97,6 +97,7 @@ class _InviteMembersPageState extends State<InviteMembersPage> {
           title: S.of(context)?.groupInviteMembers ?? 'Invite Members',
           leading: IconButton(
             icon: const Icon(Icons.close),
+            tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
             onPressed: () => Navigator.pop(context),
           ),
           actions: [

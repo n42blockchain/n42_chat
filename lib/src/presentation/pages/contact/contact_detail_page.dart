@@ -22,6 +22,7 @@ import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_event.dart';
 import '../../blocs/contact/contact_state.dart';
 import '../../widgets/common/n42_avatar.dart';
+import '../../widgets/common/n42_tap_area.dart';
 import '../moment/moment_list_page.dart';
 import '../moment/video_feed_page.dart';
 import 'common_groups_page.dart';
@@ -32,6 +33,7 @@ import 'friend_details_summary.dart';
 import 'friend_photos_page.dart';
 import 'contact_list_page.dart' show FriendRequestsPage;
 import '../../../core/theme/app_dimensions.dart';
+import '../../../core/utils/a11y_l10n.dart';
 import '../../../core/utils/debug_log.dart';
 
 /// 联系人详情页面（仿微信）
@@ -338,11 +340,13 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
         elevation: 0,
         leading: IconButton(
           icon: Icon(AppIcons.back, color: textColor, size: 20),
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           onPressed: () => Navigator.of(context).pop(),
         ),
         actions: [
           IconButton(
             icon: Icon(Icons.more_horiz, color: textColor),
+            tooltip: S.of(context)?.commonMore ?? 'More',
             onPressed: () => _openSettings(),
           ),
         ],
@@ -532,7 +536,12 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
           bottom: BorderSide(color: dividerColor, width: 0.5),
         ),
       ),
-      child: Column(children: children),
+      // Ink needs a Material at the card color; on the decorated
+      // Container it would paint underneath and stay invisible.
+      child: Material(
+        color: cardColor,
+        child: Column(children: children),
+      ),
     );
   }
 
@@ -999,6 +1008,7 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
               child: Image.file(
                 snapshot.data!,
                 fit: BoxFit.cover,
+                semanticLabel: A11yL10n.of(context).image,
                 errorBuilder: (_, _, _) => const Icon(Icons.broken_image),
               ),
             )
@@ -1069,7 +1079,7 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
     final cardColor = context.surfaceColor;
     final textColor = context.textPrimary;
     final secondaryTextColor = context.textSecondary;
-    final labelColor = context.textTertiary;
+    final labelColor = context.textSupporting;
     final dividerColor = context.dividerThin;
 
     // 检查 ContactBloc 是否可用
@@ -1289,7 +1299,12 @@ class _FriendInfoPageState extends State<FriendInfoPage> {
           bottom: BorderSide(color: dividerColor, width: 0.5),
         ),
       ),
-      child: Column(children: children),
+      // Ink needs a Material at the card color; on the decorated
+      // Container it would paint underneath and stay invisible.
+      child: Material(
+        color: cardColor,
+        child: Column(children: children),
+      ),
     );
   }
 
@@ -1520,7 +1535,7 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
     final bgColor = context.pageBackground;
     final cardColor = AppColors.inputBgOf(isDark);
     final textColor = context.textPrimary;
-    final hintColor = context.textTertiary;
+    final hintColor = context.textSupporting;
     final labelColor = context.textSecondary;
 
     final scaffold = Scaffold(
@@ -1530,7 +1545,7 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
         elevation: 0,
         leadingWidth: 70,
         leading: Center(
-          child: GestureDetector(
+          child: N42TapArea(
             onTap: () => Navigator.of(context).pop(),
             child: Padding(
               padding: const EdgeInsets.only(left: 16),
@@ -1553,7 +1568,7 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 12),
-            child: GestureDetector(
+            child: N42TapArea(
               onTap: _isSaving ? null : _save,
               child: Container(
                 padding: const EdgeInsets.symmetric(
@@ -1561,7 +1576,7 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryOf(context),
+                  color: AppColors.primaryFillOf(context),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: _isSaving
@@ -1644,7 +1659,10 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
           });
           Navigator.of(context).pop(savedRemark);
         } else if (state.status == ContactStatus.error) {
-          final errorMessage = state.errorMessage ?? 'Failed to save remark';
+          final errorMessage =
+              state.errorMessage ??
+              S.of(context)?.ui3SaveRemarkFailed ??
+              'Failed to save remark';
           setState(() {
             _isSaving = false;
             _pendingRemarkToSave = null;
@@ -1652,7 +1670,7 @@ class _EditRemarkPageState extends State<EditRemarkPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(errorMessage),
-              backgroundColor: AppColors.error,
+              backgroundColor: AppColors.errorFill,
             ),
           );
         }

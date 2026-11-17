@@ -44,6 +44,7 @@ class _GroupListPageState extends State<GroupListPage> {
         actions: [
           IconButton(
             icon: Icon(Icons.add, color: context.textPrimary),
+            tooltip: S.of(context)?.commonCreateGroup ?? 'Create Group',
             onPressed: () => _navigateToCreateGroup(),
           ),
         ],
@@ -211,7 +212,10 @@ class _GroupListPageState extends State<GroupListPage> {
         ),
         subtitle: Text(
           S.of(context)?.commonInvitedToJoinGroup ?? 'Invited to join group',
-          style: TextStyle(fontSize: 13, color: AppColors.primaryOf(context)),
+          style: TextStyle(
+            fontSize: 13,
+            color: AppColors.primaryOnTintOf(context),
+          ),
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
@@ -289,7 +293,7 @@ class _GroupListPageState extends State<GroupListPage> {
                 ),
                 title: Text(
                   S.of(context)?.commonDissolveGroup ?? 'Dissolve Group',
-                  style: const TextStyle(color: AppColors.error),
+                  style: TextStyle(color: AppColors.errorTextOf(context)),
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -301,7 +305,7 @@ class _GroupListPageState extends State<GroupListPage> {
                 leading: const Icon(Icons.exit_to_app, color: AppColors.error),
                 title: Text(
                   S.of(context)?.commonLeaveGroup ?? 'Leave Group',
-                  style: const TextStyle(color: AppColors.error),
+                  style: TextStyle(color: AppColors.errorTextOf(context)),
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -335,7 +339,7 @@ class _GroupListPageState extends State<GroupListPage> {
             },
             child: Text(
               S.of(context)?.commonLeave ?? 'Leave',
-              style: const TextStyle(color: AppColors.error),
+              style: TextStyle(color: AppColors.errorTextOf(context)),
             ),
           ),
         ],
@@ -364,7 +368,7 @@ class _GroupListPageState extends State<GroupListPage> {
             },
             child: Text(
               S.of(context)?.commonDissolve ?? 'Dissolve',
-              style: const TextStyle(color: AppColors.error),
+              style: TextStyle(color: AppColors.errorTextOf(context)),
             ),
           ),
         ],

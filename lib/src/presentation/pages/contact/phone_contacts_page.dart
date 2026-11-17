@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/contact_sync_service.dart';
@@ -80,14 +81,18 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
       if (!mounted) return;
       Navigator.of(context).pop(roomId);
     } catch (e) {
-      _showError('Failed to create chat: $e');
+      if (!mounted) return;
+      _showError(
+        S.of(context)?.contactCreateChatFailed(e.toString()) ??
+            'Failed to create chat: $e',
+      );
     }
   }
 
   void _showError(String message) {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message), backgroundColor: AppColors.error),
+        SnackBar(content: Text(message), backgroundColor: AppColors.errorFill),
       );
     }
   }
@@ -98,14 +103,18 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
 
     return Scaffold(
       backgroundColor: context.pageBackground,
-      appBar: const N42AppBar(title: 'From Contacts'),
+      appBar: N42AppBar(
+        title: S.of(context)?.ui3FromContacts ?? 'From Contacts',
+      ),
       body: _buildBody(isDark),
     );
   }
 
   Widget _buildBody(bool isDark) {
     if (_isLoading) {
-      return const N42Loading(message: 'Loading contacts...');
+      return N42Loading(
+        message: S.of(context)?.ui3LoadingContacts ?? 'Loading contacts...',
+      );
     }
 
     if (!_hasPermission) {
@@ -137,7 +146,8 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
             ),
             const SizedBox(height: AppDimensions.spacingXL),
             Text(
-              'Contacts Permission Required',
+              S.of(context)?.ui3ContactsPermissionRequired ??
+                  'Contacts Permission Required',
               textAlign: TextAlign.center,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -150,7 +160,8 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
             ),
             const SizedBox(height: AppDimensions.spacingM),
             Text(
-              'To find friends from your contacts, please allow access to your contacts.',
+              S.of(context)?.ui3ContactsPermissionMessage ??
+                  'To find friends from your contacts, please allow access to your contacts.',
               textAlign: TextAlign.center,
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
@@ -164,14 +175,14 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
             ElevatedButton(
               onPressed: _loadContacts,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryOf(context),
+                backgroundColor: AppColors.primaryFillOf(context),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppDimensions.spacingXXL,
                   vertical: AppDimensions.spacingM,
                 ),
               ),
-              child: const Text('Allow Access'),
+              child: Text(S.of(context)?.ui3AllowAccess ?? 'Allow Access'),
             ),
           ],
         ),
@@ -189,14 +200,19 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
             const Icon(Icons.error_outline, size: 64, color: AppColors.error),
             const SizedBox(height: AppDimensions.spacing),
             Text(
-              _errorMessage ?? 'Unknown error',
+              _errorMessage ??
+                  S.of(context)?.qrcodeUnknownError ??
+                  'Unknown error',
               textAlign: TextAlign.center,
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(height: 1.4, color: context.textSecondary),
             ),
             const SizedBox(height: AppDimensions.spacingXL),
-            TextButton(onPressed: _loadContacts, child: const Text('Retry')),
+            TextButton(
+              onPressed: _loadContacts,
+              child: Text(S.of(context)?.commonRetry ?? 'Retry'),
+            ),
           ],
         ),
       ),
@@ -217,7 +233,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
             ),
             const SizedBox(height: AppDimensions.spacingXL),
             Text(
-              'No Matches Found',
+              S.of(context)?.ui3NoContactMatches ?? 'No Matches Found',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
@@ -229,7 +245,8 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
             ),
             const SizedBox(height: AppDimensions.spacingM),
             Text(
-              'None of your contacts are using this app yet. Invite them to join!',
+              S.of(context)?.ui3NoContactMatchesMessage ??
+                  'None of your contacts are using this app yet. Invite them to join!',
               textAlign: TextAlign.center,
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
@@ -241,7 +258,8 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
             ),
             const SizedBox(height: AppDimensions.spacing),
             Text(
-              'Scanned ${_allPhoneContacts.length} contacts',
+              S.of(context)?.ui3ScannedContacts(_allPhoneContacts.length) ??
+                  'Scanned ${_allPhoneContacts.length} contacts',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
@@ -273,7 +291,10 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
               const SizedBox(width: AppDimensions.spacingS),
               Flexible(
                 child: Text(
-                  'Found ${_matchedContacts.length} matches from your contacts',
+                  S.of(context)?.ui3FoundContactMatches(
+                        _matchedContacts.length,
+                      ) ??
+                      'Found ${_matchedContacts.length} matches from your contacts',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
@@ -354,7 +375,8 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
           ),
           if (phoneContact.displayName != displayName)
             Text(
-              'In Contacts: ${phoneContact.displayName}',
+              S.of(context)?.ui3InContactsAs(phoneContact.displayName) ??
+                  'In Contacts: ${phoneContact.displayName}',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
@@ -375,7 +397,7 @@ class _PhoneContactsPageState extends State<PhoneContactsPage> {
             horizontal: AppDimensions.spacing,
           ),
         ),
-        child: const Text('Chat'),
+        child: Text(S.of(context)?.commonChat ?? 'Chat'),
       ),
     );
   }

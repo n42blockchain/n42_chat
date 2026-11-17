@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
@@ -80,6 +81,7 @@ class _ChannelEditorSheetState extends State<_ChannelEditorSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = S.of(context);
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -111,9 +113,10 @@ class _ChannelEditorSheetState extends State<_ChannelEditorSheet> {
                     ),
                     IconButton(
                       icon: const Icon(Icons.close, size: 20),
+                      tooltip: MaterialLocalizations.of(
+                        context,
+                      ).closeButtonTooltip,
                       onPressed: () => Navigator.pop(context),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
                     ),
                   ],
                 ),
@@ -121,28 +124,34 @@ class _ChannelEditorSheetState extends State<_ChannelEditorSheet> {
                 TextField(
                   controller: _nameController,
                   autofocus: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Channel Name',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.tag),
+                  decoration: InputDecoration(
+                    labelText: l10n?.groupChannelName ?? 'Channel Name',
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.tag),
                   ),
                 ),
                 const SizedBox(height: AppDimensions.spacingM),
                 TextField(
                   controller: _categoryController,
-                  decoration: const InputDecoration(
-                    labelText: 'Category (optional)',
-                    hintText: 'Announcements / Product / Support',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.folder_outlined),
+                  decoration: InputDecoration(
+                    labelText:
+                        l10n?.ui3ChannelCategoryOptional ??
+                        'Category (optional)',
+                    hintText:
+                        l10n?.ui3ChannelCategoryHint ??
+                        'Announcements / Product / Support',
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.folder_outlined),
                   ),
                 ),
                 const SizedBox(height: AppDimensions.spacingM),
                 TextField(
                   controller: _topicController,
-                  decoration: const InputDecoration(
-                    labelText: 'Description (optional)',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText:
+                        l10n?.ui3DescriptionOptional ??
+                        'Description (optional)',
+                    border: const OutlineInputBorder(),
                   ),
                 ),
                 const SizedBox(height: AppDimensions.spacingL),
@@ -150,7 +159,7 @@ class _ChannelEditorSheetState extends State<_ChannelEditorSheet> {
                   width: double.infinity,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryOf(context),
+                      backgroundColor: AppColors.primaryFillOf(context),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),

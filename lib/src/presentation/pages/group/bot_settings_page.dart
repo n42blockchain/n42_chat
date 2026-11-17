@@ -6,6 +6,7 @@ import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/bot_webhook_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../core/utils/external_url_safety.dart';
 import '../../../data/datasources/local/secure_storage_datasource.dart';
 import '../../../domain/entities/bot_config_entity.dart';
@@ -119,7 +120,7 @@ class _BotSettingsPageState extends State<BotSettingsPage> {
                   state.successMessage ?? BlocMessageKeys.groupBotConfigUpdated,
                 ),
               ),
-              backgroundColor: AppColors.success,
+              backgroundColor: ChatContrast.fillForWhiteText(AppColors.success),
             ),
           );
           Navigator.of(context).pop();
@@ -129,7 +130,7 @@ class _BotSettingsPageState extends State<BotSettingsPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(resolveBlocMessage(context, state.errorMessage!)),
-              backgroundColor: AppColors.error,
+              backgroundColor: AppColors.errorFill,
             ),
           );
         }
@@ -153,7 +154,7 @@ class _BotSettingsPageState extends State<BotSettingsPage> {
             : ListView(
                 children: [
                   const SizedBox(height: 10),
-                  Container(
+                  Material(
                     color: context.surfaceColor,
                     child: SwitchListTile(
                       title: Text(l10n?.groupBotEnabled ?? 'Enable Bot'),
@@ -192,12 +193,15 @@ class _BotSettingsPageState extends State<BotSettingsPage> {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    Container(
+                    Material(
                       color: context.surfaceColor,
                       child: SwitchListTile(
-                        title: const Text('Enable webhook automation'),
-                        subtitle: const Text(
-                          'Post member-join and welcome events to your integration endpoint.',
+                        title: Text(
+                          l10n?.ui3WebhookEnable ?? 'Enable webhook automation',
+                        ),
+                        subtitle: Text(
+                          l10n?.ui3WebhookEnableDesc ??
+                              'Post member-join and welcome events to your integration endpoint.',
                         ),
                         value: _webhookEnabled,
                         onChanged: (v) => setState(() => _webhookEnabled = v),
@@ -211,9 +215,9 @@ class _BotSettingsPageState extends State<BotSettingsPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'Webhook URL',
-                              style: TextStyle(fontSize: 13),
+                            Text(
+                              l10n?.ui3WebhookUrl ?? 'Webhook URL',
+                              style: const TextStyle(fontSize: 13),
                             ),
                             const SizedBox(height: AppDimensions.spacingS),
                             TextField(
@@ -225,34 +229,43 @@ class _BotSettingsPageState extends State<BotSettingsPage> {
                               ),
                             ),
                             const SizedBox(height: AppDimensions.spacingM),
-                            const Text(
-                              'Signing Secret (optional)',
-                              style: TextStyle(fontSize: 13),
+                            Text(
+                              l10n?.ui3WebhookSecretOptional ??
+                                  'Signing Secret (optional)',
+                              style: const TextStyle(fontSize: 13),
                             ),
                             const SizedBox(height: AppDimensions.spacingS),
                             TextField(
                               controller: _webhookSecretController,
-                              decoration: const InputDecoration(
-                                hintText: 'Used for X-N42-Signature',
-                                border: OutlineInputBorder(),
+                              decoration: InputDecoration(
+                                hintText:
+                                    l10n?.ui3WebhookSecretHint ??
+                                    'Used for X-N42-Signature',
+                                border: const OutlineInputBorder(),
                               ),
                             ),
                           ],
                         ),
                       ),
                       const SizedBox(height: 10),
-                      Container(
+                      Material(
                         color: context.surfaceColor,
                         child: Column(
                           children: [
                             SwitchListTile(
-                              title: const Text('Notify when a member joins'),
+                              title: Text(
+                                l10n?.ui3WebhookNotifyMemberJoined ??
+                                    'Notify when a member joins',
+                              ),
                               value: _notifyMemberJoined,
                               onChanged: (v) =>
                                   setState(() => _notifyMemberJoined = v),
                             ),
                             SwitchListTile(
-                              title: const Text('Notify when welcome is sent'),
+                              title: Text(
+                                l10n?.ui3WebhookNotifyWelcomeSent ??
+                                    'Notify when welcome is sent',
+                              ),
                               value: _notifyWelcomeSent,
                               onChanged: (v) =>
                                   setState(() => _notifyWelcomeSent = v),
@@ -280,8 +293,9 @@ class _BotSettingsPageState extends State<BotSettingsPage> {
                             : const Icon(Icons.send_outlined),
                         label: Text(
                           _isTestingWebhook
-                              ? 'Sending test webhook...'
-                              : 'Send test webhook',
+                              ? l10n?.ui3WebhookTestSending ??
+                                    'Sending test webhook...'
+                              : l10n?.ui3WebhookTestSend ?? 'Send test webhook',
                         ),
                       ),
                     ),
@@ -324,10 +338,12 @@ class _BotSettingsPageState extends State<BotSettingsPage> {
           allowedSchemes: const {'https'},
         ) ==
         null) {
-      return 'Webhook URL must be a public HTTPS address';
+      return S.of(context)?.ui3WebhookUrlInvalid ??
+          'Webhook URL must be a public HTTPS address';
     }
     if (config.webhookEvents.isEmpty) {
-      return 'Select at least one webhook event';
+      return S.of(context)?.ui3WebhookSelectEvent ??
+          'Select at least one webhook event';
     }
     return null;
   }
@@ -376,7 +392,7 @@ class _BotSettingsPageState extends State<BotSettingsPage> {
       messenger.showSnackBar(
         SnackBar(
           content: Text(validationError),
-          backgroundColor: AppColors.error,
+          backgroundColor: AppColors.errorFill,
         ),
       );
       return;
@@ -385,9 +401,12 @@ class _BotSettingsPageState extends State<BotSettingsPage> {
     final eventType = _preferredTestEvent(config);
     if (eventType == null) {
       messenger.showSnackBar(
-        const SnackBar(
-          content: Text('Select at least one webhook event'),
-          backgroundColor: AppColors.error,
+        SnackBar(
+          content: Text(
+            S.of(context)?.ui3WebhookSelectEvent ??
+                'Select at least one webhook event',
+          ),
+          backgroundColor: AppColors.errorFill,
         ),
       );
       return;
@@ -407,18 +426,25 @@ class _BotSettingsPageState extends State<BotSettingsPage> {
         SnackBar(
           content: Text(
             result.success
-                ? 'Test webhook sent successfully'
-                : (result.errorMessage ?? 'Failed to send test webhook'),
+                ? S.of(context)?.ui3WebhookTestSent ??
+                      'Test webhook sent successfully'
+                : (result.errorMessage ??
+                      S.of(context)?.ui3WebhookTestFailed ??
+                      'Failed to send test webhook'),
           ),
-          backgroundColor: result.success ? AppColors.success : AppColors.error,
+          backgroundColor: result.success
+              ? ChatContrast.fillForWhiteText(AppColors.success)
+              : AppColors.errorFill,
         ),
       );
     } catch (e) {
       if (!mounted) return;
       messenger.showSnackBar(
         SnackBar(
-          content: Text('Failed to send test webhook: $e'),
-          backgroundColor: AppColors.error,
+          content: Text(
+            '${S.of(context)?.ui3WebhookTestFailed ?? 'Failed to send test webhook'}: $e',
+          ),
+          backgroundColor: AppColors.errorFill,
         ),
       );
     } finally {
@@ -437,7 +463,7 @@ class _BotSettingsPageState extends State<BotSettingsPage> {
       messenger.showSnackBar(
         SnackBar(
           content: Text(validationError),
-          backgroundColor: AppColors.error,
+          backgroundColor: AppColors.errorFill,
         ),
       );
       return;
@@ -454,8 +480,10 @@ class _BotSettingsPageState extends State<BotSettingsPage> {
       if (!mounted) return;
       messenger.showSnackBar(
         SnackBar(
-          content: Text('Failed to save bot settings: $e'),
-          backgroundColor: AppColors.error,
+          content: Text(
+            '${S.of(context)?.commonSaveFailed ?? 'Save failed'}: $e',
+          ),
+          backgroundColor: AppColors.errorFill,
         ),
       );
     }

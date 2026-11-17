@@ -37,11 +37,14 @@ class EnterpriseContactsPage extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.search, size: 20, color: context.textTertiary),
+                  Icon(Icons.search, size: 20, color: context.textSupporting),
                   const SizedBox(width: 6),
                   Text(
                     S.of(context)?.commonSearch ?? 'Search',
-                    style: TextStyle(fontSize: 15, color: context.textTertiary),
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: context.textSupporting,
+                    ),
                   ),
                 ],
               ),

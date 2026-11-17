@@ -101,7 +101,7 @@ class _ContactPermissionsPageState extends State<ContactPermissionsPage> {
       messenger.showSnackBar(
         SnackBar(
           content: Text(saveFailedMessage),
-          backgroundColor: AppColors.error,
+          backgroundColor: AppColors.errorFill,
         ),
       );
     } finally {
@@ -214,29 +214,31 @@ class _ContactPermissionsPageState extends State<ContactPermissionsPage> {
     required Color textColor,
     required Color subtitleColor,
   }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: TextStyle(fontSize: 16, color: textColor)),
-                const SizedBox(height: 4),
-                Text(
-                  subtitle,
-                  style: TextStyle(fontSize: 13, color: subtitleColor),
-                ),
-              ],
+    return MergeSemantics(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: TextStyle(fontSize: 16, color: textColor)),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: TextStyle(fontSize: 13, color: subtitleColor),
+                  ),
+                ],
+              ),
             ),
-          ),
-          Switch(
-            value: value,
-            onChanged: _isLoading || _isSaving ? null : onChanged,
-            activeThumbColor: AppColors.primaryOf(context),
-          ),
-        ],
+            Switch(
+              value: value,
+              onChanged: _isLoading || _isSaving ? null : onChanged,
+              activeThumbColor: AppColors.primaryOf(context),
+            ),
+          ],
+        ),
       ),
     );
   }

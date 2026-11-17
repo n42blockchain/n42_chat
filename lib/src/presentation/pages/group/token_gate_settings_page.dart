@@ -106,7 +106,7 @@ class _TokenGateSettingsPageState extends State<TokenGateSettingsPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(resolveBlocMessage(context, state.errorMessage!)),
-              backgroundColor: AppColors.error,
+              backgroundColor: AppColors.errorFill,
             ),
           );
         }
@@ -303,6 +303,7 @@ class _TokenGateRuleCard extends StatelessWidget {
         ),
         trailing: IconButton(
           icon: const Icon(Icons.delete_outline, color: AppColors.error),
+          tooltip: s?.commonDelete ?? 'Delete',
           onPressed: onRemove,
         ),
         isThreeLine: true,

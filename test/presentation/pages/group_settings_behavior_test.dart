@@ -85,6 +85,7 @@ void main() {
     );
 
     await tester.ensureVisible(find.text('Current announcement'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Current announcement'));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField), 'New announcement');
@@ -96,6 +97,7 @@ void main() {
     );
 
     await tester.ensureVisible(find.text('Current topic'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Current topic'));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField), 'New topic');
@@ -104,6 +106,7 @@ void main() {
     expect(bloc.events.whereType<UpdateGroupTopic>().single.topic, 'New topic');
 
     await tester.ensureVisible(find.text(l10n.groupMaxMembers));
+    await tester.pumpAndSettle();
     await tester.tap(find.text(l10n.groupMaxMembers));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField), '90');
@@ -113,6 +116,7 @@ void main() {
 
     final visibility = find.byType(SwitchListTile).first;
     await tester.ensureVisible(visibility);
+    await tester.pumpAndSettle();
     await tester.tap(visibility);
     await tester.pumpAndSettle();
     expect(
@@ -121,6 +125,7 @@ void main() {
     );
 
     await tester.ensureVisible(find.text(l10n.commonClearChatHistory));
+    await tester.pumpAndSettle();
     await tester.tap(find.text(l10n.commonClearChatHistory));
     await tester.pumpAndSettle();
     await tester.tap(find.text(l10n.commonCancel));

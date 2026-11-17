@@ -382,8 +382,11 @@ void main() {
         );
         await tester.pump();
       }
+      await tester.tap(find.byIcon(Icons.delete_outline).first);
+      await tester.pumpAndSettle();
       await tester.runAsync(() async {
-        await tester.tap(find.byIcon(Icons.delete_outline).first);
+        // Deletion now asks for confirmation first.
+        await tester.tap(find.widgetWithText(TextButton, 'Delete'));
         final deadline = DateTime.now().add(const Duration(seconds: 5));
         await tester.pump();
         while (((await store.load())['photos'] as List?)?.length != 1 ||

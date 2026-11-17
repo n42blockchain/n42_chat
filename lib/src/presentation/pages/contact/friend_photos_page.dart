@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/friend_details_store.dart';
+import '../../../core/utils/a11y_l10n.dart';
 
 class FriendPhotosPage extends StatefulWidget {
   final FriendDetailsStore store;
@@ -66,6 +68,14 @@ class _FriendPhotosPageState extends State<FriendPhotosPage> {
 
   Future<void> _delete(String name) async {
     if (_busy) return;
+    final strings = S.of(context);
+    final confirmed = await context.showConfirmDialog(
+      title: strings?.commonDelete ?? 'Delete',
+      content: strings?.ui3DeletePhotoConfirm ?? 'Delete this photo?',
+      confirmText: strings?.commonDelete ?? 'Delete',
+      isDanger: true,
+    );
+    if (!confirmed || !mounted || _busy) return;
     setState(() => _busy = true);
     try {
       final next = _photos.where((photo) => photo != name).toList();
@@ -144,6 +154,7 @@ class _FriendPhotosPageState extends State<FriendPhotosPage> {
                             child: Image.file(
                               file,
                               fit: BoxFit.cover,
+                              semanticLabel: A11yL10n.of(context).image,
                               errorBuilder: (_, _, _) =>
                                   const Icon(Icons.broken_image),
                             ),

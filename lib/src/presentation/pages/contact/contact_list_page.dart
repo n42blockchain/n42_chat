@@ -11,6 +11,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../domain/entities/contact_entity.dart';
 import '../../../domain/entities/conversation_entity.dart';
@@ -111,6 +112,7 @@ class _ContactListPageState extends State<ContactListPage> {
                     Icons.person_add_outlined,
                     color: context.textPrimary,
                   ),
+                  tooltip: S.of(context)?.commonAddFriend ?? 'Add Friend',
                   onPressed: _showAddContactDialog,
                 ),
               ],
@@ -554,7 +556,7 @@ class _ContactListPageState extends State<ContactListPage> {
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.error,
+                    color: AppColors.errorFill,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
@@ -879,7 +881,7 @@ class _ContactListPageState extends State<ContactListPage> {
                       ) ??
                   'Recommended ${contact.effectiveDisplayName}\'s card to ${selectedContact.effectiveDisplayName}',
             ),
-            backgroundColor: AppColors.success,
+            backgroundColor: ChatContrast.fillForWhiteText(AppColors.success),
           ),
         );
       }
@@ -896,7 +898,7 @@ class _ContactListPageState extends State<ContactListPage> {
                   : (S.of(context)?.contactRecommendFailed(e.toString()) ??
                         'Recommend failed: $e'),
             ),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.errorFill,
           ),
         );
       }
@@ -921,6 +923,7 @@ class _ContactListPageState extends State<ContactListPage> {
             border: const OutlineInputBorder(),
             suffixIcon: IconButton(
               icon: const Icon(Icons.clear),
+              tooltip: S.of(context)?.commonClear ?? 'Clear',
               onPressed: () => controller.clear(),
             ),
           ),
@@ -1019,7 +1022,7 @@ class _ContactListPageState extends State<ContactListPage> {
               S.of(context)?.contactOpenChatFailed(e.toString()) ??
                   'Open chat failed: $e',
             ),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.errorFill,
           ),
         );
       }
@@ -1529,7 +1532,7 @@ class FriendRequestsPageState extends State<FriendRequestsPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(S.of(context)?.commonSaveFailed ?? 'Operation failed'),
-          backgroundColor: AppColors.error,
+          backgroundColor: AppColors.errorFill,
         ),
       );
     } finally {
@@ -1629,6 +1632,7 @@ class _GroupListPageState extends State<_GroupListPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
+            tooltip: S.of(context)?.commonCreateGroup ?? 'Create Group',
             onPressed: _navigateToCreateGroup,
           ),
         ],
@@ -1685,7 +1689,7 @@ class _GroupListPageState extends State<_GroupListPage> {
             icon: const Icon(Icons.add),
             label: Text(S.of(context)?.commonCreateGroup ?? 'Create Group'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryOf(context),
+              backgroundColor: AppColors.primaryFillOf(context),
               foregroundColor: Colors.white,
             ),
           ),
@@ -1813,7 +1817,7 @@ class _GroupListPageState extends State<_GroupListPage> {
           style: TextStyle(
             fontSize: 13,
             height: 1.3,
-            color: AppColors.primaryOf(context),
+            color: AppColors.primaryOnTintOf(context),
           ),
         ),
         trailing: Row(
@@ -1861,7 +1865,7 @@ class _GroupListPageState extends State<_GroupListPage> {
                 ),
                 title: Text(
                   S.of(context)?.commonDissolveGroup ?? 'Dissolve Group',
-                  style: const TextStyle(color: AppColors.error),
+                  style: TextStyle(color: AppColors.errorTextOf(context)),
                 ),
                 onTap: () {
                   Navigator.pop(ctx);
@@ -1873,7 +1877,7 @@ class _GroupListPageState extends State<_GroupListPage> {
                 leading: const Icon(Icons.exit_to_app, color: AppColors.error),
                 title: Text(
                   S.of(context)?.commonLeaveGroup ?? 'Leave Group',
-                  style: const TextStyle(color: AppColors.error),
+                  style: TextStyle(color: AppColors.errorTextOf(context)),
                 ),
                 onTap: () {
                   Navigator.pop(ctx);
@@ -1907,7 +1911,7 @@ class _GroupListPageState extends State<_GroupListPage> {
             },
             child: Text(
               S.of(context)?.commonLeave ?? 'Leave',
-              style: const TextStyle(color: AppColors.error),
+              style: TextStyle(color: AppColors.errorTextOf(context)),
             ),
           ),
         ],
@@ -1936,7 +1940,7 @@ class _GroupListPageState extends State<_GroupListPage> {
             },
             child: Text(
               S.of(context)?.commonDissolve ?? 'Dissolve',
-              style: const TextStyle(color: AppColors.error),
+              style: TextStyle(color: AppColors.errorTextOf(context)),
             ),
           ),
         ],
@@ -2104,7 +2108,7 @@ class _RecommendContactSheetState extends State<_RecommendContactSheet> {
                           contact.userId,
                           style: TextStyle(
                             fontSize: 12,
-                            color: AppColors.textTertiaryOf(widget.isDark),
+                            color: context.textSupporting,
                           ),
                         ),
                         onTap: () => Navigator.pop(context, contact),

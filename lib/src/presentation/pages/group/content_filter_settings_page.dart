@@ -5,6 +5,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../domain/entities/content_filter_entity.dart';
 import '../../../domain/repositories/group_repository.dart';
 import '../../blocs/bloc_message_keys.dart';
@@ -91,7 +92,7 @@ class _ContentFilterSettingsPageState extends State<ContentFilterSettingsPage> {
               content: Text(
                 l10n?.groupContentFilterUpdated ?? 'Content filter updated',
               ),
-              backgroundColor: AppColors.success,
+              backgroundColor: ChatContrast.fillForWhiteText(AppColors.success),
             ),
           );
           Navigator.of(context).pop();
@@ -104,7 +105,7 @@ class _ContentFilterSettingsPageState extends State<ContentFilterSettingsPage> {
               content: Text(
                 state.errorMessage ?? 'Failed to update content filter',
               ),
-              backgroundColor: AppColors.error,
+              backgroundColor: AppColors.errorFill,
             ),
           );
         }
@@ -128,7 +129,7 @@ class _ContentFilterSettingsPageState extends State<ContentFilterSettingsPage> {
             : ListView(
                 children: [
                   const SizedBox(height: 10),
-                  Container(
+                  Material(
                     color: context.surfaceColor,
                     child: SwitchListTile(
                       title: Text(
@@ -141,7 +142,7 @@ class _ContentFilterSettingsPageState extends State<ContentFilterSettingsPage> {
                   ),
                   if (_enabled) ...[
                     const SizedBox(height: 10),
-                    Container(
+                    Material(
                       color: context.surfaceColor,
                       child: RadioGroup<FilterAction>(
                         groupValue: _action,
@@ -222,6 +223,7 @@ class _ContentFilterSettingsPageState extends State<ContentFilterSettingsPage> {
                                     Icons.add_circle_outline,
                                     color: AppColors.primaryOf(context),
                                   ),
+                                  tooltip: l10n?.commonAdd ?? 'Add',
                                   onPressed: _addWord,
                                 ),
                               ],
@@ -256,7 +258,7 @@ class _ContentFilterSettingsPageState extends State<ContentFilterSettingsPage> {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    Container(
+                    Material(
                       color: context.surfaceColor,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -264,7 +266,8 @@ class _ContentFilterSettingsPageState extends State<ContentFilterSettingsPage> {
                           Padding(
                             padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
                             child: Text(
-                              'Sensitive Data Detection',
+                              l10n?.ui3SensitiveDataDetection ??
+                                  'Sensitive Data Detection',
                               style: TextStyle(
                                 fontSize: 13,
                                 color: context.textSecondary,
@@ -325,28 +328,33 @@ class _ContentFilterSettingsPageState extends State<ContentFilterSettingsPage> {
   }
 
   String _labelForSensitiveDataType(SensitiveDataType type) {
+    final l10n = S.of(context);
     switch (type) {
       case SensitiveDataType.email:
-        return 'Email';
+        return l10n?.ui3Email ?? 'Email';
       case SensitiveDataType.phoneNumber:
-        return 'Phone Number';
+        return l10n?.profilePhoneNumber ?? 'Phone Number';
       case SensitiveDataType.creditCard:
-        return 'Credit Card';
+        return l10n?.ui3CreditCard ?? 'Credit Card';
       case SensitiveDataType.walletAddress:
-        return 'Wallet Address';
+        return l10n?.web3WalletAddress ?? 'Wallet Address';
     }
   }
 
   String _descriptionForSensitiveDataType(SensitiveDataType type) {
+    final l10n = S.of(context);
     switch (type) {
       case SensitiveDataType.email:
-        return 'Detect email addresses in text messages';
+        return l10n?.ui3DetectEmailDesc ??
+            'Detect email addresses in text messages';
       case SensitiveDataType.phoneNumber:
-        return 'Detect phone numbers and international numbers';
+        return l10n?.ui3DetectPhoneDesc ??
+            'Detect phone numbers and international numbers';
       case SensitiveDataType.creditCard:
-        return 'Detect likely bank and card numbers';
+        return l10n?.ui3DetectCardDesc ?? 'Detect likely bank and card numbers';
       case SensitiveDataType.walletAddress:
-        return 'Detect Ethereum-style wallet addresses';
+        return l10n?.ui3DetectWalletDesc ??
+            'Detect Ethereum-style wallet addresses';
     }
   }
 }

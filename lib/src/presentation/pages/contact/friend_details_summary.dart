@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/services/friend_details_store.dart';
+import '../../../core/utils/a11y_l10n.dart';
 import '../../../data/datasources/local/secure_storage_datasource.dart';
 
 /// Read-only preview of this account's private annotations on a friend.
@@ -154,6 +155,7 @@ class _FriendDetailsSummaryState extends State<FriendDetailsSummary> {
                 child: Image.file(
                   file,
                   fit: BoxFit.cover,
+                  semanticLabel: A11yL10n.of(context).image,
                   errorBuilder: (_, _, _) => const Icon(Icons.broken_image),
                 ),
               ),

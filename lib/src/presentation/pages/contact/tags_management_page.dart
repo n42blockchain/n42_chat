@@ -186,7 +186,7 @@ class _TagsManagementPageState extends State<TagsManagementPage> {
       messenger.showSnackBar(
         SnackBar(
           content: Text(saveFailedMessage),
-          backgroundColor: AppColors.error,
+          backgroundColor: AppColors.errorFill,
         ),
       );
     } finally {
@@ -257,7 +257,7 @@ class _TagsManagementPageState extends State<TagsManagementPage> {
             },
             child: Text(
               S.of(context)?.commonDelete ?? 'Delete',
-              style: const TextStyle(color: AppColors.error),
+              style: TextStyle(color: AppColors.errorTextOf(context)),
             ),
           ),
         ],
@@ -319,7 +319,7 @@ class _TagsManagementPageState extends State<TagsManagementPage> {
                       S.of(context)?.contactCreateTag ?? 'Create Tag',
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryOf(context),
+                      backgroundColor: AppColors.primaryFillOf(context),
                       foregroundColor: Colors.white,
                     ),
                   ),
@@ -415,7 +415,7 @@ class _TagsManagementPageState extends State<TagsManagementPage> {
               leading: const Icon(Icons.delete, color: AppColors.error),
               title: Text(
                 S.of(context)?.commonDelete ?? 'Delete',
-                style: const TextStyle(color: AppColors.error),
+                style: TextStyle(color: AppColors.errorTextOf(context)),
               ),
               onTap: () {
                 Navigator.pop(ctx);

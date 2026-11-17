@@ -139,6 +139,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
           title: S.of(context)?.commonCreateGroup ?? 'Create Group',
           leading: IconButton(
             icon: const Icon(Icons.close),
+            tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
             onPressed: () => Navigator.pop(context),
           ),
           actions: [
@@ -173,8 +174,9 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
               child: Row(
                 children: [
                   // 群头像
-                  GestureDetector(
+                  N42TapArea(
                     onTap: _pickAvatar,
+                    semanticLabel: S.of(context)?.profileAvatar ?? 'Avatar',
                     child: Container(
                       width: 56,
                       height: 56,

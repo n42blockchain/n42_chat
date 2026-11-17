@@ -9,6 +9,7 @@ import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/chat_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../integration/wallet_bridge.dart';
@@ -377,6 +378,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
         title: S.of(context)?.commonAddFriend ?? 'Add Friend',
         leading: IconButton(
           icon: const Icon(Icons.close),
+          tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -399,7 +401,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
                   children: [
                     Expanded(
                       child: Container(
-                        height: 44,
+                        constraints: const BoxConstraints(minHeight: 44),
                         decoration: BoxDecoration(
                           color: ChatColors.of(context).recessedFill,
                           borderRadius: BorderRadius.circular(
@@ -442,7 +444,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
                     ElevatedButton(
                       onPressed: _isLoading ? null : _searchUser,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primaryOf(context),
+                        backgroundColor: AppColors.primaryFillOf(context),
                         foregroundColor: Colors.white,
                         minimumSize: const Size(72, 44),
                         shape: RoundedRectangleBorder(
@@ -495,14 +497,15 @@ class _AddFriendPageState extends State<AddFriendPage> {
                   ),
                 ),
                 title: Text(
-                  'From Contacts',
+                  S.of(context)?.ui3FromContacts ?? 'From Contacts',
                   style: TextStyle(
                     color: context.textPrimary,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
                 subtitle: Text(
-                  'Find friends from your phone contacts',
+                  S.of(context)?.ui3FindFriendsFromContacts ??
+                      'Find friends from your phone contacts',
                   style: TextStyle(fontSize: 13, color: context.textSecondary),
                 ),
                 trailing: Icon(AppIcons.chevron, color: context.textSecondary),
@@ -519,7 +522,16 @@ class _AddFriendPageState extends State<AddFriendPage> {
               color: AppColors.error.withValues(alpha: 0.1),
               child: Text(
                 _errorMessage!,
-                style: const TextStyle(color: AppColors.error, fontSize: 13),
+                style: TextStyle(
+                  // Shade of error red that reaches 4.5:1 on its 10% tint.
+                  color: ChatContrast.onTint(
+                    AppColors.error,
+                    [context.pageBackground],
+                    dark: isDark,
+                    alpha: 0.1,
+                  ),
+                  fontSize: 13,
+                ),
               ),
             ),
 
@@ -664,11 +676,11 @@ class _InputTypeChip extends StatelessWidget {
 
     switch (type) {
       case _InputType.walletAddress:
-        label = 'Wallet Address';
+        label = S.of(context)?.web3WalletAddress ?? 'Wallet Address';
         color = Colors.orange;
         icon = Icons.account_balance_wallet_outlined;
       case _InputType.ensName:
-        label = 'ENS / Domain';
+        label = S.of(context)?.ui3EnsOrDomain ?? 'ENS / Domain';
         color = const Color(0xFF5298FF);
         icon = Icons.verified_outlined;
       case _InputType.matrixId:
@@ -676,10 +688,17 @@ class _InputTypeChip extends StatelessWidget {
         color = AppColors.primaryOf(context);
         icon = Icons.person_outline;
       case _InputType.username:
-        label = 'Username';
+        label = S.of(context)?.authUsername ?? 'Username';
         color = Colors.teal;
         icon = Icons.alternate_email;
     }
+    // Readable shade of the type color on its 10% tint (4.5:1).
+    final labelColor = ChatContrast.onTint(
+      color,
+      [context.surfaceColor],
+      dark: isDark,
+      alpha: 0.1,
+    );
 
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -694,13 +713,13 @@ class _InputTypeChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 12, color: color),
+          Icon(icon, size: 12, color: labelColor),
           const SizedBox(width: AppDimensions.spacingXS),
           Text(
             label,
             style: TextStyle(
               fontSize: 11,
-              color: color,
+              color: labelColor,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -793,7 +812,7 @@ class _SearchMethodRow extends StatelessWidget {
         _MethodCard(
           icon: Icons.verified_outlined,
           color: const Color(0xFF5298FF),
-          title: 'ENS / Domain',
+          title: l10n?.ui3EnsOrDomain ?? 'ENS / Domain',
           desc: 'vitalik.eth • alice.lens',
           isDark: isDark,
         ),

@@ -105,7 +105,7 @@ class _GroupTopicsBody extends StatelessWidget {
           floatingActionButton: canManage
               ? FloatingActionButton(
                   onPressed: () => _showCreateTopicSheet(context),
-                  backgroundColor: AppColors.primaryOf(context),
+                  backgroundColor: AppColors.primaryFillOf(context),
                   tooltip: l10n?.groupChannelCreate ?? 'New Topic',
                   child: const Icon(Icons.add, color: Colors.white),
                 )
@@ -134,7 +134,7 @@ class _GroupTopicsBody extends StatelessWidget {
                         _buildSectionHeader(
                           context,
                           Icons.forum_outlined,
-                          'General',
+                          l10n?.ui3GeneralTopic ?? 'General',
                         ),
                         _buildTopicTile(context, ChannelEntity.general(roomId)),
                         ...regularByCategory.entries.expand((entry) {
@@ -197,7 +197,7 @@ class _GroupTopicsBody extends StatelessWidget {
     final lastMsg = channel.lastMessage;
     final unread = channel.unreadCount;
 
-    return Container(
+    return Material(
       color: context.surfaceColor,
       child: Column(
         children: [
@@ -285,7 +285,7 @@ class _GroupTopicsBody extends StatelessWidget {
                       vertical: 3,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.primaryOf(context),
+                      color: AppColors.primaryFillOf(context),
                       borderRadius: BorderRadius.circular(
                         AppDimensions.radiusL,
                       ),

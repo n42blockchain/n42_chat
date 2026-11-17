@@ -160,6 +160,7 @@ class _GroupFilesPageState extends State<GroupFilesPage>
         ),
         leading: IconButton(
           icon: Icon(Icons.arrow_back_rounded, color: textColor),
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           onPressed: () => Navigator.pop(context),
         ),
         bottom: PreferredSize(
@@ -222,7 +223,7 @@ class _GroupFilesPageState extends State<GroupFilesPage>
   ) {
     final secondaryTextColor = context.textSecondary;
 
-    return Container(
+    return Material(
       color: cardColor,
       child: ListTile(
         leading: _buildFileIcon(file),
@@ -249,15 +250,20 @@ class _GroupFilesPageState extends State<GroupFilesPage>
             ),
             if (file.senderName != null) ...[
               const SizedBox(width: AppDimensions.spacingS),
-              Text(
-                file.senderName!,
-                style: TextStyle(color: secondaryTextColor, fontSize: 12),
+              Flexible(
+                child: Text(
+                  file.senderName!,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: secondaryTextColor, fontSize: 12),
+                ),
               ),
             ],
           ],
         ),
         trailing: IconButton(
           icon: Icon(Icons.download, color: AppColors.primaryOf(context)),
+          tooltip: S.of(context)?.chatDownload ?? 'Download',
           onPressed: () => _downloadFile(file),
         ),
         onTap: () => _openFile(file),
@@ -351,7 +357,7 @@ class _GroupFilesPageState extends State<GroupFilesPage>
             content: Text(
               '${S.of(context)?.downloadFailed ?? 'Download failed'}: $e',
             ),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.errorFill,
           ),
         );
       }

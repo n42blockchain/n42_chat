@@ -6,6 +6,8 @@ import 'package:get_it/get_it.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
+import '../../../core/utils/a11y_l10n.dart';
 import '../../../domain/entities/group_album_entity.dart';
 import '../../../domain/repositories/message_repository.dart';
 import '../../blocs/group_album/group_album_bloc.dart';
@@ -181,6 +183,7 @@ class _GroupAlbumViewState extends State<_GroupAlbumView>
         ),
         leading: IconButton(
           icon: Icon(Icons.arrow_back_rounded, color: textColor),
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           onPressed: () => Navigator.pop(context),
         ),
         bottom: PreferredSize(
@@ -297,63 +300,71 @@ class _GroupAlbumViewState extends State<_GroupAlbumView>
   }
 
   Widget _buildMediaItem(BuildContext context, AlbumMediaEntity media) {
-    return GestureDetector(
-      onTap: () => _viewMedia(context, media),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          // 缩略图
-          CachedNetworkImage(
-            imageUrl: media.thumbnailUrl ?? media.httpUrl ?? '',
-            fit: BoxFit.cover,
-            placeholder: (_, _) => Container(
-              color: Colors.grey[300],
-              child: const Center(
-                child: SizedBox(
-                  width: AppDimensions.spacingL,
-                  height: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
+    return Semantics(
+      button: true,
+      label: A11yL10n.of(context).image,
+      child: GestureDetector(
+        onTap: () => _viewMedia(context, media),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            // 缩略图
+            CachedNetworkImage(
+              imageUrl: media.thumbnailUrl ?? media.httpUrl ?? '',
+              fit: BoxFit.cover,
+              placeholder: (_, _) => Container(
+                color: ChatColors.of(context).placeholderTile,
+                child: const Center(
+                  child: SizedBox(
+                    width: AppDimensions.spacingL,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
                 ),
               ),
+              errorWidget: (_, _, _) => Container(
+                color: ChatColors.of(context).placeholderTile,
+                child: Icon(Icons.broken_image, color: context.textSupporting),
+              ),
             ),
-            errorWidget: (_, _, _) => Container(
-              color: Colors.grey[300],
-              child: Icon(Icons.broken_image, color: context.textTertiary),
-            ),
-          ),
-          // 视频标识
-          if (media.isVideo)
-            Positioned(
-              right: 4,
-              bottom: 4,
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppDimensions.spacingXS,
-                  vertical: 2,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.6),
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusS),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.play_arrow, color: Colors.white, size: 12),
-                    if (media.formattedDuration != null) ...[
-                      const SizedBox(width: 2),
-                      Text(
-                        media.formattedDuration!,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                        ),
+            // 视频标识
+            if (media.isVideo)
+              Positioned(
+                right: 4,
+                bottom: 4,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppDimensions.spacingXS,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.6),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusS),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.play_arrow,
+                        color: Colors.white,
+                        size: 12,
                       ),
+                      if (media.formattedDuration != null) ...[
+                        const SizedBox(width: 2),
+                        Text(
+                          media.formattedDuration!,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                          ),
+                        ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }

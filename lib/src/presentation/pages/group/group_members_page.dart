@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/group_entity.dart';
 import '../../blocs/group/group_bloc.dart';
@@ -182,7 +183,8 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: AppColors.warning,
+                  // Darkened orange so the white 10pt label reaches 4.5:1.
+                  color: ChatContrast.fillForWhiteText(AppColors.warning),
                   borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                 ),
                 child: Text(
@@ -195,7 +197,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryOf(context),
+                  color: AppColors.primaryFillOf(context),
                   borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                 ),
                 child: Text(
@@ -305,7 +307,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
                 title: Text(
                   S.of(this.context)?.chatRemoveFromGroup ??
                       'Remove from Group',
-                  style: const TextStyle(color: AppColors.error),
+                  style: TextStyle(color: AppColors.errorTextOf(context)),
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -357,7 +359,7 @@ class _GroupMembersPageState extends State<GroupMembersPage> {
             },
             child: Text(
               S.of(context)?.commonRemove ?? 'Remove',
-              style: const TextStyle(color: AppColors.error),
+              style: TextStyle(color: AppColors.errorTextOf(context)),
             ),
           ),
         ],

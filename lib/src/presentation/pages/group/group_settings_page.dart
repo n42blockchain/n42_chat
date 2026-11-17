@@ -7,6 +7,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../domain/entities/group_entity.dart';
 import '../../../domain/repositories/group_repository.dart';
@@ -74,14 +75,17 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
             message = resolveBlocMessage(context, message);
           }
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(message), backgroundColor: AppColors.error),
+            SnackBar(
+              content: Text(message),
+              backgroundColor: AppColors.errorFill,
+            ),
           );
         } else if (state.status == GroupStatus.success &&
             state.successMessage != null) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(resolveBlocMessage(context, state.successMessage!)),
-              backgroundColor: AppColors.success,
+              backgroundColor: ChatContrast.fillForWhiteText(AppColors.success),
             ),
           );
         }
@@ -124,6 +128,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.more_horiz),
+            tooltip: S.of(context)?.commonMore ?? 'More',
             onPressed: () => _showMoreOptions(group),
           ),
         ],
@@ -159,8 +164,11 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
       child: Row(
         children: [
           // 群头像
-          GestureDetector(
+          N42TapArea(
             onTap: group.canEditAvatar ? () => _changeAvatar() : null,
+            semanticLabel: group.canEditAvatar
+                ? S.of(context)?.profileAvatar ?? 'Avatar'
+                : null,
             child: Stack(
               children: [
                 N42Avatar(
@@ -175,7 +183,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                     child: Container(
                       padding: const EdgeInsets.all(AppDimensions.spacingXS),
                       decoration: BoxDecoration(
-                        color: AppColors.primaryOf(context),
+                        color: AppColors.primaryFillOf(context),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -196,7 +204,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                GestureDetector(
+                N42TapArea(
                   onTap: () {
                     debugLog(
                       'Group name tapped: canChangeSettings=${group.canChangeSettings}, myRole=${group.myRole}',
@@ -240,7 +248,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                   ),
                 ),
                 const SizedBox(height: AppDimensions.spacingXS),
-                GestureDetector(
+                N42TapArea(
                   onTap: () {
                     Clipboard.setData(ClipboardData(text: group.roomId));
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -341,7 +349,8 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                       vertical: 1,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.warning,
+                      // Darkened orange so the white 9pt label reaches 4.5:1.
+                      color: ChatContrast.fillForWhiteText(AppColors.warning),
                       borderRadius: BorderRadius.circular(
                         AppDimensions.radiusS,
                       ),
@@ -369,7 +378,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                       vertical: 1,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.primaryOf(context),
+                      color: AppColors.primaryFillOf(context),
                       borderRadius: BorderRadius.circular(
                         AppDimensions.radiusS,
                       ),
@@ -459,11 +468,13 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
       _buildSettingsDivider(isDark),
       ListTile(
         leading: const Icon(Icons.link_outlined),
-        title: const Text('Invite Link'),
+        title: Text(S.of(context)?.ui3InviteLink ?? 'Invite Link'),
         subtitle: Text(
           group.isPublic
-              ? 'Share a join link for this room'
-              : 'Share a room reference with invited members',
+              ? S.of(context)?.ui3ShareJoinLink ??
+                    'Share a join link for this room'
+              : S.of(context)?.ui3ShareRoomReference ??
+                    'Share a room reference with invited members',
         ),
         trailing: const Icon(AppIcons.chevron),
         onTap: () => _showInviteLinkActions(group),
@@ -645,7 +656,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
               group.isOwner
                   ? (S.of(context)?.commonDissolveGroup ?? 'Dissolve Group')
                   : (S.of(context)?.commonLeaveGroup ?? 'Leave Group'),
-              style: const TextStyle(color: AppColors.error),
+              style: TextStyle(color: AppColors.errorTextOf(context)),
             ),
             onTap: () {
               if (group.isOwner) {
@@ -787,13 +798,18 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
   ShareableLinkPresentation _buildGroupInvitePresentation(GroupEntity group) {
     return ShareableLinkPresentation(
       entityName: group.name,
-      linkLabel: 'Invite Link',
+      linkLabel: S.of(context)?.ui3InviteLink ?? 'Invite Link',
       qrCodeTitle: S.of(context)?.groupQrCode ?? 'Group QR Code',
       qrCodeSubtitle: group.isPublic
-          ? 'Scan to join this group directly'
-          : 'Scan to share this room reference with invited members',
-      errorPrefix: 'Failed to load invite link',
-      copySuccessMessage: 'Invite link copied',
+          ? S.of(context)?.ui3ScanToJoinGroup ??
+                'Scan to join this group directly'
+          : S.of(context)?.ui3ScanToShareRoomReference ??
+                'Scan to share this room reference with invited members',
+      errorPrefix:
+          S.of(context)?.ui3InviteLinkLoadFailed ??
+          'Failed to load invite link',
+      copySuccessMessage:
+          S.of(context)?.ui3InviteLinkCopied ?? 'Invite link copied',
       icon: group.isChannel ? Icons.campaign_outlined : Icons.group_outlined,
     );
   }
@@ -829,7 +845,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
             },
             child: Text(
               S.of(context)?.commonClear ?? 'Clear',
-              style: const TextStyle(color: AppColors.error),
+              style: TextStyle(color: AppColors.errorTextOf(context)),
             ),
           ),
         ],
@@ -870,7 +886,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
             },
             child: Text(
               S.of(context)?.commonLeave ?? 'Leave',
-              style: const TextStyle(color: AppColors.error),
+              style: TextStyle(color: AppColors.errorTextOf(context)),
             ),
           ),
         ],
@@ -900,7 +916,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
             },
             child: Text(
               S.of(context)?.commonDissolve ?? 'Dissolve',
-              style: const TextStyle(color: AppColors.error),
+              style: TextStyle(color: AppColors.errorTextOf(context)),
             ),
           ),
         ],

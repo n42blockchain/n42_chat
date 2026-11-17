@@ -44,7 +44,8 @@ class _GroupChannelsPageState extends State<GroupChannelsPage> {
           floatingActionButton: canManage
               ? FloatingActionButton(
                   onPressed: () => _showCreateChannelDialog(context),
-                  backgroundColor: AppColors.primaryOf(context),
+                  tooltip: l10n?.groupChannelCreate ?? 'New Channel',
+                  backgroundColor: AppColors.primaryFillOf(context),
                   child: const Icon(Icons.add, color: Colors.white),
                 )
               : null,
@@ -108,7 +109,7 @@ class _GroupChannelsPageState extends State<GroupChannelsPage> {
           ? Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: AppColors.primaryOf(context),
+                color: AppColors.primaryFillOf(context),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Text(
@@ -164,7 +165,7 @@ class _GroupChannelsPageState extends State<GroupChannelsPage> {
               leading: const Icon(Icons.delete_outline, color: AppColors.error),
               title: Text(
                 l10n?.groupChannelDelete ?? 'Delete Channel',
-                style: const TextStyle(color: AppColors.error),
+                style: TextStyle(color: AppColors.errorTextOf(context)),
               ),
               onTap: () {
                 Navigator.pop(sheetCtx);
@@ -231,7 +232,7 @@ class _GroupChannelsPageState extends State<GroupChannelsPage> {
             },
             child: Text(
               l10n?.commonDelete ?? 'Delete',
-              style: const TextStyle(color: AppColors.error),
+              style: TextStyle(color: AppColors.errorTextOf(context)),
             ),
           ),
         ],
