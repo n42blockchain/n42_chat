@@ -6371,4 +6371,2007 @@ class STr extends S {
   String scheduledSendTomorrowMorningAt(String time) {
     return 'Yarın sabah ($time)';
   }
+
+  @override
+  String get a11yScrollToBottom => 'En alta kaydır';
+
+  @override
+  String get ui3EnterMessageBeforeScheduling =>
+      'Zamanlamadan önce bir mesaj girin';
+
+  @override
+  String get ui3SendCode => 'Kod gönder';
+
+  @override
+  String get ui3CodeLanguage => 'Dil';
+
+  @override
+  String get ui3PasteCodeHere => 'Kodu buraya yapıştırın';
+
+  @override
+  String ui3ReminderSetAt(String time) {
+    return 'Hatırlatıcı ayarlandı · $time';
+  }
+
+  @override
+  String get ui3RedPacketCreateFailed => 'Kırmızı zarf oluşturulamadı';
+
+  @override
+  String get ui3SendTip => 'Bahşiş gönder';
+
+  @override
+  String get ui3TokenLabel => 'Jeton';
+
+  @override
+  String get ui3NoteOptional => 'Not (isteğe bağlı)';
+
+  @override
+  String ui3TipFailed(String error) {
+    return 'Bahşiş başarısız: $error';
+  }
+
+  @override
+  String get ui3GiftNftTitle => 'NFT hediye et';
+
+  @override
+  String get ui3TokenId => 'Token kimliği';
+
+  @override
+  String ui3NftGiftFailed(String error) {
+    return 'NFT hediyesi başarısız: $error';
+  }
+
+  @override
+  String get ui3AiAgentSubtitle =>
+      'Bir görev tanımlayın, doğru mini uygulamayı açın';
+
+  @override
+  String get ui3GiftNft => 'NFT hediye et';
+
+  @override
+  String get ui3GiftNftSubtitle => 'Bu kişiye NFT gönder';
+
+  @override
+  String get ui3MiniAppUnavailable => 'Mini uygulama kullanılamıyor';
+
+  @override
+  String ui3MediaItemsNotSent(int count) {
+    return 'Seçilen $count medya öğesi gönderilemedi';
+  }
+
+  @override
+  String get ui3PhotosSubtitle =>
+      'Fotoğraf ve videoları sohbete uygun biçimde gönderin';
+
+  @override
+  String get ui3OriginalImages => 'Orijinal görseller';
+
+  @override
+  String get ui3OriginalImagesSubtitle =>
+      'Sıkıştırılmamış fotoğrafları dosya olarak gönderin';
+
+  @override
+  String ui3ScheduledFileFor(String filename, String time) {
+    return '$filename, $time için zamanlandı';
+  }
+
+  @override
+  String ui3SendingOriginalImage(String filename) {
+    return 'Orijinal görsel gönderiliyor: $filename';
+  }
+
+  @override
+  String ui3ScheduledOriginalImage(String filename) {
+    return 'Orijinal görsel zamanlandı: $filename';
+  }
+
+  @override
+  String get ui3PaymentAlreadySent => 'Ödeme zaten gönderildi';
+
+  @override
+  String get ui3PaymentProcessing => 'Ödeme işleniyor';
+
+  @override
+  String ui3ChainStatus(String status) {
+    return 'Zincir durumu: $status';
+  }
+
+  @override
+  String get ui3NotChecked => 'Kontrol edilmedi';
+
+  @override
+  String ui3ConfirmationsCount(int confirmations, int required) {
+    return 'Onaylandı: $confirmations / $required blok';
+  }
+
+  @override
+  String get ui3CopyTxHash => 'İşlem hash\'ini kopyala';
+
+  @override
+  String get ui3VerifyAgain => 'Yeniden doğrula';
+
+  @override
+  String get ui3VerifyOnChain => 'Zincirde doğrula';
+
+  @override
+  String get ui3TransferMissingChainDetails =>
+      'Bu transfer kesin zincir ve varlık bilgilerini içermiyor.';
+
+  @override
+  String get ui3ReceiptPending => 'Zincirde beklemede';
+
+  @override
+  String get ui3ReceiptConfirmed => 'Onaylandı';
+
+  @override
+  String get ui3ReceiptFailed => 'Zincirde başarısız';
+
+  @override
+  String get ui3ReceiptMismatch => 'İşlem ayrıntıları eşleşmiyor';
+
+  @override
+  String get ui3ReceiptUnsupported => 'Zincir doğrulaması desteklenmiyor';
+
+  @override
+  String get ui3ReceiptUnavailable => 'Doğrulama kullanılamıyor';
+
+  @override
+  String get ui3OpenOrSave => 'Aç / Kaydet';
+
+  @override
+  String get ui3UnableToOpenFile => 'Bu dosya açılamıyor.';
+
+  @override
+  String ui3AiRewriteFailed(String error) {
+    return 'Yapay zekâ ile yeniden yazma başarısız: $error';
+  }
+
+  @override
+  String get ui3AiShareMessagesTitle =>
+      'Mesajlar yapay zekâyla paylaşılsın mı?';
+
+  @override
+  String get ui3AiShareMessagesBody =>
+      'Yapay zekânın bu yanıt için kullanabileceği mesajları seçin. Bu tek seferlik onay iki dakika sonra sona erer. Hızlı Yanıt\'ı kapatmak bekleyen sonuçları iptal eder. Ödemelere veya dışa aktarmalara izin vermez.';
+
+  @override
+  String get ui3OtherParticipant => 'Karşı taraf';
+
+  @override
+  String get ui3ShareSelected => 'Seçilenleri paylaş';
+
+  @override
+  String get ui3BotCommandError => 'Komut hatası';
+
+  @override
+  String get ui3BotUnknownCommand => 'Bilinmeyen komut';
+
+  @override
+  String get ui3BotTypeHelp =>
+      'Kullanılabilir komutları görmek için /help yazın.';
+
+  @override
+  String get ui3FilesMediaLinks => 'Dosyalar, Medya ve Bağlantılar';
+
+  @override
+  String get ui3ChatStorage => 'Sohbet depolama alanı';
+
+  @override
+  String get ui3EncryptionKeysDevices => 'Şifreleme anahtarları ve cihazlar';
+
+  @override
+  String get ui3EncryptionServiceUnavailable =>
+      'Şifreleme hizmeti henüz kullanılamıyor';
+
+  @override
+  String get ui3ExportLoadingHistory =>
+      'Dışa aktarma için daha fazla sohbet geçmişi yükleniyor...';
+
+  @override
+  String get ui3ExportTxtDesc =>
+      'Notlar, yedekleme veya uyumluluk incelemesi için düz metin döküm';
+
+  @override
+  String get ui3ExportCustomRange => 'Özel aralık';
+
+  @override
+  String get ui3ExportStart => 'Başlangıç';
+
+  @override
+  String get ui3ExportEnd => 'Bitiş';
+
+  @override
+  String get ui3ExportSelectDate => 'Tarih seçin';
+
+  @override
+  String get ui3FolderFilterUnreadOnly => 'Yalnızca okunmamışlar';
+
+  @override
+  String get ui3FolderFilterMutedOnly => 'Yalnızca sessize alınanlar';
+
+  @override
+  String get ui3FolderFilterNoDms => 'DM\'ler hariç';
+
+  @override
+  String get ui3FolderFilterNoGroups => 'Gruplar hariç';
+
+  @override
+  String get ui3FolderFilterNoChannels => 'Kanallar hariç';
+
+  @override
+  String get ui3FolderFilterAllChats => 'Tüm sohbetler';
+
+  @override
+  String get ui3Create => 'Oluştur';
+
+  @override
+  String ui3DeleteFolderConfirm(String name) {
+    return '\"$name\" klasörü silinsin mi?';
+  }
+
+  @override
+  String get a11yDecreaseTextSize => 'Metni küçült';
+
+  @override
+  String get a11yIncreaseTextSize => 'Metni büyüt';
+
+  @override
+  String ui3MinutesRead(int minutes) {
+    return '$minutes dk okuma';
+  }
+
+  @override
+  String get ui3TipOnChain => 'Zincirde ✓';
+
+  @override
+  String get ui3ViewSource => 'Kaynağı görüntüle';
+
+  @override
+  String get a11yPreviousPage => 'Önceki sayfa';
+
+  @override
+  String get a11yNextPage => 'Sonraki sayfa';
+
+  @override
+  String get ui3OpenExternalLinkTitle => 'Harici bağlantı açılsın mı?';
+
+  @override
+  String get ui3Open => 'Aç';
+
+  @override
+  String get ui3UnableToOpenLink => 'Bu bağlantı açılamıyor.';
+
+  @override
+  String get ui3ImageUnavailable => 'Görsel kullanılamıyor';
+
+  @override
+  String ui3LoadImageFrom(Object host) {
+    return 'Görseli $host adresinden yükle';
+  }
+
+  @override
+  String ui3RetryImageFrom(Object host) {
+    return 'Görseli $host adresinden yeniden dene';
+  }
+
+  @override
+  String get ui3TranslatedByN42 => 'N42 tarafından çevrildi';
+
+  @override
+  String ui3TranslatedFromByN42(Object language) {
+    return 'N42 tarafından $language dilinden çevrildi';
+  }
+
+  @override
+  String get ui3ClearWhiteboardTitle => 'Beyaz tahta temizlensin mi?';
+
+  @override
+  String get ui3ClearWhiteboardMessage =>
+      'Tüm çizimler herkes için kaldırılacak. Bu işlem geri alınamaz.';
+
+  @override
+  String get ui3WhiteboardLive => 'Beyaz tahta · Canlı';
+
+  @override
+  String get a11yPenColor => 'Kalem rengi';
+
+  @override
+  String get ui3AiDescribeOcr => 'Yapay zekâ açıklaması / OCR';
+
+  @override
+  String get ui3DocumentPreviewFailed =>
+      'Bu belge güvenli şekilde önizlenemiyor. Bağlantıyı ve dosya boyutunu kontrol edin (en fazla 2 MB).';
+
+  @override
+  String get ui3AiConsentMessage =>
+      'Yapay zekânın bu özet için kullanabileceği mesajları seçin. Bu tek seferlik onay iki dakika sonra sona erer. Ödemelere veya dışa aktarmalara izin vermez.';
+
+  @override
+  String get ui3AiSuggestedReplies => 'Önerilen yanıtlar';
+
+  @override
+  String get ui3AiGeneratingSuggestions => 'Öneriler oluşturuluyor...';
+
+  @override
+  String get ui3StickersEmpty => 'Henüz çıkartma yok';
+
+  @override
+  String get ui3StickersGet => 'Çıkartma edin';
+
+  @override
+  String get a11yFormatBold => 'Kalın';
+
+  @override
+  String get a11yFormatItalic => 'İtalik';
+
+  @override
+  String get a11yFormatStrikethrough => 'Üstü çizili';
+
+  @override
+  String get a11yFormatInlineCode => 'Satır içi kod';
+
+  @override
+  String get a11yFormatCodeBlock => 'Kod bloğu';
+
+  @override
+  String get a11yFormatChecklistItem => 'Kontrol listesi öğesi';
+
+  @override
+  String get a11yFormatBulletList => 'Madde işaretli liste';
+
+  @override
+  String get a11yFormatNumberedList => 'Numaralı liste';
+
+  @override
+  String get a11yFormatLink => 'Bağlantı';
+
+  @override
+  String get a11yFormatTable => 'Tablo';
+
+  @override
+  String get a11yFormatMeetingTemplate => 'Toplantı şablonu';
+
+  @override
+  String get a11yEmojiSmileys => 'Yüz ifadeleri ve insanlar';
+
+  @override
+  String get a11yEmojiHearts => 'Kalpler';
+
+  @override
+  String get a11yEmojiAnimals => 'Hayvanlar ve doğa';
+
+  @override
+  String get a11yEmojiFood => 'Yiyecek ve içecek';
+
+  @override
+  String get a11yEmojiTravel => 'Seyahat ve yerler';
+
+  @override
+  String get a11yEmojiActivities => 'Etkinlikler';
+
+  @override
+  String get a11yEmojiObjects => 'Nesneler';
+
+  @override
+  String get a11yEmojiSymbols => 'Semboller';
+
+  @override
+  String get ui3FrequentlyUsed => 'Sık kullanılanlar';
+
+  @override
+  String get ui3NoEditHistory => 'Düzenleme geçmişi yok';
+
+  @override
+  String get ui3EventNew => 'Yeni etkinlik';
+
+  @override
+  String get ui3EventTitleLabel => 'Başlık';
+
+  @override
+  String get ui3EventLocationOptional => 'Konum (isteğe bağlı)';
+
+  @override
+  String get ui3EventDescriptionOptional => 'Açıklama (isteğe bağlı)';
+
+  @override
+  String get ui3EventSend => 'Etkinliği gönder';
+
+  @override
+  String get ui3EventTitleRequired => 'Başlık gerekli';
+
+  @override
+  String get ui3EventEndAfterStart => 'Bitiş saati başlangıçtan sonra olmalı';
+
+  @override
+  String get ui3MiniAppAgentIntro =>
+      'Ne yapmak istediğini anlat, uygun mini uygulamayı açayım.';
+
+  @override
+  String get ui3MiniAppAgentExample => 'örn. ETH\'yi USDC\'ye çevir';
+
+  @override
+  String get ui3MiniAppAgentNoMatch =>
+      'Eşleşen mini uygulama bulunamadı. Farklı ifade etmeyi dene.';
+
+  @override
+  String ui3MiniAppOpen(Object appName) {
+    return '$appName uygulamasını aç';
+  }
+
+  @override
+  String get ui3MusicLinkPlatforms =>
+      'NetEase Cloud Music, QQ Music, Kugou, Kuwo ve diğerlerinden şarkı bağlantılarını destekler';
+
+  @override
+  String get ui3PollMarkCorrectAnswer => 'Boş olmayan bir doğru cevap işaretle';
+
+  @override
+  String get ui3PollQuizMode => 'Test modu';
+
+  @override
+  String get ui3PollAnswerExplanationHint => 'Cevap açıklaması (isteğe bağlı)';
+
+  @override
+  String get a11yCorrectAnswer => 'Doğru cevap';
+
+  @override
+  String get ui3AiSuggestions => 'Yapay zekâ önerileri';
+
+  @override
+  String get a11yPaste => 'Yapıştır';
+
+  @override
+  String get a11yRefresh => 'Yenile';
+
+  @override
+  String get ui3RecoveryKeyStoreWarning =>
+      'Bu anahtarı güvenli bir yerde sakla. Tüm cihazlarına erişimini kaybedersen şifreli mesajlarını kurtarmanın tek yolu budur.';
+
+  @override
+  String ui3SavedToPath(Object path) {
+    return 'Kaydedildi: $path';
+  }
+
+  @override
+  String get ui3UnknownAccount => 'Bilinmeyen hesap';
+
+  @override
+  String get ui3UnknownHomeserver => 'Bilinmeyen ana sunucu';
+
+  @override
+  String get ui3ImportRecoveryKey => 'Kurtarma anahtarını içe aktar';
+
+  @override
+  String get ui3ImportRecoveryKeyDesc =>
+      'Şifreli mesaj geçmişinin oda anahtarlarını geri yüklemek için kurtarma anahtarını gir veya yapıştır.';
+
+  @override
+  String ui3RecoveryKeyAccountInfo(Object account, Object homeserver) {
+    return 'Hesap: $account\\nAna sunucu: $homeserver';
+  }
+
+  @override
+  String get ui3Import => 'İçe aktar';
+
+  @override
+  String get ui3InvalidRecoveryKeyFormat => 'Geçersiz kurtarma anahtarı biçimi';
+
+  @override
+  String ui3RecoveryKeyPartialRestore(
+    Object restored,
+    Object total,
+    Object failed,
+  ) {
+    return '$total anahtardan $restored tanesi geri yüklendi. $failed anahtar başarısız oldu. Hesabı, ağı ve yedeği kontrol edip tekrar dene. Geçmişin bir kısmı okunamaz kalabilir.';
+  }
+
+  @override
+  String ui3RecoveryKeyRestoreSuccess(Object restored, Object total) {
+    return '$total anahtardan $restored tanesi başarıyla geri yüklendi';
+  }
+
+  @override
+  String ui3ImportFailed(Object error) {
+    return 'İçe aktarma başarısız: $error';
+  }
+
+  @override
+  String ui3PasskeyRegistrationFailed(Object error) {
+    return 'Geçiş anahtarı kaydı başarısız: $error';
+  }
+
+  @override
+  String get ui3PasskeyDefaultName => 'Geçiş anahtarım';
+
+  @override
+  String get ui3PasskeyNameHint => 'örn. iPhone, MacBook';
+
+  @override
+  String get ui3PasskeyDeleteFailed => 'Geçiş anahtarı silinemedi';
+
+  @override
+  String get ui3TwoFactorAuth => 'İki faktörlü kimlik doğrulama';
+
+  @override
+  String get ui3TwoFactorOnSubtitle =>
+      'Açık — kimlik doğrulama uygulaması kodu gerekli';
+
+  @override
+  String get ui3TwoFactorOffSubtitle =>
+      'Kapalı — kimlik doğrulama uygulamasıyla (TOTP) koru';
+
+  @override
+  String get ui3ShowRecoveryKey => 'Kurtarma anahtarını göster';
+
+  @override
+  String get ui3ShowRecoveryKeyDesc =>
+      'Yedekleme için kurtarma anahtarını görüntüle';
+
+  @override
+  String get ui3ImportRecoveryKeyHint =>
+      'Mesajları kurtarma anahtarıyla geri yükle';
+
+  @override
+  String get ui3RecoveryKeyCreateFailed => 'Kurtarma anahtarı oluşturulamadı';
+
+  @override
+  String get ui3TotpIncorrectCode => 'Yanlış kod, tekrar dene';
+
+  @override
+  String get ui3TwoFactorEnabled =>
+      'İki faktörlü kimlik doğrulama etkinleştirildi';
+
+  @override
+  String get ui3TwoFactorDisabled =>
+      'İki faktörlü kimlik doğrulama devre dışı bırakıldı';
+
+  @override
+  String get ui3TwoFactorTurnOffTitle =>
+      'İki faktörlü kimlik doğrulama kapatılsın mı?';
+
+  @override
+  String get ui3TwoFactorTurnOffMessage =>
+      'Kimlik doğrulama uygulaman artık gerekmeyecek. Daha sonra yeni bir anahtarla yeniden kurabilirsin.';
+
+  @override
+  String get ui3TurnOff => 'Kapat';
+
+  @override
+  String get ui3TwoFactorTotpTitle => 'İki faktörlü (TOTP)';
+
+  @override
+  String get ui3TwoFactorIsOn => 'İki faktörlü kimlik doğrulama açık';
+
+  @override
+  String get ui3TwoFactorCodeRequired =>
+      'Kimlik doğrulama uygulamandan bir kod gerekli.';
+
+  @override
+  String get ui3TotpStepScan =>
+      '1. Bu QR kodunu bir kimlik doğrulama uygulamasıyla (Google Authenticator, Authy, 1Password…) tara veya anahtarı elle gir.';
+
+  @override
+  String get ui3TotpKeyCopied => 'Anahtar kopyalandı';
+
+  @override
+  String get ui3TotpStepConfirm => '2. Onaylamak için 6 haneli kodu gir.';
+
+  @override
+  String get ui3Enable => 'Etkinleştir';
+
+  @override
+  String get ui3BackupSettingsDesc =>
+      'Yerel sohbet ayarlarını yedekle. Mesajlar yeniden giriş yaptıktan sonra sunucudan geri yüklenir.';
+
+  @override
+  String get ui3BackupKeysSeparate => 'Şifreleme anahtarları ayrı yönetilir';
+
+  @override
+  String get ui3BackupKeysSeparateHint =>
+      'Şifreli mesaj erişimini yedeklemek için Güvenlik > Kurtarma Anahtarı\'nı kullan.';
+
+  @override
+  String ui3BackupRoomsSize(Object rooms, Object size) {
+    return '$rooms oda  $size';
+  }
+
+  @override
+  String get ui3BackupRestoreFromFileDesc =>
+      'Başka bir cihazdan veya önceki bir yedekten .n42backup dosyası içe aktar. Şifreleme anahtarları kurtarma anahtarınla ayrıca geri yüklenir.';
+
+  @override
+  String get ui3UsernameSessionRequired =>
+      'Kullanıcı adı için etkin bir oturum gerekir';
+
+  @override
+  String get ui3SecuritySessionRequired =>
+      'Güvenlik ayarları için etkin bir oturum gerekir';
+
+  @override
+  String get ui3ConnectedAccountsSessionRequired =>
+      'Bağlı hesaplar için etkin bir oturum gerekir';
+
+  @override
+  String get ui3SystemAccounts => 'Sistem ve hesaplar';
+
+  @override
+  String get ui3AccountIdentity => 'Hesap ve kimlik';
+
+  @override
+  String get ui3Accounts => 'Hesaplar';
+
+  @override
+  String get ui3DevicesSessions => 'Cihazlar ve oturumlar';
+
+  @override
+  String get ui3Integrations => 'Entegrasyonlar';
+
+  @override
+  String get ui3ConnectedAccounts => 'Bağlı hesaplar';
+
+  @override
+  String get ui3ConnectedAccountsDesc =>
+      'Telegram, WhatsApp, Discord ve API köprüsü entegrasyonları';
+
+  @override
+  String get ui3SystemOverview => 'Sisteme genel bakış';
+
+  @override
+  String ui3AccountCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count hesap',
+      one: '1 hesap',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String ui3DeviceCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count cihaz',
+      one: '1 cihaz',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get ui3PrivacySecurityOverview =>
+      'Uçtan uca şifreleme, ekran görüntüsü koruması ve proxy denetimleri';
+
+  @override
+  String get ui3ConversationPrivacy => 'Sohbet gizliliği';
+
+  @override
+  String get ui3NetworkPrivacy => 'Ağ gizliliği';
+
+  @override
+  String get ui3IdentityPrivacy => 'Kimlik gizliliği';
+
+  @override
+  String get ui3EncryptionKeyBackup => 'Şifreleme ve anahtar yedekleme';
+
+  @override
+  String get ui3DevicesVerification => 'Cihazlar ve doğrulama';
+
+  @override
+  String get ui3ChipE2eeDefault => 'Varsayılan E2EE';
+
+  @override
+  String get ui3ChipManualE2ee => 'Manuel E2EE';
+
+  @override
+  String get ui3ChipSelfDestruct => 'Kendini imha';
+
+  @override
+  String get ui3ChipScreenshotGuard => 'Ekran görüntüsü koruması';
+
+  @override
+  String get ui3ChipIpProxy => 'IP / proxy sunucusu';
+
+  @override
+  String get ui3ChipLinkPreviewsOff => 'Bağlantı önizlemeleri kapalı';
+
+  @override
+  String get ui3ChipPublicHandle => 'Herkese açık kullanıcı adı';
+
+  @override
+  String get a11yShowPassword => 'Şifreyi göster';
+
+  @override
+  String get a11yHidePassword => 'Şifreyi gizle';
+
+  @override
+  String get a11yCheckServer => 'Sunucuyu kontrol et';
+
+  @override
+  String get ui3AuthAnonymousRegistration => 'Anonim Kayıt';
+
+  @override
+  String get ui3AuthAnonymousRegistrationDesc =>
+      'Telefon veya e-posta bağlamadan hesap oluşturun. Kullanıcı adı otomatik olarak oluşturulur.';
+
+  @override
+  String get ui3AuthAnonymousModeOn => 'Anonim mod açık';
+
+  @override
+  String get ui3AuthAnonymousModeOnDesc =>
+      'Uygulama sizin için rastgele bir Matrix kullanıcı adı oluşturacak. Daha sonra oluşturulan hesap ve şifreyle giriş yapabilirsiniz.';
+
+  @override
+  String get ui3AuthChooseLoginMethod => 'Giriş yöntemini seçin';
+
+  @override
+  String get ui3AuthSsoOpenFailed => 'SSO giriş sayfası açılamadı';
+
+  @override
+  String get ui3AuthWalletUnavailable => 'Cüzdan kullanılamıyor';
+
+  @override
+  String get ui3ProfileSubscriptions => 'Abonelikler';
+
+  @override
+  String get ui3ProfileBuySellCrypto => 'Kripto al / sat';
+
+  @override
+  String get ui3ProfileOnDeviceAi => 'Cihaz üzerinde yapay zekâ';
+
+  @override
+  String get ui3ProfileSetAUsername => 'Kullanıcı adı belirle';
+
+  @override
+  String get ui3ProfileAvatarStudio => 'Avatar Stüdyosu';
+
+  @override
+  String get ui3ProfileAvatarStudioSubtitle => 'NFT Avatar / Süslemeler';
+
+  @override
+  String get ui3ProfileCustomize => 'Özelleştir';
+
+  @override
+  String get ui3ProfileQrSubtitle =>
+      'Bu profili açmak veya sohbet başlatmak için tarayın';
+
+  @override
+  String get ui3PrivacyHardening => 'Gizlilik Güçlendirme';
+
+  @override
+  String get ui3HidePhoneNumber => 'Telefon Numarasını Gizle';
+
+  @override
+  String get ui3HidePhoneNumberDesc =>
+      'Bu cihazdaki profil ekranlarında bağlı telefon numarasını maskele';
+
+  @override
+  String get ui3EncryptNewChatsByDefault =>
+      'Yeni Sohbetleri Varsayılan Olarak Şifrele';
+
+  @override
+  String get ui3EncryptNewChatsByDefaultDesc =>
+      'Yeni doğrudan sohbetleri ve özel odaları E2EE etkin olarak başlat';
+
+  @override
+  String get ui3PrivateChatMode => 'Özel Sohbet Modu';
+
+  @override
+  String get ui3PrivateChatModeDesc =>
+      'Özel veya şifreli sohbetleri görüntülerken ekran görüntüsünü geçici olarak engelle';
+
+  @override
+  String get ui3DefaultSelfDestructTimer => 'Varsayılan Kendini İmha Süresi';
+
+  @override
+  String get ui3DefaultSelfDestructTimerDesc =>
+      'Yeni gönderilen mesajlara varsayılan kendini imha süresi uygula';
+
+  @override
+  String get ui3LinkPreviews => 'Bağlantı Önizlemeleri';
+
+  @override
+  String get ui3LinkPreviewsDesc =>
+      'Mesajlar URL içerdiğinde başlık, açıklama ve küçük resimleri getir';
+
+  @override
+  String get ui3IpAddressProtection => 'IP Adresi Koruması';
+
+  @override
+  String get ui3IpAddressProtectionDesc =>
+      'Mevcut olduğunda Matrix ve bağlantı önizleme isteklerini yapılandırdığınız HTTP gizlilik proxy\'si üzerinden yönlendir';
+
+  @override
+  String get ui3UseTorProxy => 'Tor / Privoxy HTTP Proxy\'si Kullan';
+
+  @override
+  String get ui3UseTorProxyDesc =>
+      '127.0.0.1:8118 üzerindeki Privoxy gibi yerel bir HTTP proxy uç noktası kullanın. Yerel SOCKS5 Tor yönlendirmesi burada desteklenmez.';
+
+  @override
+  String get ui3CustomProxy => 'Özel Proxy';
+
+  @override
+  String get ui3CustomProxyDesc =>
+      'Matrix trafiği ve bağlantı önizlemeleri için özel bir HTTP veya HTTPS proxy\'si kullan';
+
+  @override
+  String get ui3ProxyEndpoint => 'Proxy Adresi';
+
+  @override
+  String get ui3ProxyEndpointDesc =>
+      'HTTP/HTTPS proxy adresi (SOCKS desteklenmez)';
+
+  @override
+  String get ui3InvalidEndpoint => 'Geçersiz adres';
+
+  @override
+  String get ui3CustomProxyStaysOff =>
+      'Geçerli bir adres belirleyene kadar özel proxy kapalı kalır';
+
+  @override
+  String get ui3NotificationFilterNote =>
+      'Öncelik kuralları her zaman bildirim gönderir (sessiz, yalnızca bahsetmeler ve Rahatsız Etmeyin modlarını atlayarak). Sessize alınan anahtar kelimeler bildirimleri engeller.';
+
+  @override
+  String get ui3PriorityKeywords => 'Öncelikli anahtar kelimeler';
+
+  @override
+  String get ui3PriorityKeywordHint => 'ör. acil';
+
+  @override
+  String get ui3MutedKeywords => 'Sessize alınan anahtar kelimeler';
+
+  @override
+  String get ui3MutedKeywordHint => 'ör. spam';
+
+  @override
+  String get ui3PrioritySenders => 'Öncelikli gönderenler';
+
+  @override
+  String get ui3CaseSensitive => 'Büyük/küçük harfe duyarlı';
+
+  @override
+  String get ui3None => 'Yok';
+
+  @override
+  String get ui3SmartReplyTranslation => 'Akıllı yanıt çevirisi';
+
+  @override
+  String get ui3SmartReplyTranslationDesc =>
+      'Mesajlarınızı göndermeden önce alıcının diline otomatik olarak çevirin.';
+
+  @override
+  String get ui3FromPhotos => 'Fotoğraflardan';
+
+  @override
+  String get ui3ChangePhoto => 'Fotoğrafı değiştir';
+
+  @override
+  String get ui3RoamingUsesMobileData =>
+      'Dolaşımda Mobil Veri kuralları geçerli';
+
+  @override
+  String get ui3RoamingUsesMobileDataDesc =>
+      'Ayrı dolaşım algılama henüz mevcut değil, bu yüzden dolaşım şu anda Mobil Veri otomatik indirme ayarlarını izler.';
+
+  @override
+  String ui3DeleteQuickReplyConfirm(String content) {
+    return '\"$content\" silinsin mi?';
+  }
+
+  @override
+  String get ui3ResetToDefaults => 'Varsayılanlara Sıfırla';
+
+  @override
+  String get ui3ResetQuickRepliesMessage =>
+      'Bu işlem tüm özel hızlı yanıtları kaldırıp varsayılanları geri yükleyecek. Devam edilsin mi?';
+
+  @override
+  String get ui3LocalLlmUnavailable => 'Bu cihazda desteklenmiyor';
+
+  @override
+  String get ui3LocalLlmNotDownloaded => 'Model indirilmedi';
+
+  @override
+  String get ui3LocalLlmReady => 'Hazır (cihaz üzerinde)';
+
+  @override
+  String get ui3LocalLlmDescription =>
+      'Etkin ve hazır olduğunda yapay zekâ özellikleri (özetleme, yeniden yazma, çeviri, yanıtlar) tamamen cihaz üzerinde çalışır — veriler telefonunuzdan asla çıkmaz. Aksi halde bulut sağlayıcı kullanılır.';
+
+  @override
+  String get ui3UseOnDeviceAi => 'Cihaz üzerinde yapay zekâ kullan';
+
+  @override
+  String get ui3UseOnDeviceAiDesc => 'Hazır olduğunda yerel çıkarımı tercih et';
+
+  @override
+  String get ui3DownloadModel => 'Modeli indir';
+
+  @override
+  String get ui3LocalLlmRuntimeRequired =>
+      'Cihaz üzerinde çıkarım için yerel çalışma zamanı (Android MediaPipe / iOS Core ML) gerekir. Platform işleyicisi kullanılabilir olduğunda otomatik olarak etkinleşir.';
+
+  @override
+  String get ui3PhotoAvatar => 'Fotoğraf Avatarı';
+
+  @override
+  String get ui3AvatarStyles => 'Avatar Stilleri';
+
+  @override
+  String get ui3AvatarStylesDesc =>
+      'Profil ve avatar giriş noktaları için tek bir süsleme seçici kullan.';
+
+  @override
+  String get ui3ReplaceNftAvatar => 'NFT Avatarı Değiştir';
+
+  @override
+  String get ui3NftAvatarDesc =>
+      'Zincir üstü bir koleksiyon öğesini avatarınız olarak kullanın.';
+
+  @override
+  String get ui3UsePhotoAvatar => 'Fotoğraf Avatarı Kullan';
+
+  @override
+  String get ui3UsePhotoAvatarDesc =>
+      'Yüklenen avatarı koru ve NFT bağlantısını kaldır.';
+
+  @override
+  String ui3AvatarStyleSet(Object name) {
+    return 'Avatar stili ayarlandı: $name';
+  }
+
+  @override
+  String get ui3NftAvatarUpdated => 'NFT avatar güncellendi';
+
+  @override
+  String get ui3SwitchedToPhotoAvatar => 'Fotoğraf avatarına geri dönüldü';
+
+  @override
+  String get ui3SignInToViewRedPacketHistory =>
+      'Kırmızı zarf geçmişini görmek için giriş yapın';
+
+  @override
+  String get ui3RedPacketActive => 'Aktif';
+
+  @override
+  String get ui3RedPacketCompleted => 'Tamamlandı';
+
+  @override
+  String get ui3CardsAndPasses => 'Kartlar ve geçiş kartları';
+
+  @override
+  String get ui3CardsAndPassesDesc =>
+      'Cüzdan kartları, kuponlar ve geçiş kartları ana uygulamada yönetilir.';
+
+  @override
+  String get ui3CardPackRequiresMainApp =>
+      'Kart Paketi için ana uygulama gerekir';
+
+  @override
+  String get ui3OpenCardPack => 'Kart Paketini Aç';
+
+  @override
+  String get ui3UnableToOpenChat => 'Bu kişiyle sohbet açılamıyor';
+
+  @override
+  String get ui3WalletManagedInMainApp => 'Cüzdan ana uygulamada yönetiliyor';
+
+  @override
+  String ui3CreatorPlans(Object name) {
+    return '$name · Planlar';
+  }
+
+  @override
+  String get ui3NewPlan => 'Yeni plan';
+
+  @override
+  String get ui3MySubscriptions => 'Aboneliklerim';
+
+  @override
+  String get ui3AvailablePlans => 'Mevcut planlar';
+
+  @override
+  String get ui3NoPlansYet =>
+      'Henüz plan yok · oluşturmak için “Yeni plan”a dokunun';
+
+  @override
+  String ui3DaysLeft(Object days) {
+    return '$days gün kaldı';
+  }
+
+  @override
+  String get ui3SubscriptionCancelled => 'İptal edildi';
+
+  @override
+  String get ui3AutoRenewOn => 'Otomatik yenileme: açık';
+
+  @override
+  String get ui3AutoRenewOff => 'Otomatik yenileme: kapalı';
+
+  @override
+  String get ui3CancelSubscriptionTitle => 'Abonelik iptal edilsin mi?';
+
+  @override
+  String ui3CancelSubscriptionConfirm(Object name) {
+    return '$name aboneliğiniz süresi dolana kadar etkin kalır ve yenilenmez.';
+  }
+
+  @override
+  String get ui3Subscribe => 'Abone ol';
+
+  @override
+  String ui3SubscribedTo(Object name) {
+    return '$name abonesi oldunuz';
+  }
+
+  @override
+  String get ui3PlanPriceLabel => 'Fiyat (ör. 9.9 USDT)';
+
+  @override
+  String get ui3PlanDescriptionLabel => 'Açıklama (isteğe bağlı)';
+
+  @override
+  String get ui3PlanBenefitsLabel => 'Avantajlar (virgülle ayırın)';
+
+  @override
+  String get ui3PlanPeriod => 'Dönem:';
+
+  @override
+  String get ui3Monthly => 'Aylık';
+
+  @override
+  String get ui3Yearly => 'Yıllık';
+
+  @override
+  String get ui3SaveRemarkFailed => 'Not kaydedilemedi';
+
+  @override
+  String get ui3CopyLink => 'Bağlantıyı Kopyala';
+
+  @override
+  String get ui3Connect => 'Bağlan';
+
+  @override
+  String get ui3CommonTokens => 'Ortak tokenler';
+
+  @override
+  String get ui3SharedNfts => 'Ortak NFT\'ler';
+
+  @override
+  String get ui3TransactionHistory => 'İşlem geçmişi';
+
+  @override
+  String get ui3CommonDaos => 'Ortak DAO\'lar';
+
+  @override
+  String get ui3SameChains => 'Aynı zincirler';
+
+  @override
+  String get ui3ChatInitFailed => 'Sohbet başlatılamadı';
+
+  @override
+  String get ui3CheckNetworkRetry =>
+      'Lütfen ağ bağlantınızı kontrol edip tekrar deneyin';
+
+  @override
+  String get ui3FromContacts => 'Rehberden';
+
+  @override
+  String get ui3FindFriendsFromContacts =>
+      'Telefon rehberinizden arkadaş bulun';
+
+  @override
+  String get ui3EnsOrDomain => 'ENS / Alan adı';
+
+  @override
+  String get ui3LoadingContacts => 'Kişiler yükleniyor...';
+
+  @override
+  String get ui3ContactsPermissionRequired => 'Rehber İzni Gerekli';
+
+  @override
+  String get ui3ContactsPermissionMessage =>
+      'Rehberinizden arkadaş bulmak için lütfen kişilerinize erişime izin verin.';
+
+  @override
+  String get ui3AllowAccess => 'Erişime İzin Ver';
+
+  @override
+  String get ui3NoContactMatches => 'Eşleşme Bulunamadı';
+
+  @override
+  String get ui3NoContactMatchesMessage =>
+      'Rehberinizdeki kimse henüz bu uygulamayı kullanmıyor. Onları davet edin!';
+
+  @override
+  String ui3ScannedContacts(Object count) {
+    return '$count kişi tarandı';
+  }
+
+  @override
+  String ui3FoundContactMatches(Object count) {
+    return 'Rehberinizde $count eşleşme bulundu';
+  }
+
+  @override
+  String ui3InContactsAs(Object name) {
+    return 'Rehberde: $name';
+  }
+
+  @override
+  String get ui3DeletePhotoConfirm => 'Bu fotoğraf silinsin mi?';
+
+  @override
+  String get ui3InviteLink => 'Davet Bağlantısı';
+
+  @override
+  String get ui3ShareJoinLink => 'Bu odaya katılma bağlantısını paylaşın';
+
+  @override
+  String get ui3ShareRoomReference =>
+      'Davet edilen üyelerle oda referansını paylaşın';
+
+  @override
+  String get ui3ScanToJoinGroup => 'Bu gruba doğrudan katılmak için tarayın';
+
+  @override
+  String get ui3ScanToShareRoomReference =>
+      'Bu oda referansını davet edilen üyelerle paylaşmak için tarayın';
+
+  @override
+  String get ui3InviteLinkLoadFailed => 'Davet bağlantısı yüklenemedi';
+
+  @override
+  String get ui3InviteLinkCopied => 'Davet bağlantısı kopyalandı';
+
+  @override
+  String get ui3ChannelCategoryOptional => 'Kategori (isteğe bağlı)';
+
+  @override
+  String get ui3ChannelCategoryHint => 'Duyurular / Ürün / Destek';
+
+  @override
+  String get ui3DescriptionOptional => 'Açıklama (isteğe bağlı)';
+
+  @override
+  String get ui3WebhookEnable => 'Webhook otomasyonunu etkinleştir';
+
+  @override
+  String get ui3WebhookEnableDesc =>
+      'Üye katılma ve karşılama olaylarını entegrasyon uç noktanıza gönderin.';
+
+  @override
+  String get ui3WebhookUrl => 'Webhook URL\'si';
+
+  @override
+  String get ui3WebhookSecretOptional => 'İmzalama Anahtarı (isteğe bağlı)';
+
+  @override
+  String get ui3WebhookSecretHint => 'X-N42-Signature için kullanılır';
+
+  @override
+  String get ui3WebhookNotifyMemberJoined => 'Bir üye katıldığında bildir';
+
+  @override
+  String get ui3WebhookNotifyWelcomeSent =>
+      'Karşılama mesajı gönderildiğinde bildir';
+
+  @override
+  String get ui3WebhookTestSend => 'Test webhook\'u gönder';
+
+  @override
+  String get ui3WebhookTestSending => 'Test webhook\'u gönderiliyor...';
+
+  @override
+  String get ui3WebhookTestSent => 'Test webhook\'u başarıyla gönderildi';
+
+  @override
+  String get ui3WebhookTestFailed => 'Test webhook\'u gönderilemedi';
+
+  @override
+  String get ui3WebhookUrlInvalid =>
+      'Webhook URL\'si herkese açık bir HTTPS adresi olmalıdır';
+
+  @override
+  String get ui3WebhookSelectEvent => 'En az bir webhook olayı seçin';
+
+  @override
+  String get ui3SensitiveDataDetection => 'Hassas Veri Algılama';
+
+  @override
+  String get ui3Email => 'E-posta';
+
+  @override
+  String get ui3CreditCard => 'Kredi Kartı';
+
+  @override
+  String get ui3DetectEmailDesc =>
+      'Metin mesajlarındaki e-posta adreslerini algıla';
+
+  @override
+  String get ui3DetectPhoneDesc =>
+      'Telefon numaralarını ve uluslararası numaraları algıla';
+
+  @override
+  String get ui3DetectCardDesc => 'Olası banka ve kart numaralarını algıla';
+
+  @override
+  String get ui3DetectWalletDesc => 'Ethereum tarzı cüzdan adreslerini algıla';
+
+  @override
+  String get ui3GeneralTopic => 'Genel';
+
+  @override
+  String get a11yPreviousResult => 'Önceki sonuç';
+
+  @override
+  String get a11yNextResult => 'Sonraki sonuç';
+
+  @override
+  String get ui3TryDifferentKeywords => 'Farklı anahtar kelimeler deneyin';
+
+  @override
+  String ui3FiltersActive(Object count) {
+    return 'Etkin filtreler: $count';
+  }
+
+  @override
+  String ui3MessageFiltersActive(Object count) {
+    return 'Etkin mesaj filtreleri: $count';
+  }
+
+  @override
+  String get ui3LoadMore => 'Daha fazla yükle';
+
+  @override
+  String get ui3MessageFilters => 'Mesaj Filtreleri';
+
+  @override
+  String get ui3SenderUserId => 'Gönderen Kullanıcı Kimliği';
+
+  @override
+  String get ui3FilterType => 'Tür';
+
+  @override
+  String get ui3FilterAny => 'Tümü';
+
+  @override
+  String get ui3FilterImage => 'Görsel';
+
+  @override
+  String get ui3FilterTime => 'Zaman';
+
+  @override
+  String get ui3AnyTime => 'Herhangi bir zaman';
+
+  @override
+  String get ui3OnlyMyMessages => 'Yalnızca mesajlarım';
+
+  @override
+  String get ui3MediaOnly => 'Yalnızca medya';
+
+  @override
+  String get ui3Apply => 'Uygula';
+
+  @override
+  String get ui3QrStyleClassic => 'Klasik';
+
+  @override
+  String get ui3QrStyleOcean => 'Okyanus';
+
+  @override
+  String get ui3QrStyleBerry => 'Böğürtlen';
+
+  @override
+  String get ui3NfcUnavailable =>
+      'NFC kullanılamıyor veya etiket desteklenmiyor. NFC\'yi açın, başka bir etiket deneyin ya da QR kullanın.';
+
+  @override
+  String get ui3CancelNfc => 'NFC\'yi iptal et';
+
+  @override
+  String get ui3ReadNfcTag => 'NFC etiketini oku';
+
+  @override
+  String get ui3HoldNearNfcTag => 'Telefonunuzu hizmet etiketine yaklaştırın.';
+
+  @override
+  String get a11yFlashlightOn => 'Feneri aç';
+
+  @override
+  String get a11yFlashlightOff => 'Feneri kapat';
+
+  @override
+  String get ui3SocialGraph => 'Sosyal Grafik';
+
+  @override
+  String get ui3RecommendedConnections => 'Önerilen Bağlantılar';
+
+  @override
+  String get ui3Portfolio => 'Portföy';
+
+  @override
+  String get ui3Chains => 'Zincirler';
+
+  @override
+  String get ui3Tokens => 'Tokenler';
+
+  @override
+  String get ui3NoConnectionsFound => 'Bağlantı bulunamadı';
+
+  @override
+  String get ui3ConnectionsHint =>
+      'Zincir üstü etkinliğiniz arttıkça bağlantılar görünür';
+
+  @override
+  String get ui3SocialGraphLoadFailed => 'Sosyal grafik yüklenemedi';
+
+  @override
+  String get ui3Similarity => 'Benzerlik';
+
+  @override
+  String get ui3Breakdown => 'Ayrıntılar';
+
+  @override
+  String get ui3TokenHoldings => 'Token varlıkları';
+
+  @override
+  String get ui3NftCollections => 'NFT koleksiyonları';
+
+  @override
+  String get ui3ChainUsage => 'Zincir kullanımı';
+
+  @override
+  String get ui3Transactions => 'İşlemler';
+
+  @override
+  String get ui3DaoMembership => 'DAO üyeliği';
+
+  @override
+  String get ui3NotWeighted => 'Ağırlıksız';
+
+  @override
+  String ui3PercentWithWeight(Object percent, Object weight) {
+    return '%$percent (ağırlık: $weight)';
+  }
+
+  @override
+  String get ui3CommonOnChainActivity => 'Ortak zincir içi etkinlik';
+
+  @override
+  String get ui3SharedTokens => 'Ortak token\'lar';
+
+  @override
+  String get ui3SharedNftCollections => 'Ortak NFT koleksiyonları';
+
+  @override
+  String get ui3SharedChains => 'Ortak zincirler';
+
+  @override
+  String get ui3NoSharedTokens => 'Ortak token bulunamadı';
+
+  @override
+  String get ui3NoSharedNftCollections => 'Ortak NFT koleksiyonu bulunamadı';
+
+  @override
+  String get ui3NoSharedChains => 'Ortak zincir bulunamadı';
+
+  @override
+  String get ui3SimilarityFailed => 'Benzerlik hesaplanamadı';
+
+  @override
+  String ui3ItemsAndMore(Object items, Object count) {
+    return '$items +$count tane daha';
+  }
+
+  @override
+  String get a11yGovernance => 'Yönetişim';
+
+  @override
+  String get ui3CommunityLink => 'Topluluk bağlantısı';
+
+  @override
+  String get ui3CommunityQrCode => 'Topluluk QR kodu';
+
+  @override
+  String get ui3CommunityQrSubtitle =>
+      'Bu topluluğa katılmak ve kanallarına göz atmak için tarayın';
+
+  @override
+  String get ui3CommunityLinkLoadFailed => 'Topluluk bağlantısı yüklenemedi';
+
+  @override
+  String get ui3CommunityLinkCopied => 'Topluluk bağlantısı kopyalandı';
+
+  @override
+  String ui3KickMemberConfirm(Object name) {
+    return '$name bu topluluktan çıkarılacak.';
+  }
+
+  @override
+  String ui3BanMemberConfirm(Object name) {
+    return '$name çıkarılacak ve yeniden katılamayacak.';
+  }
+
+  @override
+  String get ui3SignInToDiscoverChannels =>
+      'Herkese açık kanalları keşfetmek için giriş yapın';
+
+  @override
+  String ui3UnableToJoinChannel(Object name, Object error) {
+    return '$name kanalına katılınamadı: $error';
+  }
+
+  @override
+  String get ui3CategoryTech => 'Teknoloji';
+
+  @override
+  String get ui3CategorySocial => 'Sosyal';
+
+  @override
+  String get ui3NoPublicChannels => 'Herkese açık kanal bulunamadı';
+
+  @override
+  String get ui3StoriesAndFun => 'Hikâyeler ve Eğlence';
+
+  @override
+  String get ui3SearchMusicHint => 'Şarkı, sanatçı veya arkadaş ara';
+
+  @override
+  String get ui3ForYou => 'Sana özel';
+
+  @override
+  String get ui3Liked => 'Beğenilenler';
+
+  @override
+  String get ui3NoLikedMusic => 'Henüz beğenilen müzik yok';
+
+  @override
+  String get ui3NoMusicStories => 'Henüz müzikli hikâye yok';
+
+  @override
+  String get ui3LikedMusicHint =>
+      'Burada saklamak için şarkının yanındaki kalbe dokunun.';
+
+  @override
+  String get ui3MusicStoriesHint =>
+      'Hikâyelerde paylaşılan müzikler burada görünür.';
+
+  @override
+  String ui3SharedBy(Object artist, Object name) {
+    return '$artist · $name paylaştı';
+  }
+
+  @override
+  String ui3UnableToPlay(Object title, Object error) {
+    return '$title oynatılamıyor: $error';
+  }
+
+  @override
+  String get a11yPreviousTrack => 'Önceki parça';
+
+  @override
+  String get a11yNextTrack => 'Sonraki parça';
+
+  @override
+  String get a11yPlay => 'Oynat';
+
+  @override
+  String get a11yPause => 'Duraklat';
+
+  @override
+  String get ui3Refresh => 'Yenile';
+
+  @override
+  String get ui3NearbyIntroTitle =>
+      'Yakındaki herkese açık gönderileri keşfedin';
+
+  @override
+  String get ui3NearbyIntroBody =>
+      'Konumunuz, herkese açık Anları sıralamak için bu cihazda bir kez kullanılır. Yüklenmez, yayınlanmaz ve başkalarına gösterilmez.';
+
+  @override
+  String get ui3UseMyLocation => 'Konumumu kullan';
+
+  @override
+  String get ui3NearbyUnavailable => 'Yakındakiler kullanılamıyor';
+
+  @override
+  String get ui3NoNearbyPosts => 'Yakında henüz gönderi yok';
+
+  @override
+  String get ui3NoNearbyPostsHint =>
+      'Konum içeren herkese açık Anlar burada görünür.';
+
+  @override
+  String get ui3NearbyDistanceNote =>
+      'Yaklaşık mesafe · yalnızca konumlu herkese açık gönderiler';
+
+  @override
+  String get ui3PublicLocationPost => 'Konumlu herkese açık gönderi';
+
+  @override
+  String get ui3LocationServicesOff => 'Konum Servisleri kapalı';
+
+  @override
+  String get ui3LocationPermissionDenied => 'Konum izni reddedildi';
+
+  @override
+  String get ui3EnableLocationInSettings =>
+      'Sistem ayarlarından konum iznini etkinleştirin';
+
+  @override
+  String get ui3CreateStory => 'Hikâye oluştur';
+
+  @override
+  String get ui3CreateStoryDesc => 'Metin veya fotoğraf durumu paylaşın.';
+
+  @override
+  String get ui3StoryCamera => 'Hikâye kamerası';
+
+  @override
+  String get ui3StoryCameraDesc =>
+      'Doğrudan filtrelere ve fotoğraf düzenlemeye geçin.';
+
+  @override
+  String get ui3MomentsDesc => 'Akışın tamamını ve yorumları açın.';
+
+  @override
+  String get ui3MomentCamera => 'An kamerası';
+
+  @override
+  String get ui3MomentCameraDesc =>
+      'Bir gönderi oluşturun ve hemen medya seçin.';
+
+  @override
+  String get ui3GamesDesc => 'Yerleşik gündelik oyun merkezini başlatın.';
+
+  @override
+  String get ui3AvatarStudio => 'Avatar Stüdyosu';
+
+  @override
+  String get ui3AvatarStudioDesc =>
+      'Süslemeler, NFT avatar ve kimlik dokunuşları.';
+
+  @override
+  String get ui3SocialGraphDesc =>
+      'Zincir içi takipler, hayranlar ve bağlantılar.';
+
+  @override
+  String get ui3SocialHubHeroTitle => 'Hikâyeler, anlar, oyunlar ve avatarlar';
+
+  @override
+  String get ui3SocialHubHeroBody =>
+      'Sosyal özellikler sohbet, profil ve keşfet arasında dağılmak yerine tek bir yerde.';
+
+  @override
+  String get ui3SocialGraphNotConfigured =>
+      'Sosyal grafik bu sürümde yapılandırılmamış';
+
+  @override
+  String get ui3ConnectWalletForSocialGraph =>
+      'Sosyal grafiğinizi görmek için bir cüzdan bağlayın';
+
+  @override
+  String get ui3AvatarStudioSignIn =>
+      'Avatar Stüdyosu için giriş yapmanız gerekir';
+
+  @override
+  String get a11yRemoveImage => 'Görseli kaldır';
+
+  @override
+  String get a11yBack => 'Geri';
+
+  @override
+  String get ui3MiniAppConfirmTransactionTitle => 'İşlemi onayla';
+
+  @override
+  String get ui3MiniAppConfirmTransactionBody =>
+      'Bir Mini Uygulama sizin adınıza işlem göndermek istiyor.';
+
+  @override
+  String ui3MiniAppOpenTitle(Object name) {
+    return '$name açılsın mı?';
+  }
+
+  @override
+  String get ui3MiniAppOpenButton => 'Aç';
+
+  @override
+  String get ui3StoryReplySendFailed => 'Hikâye yanıtı gönderilemedi';
+
+  @override
+  String get ui3RedPacketDemoNotice =>
+      'Demo kırmızı zarf — yalnızca sohbet içi bir kayıttır, gerçek zincir içi varlık aktarılmaz.';
+
+  @override
+  String get ui3RedPacketCoverClassic => 'Klasik kırmızı';
+
+  @override
+  String get ui3RedPacketCoverGolden => 'Altın';
+
+  @override
+  String get ui3RedPacketCoverPurple => 'Mor';
+
+  @override
+  String get ui3RedPacketCoverOceanBlue => 'Okyanus mavisi';
+
+  @override
+  String get ui3RedPacketCoverNatureGreen => 'Doğa yeşili';
+
+  @override
+  String get ui3RedPacketCoverRosePink => 'Gül pembesi';
+
+  @override
+  String get ui3RedPacketHistoryEmpty => 'Henüz kırmızı zarf yok';
+
+  @override
+  String get ui3TransferMerchantQrWithAmount => 'Satıcı QR (tutarlı)';
+
+  @override
+  String get ui3TransferMerchantQrTitle => 'Satıcı QR';
+
+  @override
+  String get ui3TransferOpenAmountHint => 'Serbest tutar için boş bırakın';
+
+  @override
+  String get ui3FiatRampTitle => 'Kripto al / sat';
+
+  @override
+  String get ui3FiatRampBuy => 'Al';
+
+  @override
+  String get ui3FiatRampSell => 'Sat';
+
+  @override
+  String get ui3FiatRampNotConfigured =>
+      'Fiat giriş/çıkış hizmeti yapılandırılmamış';
+
+  @override
+  String get a11yPointsAddRule => 'Ödül kuralı ekle';
+
+  @override
+  String get a11yGovernanceRemoveChoice => 'Seçeneği kaldır';
+
+  @override
+  String get a11yGovernanceCreateProposal => 'Teklif oluştur';
+
+  @override
+  String get ui3MiniAppUpdateN42 => 'N42\'yi güncelle';
+
+  @override
+  String get ui3MiniAppOfficial => 'Resmi';
+
+  @override
+  String ui3MiniAppUserCount(Object count) {
+    return '$count kullanıcı';
+  }
+
+  @override
+  String a11yStoryBackgroundColor(Object index) {
+    return 'Arka plan rengi $index';
+  }
+
+  @override
+  String get a11yStoryAdd => 'Hikaye ekle';
+
+  @override
+  String get ui3StoryPostFailed => 'Hikaye paylaşılamadı';
+
+  @override
+  String get ui3StoryTapToSelectImage => 'Görsel seçmek için dokunun';
+
+  @override
+  String get ui3StoryChangeImage => 'Değiştir';
+
+  @override
+  String ui3StoryMusicReadFailed(Object error) {
+    return 'Seçilen müzik okunamadı: $error';
+  }
+
+  @override
+  String get ui3StoryDeleteConfirm => 'Bu hikaye silinsin mi?';
+
+  @override
+  String get ui3StoryDeleteFailed => 'Hikaye silinemedi';
+
+  @override
+  String get ui3MomentCreateTitle => 'Anı oluştur';
+
+  @override
+  String get ui3MomentContentHint => 'Aklından ne geçiyor?';
+
+  @override
+  String get ui3MomentAddPhotos => 'Fotoğraf ekle';
+
+  @override
+  String get ui3MomentAddLocation => 'Konum ekle';
+
+  @override
+  String ui3MomentSelectedMedia(Object count) {
+    return 'Seçilen medya ($count)';
+  }
+
+  @override
+  String get ui3MomentClearAll => 'Tümünü temizle';
+
+  @override
+  String get ui3MomentClearMediaConfirm =>
+      'Seçilen tüm fotoğraflar/videolar kaldırılsın mı?';
+
+  @override
+  String get ui3MomentVisibilityPublicDesc => 'Tüm arkadaşlar görebilir';
+
+  @override
+  String get ui3MomentVisibilityPrivateDesc => 'Yalnızca sen görebilirsin';
+
+  @override
+  String get ui3MomentVisibilityPartialDesc => 'Kimlerin görebileceğini seç';
+
+  @override
+  String get ui3MomentVisibilityExcludedDesc => 'Belirli arkadaşlardan gizle';
+
+  @override
+  String get ui3MomentVideos => 'Videolar';
+
+  @override
+  String get ui3MomentNoVideos => 'Henüz video yok';
+
+  @override
+  String get a11yCallMinimize => 'Küçült';
+
+  @override
+  String get a11yCallGridView => 'Izgara görünümü';
+
+  @override
+  String get a11yCallFocusView => 'Odak görünümü';
+
+  @override
+  String get ui3CallTools => 'Arama araçları';
+
+  @override
+  String get ui3CallMeetingTools => 'Toplantı araçları';
+
+  @override
+  String get ui3CallToolsSubtitle =>
+      'Aramadan çıkmadan ses ve görüntü kalitesini ayarlayın.';
+
+  @override
+  String get ui3CallAudioEnhancement => 'Ses iyileştirme';
+
+  @override
+  String get ui3CallNoiseSuppression => 'Gürültü bastırma';
+
+  @override
+  String get ui3CallNoiseSuppressionDesc =>
+      'Klavye ve arka plan gürültüsünü azaltır.';
+
+  @override
+  String get ui3CallEchoCancellation => 'Yankı giderme';
+
+  @override
+  String get ui3CallEchoCancellationDesc =>
+      'Hoparlör sesinin mikrofona geri girmesini önler.';
+
+  @override
+  String get ui3CallAutoGainControl => 'Otomatik kazanç kontrolü';
+
+  @override
+  String get ui3CallAutoGainControlDesc =>
+      'Mikrofon ses seviyesini daha dengeli tutar.';
+
+  @override
+  String get ui3CallVoiceIsolation => 'Gelişmiş ses yalıtımı';
+
+  @override
+  String get ui3CallVoiceIsolationDesc =>
+      'Daha güçlü bir gürültü azaltma profili kullanır.';
+
+  @override
+  String get ui3CallVideoSection => 'Görüntü';
+
+  @override
+  String get ui3CallBackgroundBlur => 'Arka plan bulanıklaştırma (beta)';
+
+  @override
+  String get ui3CallBlurDescReady =>
+      'Tercih etkin. Görsel bulanıklık hâlâ video işlemcisinin kullanıma sunulmasına bağlı.';
+
+  @override
+  String get ui3CallBlurDescSaved =>
+      'Bulanıklık tercihi kaydedildi; kamera işleme kullanılabilir olduğunda uygulanacak.';
+
+  @override
+  String get ui3CallBlurDescCameraOff =>
+      'Arka plan işleme kullanılabilir olduğunda kameranızı açın.';
+
+  @override
+  String get ui3CallRecordingSection => 'Kayıt';
+
+  @override
+  String get ui3CallRecordingDesc =>
+      'Kayıtların kaydedilebilmesi için sunucu tarafı egress gerekir.';
+
+  @override
+  String ui3CallSettingsUpdateFailed(Object error) {
+    return 'Arama ayarları güncellenemedi: $error';
+  }
+
+  @override
+  String get ui3CallRecordingStarted => 'Kayıt başladı';
+
+  @override
+  String get ui3VoiceRoomNotFound => 'Oda bulunamadı';
+
+  @override
+  String get ui3VoiceRoomEndConfirm =>
+      'Bu sesli odayı sonlandırmak istediğinizden emin misiniz?';
+
+  @override
+  String get a11yGameMoveUp => 'Yukarı taşı';
+
+  @override
+  String get a11yGameMoveDown => 'Aşağı taşı';
+
+  @override
+  String get a11yGameMoveLeft => 'Sola taşı';
+
+  @override
+  String get a11yGameMoveRight => 'Sağa taşı';
+
+  @override
+  String get a11yGameRotate => 'Döndür';
+
+  @override
+  String get a11yGameDrop => 'Bırak';
+
+  @override
+  String ui3StickerAddedCount(Object count) {
+    return '$count çıkartma eklendi';
+  }
+
+  @override
+  String ui3StickerAddFailed(Object error) {
+    return 'Eklenemedi: $error';
+  }
+
+  @override
+  String get ui3StickerRemoveTitle => 'Çıkartmayı kaldır';
+
+  @override
+  String get ui3StickerRemoveConfirm => 'Bu çıkartma paketten kaldırılsın mı?';
+
+  @override
+  String get ui3StickerRemoveFailed => 'Kaldırılamadı';
+
+  @override
+  String get ui3StickerRenamePack => 'Paketi yeniden adlandır';
+
+  @override
+  String get ui3StickerPackName => 'Paket adı';
+
+  @override
+  String get ui3StickerRenameFailed => 'Yeniden adlandırılamadı';
+
+  @override
+  String get ui3StickerDeletePack => 'Paketi sil';
+
+  @override
+  String get ui3StickerThisPack => 'bu paket';
+
+  @override
+  String ui3StickerDeletePackConfirm(Object name) {
+    return '\"$name\" ve tüm çıkartmaları silinsin mi? Bu işlem geri alınamaz.';
+  }
+
+  @override
+  String get ui3StickerDeleteFailed => 'Silinemedi';
+
+  @override
+  String get ui3StickerPack => 'Çıkartma paketi';
+
+  @override
+  String get ui3StickerAdding => 'Ekleniyor…';
+
+  @override
+  String get ui3StickerAddStickers => 'Çıkartma ekle';
+
+  @override
+  String get ui3StickerPackNotFound => 'Paket bulunamadı';
+
+  @override
+  String get ui3StickerEmptyHint =>
+      'Görsel yüklemek için \"Çıkartma ekle\"ye dokunun';
+
+  @override
+  String get ui3StickerNewPack => 'Yeni çıkartma paketi';
+
+  @override
+  String get ui3StickerCreate => 'Oluştur';
+
+  @override
+  String get ui3StickerCreateFailed => 'Paket oluşturulamadı';
+
+  @override
+  String ui3StickerInstalled(Object name) {
+    return '\"$name\" yüklendi';
+  }
+
+  @override
+  String get ui3StickerRemovePackTitle => 'Çıkartma paketini kaldır';
+
+  @override
+  String ui3StickerRemovePackConfirm(Object name) {
+    return '\"$name\" çıkartmalarınızdan kaldırılsın mı?';
+  }
+
+  @override
+  String ui3StickerRemoved(Object name) {
+    return '\"$name\" kaldırıldı';
+  }
+
+  @override
+  String get ui3StickerAiSticker => 'Yapay zekâ çıkartması';
+
+  @override
+  String get ui3StickerStoreTab => 'Mağaza';
+
+  @override
+  String get ui3StickerMyStickersTab => 'Çıkartmalarım';
+
+  @override
+  String get ui3StickerNoneFound => 'Çıkartma bulunamadı';
+
+  @override
+  String ui3StickerByAuthor(Object author) {
+    return '$author tarafından';
+  }
+
+  @override
+  String get ui3StickerManage => 'Yönet';
+
+  @override
+  String ui3StickerCount(Object count) {
+    return '$count çıkartma';
+  }
+
+  @override
+  String get ui3StickerNoneInstalled => 'Yüklü çıkartma yok';
+
+  @override
+  String get ui3StickerGetFromStore => 'Mağazadan çıkartma edinin';
+
+  @override
+  String get ui3StickerBrowseStore => 'Mağazaya göz at';
+
+  @override
+  String get ui3StickerAddedToAi => '\"Yapay zekâ çıkartmaları\"na eklendi';
+
+  @override
+  String get ui3StickerAddOneFailed => 'Çıkartma eklenemedi';
+
+  @override
+  String get ui3StickerPromptLabel => 'Çıkartmanızı tarif edin';
+
+  @override
+  String get ui3StickerPromptHint =>
+      'ör. güneş gözlüklü mutlu turuncu bir kedi';
+
+  @override
+  String get ui3StickerGenerating => 'Oluşturuluyor…';
+
+  @override
+  String get ui3StickerGenerate => 'Oluştur';
+
+  @override
+  String get ui3StickerAddToStickers => 'Çıkartmalara ekle';
+
+  @override
+  String get ui3StickerGeneratingPreview => 'Çıkartmanız oluşturuluyor…';
+
+  @override
+  String get ui3StickerGenerateEmpty =>
+      'Bir çıkartma tarif edin ve \"Oluştur\"a dokunun';
 }

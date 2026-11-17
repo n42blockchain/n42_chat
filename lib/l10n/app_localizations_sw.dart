@@ -6405,4 +6405,2015 @@ class SSw extends S {
   String scheduledSendTomorrowMorningAt(String time) {
     return 'Kesho asubuhi ($time)';
   }
+
+  @override
+  String get a11yScrollToBottom => 'Sogeza hadi chini';
+
+  @override
+  String get ui3EnterMessageBeforeScheduling =>
+      'Andika ujumbe kabla ya kuratibu';
+
+  @override
+  String get ui3SendCode => 'Tuma msimbo';
+
+  @override
+  String get ui3CodeLanguage => 'Lugha';
+
+  @override
+  String get ui3PasteCodeHere => 'Bandika msimbo hapa';
+
+  @override
+  String ui3ReminderSetAt(String time) {
+    return 'Kikumbusho kimewekwa · $time';
+  }
+
+  @override
+  String get ui3RedPacketCreateFailed => 'Imeshindwa kuunda bahasha nyekundu';
+
+  @override
+  String get ui3SendTip => 'Tuma bakshishi';
+
+  @override
+  String get ui3TokenLabel => 'Tokeni';
+
+  @override
+  String get ui3NoteOptional => 'Dokezo (si lazima)';
+
+  @override
+  String ui3TipFailed(String error) {
+    return 'Bakshishi imeshindwa: $error';
+  }
+
+  @override
+  String get ui3GiftNftTitle => 'Toa NFT kama zawadi';
+
+  @override
+  String get ui3TokenId => 'Kitambulisho cha tokeni';
+
+  @override
+  String ui3NftGiftFailed(String error) {
+    return 'Zawadi ya NFT imeshindwa: $error';
+  }
+
+  @override
+  String get ui3AiAgentSubtitle => 'Eleza kazi, fungua programu ndogo inayofaa';
+
+  @override
+  String get ui3GiftNft => 'Zawadi ya NFT';
+
+  @override
+  String get ui3GiftNftSubtitle => 'Tuma NFT kwa mwasiliani huyu';
+
+  @override
+  String get ui3MiniAppUnavailable => 'Programu ndogo haipatikani';
+
+  @override
+  String ui3MediaItemsNotSent(int count) {
+    return 'Midia $count uliyochagua haikuweza kutumwa';
+  }
+
+  @override
+  String get ui3PhotosSubtitle =>
+      'Tuma picha na video katika muundo unaofaa gumzo';
+
+  @override
+  String get ui3OriginalImages => 'Picha asili';
+
+  @override
+  String get ui3OriginalImagesSubtitle => 'Tuma picha zisizobanwa kama faili';
+
+  @override
+  String ui3ScheduledFileFor(String filename, String time) {
+    return '$filename imeratibiwa $time';
+  }
+
+  @override
+  String ui3SendingOriginalImage(String filename) {
+    return 'Inatuma picha asili: $filename';
+  }
+
+  @override
+  String ui3ScheduledOriginalImage(String filename) {
+    return 'Picha asili imeratibiwa: $filename';
+  }
+
+  @override
+  String get ui3PaymentAlreadySent => 'Malipo tayari yametumwa';
+
+  @override
+  String get ui3PaymentProcessing => 'Malipo yanashughulikiwa';
+
+  @override
+  String ui3ChainStatus(String status) {
+    return 'Hali kwenye mnyororo: $status';
+  }
+
+  @override
+  String get ui3NotChecked => 'Haijakaguliwa';
+
+  @override
+  String ui3ConfirmationsCount(int confirmations, int required) {
+    return 'Imethibitishwa: vitalu $confirmations / $required';
+  }
+
+  @override
+  String get ui3CopyTxHash => 'Nakili hash ya muamala';
+
+  @override
+  String get ui3VerifyAgain => 'Thibitisha tena';
+
+  @override
+  String get ui3VerifyOnChain => 'Thibitisha kwenye mnyororo';
+
+  @override
+  String get ui3TransferMissingChainDetails =>
+      'Uhamisho huu haujumuishi maelezo kamili ya mnyororo na rasilimali.';
+
+  @override
+  String get ui3ReceiptPending => 'Inasubiri kwenye mnyororo';
+
+  @override
+  String get ui3ReceiptConfirmed => 'Imethibitishwa';
+
+  @override
+  String get ui3ReceiptFailed => 'Imeshindwa kwenye mnyororo';
+
+  @override
+  String get ui3ReceiptMismatch => 'Maelezo ya muamala hayalingani';
+
+  @override
+  String get ui3ReceiptUnsupported => 'Uthibitishaji wa mnyororo hautumiki';
+
+  @override
+  String get ui3ReceiptUnavailable => 'Uthibitishaji haupatikani';
+
+  @override
+  String get ui3OpenOrSave => 'Fungua / Hifadhi';
+
+  @override
+  String get ui3UnableToOpenFile => 'Imeshindwa kufungua faili hii.';
+
+  @override
+  String ui3AiRewriteFailed(String error) {
+    return 'Kuandika upya kwa AI kumeshindwa: $error';
+  }
+
+  @override
+  String get ui3AiShareMessagesTitle => 'Shiriki ujumbe na AI?';
+
+  @override
+  String get ui3AiShareMessagesBody =>
+      'Chagua ujumbe ambao AI inaweza kutumia kwa jibu hili. Idhini hii ya ombi moja itaisha baada ya dakika mbili. Kufunga Jibu la Haraka kunaghairi matokeo yanayosubiri. Haiidhinishi malipo wala uhamishaji.';
+
+  @override
+  String get ui3OtherParticipant => 'Mwingine';
+
+  @override
+  String get ui3ShareSelected => 'Shiriki zilizochaguliwa';
+
+  @override
+  String get ui3BotCommandError => 'Hitilafu ya amri';
+
+  @override
+  String get ui3BotUnknownCommand => 'Amri isiyojulikana';
+
+  @override
+  String get ui3BotTypeHelp => 'Andika /help kuona amri zinazopatikana.';
+
+  @override
+  String get ui3FilesMediaLinks => 'Faili, Midia na Viungo';
+
+  @override
+  String get ui3ChatStorage => 'Hifadhi ya gumzo';
+
+  @override
+  String get ui3EncryptionKeysDevices => 'Funguo za usimbaji fiche na vifaa';
+
+  @override
+  String get ui3EncryptionServiceUnavailable =>
+      'Huduma ya usimbaji fiche bado haipatikani';
+
+  @override
+  String get ui3ExportLoadingHistory =>
+      'Inapakia historia zaidi ya gumzo kwa ajili ya kuhamisha...';
+
+  @override
+  String get ui3ExportTxtDesc =>
+      'Nakala ya maandishi matupu kwa madokezo, nakala rudufu au ukaguzi wa utiifu';
+
+  @override
+  String get ui3ExportCustomRange => 'Kipindi maalum';
+
+  @override
+  String get ui3ExportStart => 'Mwanzo';
+
+  @override
+  String get ui3ExportEnd => 'Mwisho';
+
+  @override
+  String get ui3ExportSelectDate => 'Chagua tarehe';
+
+  @override
+  String get ui3FolderFilterUnreadOnly => 'Ambazo hazijasomwa pekee';
+
+  @override
+  String get ui3FolderFilterMutedOnly => 'Zilizonyamazishwa pekee';
+
+  @override
+  String get ui3FolderFilterNoDms => 'Bila ujumbe wa moja kwa moja';
+
+  @override
+  String get ui3FolderFilterNoGroups => 'Bila vikundi';
+
+  @override
+  String get ui3FolderFilterNoChannels => 'Bila chaneli';
+
+  @override
+  String get ui3FolderFilterAllChats => 'Gumzo zote';
+
+  @override
+  String get ui3Create => 'Unda';
+
+  @override
+  String ui3DeleteFolderConfirm(String name) {
+    return 'Futa folda \"$name\"?';
+  }
+
+  @override
+  String get a11yDecreaseTextSize => 'Punguza ukubwa wa maandishi';
+
+  @override
+  String get a11yIncreaseTextSize => 'Ongeza ukubwa wa maandishi';
+
+  @override
+  String ui3MinutesRead(int minutes) {
+    return 'Dakika $minutes za kusoma';
+  }
+
+  @override
+  String get ui3TipOnChain => 'Kwenye mnyororo ✓';
+
+  @override
+  String get ui3ViewSource => 'Tazama chanzo';
+
+  @override
+  String get a11yPreviousPage => 'Ukurasa uliotangulia';
+
+  @override
+  String get a11yNextPage => 'Ukurasa unaofuata';
+
+  @override
+  String get ui3OpenExternalLinkTitle => 'Fungua kiungo cha nje?';
+
+  @override
+  String get ui3Open => 'Fungua';
+
+  @override
+  String get ui3UnableToOpenLink => 'Imeshindwa kufungua kiungo hiki.';
+
+  @override
+  String get ui3ImageUnavailable => 'Picha haipatikani';
+
+  @override
+  String ui3LoadImageFrom(Object host) {
+    return 'Pakia picha kutoka $host';
+  }
+
+  @override
+  String ui3RetryImageFrom(Object host) {
+    return 'Jaribu tena picha kutoka $host';
+  }
+
+  @override
+  String get ui3TranslatedByN42 => 'Imetafsiriwa na N42';
+
+  @override
+  String ui3TranslatedFromByN42(Object language) {
+    return 'Imetafsiriwa kutoka $language na N42';
+  }
+
+  @override
+  String get ui3ClearWhiteboardTitle => 'Futa ubao mweupe?';
+
+  @override
+  String get ui3ClearWhiteboardMessage =>
+      'Mistari yote itaondolewa kwa kila mtu. Hatua hii haiwezi kutenduliwa.';
+
+  @override
+  String get ui3WhiteboardLive => 'Ubao mweupe · Moja kwa moja';
+
+  @override
+  String get a11yPenColor => 'Rangi ya kalamu';
+
+  @override
+  String get ui3AiDescribeOcr => 'Maelezo ya AI / OCR';
+
+  @override
+  String get ui3DocumentPreviewFailed =>
+      'Imeshindwa kuhakiki hati hii kwa usalama. Angalia muunganisho na ukubwa wa faili (kiwango cha juu 2MB).';
+
+  @override
+  String get ui3AiConsentMessage =>
+      'Chagua ujumbe ambao AI inaweza kutumia kwa muhtasari huu. Idhini hii ya ombi moja itaisha baada ya dakika mbili. Haiidhinishi malipo wala uhamishaji.';
+
+  @override
+  String get ui3AiSuggestedReplies => 'Majibu yanayopendekezwa';
+
+  @override
+  String get ui3AiGeneratingSuggestions => 'Inatengeneza mapendekezo...';
+
+  @override
+  String get ui3StickersEmpty => 'Bado hakuna vibandiko';
+
+  @override
+  String get ui3StickersGet => 'Pata vibandiko';
+
+  @override
+  String get a11yFormatBold => 'Herufi nzito';
+
+  @override
+  String get a11yFormatItalic => 'Italiki';
+
+  @override
+  String get a11yFormatStrikethrough => 'Mstari katikati';
+
+  @override
+  String get a11yFormatInlineCode => 'Msimbo wa ndani ya mstari';
+
+  @override
+  String get a11yFormatCodeBlock => 'Kizuizi cha msimbo';
+
+  @override
+  String get a11yFormatChecklistItem => 'Kipengee cha orodha hakiki';
+
+  @override
+  String get a11yFormatBulletList => 'Orodha ya vitone';
+
+  @override
+  String get a11yFormatNumberedList => 'Orodha ya namba';
+
+  @override
+  String get a11yFormatLink => 'Kiungo';
+
+  @override
+  String get a11yFormatTable => 'Jedwali';
+
+  @override
+  String get a11yFormatMeetingTemplate => 'Kiolezo cha mkutano';
+
+  @override
+  String get a11yEmojiSmileys => 'Vikaragosi na watu';
+
+  @override
+  String get a11yEmojiHearts => 'Mioyo';
+
+  @override
+  String get a11yEmojiAnimals => 'Wanyama na mazingira';
+
+  @override
+  String get a11yEmojiFood => 'Chakula na vinywaji';
+
+  @override
+  String get a11yEmojiTravel => 'Safari na maeneo';
+
+  @override
+  String get a11yEmojiActivities => 'Shughuli';
+
+  @override
+  String get a11yEmojiObjects => 'Vitu';
+
+  @override
+  String get a11yEmojiSymbols => 'Alama';
+
+  @override
+  String get ui3FrequentlyUsed => 'Zinazotumika mara kwa mara';
+
+  @override
+  String get ui3NoEditHistory => 'Hakuna historia ya uhariri';
+
+  @override
+  String get ui3EventNew => 'Tukio jipya';
+
+  @override
+  String get ui3EventTitleLabel => 'Kichwa';
+
+  @override
+  String get ui3EventLocationOptional => 'Mahali (si lazima)';
+
+  @override
+  String get ui3EventDescriptionOptional => 'Maelezo (si lazima)';
+
+  @override
+  String get ui3EventSend => 'Tuma tukio';
+
+  @override
+  String get ui3EventTitleRequired => 'Kichwa kinahitajika';
+
+  @override
+  String get ui3EventEndAfterStart =>
+      'Muda wa kumalizika lazima uwe baada ya kuanza';
+
+  @override
+  String get ui3MiniAppAgentIntro =>
+      'Eleza unachotaka kufanya — nitafungua programu ndogo inayofaa.';
+
+  @override
+  String get ui3MiniAppAgentExample => 'mf. badilisha ETH kuwa USDC';
+
+  @override
+  String get ui3MiniAppAgentNoMatch =>
+      'Hakuna programu ndogo inayolingana. Jaribu kusema kwa njia nyingine.';
+
+  @override
+  String ui3MiniAppOpen(Object appName) {
+    return 'Fungua $appName';
+  }
+
+  @override
+  String get ui3MusicLinkPlatforms =>
+      'Inaauni viungo vya nyimbo kutoka NetEase Cloud Music, QQ Music, Kugou, Kuwo na zaidi';
+
+  @override
+  String get ui3PollMarkCorrectAnswer =>
+      'Weka alama kwenye jibu sahihi lisilo tupu';
+
+  @override
+  String get ui3PollQuizMode => 'Hali ya chemsha bongo';
+
+  @override
+  String get ui3PollAnswerExplanationHint => 'Maelezo ya jibu (si lazima)';
+
+  @override
+  String get a11yCorrectAnswer => 'Jibu sahihi';
+
+  @override
+  String get ui3AiSuggestions => 'Mapendekezo ya AI';
+
+  @override
+  String get a11yPaste => 'Bandika';
+
+  @override
+  String get a11yRefresh => 'Onyesha upya';
+
+  @override
+  String get ui3RecoveryKeyStoreWarning =>
+      'Hifadhi ufunguo huu mahali salama. Ndiyo njia pekee ya kurejesha ujumbe wako uliosimbwa ukipoteza ufikiaji wa vifaa vyote.';
+
+  @override
+  String ui3SavedToPath(Object path) {
+    return 'Imehifadhiwa: $path';
+  }
+
+  @override
+  String get ui3UnknownAccount => 'Akaunti isiyojulikana';
+
+  @override
+  String get ui3UnknownHomeserver => 'Seva ya nyumbani isiyojulikana';
+
+  @override
+  String get ui3ImportRecoveryKey => 'Leta ufunguo wa urejeshaji';
+
+  @override
+  String get ui3ImportRecoveryKeyDesc =>
+      'Weka au bandika ufunguo wako wa urejeshaji ili kurejesha funguo za vyumba za historia ya ujumbe uliosimbwa.';
+
+  @override
+  String ui3RecoveryKeyAccountInfo(Object account, Object homeserver) {
+    return 'Akaunti: $account\\nSeva ya nyumbani: $homeserver';
+  }
+
+  @override
+  String get ui3Import => 'Leta';
+
+  @override
+  String get ui3InvalidRecoveryKeyFormat =>
+      'Muundo wa ufunguo wa urejeshaji si sahihi';
+
+  @override
+  String ui3RecoveryKeyPartialRestore(
+    Object restored,
+    Object total,
+    Object failed,
+  ) {
+    return 'Funguo $restored kati ya $total zimerejeshwa. Funguo $failed zimeshindwa. Kagua akaunti, mtandao na nakala rudufu, kisha ujaribu tena. Sehemu ya historia huenda isisomeke.';
+  }
+
+  @override
+  String ui3RecoveryKeyRestoreSuccess(Object restored, Object total) {
+    return 'Funguo $restored kati ya $total zimerejeshwa kwa mafanikio';
+  }
+
+  @override
+  String ui3ImportFailed(Object error) {
+    return 'Imeshindwa kuleta: $error';
+  }
+
+  @override
+  String ui3PasskeyRegistrationFailed(Object error) {
+    return 'Usajili wa passkey umeshindwa: $error';
+  }
+
+  @override
+  String get ui3PasskeyDefaultName => 'Passkey yangu';
+
+  @override
+  String get ui3PasskeyNameHint => 'mf. iPhone, MacBook';
+
+  @override
+  String get ui3PasskeyDeleteFailed => 'Imeshindwa kufuta passkey';
+
+  @override
+  String get ui3TwoFactorAuth => 'Uthibitishaji wa hatua mbili';
+
+  @override
+  String get ui3TwoFactorOnSubtitle =>
+      'Imewashwa — msimbo wa programu ya uthibitishaji unahitajika';
+
+  @override
+  String get ui3TwoFactorOffSubtitle =>
+      'Imezimwa — linda kwa programu ya uthibitishaji (TOTP)';
+
+  @override
+  String get ui3ShowRecoveryKey => 'Onyesha ufunguo wa urejeshaji';
+
+  @override
+  String get ui3ShowRecoveryKeyDesc =>
+      'Onyesha ufunguo wako wa urejeshaji kwa ajili ya nakala rudufu';
+
+  @override
+  String get ui3ImportRecoveryKeyHint =>
+      'Rejesha ujumbe kwa kutumia ufunguo wa urejeshaji';
+
+  @override
+  String get ui3RecoveryKeyCreateFailed =>
+      'Imeshindwa kuunda ufunguo wa urejeshaji';
+
+  @override
+  String get ui3TotpIncorrectCode => 'Msimbo si sahihi, jaribu tena';
+
+  @override
+  String get ui3TwoFactorEnabled => 'Uthibitishaji wa hatua mbili umewashwa';
+
+  @override
+  String get ui3TwoFactorDisabled => 'Uthibitishaji wa hatua mbili umezimwa';
+
+  @override
+  String get ui3TwoFactorTurnOffTitle => 'Zima uthibitishaji wa hatua mbili?';
+
+  @override
+  String get ui3TwoFactorTurnOffMessage =>
+      'Programu yako ya uthibitishaji haitahitajika tena. Unaweza kuiweka upya baadaye kwa ufunguo mpya.';
+
+  @override
+  String get ui3TurnOff => 'Zima';
+
+  @override
+  String get ui3TwoFactorTotpTitle => 'Hatua mbili (TOTP)';
+
+  @override
+  String get ui3TwoFactorIsOn => 'Uthibitishaji wa hatua mbili umewashwa';
+
+  @override
+  String get ui3TwoFactorCodeRequired =>
+      'Msimbo kutoka kwa programu yako ya uthibitishaji unahitajika.';
+
+  @override
+  String get ui3TotpStepScan =>
+      '1. Changanua QR hii kwa programu ya uthibitishaji (Google Authenticator, Authy, 1Password…), au weka ufunguo mwenyewe.';
+
+  @override
+  String get ui3TotpKeyCopied => 'Ufunguo umenakiliwa';
+
+  @override
+  String get ui3TotpStepConfirm =>
+      '2. Weka msimbo wa tarakimu 6 ili kuthibitisha.';
+
+  @override
+  String get ui3Enable => 'Washa';
+
+  @override
+  String get ui3BackupSettingsDesc =>
+      'Hifadhi nakala ya mipangilio yako ya gumzo ya ndani. Ujumbe utarejeshwa kutoka kwa seva baada ya kuingia tena.';
+
+  @override
+  String get ui3BackupKeysSeparate =>
+      'Funguo za usimbaji fiche zinadhibitiwa kando';
+
+  @override
+  String get ui3BackupKeysSeparateHint =>
+      'Tumia Usalama > Ufunguo wa Urejeshaji kuhifadhi nakala ya ufikiaji wa ujumbe uliosimbwa.';
+
+  @override
+  String ui3BackupRoomsSize(Object rooms, Object size) {
+    return 'Vyumba $rooms  $size';
+  }
+
+  @override
+  String get ui3BackupRestoreFromFileDesc =>
+      'Leta faili ya .n42backup kutoka kifaa kingine au nakala rudufu ya awali. Funguo za usimbaji fiche hurejeshwa kando kwa ufunguo wako wa urejeshaji.';
+
+  @override
+  String get ui3UsernameSessionRequired =>
+      'Jina la mtumiaji linahitaji kipindi amilifu';
+
+  @override
+  String get ui3SecuritySessionRequired =>
+      'Mipangilio ya usalama inahitaji kipindi amilifu';
+
+  @override
+  String get ui3ConnectedAccountsSessionRequired =>
+      'Akaunti zilizounganishwa zinahitaji kipindi amilifu';
+
+  @override
+  String get ui3SystemAccounts => 'Mfumo na akaunti';
+
+  @override
+  String get ui3AccountIdentity => 'Akaunti na utambulisho';
+
+  @override
+  String get ui3Accounts => 'Akaunti';
+
+  @override
+  String get ui3DevicesSessions => 'Vifaa na vipindi';
+
+  @override
+  String get ui3Integrations => 'Miunganisho';
+
+  @override
+  String get ui3ConnectedAccounts => 'Akaunti zilizounganishwa';
+
+  @override
+  String get ui3ConnectedAccountsDesc =>
+      'Miunganisho ya Telegram, WhatsApp, Discord na madaraja ya API';
+
+  @override
+  String get ui3SystemOverview => 'Muhtasari wa mfumo';
+
+  @override
+  String ui3AccountCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Akaunti $count',
+      one: 'Akaunti 1',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String ui3DeviceCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Vifaa $count',
+      one: 'Kifaa 1',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get ui3PrivacySecurityOverview =>
+      'Usimbaji fiche wa mwisho hadi mwisho, ulinzi wa picha za skrini na udhibiti wa proksi';
+
+  @override
+  String get ui3ConversationPrivacy => 'Faragha ya mazungumzo';
+
+  @override
+  String get ui3NetworkPrivacy => 'Faragha ya mtandao';
+
+  @override
+  String get ui3IdentityPrivacy => 'Faragha ya utambulisho';
+
+  @override
+  String get ui3EncryptionKeyBackup => 'Usimbaji fiche na nakala ya funguo';
+
+  @override
+  String get ui3DevicesVerification => 'Vifaa na uthibitishaji';
+
+  @override
+  String get ui3ChipE2eeDefault => 'E2EE kwa chaguomsingi';
+
+  @override
+  String get ui3ChipManualE2ee => 'E2EE ya mikono';
+
+  @override
+  String get ui3ChipSelfDestruct => 'Kujifuta';
+
+  @override
+  String get ui3ChipScreenshotGuard => 'Kinga ya picha za skrini';
+
+  @override
+  String get ui3ChipIpProxy => 'IP / seva mbadala';
+
+  @override
+  String get ui3ChipLinkPreviewsOff => 'Onyesho la viungo limezimwa';
+
+  @override
+  String get ui3ChipPublicHandle => 'Jina la mtumiaji la umma';
+
+  @override
+  String get a11yShowPassword => 'Onyesha nenosiri';
+
+  @override
+  String get a11yHidePassword => 'Ficha nenosiri';
+
+  @override
+  String get a11yCheckServer => 'Kagua seva';
+
+  @override
+  String get ui3AuthAnonymousRegistration => 'Usajili bila kujitambulisha';
+
+  @override
+  String get ui3AuthAnonymousRegistrationDesc =>
+      'Fungua akaunti bila kuunganisha simu au barua pepe. Jina la mtumiaji litatengenezwa kiotomatiki.';
+
+  @override
+  String get ui3AuthAnonymousModeOn => 'Hali ya kutojulikana imewashwa';
+
+  @override
+  String get ui3AuthAnonymousModeOnDesc =>
+      'Programu itakutengenezea jina la mtumiaji la Matrix la nasibu. Bado unaweza kuingia baadaye kwa akaunti na nenosiri vilivyotengenezwa.';
+
+  @override
+  String get ui3AuthChooseLoginMethod => 'Chagua njia ya kuingia';
+
+  @override
+  String get ui3AuthSsoOpenFailed =>
+      'Imeshindwa kufungua ukurasa wa kuingia wa SSO';
+
+  @override
+  String get ui3AuthWalletUnavailable => 'Pochi haipatikani';
+
+  @override
+  String get ui3ProfileSubscriptions => 'Usajili';
+
+  @override
+  String get ui3ProfileBuySellCrypto => 'Nunua / Uza kripto';
+
+  @override
+  String get ui3ProfileOnDeviceAi => 'AI kwenye kifaa';
+
+  @override
+  String get ui3ProfileSetAUsername => 'Weka jina la mtumiaji';
+
+  @override
+  String get ui3ProfileAvatarStudio => 'Studio ya Avatar';
+
+  @override
+  String get ui3ProfileAvatarStudioSubtitle => 'Avatar ya NFT / Mapambo';
+
+  @override
+  String get ui3ProfileCustomize => 'Badilisha upendavyo';
+
+  @override
+  String get ui3ProfileQrSubtitle =>
+      'Changanua ili kufungua wasifu huu au kuanzisha gumzo';
+
+  @override
+  String get ui3PrivacyHardening => 'Kuimarisha Faragha';
+
+  @override
+  String get ui3HidePhoneNumber => 'Ficha Nambari ya Simu';
+
+  @override
+  String get ui3HidePhoneNumberDesc =>
+      'Ficha nambari ya simu iliyounganishwa kwenye kurasa za wasifu kwenye kifaa hiki';
+
+  @override
+  String get ui3EncryptNewChatsByDefault => 'Simba Gumzo Mpya kwa Chaguomsingi';
+
+  @override
+  String get ui3EncryptNewChatsByDefaultDesc =>
+      'Anzisha gumzo za moja kwa moja na vyumba vya faragha vipya E2EE ikiwa imewashwa';
+
+  @override
+  String get ui3PrivateChatMode => 'Hali ya Gumzo la Faragha';
+
+  @override
+  String get ui3PrivateChatModeDesc =>
+      'Zuia picha za skrini kwa muda unapotazama gumzo za faragha au zilizosimbwa';
+
+  @override
+  String get ui3DefaultSelfDestructTimer =>
+      'Kipima Muda cha Kujifuta Chaguomsingi';
+
+  @override
+  String get ui3DefaultSelfDestructTimerDesc =>
+      'Tumia kipima muda cha kujifuta chaguomsingi kwa ujumbe mpya unaotumwa';
+
+  @override
+  String get ui3LinkPreviews => 'Onyesho la Viungo';
+
+  @override
+  String get ui3LinkPreviewsDesc =>
+      'Leta vichwa, maelezo na picha ndogo ujumbe unapokuwa na URL';
+
+  @override
+  String get ui3IpAddressProtection => 'Ulinzi wa Anwani ya IP';
+
+  @override
+  String get ui3IpAddressProtectionDesc =>
+      'Pitisha maombi ya Matrix na ya onyesho la viungo kupitia seva mbadala ya faragha ya HTTP uliyosanidi inapopatikana';
+
+  @override
+  String get ui3UseTorProxy => 'Tumia Seva Mbadala ya HTTP ya Tor / Privoxy';
+
+  @override
+  String get ui3UseTorProxyDesc =>
+      'Tumia sehemu ya seva mbadala ya HTTP ya ndani kama Privoxy kwenye 127.0.0.1:8118. Uelekezaji asilia wa Tor kupitia SOCKS5 hautumiki hapa.';
+
+  @override
+  String get ui3CustomProxy => 'Seva Mbadala Maalum';
+
+  @override
+  String get ui3CustomProxyDesc =>
+      'Tumia seva mbadala maalum ya HTTP au HTTPS kwa trafiki ya Matrix na onyesho la viungo';
+
+  @override
+  String get ui3ProxyEndpoint => 'Anwani ya Seva Mbadala';
+
+  @override
+  String get ui3ProxyEndpointDesc =>
+      'Anwani ya seva mbadala ya HTTP/HTTPS (SOCKS haitumiki)';
+
+  @override
+  String get ui3InvalidEndpoint => 'Anwani si sahihi';
+
+  @override
+  String get ui3CustomProxyStaysOff =>
+      'Seva mbadala maalum itabaki imezimwa hadi uweke anwani sahihi';
+
+  @override
+  String get ui3NotificationFilterNote =>
+      'Kanuni za kipaumbele huarifu kila wakati (hupita kunyamazisha, kutajwa tu na Usisumbue). Maneno muhimu yaliyonyamazishwa huzuia arifa.';
+
+  @override
+  String get ui3PriorityKeywords => 'Maneno muhimu ya kipaumbele';
+
+  @override
+  String get ui3PriorityKeywordHint => 'k.m. dharura';
+
+  @override
+  String get ui3MutedKeywords => 'Maneno muhimu yaliyonyamazishwa';
+
+  @override
+  String get ui3MutedKeywordHint => 'k.m. barua taka';
+
+  @override
+  String get ui3PrioritySenders => 'Watumaji wa kipaumbele';
+
+  @override
+  String get ui3CaseSensitive => 'Zingatia herufi kubwa/ndogo';
+
+  @override
+  String get ui3None => 'Hakuna';
+
+  @override
+  String get ui3SmartReplyTranslation => 'Tafsiri ya majibu mahiri';
+
+  @override
+  String get ui3SmartReplyTranslationDesc =>
+      'Tafsiri ujumbe wako kiotomatiki kwa lugha ya mpokeaji kabla ya kutuma.';
+
+  @override
+  String get ui3FromPhotos => 'Kutoka kwa Picha';
+
+  @override
+  String get ui3ChangePhoto => 'Badilisha picha';
+
+  @override
+  String get ui3RoamingUsesMobileData =>
+      'Uzururaji unafuata kanuni za Data ya Simu';
+
+  @override
+  String get ui3RoamingUsesMobileDataDesc =>
+      'Utambuzi maalum wa uzururaji bado haupatikani, kwa hivyo uzururaji kwa sasa unafuata mipangilio ya kupakua kiotomatiki ya Data ya Simu.';
+
+  @override
+  String ui3DeleteQuickReplyConfirm(String content) {
+    return 'Ungependa kufuta \"$content\"?';
+  }
+
+  @override
+  String get ui3ResetToDefaults => 'Rejesha Chaguomsingi';
+
+  @override
+  String get ui3ResetQuickRepliesMessage =>
+      'Hii itaondoa majibu yote ya haraka maalum na kurejesha chaguomsingi. Ungependa kuendelea?';
+
+  @override
+  String get ui3LocalLlmUnavailable => 'Haitumiki kwenye kifaa hiki';
+
+  @override
+  String get ui3LocalLlmNotDownloaded => 'Muundo haujapakuliwa';
+
+  @override
+  String get ui3LocalLlmReady => 'Tayari (kwenye kifaa)';
+
+  @override
+  String get ui3LocalLlmDescription =>
+      'Ikiwashwa na kuwa tayari, vipengele vya AI (kufupisha, kuandika upya, kutafsiri, majibu) huendeshwa kikamilifu kwenye kifaa — data haitoki kamwe kwenye simu yako. Vinginevyo vinatumia mtoa huduma wa wingu.';
+
+  @override
+  String get ui3UseOnDeviceAi => 'Tumia AI kwenye kifaa';
+
+  @override
+  String get ui3UseOnDeviceAiDesc =>
+      'Pendelea uchakataji wa ndani ukiwa tayari';
+
+  @override
+  String get ui3DownloadModel => 'Pakua muundo';
+
+  @override
+  String get ui3LocalLlmRuntimeRequired =>
+      'Uchakataji kwenye kifaa unahitaji mazingira asilia ya utekelezaji (Android MediaPipe / iOS Core ML). Utawashwa kiotomatiki mara kishughulikiaji cha jukwaa kitakapopatikana.';
+
+  @override
+  String get ui3PhotoAvatar => 'Avatar ya Picha';
+
+  @override
+  String get ui3AvatarStyles => 'Mitindo ya Avatar';
+
+  @override
+  String get ui3AvatarStylesDesc =>
+      'Tumia kichaguzi kimoja cha mapambo kwa wasifu na sehemu za kuingia za avatar.';
+
+  @override
+  String get ui3ReplaceNftAvatar => 'Badilisha Avatar ya NFT';
+
+  @override
+  String get ui3NftAvatarDesc =>
+      'Tumia mkusanyiko ulio kwenye mnyororo kama avatar yako.';
+
+  @override
+  String get ui3UsePhotoAvatar => 'Tumia Avatar ya Picha';
+
+  @override
+  String get ui3UsePhotoAvatarDesc =>
+      'Hifadhi avatar uliyopakia na uondoe muunganisho wa NFT.';
+
+  @override
+  String ui3AvatarStyleSet(Object name) {
+    return 'Mtindo wa avatar umewekwa kuwa: $name';
+  }
+
+  @override
+  String get ui3NftAvatarUpdated => 'Avatar ya NFT imesasishwa';
+
+  @override
+  String get ui3SwitchedToPhotoAvatar => 'Umerudi kwenye avatar ya picha';
+
+  @override
+  String get ui3SignInToViewRedPacketHistory =>
+      'Ingia ili kuona historia ya bahasha nyekundu';
+
+  @override
+  String get ui3RedPacketActive => 'Zinazoendelea';
+
+  @override
+  String get ui3RedPacketCompleted => 'Zimekamilika';
+
+  @override
+  String get ui3CardsAndPasses => 'Kadi na pasi';
+
+  @override
+  String get ui3CardsAndPassesDesc =>
+      'Kadi za pochi, kuponi na pasi zinasimamiwa na programu kuu.';
+
+  @override
+  String get ui3CardPackRequiresMainApp =>
+      'Kifurushi cha Kadi kinahitaji programu kuu';
+
+  @override
+  String get ui3OpenCardPack => 'Fungua Kifurushi cha Kadi';
+
+  @override
+  String get ui3UnableToOpenChat =>
+      'Imeshindwa kufungua gumzo na mwasiliani huyu';
+
+  @override
+  String get ui3WalletManagedInMainApp =>
+      'Pochi inasimamiwa kwenye programu kuu';
+
+  @override
+  String ui3CreatorPlans(Object name) {
+    return '$name · Mipango';
+  }
+
+  @override
+  String get ui3NewPlan => 'Mpango mpya';
+
+  @override
+  String get ui3MySubscriptions => 'Usajili wangu';
+
+  @override
+  String get ui3AvailablePlans => 'Mipango inayopatikana';
+
+  @override
+  String get ui3NoPlansYet =>
+      'Bado hakuna mipango · gusa \"Mpango mpya\" ili kuunda';
+
+  @override
+  String ui3DaysLeft(Object days) {
+    return 'Zimebaki siku $days';
+  }
+
+  @override
+  String get ui3SubscriptionCancelled => 'Umeghairiwa';
+
+  @override
+  String get ui3AutoRenewOn => 'Kusasisha kiotomatiki: kumewashwa';
+
+  @override
+  String get ui3AutoRenewOff => 'Kusasisha kiotomatiki: kumezimwa';
+
+  @override
+  String get ui3CancelSubscriptionTitle => 'Ungependa kughairi usajili?';
+
+  @override
+  String ui3CancelSubscriptionConfirm(Object name) {
+    return 'Usajili wako wa $name utaendelea kuwa hai hadi utakapoisha na hautasasishwa.';
+  }
+
+  @override
+  String get ui3Subscribe => 'Jisajili';
+
+  @override
+  String ui3SubscribedTo(Object name) {
+    return 'Umejisajili kwa $name';
+  }
+
+  @override
+  String get ui3PlanPriceLabel => 'Bei (mf. 9.9 USDT)';
+
+  @override
+  String get ui3PlanDescriptionLabel => 'Maelezo (si lazima)';
+
+  @override
+  String get ui3PlanBenefitsLabel => 'Manufaa (tenganisha kwa koma)';
+
+  @override
+  String get ui3PlanPeriod => 'Kipindi:';
+
+  @override
+  String get ui3Monthly => 'Kila mwezi';
+
+  @override
+  String get ui3Yearly => 'Kila mwaka';
+
+  @override
+  String get ui3SaveRemarkFailed => 'Imeshindwa kuhifadhi dokezo';
+
+  @override
+  String get ui3CopyLink => 'Nakili Kiungo';
+
+  @override
+  String get ui3Connect => 'Unganisha';
+
+  @override
+  String get ui3CommonTokens => 'Tokeni za pamoja';
+
+  @override
+  String get ui3SharedNfts => 'NFT za pamoja';
+
+  @override
+  String get ui3TransactionHistory => 'Historia ya miamala';
+
+  @override
+  String get ui3CommonDaos => 'DAO za pamoja';
+
+  @override
+  String get ui3SameChains => 'Minyororo sawa';
+
+  @override
+  String get ui3ChatInitFailed => 'Imeshindwa kuanzisha gumzo';
+
+  @override
+  String get ui3CheckNetworkRetry =>
+      'Tafadhali angalia mtandao wako kisha ujaribu tena';
+
+  @override
+  String get ui3FromContacts => 'Kutoka kwa Anwani';
+
+  @override
+  String get ui3FindFriendsFromContacts =>
+      'Tafuta marafiki kutoka kwa anwani za simu yako';
+
+  @override
+  String get ui3EnsOrDomain => 'ENS / Kikoa';
+
+  @override
+  String get ui3LoadingContacts => 'Inapakia anwani...';
+
+  @override
+  String get ui3ContactsPermissionRequired => 'Ruhusa ya Anwani Inahitajika';
+
+  @override
+  String get ui3ContactsPermissionMessage =>
+      'Ili kupata marafiki kutoka kwa anwani zako, tafadhali ruhusu ufikiaji wa anwani zako.';
+
+  @override
+  String get ui3AllowAccess => 'Ruhusu Ufikiaji';
+
+  @override
+  String get ui3NoContactMatches => 'Hakuna Vinavyolingana';
+
+  @override
+  String get ui3NoContactMatchesMessage =>
+      'Hakuna kati ya anwani zako anayetumia programu hii bado. Waalike wajiunge!';
+
+  @override
+  String ui3ScannedContacts(Object count) {
+    return 'Anwani $count zimechanganuliwa';
+  }
+
+  @override
+  String ui3FoundContactMatches(Object count) {
+    return 'Vinavyolingana $count vimepatikana kwenye anwani zako';
+  }
+
+  @override
+  String ui3InContactsAs(Object name) {
+    return 'Kwenye Anwani: $name';
+  }
+
+  @override
+  String get ui3DeletePhotoConfirm => 'Ungependa kufuta picha hii?';
+
+  @override
+  String get ui3InviteLink => 'Kiungo cha Mwaliko';
+
+  @override
+  String get ui3ShareJoinLink => 'Shiriki kiungo cha kujiunga na chumba hiki';
+
+  @override
+  String get ui3ShareRoomReference =>
+      'Shiriki marejeleo ya chumba na wanachama walioalikwa';
+
+  @override
+  String get ui3ScanToJoinGroup =>
+      'Changanua ili ujiunge na kikundi hiki moja kwa moja';
+
+  @override
+  String get ui3ScanToShareRoomReference =>
+      'Changanua ili kushiriki marejeleo ya chumba hiki na wanachama walioalikwa';
+
+  @override
+  String get ui3InviteLinkLoadFailed => 'Imeshindwa kupakia kiungo cha mwaliko';
+
+  @override
+  String get ui3InviteLinkCopied => 'Kiungo cha mwaliko kimenakiliwa';
+
+  @override
+  String get ui3ChannelCategoryOptional => 'Aina (si lazima)';
+
+  @override
+  String get ui3ChannelCategoryHint => 'Matangazo / Bidhaa / Usaidizi';
+
+  @override
+  String get ui3DescriptionOptional => 'Maelezo (si lazima)';
+
+  @override
+  String get ui3WebhookEnable => 'Washa uendeshaji otomatiki wa webhook';
+
+  @override
+  String get ui3WebhookEnableDesc =>
+      'Tuma matukio ya mwanachama kujiunga na makaribisho kwa endpoint ya muunganisho wako.';
+
+  @override
+  String get ui3WebhookUrl => 'URL ya webhook';
+
+  @override
+  String get ui3WebhookSecretOptional => 'Siri ya Kusaini (si lazima)';
+
+  @override
+  String get ui3WebhookSecretHint => 'Hutumika kwa X-N42-Signature';
+
+  @override
+  String get ui3WebhookNotifyMemberJoined => 'Arifu mwanachama anapojiunga';
+
+  @override
+  String get ui3WebhookNotifyWelcomeSent => 'Arifu ukaribisho unapotumwa';
+
+  @override
+  String get ui3WebhookTestSend => 'Tuma webhook ya majaribio';
+
+  @override
+  String get ui3WebhookTestSending => 'Inatuma webhook ya majaribio...';
+
+  @override
+  String get ui3WebhookTestSent => 'Webhook ya majaribio imetumwa';
+
+  @override
+  String get ui3WebhookTestFailed => 'Imeshindwa kutuma webhook ya majaribio';
+
+  @override
+  String get ui3WebhookUrlInvalid =>
+      'URL ya webhook lazima iwe anwani ya umma ya HTTPS';
+
+  @override
+  String get ui3WebhookSelectEvent => 'Chagua angalau tukio moja la webhook';
+
+  @override
+  String get ui3SensitiveDataDetection => 'Ugunduzi wa Data Nyeti';
+
+  @override
+  String get ui3Email => 'Barua pepe';
+
+  @override
+  String get ui3CreditCard => 'Kadi ya Mkopo';
+
+  @override
+  String get ui3DetectEmailDesc =>
+      'Gundua anwani za barua pepe katika ujumbe wa maandishi';
+
+  @override
+  String get ui3DetectPhoneDesc =>
+      'Gundua nambari za simu na nambari za kimataifa';
+
+  @override
+  String get ui3DetectCardDesc =>
+      'Gundua nambari zinazowezekana za benki na kadi';
+
+  @override
+  String get ui3DetectWalletDesc =>
+      'Gundua anwani za pochi za mtindo wa Ethereum';
+
+  @override
+  String get ui3GeneralTopic => 'Jumla';
+
+  @override
+  String get a11yPreviousResult => 'Tokeo lililotangulia';
+
+  @override
+  String get a11yNextResult => 'Tokeo linalofuata';
+
+  @override
+  String get ui3TryDifferentKeywords => 'Jaribu maneno muhimu tofauti';
+
+  @override
+  String ui3FiltersActive(Object count) {
+    return 'Vichujio vinavyotumika: $count';
+  }
+
+  @override
+  String ui3MessageFiltersActive(Object count) {
+    return 'Vichujio vya ujumbe vinavyotumika: $count';
+  }
+
+  @override
+  String get ui3LoadMore => 'Pakia zaidi';
+
+  @override
+  String get ui3MessageFilters => 'Vichujio vya Ujumbe';
+
+  @override
+  String get ui3SenderUserId => 'Kitambulisho cha Mtumaji';
+
+  @override
+  String get ui3FilterType => 'Aina';
+
+  @override
+  String get ui3FilterAny => 'Yoyote';
+
+  @override
+  String get ui3FilterImage => 'Picha';
+
+  @override
+  String get ui3FilterTime => 'Muda';
+
+  @override
+  String get ui3AnyTime => 'Wakati wowote';
+
+  @override
+  String get ui3OnlyMyMessages => 'Ujumbe wangu pekee';
+
+  @override
+  String get ui3MediaOnly => 'Media pekee';
+
+  @override
+  String get ui3Apply => 'Tekeleza';
+
+  @override
+  String get ui3QrStyleClassic => 'Asili';
+
+  @override
+  String get ui3QrStyleOcean => 'Bahari';
+
+  @override
+  String get ui3QrStyleBerry => 'Beri';
+
+  @override
+  String get ui3NfcUnavailable =>
+      'NFC haipatikani au lebo haitumiki. Washa NFC, jaribu lebo nyingine, au tumia QR.';
+
+  @override
+  String get ui3CancelNfc => 'Ghairi NFC';
+
+  @override
+  String get ui3ReadNfcTag => 'Soma lebo ya NFC';
+
+  @override
+  String get ui3HoldNearNfcTag =>
+      'Shikilia simu yako karibu na lebo ya huduma.';
+
+  @override
+  String get a11yFlashlightOn => 'Washa tochi';
+
+  @override
+  String get a11yFlashlightOff => 'Zima tochi';
+
+  @override
+  String get ui3SocialGraph => 'Mtandao wa Kijamii';
+
+  @override
+  String get ui3RecommendedConnections => 'Miunganisho Inayopendekezwa';
+
+  @override
+  String get ui3Portfolio => 'Jalada la Mali';
+
+  @override
+  String get ui3Chains => 'Minyororo';
+
+  @override
+  String get ui3Tokens => 'Tokeni';
+
+  @override
+  String get ui3NoConnectionsFound => 'Hakuna miunganisho iliyopatikana';
+
+  @override
+  String get ui3ConnectionsHint =>
+      'Miunganisho itaonekana unapoongeza shughuli kwenye mnyororo';
+
+  @override
+  String get ui3SocialGraphLoadFailed =>
+      'Imeshindwa kupakia mtandao wa kijamii';
+
+  @override
+  String get ui3Similarity => 'Ufanano';
+
+  @override
+  String get ui3Breakdown => 'Mchanganuo';
+
+  @override
+  String get ui3TokenHoldings => 'Tokeni unayomiliki';
+
+  @override
+  String get ui3NftCollections => 'Mikusanyiko ya NFT';
+
+  @override
+  String get ui3ChainUsage => 'Matumizi ya mnyororo';
+
+  @override
+  String get ui3Transactions => 'Miamala';
+
+  @override
+  String get ui3DaoMembership => 'Uanachama wa DAO';
+
+  @override
+  String get ui3NotWeighted => 'Haina uzito';
+
+  @override
+  String ui3PercentWithWeight(Object percent, Object weight) {
+    return '$percent% (uzito: $weight)';
+  }
+
+  @override
+  String get ui3CommonOnChainActivity => 'Shughuli za pamoja kwenye mnyororo';
+
+  @override
+  String get ui3SharedTokens => 'Tokeni za pamoja';
+
+  @override
+  String get ui3SharedNftCollections => 'Mikusanyiko ya NFT ya pamoja';
+
+  @override
+  String get ui3SharedChains => 'Minyororo ya pamoja';
+
+  @override
+  String get ui3NoSharedTokens => 'Hakuna tokeni za pamoja zilizopatikana';
+
+  @override
+  String get ui3NoSharedNftCollections =>
+      'Hakuna mikusanyiko ya NFT ya pamoja iliyopatikana';
+
+  @override
+  String get ui3NoSharedChains => 'Hakuna minyororo ya pamoja iliyopatikana';
+
+  @override
+  String get ui3SimilarityFailed => 'Imeshindwa kukokotoa ufanano';
+
+  @override
+  String ui3ItemsAndMore(Object items, Object count) {
+    return '$items +$count zaidi';
+  }
+
+  @override
+  String get a11yGovernance => 'Utawala';
+
+  @override
+  String get ui3CommunityLink => 'Kiungo cha jumuiya';
+
+  @override
+  String get ui3CommunityQrCode => 'Msimbo wa QR wa jumuiya';
+
+  @override
+  String get ui3CommunityQrSubtitle =>
+      'Changanua ili ujiunge na jumuiya hii na uvinjari chaneli zake';
+
+  @override
+  String get ui3CommunityLinkLoadFailed =>
+      'Imeshindwa kupakia kiungo cha jumuiya';
+
+  @override
+  String get ui3CommunityLinkCopied => 'Kiungo cha jumuiya kimenakiliwa';
+
+  @override
+  String ui3KickMemberConfirm(Object name) {
+    return '$name ataondolewa kwenye jumuiya hii.';
+  }
+
+  @override
+  String ui3BanMemberConfirm(Object name) {
+    return '$name ataondolewa na hataweza kujiunga tena.';
+  }
+
+  @override
+  String get ui3SignInToDiscoverChannels => 'Ingia ili ugundue chaneli za umma';
+
+  @override
+  String ui3UnableToJoinChannel(Object name, Object error) {
+    return 'Imeshindwa kujiunga na $name: $error';
+  }
+
+  @override
+  String get ui3CategoryTech => 'Teknolojia';
+
+  @override
+  String get ui3CategorySocial => 'Kijamii';
+
+  @override
+  String get ui3NoPublicChannels => 'Hakuna chaneli za umma zilizopatikana';
+
+  @override
+  String get ui3StoriesAndFun => 'Hadithi na Burudani';
+
+  @override
+  String get ui3SearchMusicHint => 'Tafuta nyimbo, wasanii au marafiki';
+
+  @override
+  String get ui3ForYou => 'Kwa ajili yako';
+
+  @override
+  String get ui3Liked => 'Zilizopendwa';
+
+  @override
+  String get ui3NoLikedMusic => 'Bado hakuna muziki uliopendwa';
+
+  @override
+  String get ui3NoMusicStories => 'Bado hakuna Hadithi za muziki';
+
+  @override
+  String get ui3LikedMusicHint => 'Gusa moyo kando ya wimbo ili kuuweka hapa.';
+
+  @override
+  String get ui3MusicStoriesHint =>
+      'Muziki ulioshirikiwa kwenye Hadithi utaonekana hapa.';
+
+  @override
+  String ui3SharedBy(Object artist, Object name) {
+    return '$artist · imeshirikiwa na $name';
+  }
+
+  @override
+  String ui3UnableToPlay(Object title, Object error) {
+    return 'Imeshindwa kucheza $title: $error';
+  }
+
+  @override
+  String get a11yPreviousTrack => 'Wimbo uliotangulia';
+
+  @override
+  String get a11yNextTrack => 'Wimbo unaofuata';
+
+  @override
+  String get a11yPlay => 'Cheza';
+
+  @override
+  String get a11yPause => 'Sitisha';
+
+  @override
+  String get ui3Refresh => 'Onyesha upya';
+
+  @override
+  String get ui3NearbyIntroTitle => 'Gundua machapisho ya umma yaliyo karibu';
+
+  @override
+  String get ui3NearbyIntroBody =>
+      'Mahali ulipo hutumika mara moja kwenye kifaa hiki kupanga Matukio ya umma. Hapapakiwi, hapatangazwi wala kuonyeshwa kwa watu wengine.';
+
+  @override
+  String get ui3UseMyLocation => 'Tumia mahali nilipo';
+
+  @override
+  String get ui3NearbyUnavailable => 'Kipengele cha Karibu hakipatikani';
+
+  @override
+  String get ui3NoNearbyPosts => 'Bado hakuna machapisho karibu';
+
+  @override
+  String get ui3NoNearbyPostsHint =>
+      'Matukio ya umma yenye mahali yataonekana hapa.';
+
+  @override
+  String get ui3NearbyDistanceNote =>
+      'Umbali wa kukadiria · machapisho ya umma yenye mahali pekee';
+
+  @override
+  String get ui3PublicLocationPost => 'Chapisho la umma lenye mahali';
+
+  @override
+  String get ui3LocationServicesOff => 'Huduma za Mahali zimezimwa';
+
+  @override
+  String get ui3LocationPermissionDenied => 'Ruhusa ya mahali imekataliwa';
+
+  @override
+  String get ui3EnableLocationInSettings =>
+      'Washa ruhusa ya mahali kwenye mipangilio ya mfumo';
+
+  @override
+  String get ui3CreateStory => 'Unda Hadithi';
+
+  @override
+  String get ui3CreateStoryDesc => 'Chapisha hali ya maandishi au picha.';
+
+  @override
+  String get ui3StoryCamera => 'Kamera ya Hadithi';
+
+  @override
+  String get ui3StoryCameraDesc =>
+      'Nenda moja kwa moja kwenye vichujio na kuhariri picha.';
+
+  @override
+  String get ui3MomentsDesc => 'Fungua mlisho kamili na maoni.';
+
+  @override
+  String get ui3MomentCamera => 'Kamera ya Matukio';
+
+  @override
+  String get ui3MomentCameraDesc => 'Unda chapisho na uchague midia mara moja.';
+
+  @override
+  String get ui3GamesDesc =>
+      'Fungua kituo cha michezo ya kawaida kilichojengewa ndani.';
+
+  @override
+  String get ui3AvatarStudio => 'Studio ya Avatar';
+
+  @override
+  String get ui3AvatarStudioDesc =>
+      'Mapambo, avatar ya NFT na mtindo wa utambulisho.';
+
+  @override
+  String get ui3SocialGraphDesc =>
+      'Wanaofuatwa, mashabiki na miunganisho kwenye mnyororo.';
+
+  @override
+  String get ui3SocialHubHeroTitle => 'Hadithi, matukio, michezo na avatar';
+
+  @override
+  String get ui3SocialHubHeroBody =>
+      'Vipengele vyote vya kijamii mahali pamoja badala ya kutawanyika kwenye gumzo, wasifu na ugunduzi.';
+
+  @override
+  String get ui3SocialGraphNotConfigured =>
+      'Grafu ya kijamii haijasanidiwa kwenye toleo hili';
+
+  @override
+  String get ui3ConnectWalletForSocialGraph =>
+      'Unganisha pochi ili kuona grafu yako ya kijamii';
+
+  @override
+  String get ui3AvatarStudioSignIn =>
+      'Studio ya Avatar inahitaji mtumiaji aliyeingia';
+
+  @override
+  String get a11yRemoveImage => 'Ondoa picha';
+
+  @override
+  String get a11yBack => 'Rudi';
+
+  @override
+  String get ui3MiniAppConfirmTransactionTitle => 'Thibitisha muamala';
+
+  @override
+  String get ui3MiniAppConfirmTransactionBody =>
+      'Programu Ndogo inaomba kutuma muamala kwa niaba yako.';
+
+  @override
+  String ui3MiniAppOpenTitle(Object name) {
+    return 'Fungua $name?';
+  }
+
+  @override
+  String get ui3MiniAppOpenButton => 'Fungua';
+
+  @override
+  String get ui3StoryReplySendFailed => 'Imeshindwa kutuma jibu la Hadithi';
+
+  @override
+  String get ui3RedPacketDemoNotice =>
+      'Bahasha nyekundu ya majaribio — ni rekodi ndani ya gumzo tu, hakuna mali halisi kwenye mnyororo inayohamishwa.';
+
+  @override
+  String get ui3RedPacketCoverClassic => 'Nyekundu ya kawaida';
+
+  @override
+  String get ui3RedPacketCoverGolden => 'Dhahabu';
+
+  @override
+  String get ui3RedPacketCoverPurple => 'Zambarau';
+
+  @override
+  String get ui3RedPacketCoverOceanBlue => 'Buluu ya bahari';
+
+  @override
+  String get ui3RedPacketCoverNatureGreen => 'Kijani ya asili';
+
+  @override
+  String get ui3RedPacketCoverRosePink => 'Waridi';
+
+  @override
+  String get ui3RedPacketHistoryEmpty => 'Bado hakuna bahasha nyekundu';
+
+  @override
+  String get ui3TransferMerchantQrWithAmount =>
+      'QR ya mfanyabiashara (pamoja na kiasi)';
+
+  @override
+  String get ui3TransferMerchantQrTitle => 'QR ya mfanyabiashara';
+
+  @override
+  String get ui3TransferOpenAmountHint => 'Acha wazi kwa kiasi chochote';
+
+  @override
+  String get ui3FiatRampTitle => 'Nunua / uza kripto';
+
+  @override
+  String get ui3FiatRampBuy => 'Nunua';
+
+  @override
+  String get ui3FiatRampSell => 'Uza';
+
+  @override
+  String get ui3FiatRampNotConfigured =>
+      'Huduma ya kuingiza/kutoa fiat haijasanidiwa';
+
+  @override
+  String get a11yPointsAddRule => 'Ongeza kanuni ya zawadi';
+
+  @override
+  String get a11yGovernanceRemoveChoice => 'Ondoa chaguo';
+
+  @override
+  String get a11yGovernanceCreateProposal => 'Unda pendekezo';
+
+  @override
+  String get ui3MiniAppUpdateN42 => 'Sasisha N42';
+
+  @override
+  String get ui3MiniAppOfficial => 'Rasmi';
+
+  @override
+  String ui3MiniAppUserCount(Object count) {
+    return 'Watumiaji $count';
+  }
+
+  @override
+  String a11yStoryBackgroundColor(Object index) {
+    return 'Rangi ya mandharinyuma $index';
+  }
+
+  @override
+  String get a11yStoryAdd => 'Ongeza hadithi';
+
+  @override
+  String get ui3StoryPostFailed => 'Imeshindwa kuchapisha hadithi';
+
+  @override
+  String get ui3StoryTapToSelectImage => 'Gusa ili kuchagua picha';
+
+  @override
+  String get ui3StoryChangeImage => 'Badilisha';
+
+  @override
+  String ui3StoryMusicReadFailed(Object error) {
+    return 'Imeshindwa kusoma muziki uliochaguliwa: $error';
+  }
+
+  @override
+  String get ui3StoryDeleteConfirm => 'Futa hadithi hii?';
+
+  @override
+  String get ui3StoryDeleteFailed => 'Imeshindwa kufuta hadithi';
+
+  @override
+  String get ui3MomentCreateTitle => 'Unda tukio';
+
+  @override
+  String get ui3MomentContentHint => 'Unawaza nini?';
+
+  @override
+  String get ui3MomentAddPhotos => 'Ongeza picha';
+
+  @override
+  String get ui3MomentAddLocation => 'Ongeza mahali';
+
+  @override
+  String ui3MomentSelectedMedia(Object count) {
+    return 'Midia zilizochaguliwa ($count)';
+  }
+
+  @override
+  String get ui3MomentClearAll => 'Futa zote';
+
+  @override
+  String get ui3MomentClearMediaConfirm =>
+      'Ondoa picha/video zote zilizochaguliwa?';
+
+  @override
+  String get ui3MomentVisibilityPublicDesc => 'Marafiki wote wanaweza kuona';
+
+  @override
+  String get ui3MomentVisibilityPrivateDesc => 'Wewe pekee unaweza kuona';
+
+  @override
+  String get ui3MomentVisibilityPartialDesc => 'Chagua anayeweza kuona';
+
+  @override
+  String get ui3MomentVisibilityExcludedDesc => 'Ficha kwa marafiki fulani';
+
+  @override
+  String get ui3MomentVideos => 'Video';
+
+  @override
+  String get ui3MomentNoVideos => 'Bado hakuna video';
+
+  @override
+  String get a11yCallMinimize => 'Punguza';
+
+  @override
+  String get a11yCallGridView => 'Mwonekano wa gridi';
+
+  @override
+  String get a11yCallFocusView => 'Mwonekano wa kulenga';
+
+  @override
+  String get ui3CallTools => 'Zana za simu';
+
+  @override
+  String get ui3CallMeetingTools => 'Zana za mkutano';
+
+  @override
+  String get ui3CallToolsSubtitle =>
+      'Rekebisha ubora wa sauti na video bila kuondoka kwenye simu.';
+
+  @override
+  String get ui3CallAudioEnhancement => 'Uboreshaji wa sauti';
+
+  @override
+  String get ui3CallNoiseSuppression => 'Kuzuia kelele';
+
+  @override
+  String get ui3CallNoiseSuppressionDesc =>
+      'Punguza kelele za kibodi na za mandharinyuma.';
+
+  @override
+  String get ui3CallEchoCancellation => 'Kuondoa mwangwi';
+
+  @override
+  String get ui3CallEchoCancellationDesc =>
+      'Zuia sauti ya spika kurudi kwenye maikrofoni.';
+
+  @override
+  String get ui3CallAutoGainControl => 'Udhibiti wa kiotomatiki wa sauti';
+
+  @override
+  String get ui3CallAutoGainControlDesc =>
+      'Weka sauti ya maikrofoni iwe thabiti zaidi.';
+
+  @override
+  String get ui3CallVoiceIsolation => 'Utengaji wa sauti ulioboreshwa';
+
+  @override
+  String get ui3CallVoiceIsolationDesc =>
+      'Tumia wasifu thabiti zaidi wa kupunguza kelele.';
+
+  @override
+  String get ui3CallVideoSection => 'Mipangilio ya video';
+
+  @override
+  String get ui3CallBackgroundBlur => 'Kufifisha mandharinyuma (beta)';
+
+  @override
+  String get ui3CallBlurDescReady =>
+      'Mapendeleo yamewashwa. Ufifishaji halisi bado unategemea kuzinduliwa kwa kichakataji video.';
+
+  @override
+  String get ui3CallBlurDescSaved =>
+      'Mapendeleo ya kufifisha yamehifadhiwa na yatatumika uchakataji wa kamera ukipatikana.';
+
+  @override
+  String get ui3CallBlurDescCameraOff =>
+      'Washa kamera yako uchakataji wa mandharinyuma ukipatikana.';
+
+  @override
+  String get ui3CallRecordingSection => 'Kurekodi';
+
+  @override
+  String get ui3CallRecordingDesc =>
+      'Inahitaji huduma ya egress upande wa seva kabla ya kuhifadhi rekodi.';
+
+  @override
+  String ui3CallSettingsUpdateFailed(Object error) {
+    return 'Imeshindwa kusasisha mipangilio ya simu: $error';
+  }
+
+  @override
+  String get ui3CallRecordingStarted => 'Kurekodi kumeanza';
+
+  @override
+  String get ui3VoiceRoomNotFound => 'Chumba hakijapatikana';
+
+  @override
+  String get ui3VoiceRoomEndConfirm =>
+      'Una uhakika unataka kumaliza chumba hiki cha sauti?';
+
+  @override
+  String get a11yGameMoveUp => 'Sogeza juu';
+
+  @override
+  String get a11yGameMoveDown => 'Sogeza chini';
+
+  @override
+  String get a11yGameMoveLeft => 'Sogeza kushoto';
+
+  @override
+  String get a11yGameMoveRight => 'Sogeza kulia';
+
+  @override
+  String get a11yGameRotate => 'Zungusha';
+
+  @override
+  String get a11yGameDrop => 'Dondosha';
+
+  @override
+  String ui3StickerAddedCount(Object count) {
+    return 'Vibandiko $count vimeongezwa';
+  }
+
+  @override
+  String ui3StickerAddFailed(Object error) {
+    return 'Imeshindwa kuongeza: $error';
+  }
+
+  @override
+  String get ui3StickerRemoveTitle => 'Ondoa kibandiko';
+
+  @override
+  String get ui3StickerRemoveConfirm =>
+      'Ondoa kibandiko hiki kwenye kifurushi?';
+
+  @override
+  String get ui3StickerRemoveFailed => 'Imeshindwa kuondoa';
+
+  @override
+  String get ui3StickerRenamePack => 'Badilisha jina la kifurushi';
+
+  @override
+  String get ui3StickerPackName => 'Jina la kifurushi';
+
+  @override
+  String get ui3StickerRenameFailed => 'Imeshindwa kubadilisha jina';
+
+  @override
+  String get ui3StickerDeletePack => 'Futa kifurushi';
+
+  @override
+  String get ui3StickerThisPack => 'kifurushi hiki';
+
+  @override
+  String ui3StickerDeletePackConfirm(Object name) {
+    return 'Futa \"$name\" na vibandiko vyake vyote? Hatua hii haiwezi kutenduliwa.';
+  }
+
+  @override
+  String get ui3StickerDeleteFailed => 'Imeshindwa kufuta';
+
+  @override
+  String get ui3StickerPack => 'Kifurushi cha vibandiko';
+
+  @override
+  String get ui3StickerAdding => 'Inaongeza…';
+
+  @override
+  String get ui3StickerAddStickers => 'Ongeza vibandiko';
+
+  @override
+  String get ui3StickerPackNotFound => 'Kifurushi hakijapatikana';
+
+  @override
+  String get ui3StickerEmptyHint =>
+      'Gusa \"Ongeza vibandiko\" ili kupakia picha';
+
+  @override
+  String get ui3StickerNewPack => 'Kifurushi kipya cha vibandiko';
+
+  @override
+  String get ui3StickerCreate => 'Unda';
+
+  @override
+  String get ui3StickerCreateFailed => 'Imeshindwa kuunda kifurushi';
+
+  @override
+  String ui3StickerInstalled(Object name) {
+    return '\"$name\" imesakinishwa';
+  }
+
+  @override
+  String get ui3StickerRemovePackTitle => 'Ondoa kifurushi cha vibandiko';
+
+  @override
+  String ui3StickerRemovePackConfirm(Object name) {
+    return 'Ondoa \"$name\" kwenye vibandiko vyako?';
+  }
+
+  @override
+  String ui3StickerRemoved(Object name) {
+    return '\"$name\" imeondolewa';
+  }
+
+  @override
+  String get ui3StickerAiSticker => 'Kibandiko cha AI';
+
+  @override
+  String get ui3StickerStoreTab => 'Duka';
+
+  @override
+  String get ui3StickerMyStickersTab => 'Vibandiko vyangu';
+
+  @override
+  String get ui3StickerNoneFound => 'Hakuna vibandiko vilivyopatikana';
+
+  @override
+  String ui3StickerByAuthor(Object author) {
+    return 'na $author';
+  }
+
+  @override
+  String get ui3StickerManage => 'Dhibiti';
+
+  @override
+  String ui3StickerCount(Object count) {
+    return 'Vibandiko $count';
+  }
+
+  @override
+  String get ui3StickerNoneInstalled => 'Hakuna vibandiko vilivyosakinishwa';
+
+  @override
+  String get ui3StickerGetFromStore => 'Pata vibandiko kutoka dukani';
+
+  @override
+  String get ui3StickerBrowseStore => 'Vinjari duka';
+
+  @override
+  String get ui3StickerAddedToAi => 'Imeongezwa kwenye \"Vibandiko vya AI\"';
+
+  @override
+  String get ui3StickerAddOneFailed => 'Imeshindwa kuongeza kibandiko';
+
+  @override
+  String get ui3StickerPromptLabel => 'Eleza kibandiko chako';
+
+  @override
+  String get ui3StickerPromptHint =>
+      'mf. paka mchungwa mwenye furaha aliyevaa miwani ya jua';
+
+  @override
+  String get ui3StickerGenerating => 'Inatengeneza…';
+
+  @override
+  String get ui3StickerGenerate => 'Tengeneza';
+
+  @override
+  String get ui3StickerAddToStickers => 'Ongeza kwenye vibandiko';
+
+  @override
+  String get ui3StickerGeneratingPreview => 'Inatengeneza kibandiko chako…';
+
+  @override
+  String get ui3StickerGenerateEmpty =>
+      'Eleza kibandiko kisha gusa \"Tengeneza\"';
 }

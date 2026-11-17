@@ -6358,4 +6358,1990 @@ class SVi extends S {
   String scheduledSendTomorrowMorningAt(String time) {
     return 'Sáng mai ($time)';
   }
+
+  @override
+  String get a11yScrollToBottom => 'Cuộn xuống cuối';
+
+  @override
+  String get ui3EnterMessageBeforeScheduling =>
+      'Nhập tin nhắn trước khi hẹn giờ gửi';
+
+  @override
+  String get ui3SendCode => 'Gửi mã';
+
+  @override
+  String get ui3CodeLanguage => 'Ngôn ngữ';
+
+  @override
+  String get ui3PasteCodeHere => 'Dán mã vào đây';
+
+  @override
+  String ui3ReminderSetAt(String time) {
+    return 'Đã đặt lời nhắc · $time';
+  }
+
+  @override
+  String get ui3RedPacketCreateFailed => 'Không thể tạo lì xì';
+
+  @override
+  String get ui3SendTip => 'Gửi tiền tip';
+
+  @override
+  String get ui3TokenLabel => 'Mã thông báo';
+
+  @override
+  String get ui3NoteOptional => 'Ghi chú (không bắt buộc)';
+
+  @override
+  String ui3TipFailed(String error) {
+    return 'Gửi tip thất bại: $error';
+  }
+
+  @override
+  String get ui3GiftNftTitle => 'Tặng NFT';
+
+  @override
+  String get ui3TokenId => 'ID token';
+
+  @override
+  String ui3NftGiftFailed(String error) {
+    return 'Tặng NFT thất bại: $error';
+  }
+
+  @override
+  String get ui3AiAgentSubtitle => 'Mô tả tác vụ, mở đúng ứng dụng mini';
+
+  @override
+  String get ui3GiftNft => 'Tặng NFT';
+
+  @override
+  String get ui3GiftNftSubtitle => 'Gửi NFT cho liên hệ này';
+
+  @override
+  String get ui3MiniAppUnavailable => 'Ứng dụng mini không khả dụng';
+
+  @override
+  String ui3MediaItemsNotSent(int count) {
+    return 'Không thể gửi $count tệp phương tiện đã chọn';
+  }
+
+  @override
+  String get ui3PhotosSubtitle =>
+      'Gửi ảnh và video ở định dạng phù hợp cho trò chuyện';
+
+  @override
+  String get ui3OriginalImages => 'Ảnh gốc';
+
+  @override
+  String get ui3OriginalImagesSubtitle => 'Gửi ảnh không nén dưới dạng tệp';
+
+  @override
+  String ui3ScheduledFileFor(String filename, String time) {
+    return 'Đã hẹn gửi $filename lúc $time';
+  }
+
+  @override
+  String ui3SendingOriginalImage(String filename) {
+    return 'Đang gửi ảnh gốc: $filename';
+  }
+
+  @override
+  String ui3ScheduledOriginalImage(String filename) {
+    return 'Đã hẹn gửi ảnh gốc: $filename';
+  }
+
+  @override
+  String get ui3PaymentAlreadySent => 'Đã gửi thanh toán';
+
+  @override
+  String get ui3PaymentProcessing => 'Đang xử lý thanh toán';
+
+  @override
+  String ui3ChainStatus(String status) {
+    return 'Trạng thái on-chain: $status';
+  }
+
+  @override
+  String get ui3NotChecked => 'Chưa kiểm tra';
+
+  @override
+  String ui3ConfirmationsCount(int confirmations, int required) {
+    return 'Đã xác nhận: $confirmations / $required khối';
+  }
+
+  @override
+  String get ui3CopyTxHash => 'Sao chép mã băm giao dịch';
+
+  @override
+  String get ui3VerifyAgain => 'Xác minh lại';
+
+  @override
+  String get ui3VerifyOnChain => 'Xác minh on-chain';
+
+  @override
+  String get ui3TransferMissingChainDetails =>
+      'Giao dịch chuyển này không có thông tin chính xác về chuỗi và tài sản.';
+
+  @override
+  String get ui3ReceiptPending => 'Đang chờ trên chuỗi';
+
+  @override
+  String get ui3ReceiptConfirmed => 'Đã xác nhận';
+
+  @override
+  String get ui3ReceiptFailed => 'Thất bại trên chuỗi';
+
+  @override
+  String get ui3ReceiptMismatch => 'Chi tiết giao dịch không khớp';
+
+  @override
+  String get ui3ReceiptUnsupported => 'Không hỗ trợ xác minh on-chain';
+
+  @override
+  String get ui3ReceiptUnavailable => 'Không thể xác minh';
+
+  @override
+  String get ui3OpenOrSave => 'Mở / Lưu';
+
+  @override
+  String get ui3UnableToOpenFile => 'Không thể mở tệp này.';
+
+  @override
+  String ui3AiRewriteFailed(String error) {
+    return 'AI viết lại thất bại: $error';
+  }
+
+  @override
+  String get ui3AiShareMessagesTitle => 'Chia sẻ tin nhắn với AI?';
+
+  @override
+  String get ui3AiShareMessagesBody =>
+      'Chọn những tin nhắn AI được dùng cho câu trả lời này. Quyền một lần này sẽ hết hạn sau hai phút. Đóng Trả lời nhanh sẽ hủy các kết quả đang chờ. Quyền này không cho phép thanh toán hay xuất dữ liệu.';
+
+  @override
+  String get ui3OtherParticipant => 'Người kia';
+
+  @override
+  String get ui3ShareSelected => 'Chia sẻ mục đã chọn';
+
+  @override
+  String get ui3BotCommandError => 'Lỗi lệnh';
+
+  @override
+  String get ui3BotUnknownCommand => 'Lệnh không xác định';
+
+  @override
+  String get ui3BotTypeHelp => 'Nhập /help để xem các lệnh khả dụng.';
+
+  @override
+  String get ui3FilesMediaLinks => 'Tệp, phương tiện & liên kết';
+
+  @override
+  String get ui3ChatStorage => 'Bộ nhớ trò chuyện';
+
+  @override
+  String get ui3EncryptionKeysDevices => 'Khóa mã hóa & thiết bị';
+
+  @override
+  String get ui3EncryptionServiceUnavailable => 'Dịch vụ mã hóa chưa khả dụng';
+
+  @override
+  String get ui3ExportLoadingHistory =>
+      'Đang tải thêm lịch sử trò chuyện để xuất...';
+
+  @override
+  String get ui3ExportTxtDesc =>
+      'Bản ghi văn bản thuần để ghi chú, sao lưu hoặc rà soát tuân thủ';
+
+  @override
+  String get ui3ExportCustomRange => 'Khoảng tùy chỉnh';
+
+  @override
+  String get ui3ExportStart => 'Bắt đầu';
+
+  @override
+  String get ui3ExportEnd => 'Kết thúc';
+
+  @override
+  String get ui3ExportSelectDate => 'Chọn ngày';
+
+  @override
+  String get ui3FolderFilterUnreadOnly => 'Chỉ chưa đọc';
+
+  @override
+  String get ui3FolderFilterMutedOnly => 'Chỉ đã tắt tiếng';
+
+  @override
+  String get ui3FolderFilterNoDms => 'Không gồm tin nhắn riêng';
+
+  @override
+  String get ui3FolderFilterNoGroups => 'Không gồm nhóm';
+
+  @override
+  String get ui3FolderFilterNoChannels => 'Không gồm kênh';
+
+  @override
+  String get ui3FolderFilterAllChats => 'Tất cả cuộc trò chuyện';
+
+  @override
+  String get ui3Create => 'Tạo';
+
+  @override
+  String ui3DeleteFolderConfirm(String name) {
+    return 'Xóa thư mục \"$name\"?';
+  }
+
+  @override
+  String get a11yDecreaseTextSize => 'Giảm cỡ chữ';
+
+  @override
+  String get a11yIncreaseTextSize => 'Tăng cỡ chữ';
+
+  @override
+  String ui3MinutesRead(int minutes) {
+    return '$minutes phút đọc';
+  }
+
+  @override
+  String get ui3TipOnChain => 'Đã lên chuỗi ✓';
+
+  @override
+  String get ui3ViewSource => 'Xem nguồn';
+
+  @override
+  String get a11yPreviousPage => 'Trang trước';
+
+  @override
+  String get a11yNextPage => 'Trang sau';
+
+  @override
+  String get ui3OpenExternalLinkTitle => 'Mở liên kết bên ngoài?';
+
+  @override
+  String get ui3Open => 'Mở';
+
+  @override
+  String get ui3UnableToOpenLink => 'Không thể mở liên kết này.';
+
+  @override
+  String get ui3ImageUnavailable => 'Hình ảnh không khả dụng';
+
+  @override
+  String ui3LoadImageFrom(Object host) {
+    return 'Tải ảnh từ $host';
+  }
+
+  @override
+  String ui3RetryImageFrom(Object host) {
+    return 'Thử tải lại ảnh từ $host';
+  }
+
+  @override
+  String get ui3TranslatedByN42 => 'Dịch bởi N42';
+
+  @override
+  String ui3TranslatedFromByN42(Object language) {
+    return 'Dịch từ $language bởi N42';
+  }
+
+  @override
+  String get ui3ClearWhiteboardTitle => 'Xóa bảng trắng?';
+
+  @override
+  String get ui3ClearWhiteboardMessage =>
+      'Mọi nét vẽ sẽ bị xóa với tất cả mọi người. Không thể hoàn tác thao tác này.';
+
+  @override
+  String get ui3WhiteboardLive => 'Bảng trắng · Trực tiếp';
+
+  @override
+  String get a11yPenColor => 'Màu bút';
+
+  @override
+  String get ui3AiDescribeOcr => 'AI mô tả / OCR';
+
+  @override
+  String get ui3DocumentPreviewFailed =>
+      'Không thể xem trước tài liệu này một cách an toàn. Hãy kiểm tra kết nối và kích thước tệp (tối đa 2MB).';
+
+  @override
+  String get ui3AiConsentMessage =>
+      'Chọn những tin nhắn AI được dùng cho bản tóm tắt này. Quyền một lần này sẽ hết hạn sau hai phút. Quyền này không cho phép thanh toán hay xuất dữ liệu.';
+
+  @override
+  String get ui3AiSuggestedReplies => 'Câu trả lời gợi ý';
+
+  @override
+  String get ui3AiGeneratingSuggestions => 'Đang tạo gợi ý...';
+
+  @override
+  String get ui3StickersEmpty => 'Chưa có nhãn dán';
+
+  @override
+  String get ui3StickersGet => 'Tải nhãn dán';
+
+  @override
+  String get a11yFormatBold => 'In đậm';
+
+  @override
+  String get a11yFormatItalic => 'In nghiêng';
+
+  @override
+  String get a11yFormatStrikethrough => 'Gạch ngang';
+
+  @override
+  String get a11yFormatInlineCode => 'Mã nội dòng';
+
+  @override
+  String get a11yFormatCodeBlock => 'Khối mã';
+
+  @override
+  String get a11yFormatChecklistItem => 'Mục danh sách việc cần làm';
+
+  @override
+  String get a11yFormatBulletList => 'Danh sách dấu đầu dòng';
+
+  @override
+  String get a11yFormatNumberedList => 'Danh sách đánh số';
+
+  @override
+  String get a11yFormatLink => 'Liên kết';
+
+  @override
+  String get a11yFormatTable => 'Bảng';
+
+  @override
+  String get a11yFormatMeetingTemplate => 'Mẫu cuộc họp';
+
+  @override
+  String get a11yEmojiSmileys => 'Mặt cười & con người';
+
+  @override
+  String get a11yEmojiHearts => 'Trái tim';
+
+  @override
+  String get a11yEmojiAnimals => 'Động vật & thiên nhiên';
+
+  @override
+  String get a11yEmojiFood => 'Đồ ăn & thức uống';
+
+  @override
+  String get a11yEmojiTravel => 'Du lịch & địa điểm';
+
+  @override
+  String get a11yEmojiActivities => 'Hoạt động';
+
+  @override
+  String get a11yEmojiObjects => 'Đồ vật';
+
+  @override
+  String get a11yEmojiSymbols => 'Biểu tượng';
+
+  @override
+  String get ui3FrequentlyUsed => 'Thường dùng';
+
+  @override
+  String get ui3NoEditHistory => 'Chưa có lịch sử chỉnh sửa';
+
+  @override
+  String get ui3EventNew => 'Sự kiện mới';
+
+  @override
+  String get ui3EventTitleLabel => 'Tiêu đề';
+
+  @override
+  String get ui3EventLocationOptional => 'Địa điểm (không bắt buộc)';
+
+  @override
+  String get ui3EventDescriptionOptional => 'Mô tả (không bắt buộc)';
+
+  @override
+  String get ui3EventSend => 'Gửi sự kiện';
+
+  @override
+  String get ui3EventTitleRequired => 'Vui lòng nhập tiêu đề';
+
+  @override
+  String get ui3EventEndAfterStart =>
+      'Thời gian kết thúc phải sau thời gian bắt đầu';
+
+  @override
+  String get ui3MiniAppAgentIntro =>
+      'Mô tả việc bạn muốn làm — tôi sẽ mở mini app phù hợp.';
+
+  @override
+  String get ui3MiniAppAgentExample => 'VD: đổi ETH sang USDC';
+
+  @override
+  String get ui3MiniAppAgentNoMatch =>
+      'Không tìm thấy mini app phù hợp. Hãy thử diễn đạt lại.';
+
+  @override
+  String ui3MiniAppOpen(Object appName) {
+    return 'Mở $appName';
+  }
+
+  @override
+  String get ui3MusicLinkPlatforms =>
+      'Hỗ trợ liên kết bài hát từ NetEase Cloud Music, QQ Music, Kugou, Kuwo và nhiều nền tảng khác';
+
+  @override
+  String get ui3PollMarkCorrectAnswer =>
+      'Hãy đánh dấu một đáp án đúng không trống';
+
+  @override
+  String get ui3PollQuizMode => 'Chế độ đố vui';
+
+  @override
+  String get ui3PollAnswerExplanationHint =>
+      'Giải thích đáp án (không bắt buộc)';
+
+  @override
+  String get a11yCorrectAnswer => 'Đáp án đúng';
+
+  @override
+  String get ui3AiSuggestions => 'Gợi ý từ AI';
+
+  @override
+  String get a11yPaste => 'Dán';
+
+  @override
+  String get a11yRefresh => 'Làm mới';
+
+  @override
+  String get ui3RecoveryKeyStoreWarning =>
+      'Hãy cất giữ khóa này an toàn. Đây là cách duy nhất để khôi phục tin nhắn mã hóa nếu bạn mất quyền truy cập vào mọi thiết bị.';
+
+  @override
+  String ui3SavedToPath(Object path) {
+    return 'Đã lưu: $path';
+  }
+
+  @override
+  String get ui3UnknownAccount => 'Tài khoản không xác định';
+
+  @override
+  String get ui3UnknownHomeserver => 'Máy chủ không xác định';
+
+  @override
+  String get ui3ImportRecoveryKey => 'Nhập khóa khôi phục';
+
+  @override
+  String get ui3ImportRecoveryKeyDesc =>
+      'Nhập hoặc dán khóa khôi phục để khôi phục khóa phòng cho lịch sử tin nhắn mã hóa.';
+
+  @override
+  String ui3RecoveryKeyAccountInfo(Object account, Object homeserver) {
+    return 'Tài khoản: $account\\nMáy chủ: $homeserver';
+  }
+
+  @override
+  String get ui3Import => 'Nhập';
+
+  @override
+  String get ui3InvalidRecoveryKeyFormat =>
+      'Định dạng khóa khôi phục không hợp lệ';
+
+  @override
+  String ui3RecoveryKeyPartialRestore(
+    Object restored,
+    Object total,
+    Object failed,
+  ) {
+    return 'Đã khôi phục $restored/$total khóa. $failed khóa thất bại. Hãy kiểm tra tài khoản, mạng và bản sao lưu rồi thử lại. Một phần lịch sử có thể vẫn không đọc được.';
+  }
+
+  @override
+  String ui3RecoveryKeyRestoreSuccess(Object restored, Object total) {
+    return 'Đã khôi phục thành công $restored/$total khóa';
+  }
+
+  @override
+  String ui3ImportFailed(Object error) {
+    return 'Nhập thất bại: $error';
+  }
+
+  @override
+  String ui3PasskeyRegistrationFailed(Object error) {
+    return 'Đăng ký passkey thất bại: $error';
+  }
+
+  @override
+  String get ui3PasskeyDefaultName => 'Passkey của tôi';
+
+  @override
+  String get ui3PasskeyNameHint => 'VD: iPhone, MacBook';
+
+  @override
+  String get ui3PasskeyDeleteFailed => 'Không thể xóa passkey';
+
+  @override
+  String get ui3TwoFactorAuth => 'Xác thực hai yếu tố';
+
+  @override
+  String get ui3TwoFactorOnSubtitle => 'Bật — cần mã từ ứng dụng xác thực';
+
+  @override
+  String get ui3TwoFactorOffSubtitle =>
+      'Tắt — bảo vệ bằng ứng dụng xác thực (TOTP)';
+
+  @override
+  String get ui3ShowRecoveryKey => 'Hiện khóa khôi phục';
+
+  @override
+  String get ui3ShowRecoveryKeyDesc => 'Hiển thị khóa khôi phục để sao lưu';
+
+  @override
+  String get ui3ImportRecoveryKeyHint =>
+      'Khôi phục tin nhắn bằng khóa khôi phục';
+
+  @override
+  String get ui3RecoveryKeyCreateFailed => 'Không thể tạo khóa khôi phục';
+
+  @override
+  String get ui3TotpIncorrectCode => 'Mã không đúng, hãy thử lại';
+
+  @override
+  String get ui3TwoFactorEnabled => 'Đã bật xác thực hai yếu tố';
+
+  @override
+  String get ui3TwoFactorDisabled => 'Đã tắt xác thực hai yếu tố';
+
+  @override
+  String get ui3TwoFactorTurnOffTitle => 'Tắt xác thực hai yếu tố?';
+
+  @override
+  String get ui3TwoFactorTurnOffMessage =>
+      'Ứng dụng xác thực sẽ không còn bắt buộc. Bạn có thể thiết lập lại sau bằng khóa mới.';
+
+  @override
+  String get ui3TurnOff => 'Tắt';
+
+  @override
+  String get ui3TwoFactorTotpTitle => 'Hai yếu tố (TOTP)';
+
+  @override
+  String get ui3TwoFactorIsOn => 'Xác thực hai yếu tố đang bật';
+
+  @override
+  String get ui3TwoFactorCodeRequired => 'Cần mã từ ứng dụng xác thực của bạn.';
+
+  @override
+  String get ui3TotpStepScan =>
+      '1. Quét mã QR này bằng ứng dụng xác thực (Google Authenticator, Authy, 1Password…) hoặc nhập khóa thủ công.';
+
+  @override
+  String get ui3TotpKeyCopied => 'Đã sao chép khóa';
+
+  @override
+  String get ui3TotpStepConfirm => '2. Nhập mã 6 chữ số để xác nhận.';
+
+  @override
+  String get ui3Enable => 'Bật';
+
+  @override
+  String get ui3BackupSettingsDesc =>
+      'Sao lưu cài đặt chat cục bộ. Tin nhắn sẽ được khôi phục từ máy chủ sau khi đăng nhập lại.';
+
+  @override
+  String get ui3BackupKeysSeparate => 'Khóa mã hóa được quản lý riêng';
+
+  @override
+  String get ui3BackupKeysSeparateHint =>
+      'Dùng Bảo mật > Khóa khôi phục để sao lưu quyền truy cập tin nhắn mã hóa.';
+
+  @override
+  String ui3BackupRoomsSize(Object rooms, Object size) {
+    return '$rooms phòng  $size';
+  }
+
+  @override
+  String get ui3BackupRestoreFromFileDesc =>
+      'Nhập tệp .n42backup từ thiết bị khác hoặc bản sao lưu trước. Khóa mã hóa được khôi phục riêng bằng khóa khôi phục.';
+
+  @override
+  String get ui3UsernameSessionRequired =>
+      'Tên người dùng yêu cầu phiên đăng nhập hợp lệ';
+
+  @override
+  String get ui3SecuritySessionRequired =>
+      'Cài đặt bảo mật yêu cầu phiên đăng nhập hợp lệ';
+
+  @override
+  String get ui3ConnectedAccountsSessionRequired =>
+      'Tài khoản liên kết yêu cầu phiên đăng nhập hợp lệ';
+
+  @override
+  String get ui3SystemAccounts => 'Hệ thống & tài khoản';
+
+  @override
+  String get ui3AccountIdentity => 'Tài khoản & danh tính';
+
+  @override
+  String get ui3Accounts => 'Tài khoản';
+
+  @override
+  String get ui3DevicesSessions => 'Thiết bị & phiên';
+
+  @override
+  String get ui3Integrations => 'Tích hợp';
+
+  @override
+  String get ui3ConnectedAccounts => 'Tài khoản liên kết';
+
+  @override
+  String get ui3ConnectedAccountsDesc =>
+      'Tích hợp Telegram, WhatsApp, Discord và cầu nối API';
+
+  @override
+  String get ui3SystemOverview => 'Tổng quan hệ thống';
+
+  @override
+  String ui3AccountCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tài khoản',
+      one: '1 tài khoản',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String ui3DeviceCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count thiết bị',
+      one: '1 thiết bị',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get ui3PrivacySecurityOverview =>
+      'Mã hóa đầu cuối, chống chụp màn hình và kiểm soát proxy';
+
+  @override
+  String get ui3ConversationPrivacy => 'Quyền riêng tư cuộc trò chuyện';
+
+  @override
+  String get ui3NetworkPrivacy => 'Quyền riêng tư mạng';
+
+  @override
+  String get ui3IdentityPrivacy => 'Quyền riêng tư danh tính';
+
+  @override
+  String get ui3EncryptionKeyBackup => 'Mã hóa & sao lưu khóa';
+
+  @override
+  String get ui3DevicesVerification => 'Thiết bị & xác minh';
+
+  @override
+  String get ui3ChipE2eeDefault => 'E2EE mặc định';
+
+  @override
+  String get ui3ChipManualE2ee => 'E2EE thủ công';
+
+  @override
+  String get ui3ChipSelfDestruct => 'Tự hủy';
+
+  @override
+  String get ui3ChipScreenshotGuard => 'Chống chụp màn hình';
+
+  @override
+  String get ui3ChipIpProxy => 'IP / máy chủ proxy';
+
+  @override
+  String get ui3ChipLinkPreviewsOff => 'Đã tắt xem trước liên kết';
+
+  @override
+  String get ui3ChipPublicHandle => 'Tên người dùng công khai';
+
+  @override
+  String get a11yShowPassword => 'Hiện mật khẩu';
+
+  @override
+  String get a11yHidePassword => 'Ẩn mật khẩu';
+
+  @override
+  String get a11yCheckServer => 'Kiểm tra máy chủ';
+
+  @override
+  String get ui3AuthAnonymousRegistration => 'Đăng ký ẩn danh';
+
+  @override
+  String get ui3AuthAnonymousRegistrationDesc =>
+      'Tạo tài khoản mà không cần liên kết số điện thoại hoặc email. Tên người dùng sẽ được tạo tự động.';
+
+  @override
+  String get ui3AuthAnonymousModeOn => 'Chế độ ẩn danh đang bật';
+
+  @override
+  String get ui3AuthAnonymousModeOnDesc =>
+      'Ứng dụng sẽ tạo một tên người dùng Matrix ngẫu nhiên cho bạn. Sau này bạn vẫn có thể đăng nhập bằng tài khoản và mật khẩu đã tạo.';
+
+  @override
+  String get ui3AuthChooseLoginMethod => 'Chọn phương thức đăng nhập';
+
+  @override
+  String get ui3AuthSsoOpenFailed => 'Không thể mở trang đăng nhập SSO';
+
+  @override
+  String get ui3AuthWalletUnavailable => 'Ví không khả dụng';
+
+  @override
+  String get ui3ProfileSubscriptions => 'Gói đăng ký';
+
+  @override
+  String get ui3ProfileBuySellCrypto => 'Mua / Bán tiền mã hóa';
+
+  @override
+  String get ui3ProfileOnDeviceAi => 'AI trên thiết bị';
+
+  @override
+  String get ui3ProfileSetAUsername => 'Đặt tên người dùng';
+
+  @override
+  String get ui3ProfileAvatarStudio => 'Studio ảnh đại diện';
+
+  @override
+  String get ui3ProfileAvatarStudioSubtitle => 'Ảnh đại diện NFT / Trang trí';
+
+  @override
+  String get ui3ProfileCustomize => 'Tùy chỉnh';
+
+  @override
+  String get ui3ProfileQrSubtitle =>
+      'Quét để mở hồ sơ này hoặc bắt đầu trò chuyện';
+
+  @override
+  String get ui3PrivacyHardening => 'Tăng cường quyền riêng tư';
+
+  @override
+  String get ui3HidePhoneNumber => 'Ẩn số điện thoại';
+
+  @override
+  String get ui3HidePhoneNumberDesc =>
+      'Che số điện thoại đã liên kết trên các màn hình hồ sơ của thiết bị này';
+
+  @override
+  String get ui3EncryptNewChatsByDefault =>
+      'Mã hóa trò chuyện mới theo mặc định';
+
+  @override
+  String get ui3EncryptNewChatsByDefaultDesc =>
+      'Bắt đầu trò chuyện trực tiếp và phòng riêng tư mới với E2EE được bật';
+
+  @override
+  String get ui3PrivateChatMode => 'Chế độ trò chuyện riêng tư';
+
+  @override
+  String get ui3PrivateChatModeDesc =>
+      'Tạm thời chặn chụp màn hình khi xem trò chuyện riêng tư hoặc được mã hóa';
+
+  @override
+  String get ui3DefaultSelfDestructTimer => 'Hẹn giờ tự hủy mặc định';
+
+  @override
+  String get ui3DefaultSelfDestructTimerDesc =>
+      'Áp dụng hẹn giờ tự hủy mặc định cho tin nhắn mới gửi';
+
+  @override
+  String get ui3LinkPreviews => 'Xem trước liên kết';
+
+  @override
+  String get ui3LinkPreviewsDesc =>
+      'Tải tiêu đề, mô tả và hình thu nhỏ khi tin nhắn chứa URL';
+
+  @override
+  String get ui3IpAddressProtection => 'Bảo vệ địa chỉ IP';
+
+  @override
+  String get ui3IpAddressProtectionDesc =>
+      'Định tuyến yêu cầu Matrix và xem trước liên kết qua proxy HTTP bảo mật bạn đã cấu hình khi có thể';
+
+  @override
+  String get ui3UseTorProxy => 'Dùng proxy HTTP Tor / Privoxy';
+
+  @override
+  String get ui3UseTorProxyDesc =>
+      'Dùng điểm cuối proxy HTTP cục bộ như Privoxy tại 127.0.0.1:8118. Không hỗ trợ định tuyến Tor SOCKS5 gốc tại đây.';
+
+  @override
+  String get ui3CustomProxy => 'Proxy tùy chỉnh';
+
+  @override
+  String get ui3CustomProxyDesc =>
+      'Dùng proxy HTTP hoặc HTTPS tùy chỉnh cho lưu lượng Matrix và xem trước liên kết';
+
+  @override
+  String get ui3ProxyEndpoint => 'Địa chỉ proxy';
+
+  @override
+  String get ui3ProxyEndpointDesc =>
+      'Địa chỉ proxy HTTP/HTTPS (không hỗ trợ SOCKS)';
+
+  @override
+  String get ui3InvalidEndpoint => 'Địa chỉ không hợp lệ';
+
+  @override
+  String get ui3CustomProxyStaysOff =>
+      'Proxy tùy chỉnh sẽ tắt cho đến khi bạn đặt địa chỉ hợp lệ';
+
+  @override
+  String get ui3NotificationFilterNote =>
+      'Quy tắc ưu tiên luôn thông báo (bỏ qua tắt tiếng, chỉ lượt nhắc và Không làm phiền). Từ khóa tắt tiếng sẽ chặn thông báo.';
+
+  @override
+  String get ui3PriorityKeywords => 'Từ khóa ưu tiên';
+
+  @override
+  String get ui3PriorityKeywordHint => 'vd: khẩn cấp';
+
+  @override
+  String get ui3MutedKeywords => 'Từ khóa tắt tiếng';
+
+  @override
+  String get ui3MutedKeywordHint => 'vd: spam';
+
+  @override
+  String get ui3PrioritySenders => 'Người gửi ưu tiên';
+
+  @override
+  String get ui3CaseSensitive => 'Phân biệt chữ hoa/thường';
+
+  @override
+  String get ui3None => 'Không có';
+
+  @override
+  String get ui3SmartReplyTranslation => 'Dịch trả lời thông minh';
+
+  @override
+  String get ui3SmartReplyTranslationDesc =>
+      'Tự động dịch tin nhắn của bạn sang ngôn ngữ của người nhận trước khi gửi.';
+
+  @override
+  String get ui3FromPhotos => 'Từ Ảnh';
+
+  @override
+  String get ui3ChangePhoto => 'Đổi ảnh';
+
+  @override
+  String get ui3RoamingUsesMobileData =>
+      'Chuyển vùng áp dụng quy tắc Dữ liệu di động';
+
+  @override
+  String get ui3RoamingUsesMobileDataDesc =>
+      'Chưa hỗ trợ phát hiện chuyển vùng riêng, nên hiện tại chuyển vùng tuân theo cài đặt tự động tải xuống của Dữ liệu di động.';
+
+  @override
+  String ui3DeleteQuickReplyConfirm(String content) {
+    return 'Xóa \"$content\"?';
+  }
+
+  @override
+  String get ui3ResetToDefaults => 'Đặt lại mặc định';
+
+  @override
+  String get ui3ResetQuickRepliesMessage =>
+      'Thao tác này sẽ xóa tất cả trả lời nhanh tùy chỉnh và khôi phục mặc định. Tiếp tục?';
+
+  @override
+  String get ui3LocalLlmUnavailable => 'Không được hỗ trợ trên thiết bị này';
+
+  @override
+  String get ui3LocalLlmNotDownloaded => 'Chưa tải mô hình';
+
+  @override
+  String get ui3LocalLlmReady => 'Sẵn sàng (trên thiết bị)';
+
+  @override
+  String get ui3LocalLlmDescription =>
+      'Khi được bật và sẵn sàng, các tính năng AI (tóm tắt, viết lại, dịch, trả lời) chạy hoàn toàn trên thiết bị — dữ liệu không bao giờ rời khỏi điện thoại của bạn. Nếu không, chúng sẽ dùng nhà cung cấp đám mây.';
+
+  @override
+  String get ui3UseOnDeviceAi => 'Dùng AI trên thiết bị';
+
+  @override
+  String get ui3UseOnDeviceAiDesc => 'Ưu tiên suy luận cục bộ khi sẵn sàng';
+
+  @override
+  String get ui3DownloadModel => 'Tải mô hình';
+
+  @override
+  String get ui3LocalLlmRuntimeRequired =>
+      'Suy luận trên thiết bị cần runtime gốc (Android MediaPipe / iOS Core ML). Tính năng sẽ tự động kích hoạt khi trình xử lý nền tảng khả dụng.';
+
+  @override
+  String get ui3PhotoAvatar => 'Ảnh đại diện từ ảnh';
+
+  @override
+  String get ui3AvatarStyles => 'Kiểu ảnh đại diện';
+
+  @override
+  String get ui3AvatarStylesDesc =>
+      'Dùng chung một bộ chọn trang trí cho hồ sơ và các điểm vào ảnh đại diện.';
+
+  @override
+  String get ui3ReplaceNftAvatar => 'Thay ảnh đại diện NFT';
+
+  @override
+  String get ui3NftAvatarDesc =>
+      'Dùng một vật phẩm sưu tầm on-chain làm ảnh đại diện.';
+
+  @override
+  String get ui3UsePhotoAvatar => 'Dùng ảnh đại diện từ ảnh';
+
+  @override
+  String get ui3UsePhotoAvatarDesc =>
+      'Giữ ảnh đại diện đã tải lên và hủy liên kết NFT.';
+
+  @override
+  String ui3AvatarStyleSet(Object name) {
+    return 'Đã đặt kiểu ảnh đại diện: $name';
+  }
+
+  @override
+  String get ui3NftAvatarUpdated => 'Đã cập nhật ảnh đại diện NFT';
+
+  @override
+  String get ui3SwitchedToPhotoAvatar => 'Đã chuyển lại ảnh đại diện từ ảnh';
+
+  @override
+  String get ui3SignInToViewRedPacketHistory =>
+      'Đăng nhập để xem lịch sử lì xì';
+
+  @override
+  String get ui3RedPacketActive => 'Đang diễn ra';
+
+  @override
+  String get ui3RedPacketCompleted => 'Đã nhận hết';
+
+  @override
+  String get ui3CardsAndPasses => 'Thẻ và vé';
+
+  @override
+  String get ui3CardsAndPassesDesc =>
+      'Thẻ ví, phiếu giảm giá và vé được quản lý trong ứng dụng chính.';
+
+  @override
+  String get ui3CardPackRequiresMainApp => 'Gói thẻ cần ứng dụng chính';
+
+  @override
+  String get ui3OpenCardPack => 'Mở gói thẻ';
+
+  @override
+  String get ui3UnableToOpenChat => 'Không thể mở trò chuyện với liên hệ này';
+
+  @override
+  String get ui3WalletManagedInMainApp =>
+      'Ví được quản lý trong ứng dụng chính';
+
+  @override
+  String ui3CreatorPlans(Object name) {
+    return '$name · Gói';
+  }
+
+  @override
+  String get ui3NewPlan => 'Gói mới';
+
+  @override
+  String get ui3MySubscriptions => 'Gói đăng ký của tôi';
+
+  @override
+  String get ui3AvailablePlans => 'Gói hiện có';
+
+  @override
+  String get ui3NoPlansYet => 'Chưa có gói · nhấn \"Gói mới\" để tạo';
+
+  @override
+  String ui3DaysLeft(Object days) {
+    return 'Còn $days ngày';
+  }
+
+  @override
+  String get ui3SubscriptionCancelled => 'Đã hủy';
+
+  @override
+  String get ui3AutoRenewOn => 'Tự động gia hạn: bật';
+
+  @override
+  String get ui3AutoRenewOff => 'Tự động gia hạn: tắt';
+
+  @override
+  String get ui3CancelSubscriptionTitle => 'Hủy gói đăng ký?';
+
+  @override
+  String ui3CancelSubscriptionConfirm(Object name) {
+    return 'Gói đăng ký $name của bạn vẫn có hiệu lực đến khi hết hạn và sẽ không gia hạn.';
+  }
+
+  @override
+  String get ui3Subscribe => 'Đăng ký';
+
+  @override
+  String ui3SubscribedTo(Object name) {
+    return 'Đã đăng ký $name';
+  }
+
+  @override
+  String get ui3PlanPriceLabel => 'Giá (VD: 9.9 USDT)';
+
+  @override
+  String get ui3PlanDescriptionLabel => 'Mô tả (không bắt buộc)';
+
+  @override
+  String get ui3PlanBenefitsLabel => 'Quyền lợi (phân cách bằng dấu phẩy)';
+
+  @override
+  String get ui3PlanPeriod => 'Chu kỳ:';
+
+  @override
+  String get ui3Monthly => 'Hằng tháng';
+
+  @override
+  String get ui3Yearly => 'Hằng năm';
+
+  @override
+  String get ui3SaveRemarkFailed => 'Không thể lưu ghi chú';
+
+  @override
+  String get ui3CopyLink => 'Sao chép liên kết';
+
+  @override
+  String get ui3Connect => 'Kết nối';
+
+  @override
+  String get ui3CommonTokens => 'Token chung';
+
+  @override
+  String get ui3SharedNfts => 'NFT chung';
+
+  @override
+  String get ui3TransactionHistory => 'Lịch sử giao dịch';
+
+  @override
+  String get ui3CommonDaos => 'DAO chung';
+
+  @override
+  String get ui3SameChains => 'Cùng chuỗi';
+
+  @override
+  String get ui3ChatInitFailed => 'Khởi tạo trò chuyện thất bại';
+
+  @override
+  String get ui3CheckNetworkRetry => 'Vui lòng kiểm tra mạng và thử lại';
+
+  @override
+  String get ui3FromContacts => 'Từ danh bạ';
+
+  @override
+  String get ui3FindFriendsFromContacts => 'Tìm bạn bè từ danh bạ điện thoại';
+
+  @override
+  String get ui3EnsOrDomain => 'ENS / Tên miền';
+
+  @override
+  String get ui3LoadingContacts => 'Đang tải danh bạ...';
+
+  @override
+  String get ui3ContactsPermissionRequired => 'Cần quyền truy cập danh bạ';
+
+  @override
+  String get ui3ContactsPermissionMessage =>
+      'Để tìm bạn bè từ danh bạ, vui lòng cho phép truy cập danh bạ.';
+
+  @override
+  String get ui3AllowAccess => 'Cho phép truy cập';
+
+  @override
+  String get ui3NoContactMatches => 'Không tìm thấy kết quả phù hợp';
+
+  @override
+  String get ui3NoContactMatchesMessage =>
+      'Chưa có ai trong danh bạ dùng ứng dụng này. Hãy mời họ tham gia!';
+
+  @override
+  String ui3ScannedContacts(Object count) {
+    return 'Đã quét $count liên hệ';
+  }
+
+  @override
+  String ui3FoundContactMatches(Object count) {
+    return 'Tìm thấy $count kết quả phù hợp trong danh bạ';
+  }
+
+  @override
+  String ui3InContactsAs(Object name) {
+    return 'Trong danh bạ: $name';
+  }
+
+  @override
+  String get ui3DeletePhotoConfirm => 'Xóa ảnh này?';
+
+  @override
+  String get ui3InviteLink => 'Liên kết mời';
+
+  @override
+  String get ui3ShareJoinLink => 'Chia sẻ liên kết tham gia phòng này';
+
+  @override
+  String get ui3ShareRoomReference =>
+      'Chia sẻ tham chiếu phòng với thành viên được mời';
+
+  @override
+  String get ui3ScanToJoinGroup => 'Quét để tham gia nhóm này ngay';
+
+  @override
+  String get ui3ScanToShareRoomReference =>
+      'Quét để chia sẻ tham chiếu phòng này với thành viên được mời';
+
+  @override
+  String get ui3InviteLinkLoadFailed => 'Không thể tải liên kết mời';
+
+  @override
+  String get ui3InviteLinkCopied => 'Đã sao chép liên kết mời';
+
+  @override
+  String get ui3ChannelCategoryOptional => 'Danh mục (không bắt buộc)';
+
+  @override
+  String get ui3ChannelCategoryHint => 'Thông báo / Sản phẩm / Hỗ trợ';
+
+  @override
+  String get ui3DescriptionOptional => 'Mô tả (không bắt buộc)';
+
+  @override
+  String get ui3WebhookEnable => 'Bật tự động hóa webhook';
+
+  @override
+  String get ui3WebhookEnableDesc =>
+      'Gửi sự kiện thành viên tham gia và chào mừng đến endpoint tích hợp của bạn.';
+
+  @override
+  String get ui3WebhookUrl => 'URL webhook';
+
+  @override
+  String get ui3WebhookSecretOptional => 'Khóa bí mật ký (không bắt buộc)';
+
+  @override
+  String get ui3WebhookSecretHint => 'Dùng cho X-N42-Signature';
+
+  @override
+  String get ui3WebhookNotifyMemberJoined =>
+      'Thông báo khi có thành viên tham gia';
+
+  @override
+  String get ui3WebhookNotifyWelcomeSent =>
+      'Thông báo khi đã gửi lời chào mừng';
+
+  @override
+  String get ui3WebhookTestSend => 'Gửi webhook thử nghiệm';
+
+  @override
+  String get ui3WebhookTestSending => 'Đang gửi webhook thử nghiệm...';
+
+  @override
+  String get ui3WebhookTestSent => 'Đã gửi webhook thử nghiệm thành công';
+
+  @override
+  String get ui3WebhookTestFailed => 'Không thể gửi webhook thử nghiệm';
+
+  @override
+  String get ui3WebhookUrlInvalid =>
+      'URL webhook phải là địa chỉ HTTPS công khai';
+
+  @override
+  String get ui3WebhookSelectEvent => 'Chọn ít nhất một sự kiện webhook';
+
+  @override
+  String get ui3SensitiveDataDetection => 'Phát hiện dữ liệu nhạy cảm';
+
+  @override
+  String get ui3Email => 'Thư điện tử';
+
+  @override
+  String get ui3CreditCard => 'Thẻ tín dụng';
+
+  @override
+  String get ui3DetectEmailDesc =>
+      'Phát hiện địa chỉ email trong tin nhắn văn bản';
+
+  @override
+  String get ui3DetectPhoneDesc => 'Phát hiện số điện thoại và số quốc tế';
+
+  @override
+  String get ui3DetectCardDesc =>
+      'Phát hiện số tài khoản ngân hàng và số thẻ có khả năng';
+
+  @override
+  String get ui3DetectWalletDesc => 'Phát hiện địa chỉ ví kiểu Ethereum';
+
+  @override
+  String get ui3GeneralTopic => 'Chung';
+
+  @override
+  String get a11yPreviousResult => 'Kết quả trước';
+
+  @override
+  String get a11yNextResult => 'Kết quả tiếp theo';
+
+  @override
+  String get ui3TryDifferentKeywords => 'Hãy thử từ khóa khác';
+
+  @override
+  String ui3FiltersActive(Object count) {
+    return 'Bộ lọc đang bật: $count';
+  }
+
+  @override
+  String ui3MessageFiltersActive(Object count) {
+    return 'Bộ lọc tin nhắn đang bật: $count';
+  }
+
+  @override
+  String get ui3LoadMore => 'Tải thêm';
+
+  @override
+  String get ui3MessageFilters => 'Bộ lọc tin nhắn';
+
+  @override
+  String get ui3SenderUserId => 'ID người gửi';
+
+  @override
+  String get ui3FilterType => 'Loại';
+
+  @override
+  String get ui3FilterAny => 'Tất cả';
+
+  @override
+  String get ui3FilterImage => 'Hình ảnh';
+
+  @override
+  String get ui3FilterTime => 'Thời gian';
+
+  @override
+  String get ui3AnyTime => 'Mọi thời gian';
+
+  @override
+  String get ui3OnlyMyMessages => 'Chỉ tin nhắn của tôi';
+
+  @override
+  String get ui3MediaOnly => 'Chỉ phương tiện';
+
+  @override
+  String get ui3Apply => 'Áp dụng';
+
+  @override
+  String get ui3QrStyleClassic => 'Cổ điển';
+
+  @override
+  String get ui3QrStyleOcean => 'Đại dương';
+
+  @override
+  String get ui3QrStyleBerry => 'Quả mọng';
+
+  @override
+  String get ui3NfcUnavailable =>
+      'NFC không khả dụng hoặc thẻ không được hỗ trợ. Hãy bật NFC, thử thẻ khác hoặc dùng mã QR.';
+
+  @override
+  String get ui3CancelNfc => 'Hủy NFC';
+
+  @override
+  String get ui3ReadNfcTag => 'Đọc thẻ NFC';
+
+  @override
+  String get ui3HoldNearNfcTag => 'Đưa điện thoại lại gần thẻ dịch vụ.';
+
+  @override
+  String get a11yFlashlightOn => 'Bật đèn pin';
+
+  @override
+  String get a11yFlashlightOff => 'Tắt đèn pin';
+
+  @override
+  String get ui3SocialGraph => 'Đồ thị xã hội';
+
+  @override
+  String get ui3RecommendedConnections => 'Kết nối được đề xuất';
+
+  @override
+  String get ui3Portfolio => 'Danh mục đầu tư';
+
+  @override
+  String get ui3Chains => 'Chuỗi';
+
+  @override
+  String get ui3Tokens => 'Token';
+
+  @override
+  String get ui3NoConnectionsFound => 'Không tìm thấy kết nối';
+
+  @override
+  String get ui3ConnectionsHint =>
+      'Kết nối sẽ xuất hiện khi bạn có thêm hoạt động on-chain';
+
+  @override
+  String get ui3SocialGraphLoadFailed => 'Không thể tải đồ thị xã hội';
+
+  @override
+  String get ui3Similarity => 'Độ tương đồng';
+
+  @override
+  String get ui3Breakdown => 'Chi tiết';
+
+  @override
+  String get ui3TokenHoldings => 'Token đang nắm giữ';
+
+  @override
+  String get ui3NftCollections => 'Bộ sưu tập NFT';
+
+  @override
+  String get ui3ChainUsage => 'Mức dùng chuỗi';
+
+  @override
+  String get ui3Transactions => 'Giao dịch';
+
+  @override
+  String get ui3DaoMembership => 'Thành viên DAO';
+
+  @override
+  String get ui3NotWeighted => 'Không tính trọng số';
+
+  @override
+  String ui3PercentWithWeight(Object percent, Object weight) {
+    return '$percent% (trọng số: $weight)';
+  }
+
+  @override
+  String get ui3CommonOnChainActivity => 'Hoạt động on-chain chung';
+
+  @override
+  String get ui3SharedTokens => 'Token chung';
+
+  @override
+  String get ui3SharedNftCollections => 'Bộ sưu tập NFT chung';
+
+  @override
+  String get ui3SharedChains => 'Chuỗi chung';
+
+  @override
+  String get ui3NoSharedTokens => 'Không tìm thấy token chung';
+
+  @override
+  String get ui3NoSharedNftCollections => 'Không tìm thấy bộ sưu tập NFT chung';
+
+  @override
+  String get ui3NoSharedChains => 'Không tìm thấy chuỗi chung';
+
+  @override
+  String get ui3SimilarityFailed => 'Không thể tính độ tương đồng';
+
+  @override
+  String ui3ItemsAndMore(Object items, Object count) {
+    return '$items +$count mục khác';
+  }
+
+  @override
+  String get a11yGovernance => 'Quản trị';
+
+  @override
+  String get ui3CommunityLink => 'Liên kết cộng đồng';
+
+  @override
+  String get ui3CommunityQrCode => 'Mã QR cộng đồng';
+
+  @override
+  String get ui3CommunityQrSubtitle =>
+      'Quét để tham gia cộng đồng này và duyệt các kênh';
+
+  @override
+  String get ui3CommunityLinkLoadFailed => 'Không thể tải liên kết cộng đồng';
+
+  @override
+  String get ui3CommunityLinkCopied => 'Đã sao chép liên kết cộng đồng';
+
+  @override
+  String ui3KickMemberConfirm(Object name) {
+    return '$name sẽ bị xóa khỏi cộng đồng này.';
+  }
+
+  @override
+  String ui3BanMemberConfirm(Object name) {
+    return '$name sẽ bị xóa và không thể tham gia lại.';
+  }
+
+  @override
+  String get ui3SignInToDiscoverChannels =>
+      'Đăng nhập để khám phá kênh công khai';
+
+  @override
+  String ui3UnableToJoinChannel(Object name, Object error) {
+    return 'Không thể tham gia $name: $error';
+  }
+
+  @override
+  String get ui3CategoryTech => 'Công nghệ';
+
+  @override
+  String get ui3CategorySocial => 'Xã hội';
+
+  @override
+  String get ui3NoPublicChannels => 'Không tìm thấy kênh công khai';
+
+  @override
+  String get ui3StoriesAndFun => 'Tin & Giải trí';
+
+  @override
+  String get ui3SearchMusicHint => 'Tìm bài hát, nghệ sĩ hoặc bạn bè';
+
+  @override
+  String get ui3ForYou => 'Dành cho bạn';
+
+  @override
+  String get ui3Liked => 'Đã thích';
+
+  @override
+  String get ui3NoLikedMusic => 'Chưa có bài nhạc đã thích';
+
+  @override
+  String get ui3NoMusicStories => 'Chưa có tin âm nhạc';
+
+  @override
+  String get ui3LikedMusicHint =>
+      'Nhấn vào biểu tượng trái tim bên bài hát để lưu tại đây.';
+
+  @override
+  String get ui3MusicStoriesHint =>
+      'Nhạc được chia sẻ trong Tin sẽ hiển thị tại đây.';
+
+  @override
+  String ui3SharedBy(Object artist, Object name) {
+    return '$artist · $name đã chia sẻ';
+  }
+
+  @override
+  String ui3UnableToPlay(Object title, Object error) {
+    return 'Không thể phát $title: $error';
+  }
+
+  @override
+  String get a11yPreviousTrack => 'Bài trước';
+
+  @override
+  String get a11yNextTrack => 'Bài tiếp theo';
+
+  @override
+  String get a11yPlay => 'Phát';
+
+  @override
+  String get a11yPause => 'Tạm dừng';
+
+  @override
+  String get ui3Refresh => 'Làm mới';
+
+  @override
+  String get ui3NearbyIntroTitle => 'Khám phá bài đăng công khai gần bạn';
+
+  @override
+  String get ui3NearbyIntroBody =>
+      'Vị trí của bạn chỉ được dùng một lần trên thiết bị này để sắp xếp Khoảnh khắc công khai. Vị trí không được tải lên, phát đi hay hiển thị cho người khác.';
+
+  @override
+  String get ui3UseMyLocation => 'Dùng vị trí của tôi';
+
+  @override
+  String get ui3NearbyUnavailable => 'Tính năng Lân cận không khả dụng';
+
+  @override
+  String get ui3NoNearbyPosts => 'Chưa có bài đăng nào gần bạn';
+
+  @override
+  String get ui3NoNearbyPostsHint =>
+      'Khoảnh khắc công khai có vị trí sẽ hiển thị tại đây.';
+
+  @override
+  String get ui3NearbyDistanceNote =>
+      'Khoảng cách ước tính · chỉ bài đăng công khai có vị trí';
+
+  @override
+  String get ui3PublicLocationPost => 'Bài đăng công khai có vị trí';
+
+  @override
+  String get ui3LocationServicesOff => 'Dịch vụ vị trí đang tắt';
+
+  @override
+  String get ui3LocationPermissionDenied =>
+      'Quyền truy cập vị trí đã bị từ chối';
+
+  @override
+  String get ui3EnableLocationInSettings =>
+      'Bật quyền vị trí trong cài đặt hệ thống';
+
+  @override
+  String get ui3CreateStory => 'Tạo tin';
+
+  @override
+  String get ui3CreateStoryDesc => 'Đăng trạng thái bằng chữ hoặc ảnh.';
+
+  @override
+  String get ui3StoryCamera => 'Máy ảnh tin';
+
+  @override
+  String get ui3StoryCameraDesc => 'Chuyển ngay đến bộ lọc và chỉnh sửa ảnh.';
+
+  @override
+  String get ui3MomentsDesc => 'Mở toàn bộ bảng tin và bình luận.';
+
+  @override
+  String get ui3MomentCamera => 'Máy ảnh khoảnh khắc';
+
+  @override
+  String get ui3MomentCameraDesc => 'Tạo bài đăng và chọn nội dung ngay.';
+
+  @override
+  String get ui3GamesDesc => 'Mở trung tâm trò chơi giải trí tích hợp.';
+
+  @override
+  String get ui3AvatarStudio => 'Studio ảnh đại diện';
+
+  @override
+  String get ui3AvatarStudioDesc =>
+      'Trang trí, ảnh đại diện NFT và phong cách danh tính.';
+
+  @override
+  String get ui3SocialGraphDesc =>
+      'Theo dõi, người hâm mộ và kết nối on-chain.';
+
+  @override
+  String get ui3SocialHubHeroTitle =>
+      'Tin, khoảnh khắc, trò chơi và ảnh đại diện';
+
+  @override
+  String get ui3SocialHubHeroBody =>
+      'Mọi tính năng xã hội ở một nơi thay vì rải rác giữa trò chuyện, hồ sơ và khám phá.';
+
+  @override
+  String get ui3SocialGraphNotConfigured =>
+      'Đồ thị xã hội chưa được cấu hình trong bản dựng này';
+
+  @override
+  String get ui3ConnectWalletForSocialGraph =>
+      'Kết nối ví để xem đồ thị xã hội của bạn';
+
+  @override
+  String get ui3AvatarStudioSignIn => 'Studio ảnh đại diện yêu cầu đăng nhập';
+
+  @override
+  String get a11yRemoveImage => 'Xóa ảnh';
+
+  @override
+  String get a11yBack => 'Quay lại';
+
+  @override
+  String get ui3MiniAppConfirmTransactionTitle => 'Xác nhận giao dịch';
+
+  @override
+  String get ui3MiniAppConfirmTransactionBody =>
+      'Một Mini App đang yêu cầu gửi giao dịch thay cho bạn.';
+
+  @override
+  String ui3MiniAppOpenTitle(Object name) {
+    return 'Mở $name?';
+  }
+
+  @override
+  String get ui3MiniAppOpenButton => 'Mở';
+
+  @override
+  String get ui3StoryReplySendFailed => 'Không gửi được trả lời tin';
+
+  @override
+  String get ui3RedPacketDemoNotice =>
+      'Lì xì demo — chỉ là bản ghi trong trò chuyện, không có tài sản on-chain thật nào được chuyển.';
+
+  @override
+  String get ui3RedPacketCoverClassic => 'Đỏ cổ điển';
+
+  @override
+  String get ui3RedPacketCoverGolden => 'Vàng';
+
+  @override
+  String get ui3RedPacketCoverPurple => 'Tím';
+
+  @override
+  String get ui3RedPacketCoverOceanBlue => 'Xanh đại dương';
+
+  @override
+  String get ui3RedPacketCoverNatureGreen => 'Xanh thiên nhiên';
+
+  @override
+  String get ui3RedPacketCoverRosePink => 'Hồng phấn';
+
+  @override
+  String get ui3RedPacketHistoryEmpty => 'Chưa có lì xì nào';
+
+  @override
+  String get ui3TransferMerchantQrWithAmount => 'QR người bán (kèm số tiền)';
+
+  @override
+  String get ui3TransferMerchantQrTitle => 'QR người bán';
+
+  @override
+  String get ui3TransferOpenAmountHint => 'Để trống để nhập số tiền tùy ý';
+
+  @override
+  String get ui3FiatRampTitle => 'Mua / bán tiền mã hóa';
+
+  @override
+  String get ui3FiatRampBuy => 'Mua';
+
+  @override
+  String get ui3FiatRampSell => 'Bán';
+
+  @override
+  String get ui3FiatRampNotConfigured => 'Chưa cấu hình cổng nạp/rút fiat';
+
+  @override
+  String get a11yPointsAddRule => 'Thêm quy tắc thưởng';
+
+  @override
+  String get a11yGovernanceRemoveChoice => 'Xóa lựa chọn';
+
+  @override
+  String get a11yGovernanceCreateProposal => 'Tạo đề xuất';
+
+  @override
+  String get ui3MiniAppUpdateN42 => 'Cập nhật N42';
+
+  @override
+  String get ui3MiniAppOfficial => 'Chính thức';
+
+  @override
+  String ui3MiniAppUserCount(Object count) {
+    return '$count người dùng';
+  }
+
+  @override
+  String a11yStoryBackgroundColor(Object index) {
+    return 'Màu nền $index';
+  }
+
+  @override
+  String get a11yStoryAdd => 'Thêm tin';
+
+  @override
+  String get ui3StoryPostFailed => 'Không thể đăng tin';
+
+  @override
+  String get ui3StoryTapToSelectImage => 'Nhấn để chọn ảnh';
+
+  @override
+  String get ui3StoryChangeImage => 'Thay đổi';
+
+  @override
+  String ui3StoryMusicReadFailed(Object error) {
+    return 'Không thể đọc nhạc đã chọn: $error';
+  }
+
+  @override
+  String get ui3StoryDeleteConfirm => 'Xóa tin này?';
+
+  @override
+  String get ui3StoryDeleteFailed => 'Không thể xóa tin';
+
+  @override
+  String get ui3MomentCreateTitle => 'Tạo khoảnh khắc';
+
+  @override
+  String get ui3MomentContentHint => 'Bạn đang nghĩ gì?';
+
+  @override
+  String get ui3MomentAddPhotos => 'Thêm ảnh';
+
+  @override
+  String get ui3MomentAddLocation => 'Thêm vị trí';
+
+  @override
+  String ui3MomentSelectedMedia(Object count) {
+    return 'Phương tiện đã chọn ($count)';
+  }
+
+  @override
+  String get ui3MomentClearAll => 'Xóa tất cả';
+
+  @override
+  String get ui3MomentClearMediaConfirm => 'Xóa tất cả ảnh/video đã chọn?';
+
+  @override
+  String get ui3MomentVisibilityPublicDesc => 'Tất cả bạn bè có thể xem';
+
+  @override
+  String get ui3MomentVisibilityPrivateDesc => 'Chỉ mình bạn có thể xem';
+
+  @override
+  String get ui3MomentVisibilityPartialDesc => 'Chọn người có thể xem';
+
+  @override
+  String get ui3MomentVisibilityExcludedDesc => 'Ẩn với một số bạn bè';
+
+  @override
+  String get ui3MomentVideos => 'Video';
+
+  @override
+  String get ui3MomentNoVideos => 'Chưa có video';
+
+  @override
+  String get a11yCallMinimize => 'Thu nhỏ';
+
+  @override
+  String get a11yCallGridView => 'Dạng lưới';
+
+  @override
+  String get a11yCallFocusView => 'Dạng tập trung';
+
+  @override
+  String get ui3CallTools => 'Công cụ cuộc gọi';
+
+  @override
+  String get ui3CallMeetingTools => 'Công cụ cuộc họp';
+
+  @override
+  String get ui3CallToolsSubtitle =>
+      'Điều chỉnh chất lượng âm thanh và video mà không cần rời cuộc gọi.';
+
+  @override
+  String get ui3CallAudioEnhancement => 'Cải thiện âm thanh';
+
+  @override
+  String get ui3CallNoiseSuppression => 'Khử tiếng ồn';
+
+  @override
+  String get ui3CallNoiseSuppressionDesc =>
+      'Giảm tiếng gõ phím và tiếng ồn nền.';
+
+  @override
+  String get ui3CallEchoCancellation => 'Khử tiếng vọng';
+
+  @override
+  String get ui3CallEchoCancellationDesc =>
+      'Ngăn âm thanh từ loa lọt ngược vào micrô.';
+
+  @override
+  String get ui3CallAutoGainControl => 'Tự động điều chỉnh độ lợi';
+
+  @override
+  String get ui3CallAutoGainControlDesc => 'Giữ âm lượng micrô ổn định hơn.';
+
+  @override
+  String get ui3CallVoiceIsolation => 'Tách giọng nâng cao';
+
+  @override
+  String get ui3CallVoiceIsolationDesc =>
+      'Dùng cấu hình giảm tiếng ồn mạnh hơn.';
+
+  @override
+  String get ui3CallVideoSection => 'Cài đặt video';
+
+  @override
+  String get ui3CallBackgroundBlur => 'Làm mờ nền (beta)';
+
+  @override
+  String get ui3CallBlurDescReady =>
+      'Đã áp dụng tùy chọn. Hiệu ứng làm mờ thực tế còn tùy vào việc triển khai bộ xử lý video.';
+
+  @override
+  String get ui3CallBlurDescSaved =>
+      'Đã lưu tùy chọn làm mờ, tùy chọn sẽ được áp dụng khi có tính năng xử lý camera.';
+
+  @override
+  String get ui3CallBlurDescCameraOff =>
+      'Hãy bật camera sau khi tính năng xử lý nền khả dụng.';
+
+  @override
+  String get ui3CallRecordingSection => 'Ghi hình';
+
+  @override
+  String get ui3CallRecordingDesc =>
+      'Cần dịch vụ egress phía máy chủ để lưu bản ghi.';
+
+  @override
+  String ui3CallSettingsUpdateFailed(Object error) {
+    return 'Không thể cập nhật cài đặt cuộc gọi: $error';
+  }
+
+  @override
+  String get ui3CallRecordingStarted => 'Đã bắt đầu ghi hình';
+
+  @override
+  String get ui3VoiceRoomNotFound => 'Không tìm thấy phòng';
+
+  @override
+  String get ui3VoiceRoomEndConfirm =>
+      'Bạn có chắc muốn kết thúc phòng thoại này không?';
+
+  @override
+  String get a11yGameMoveUp => 'Di chuyển lên';
+
+  @override
+  String get a11yGameMoveDown => 'Di chuyển xuống';
+
+  @override
+  String get a11yGameMoveLeft => 'Di chuyển sang trái';
+
+  @override
+  String get a11yGameMoveRight => 'Di chuyển sang phải';
+
+  @override
+  String get a11yGameRotate => 'Xoay';
+
+  @override
+  String get a11yGameDrop => 'Thả xuống';
+
+  @override
+  String ui3StickerAddedCount(Object count) {
+    return 'Đã thêm $count nhãn dán';
+  }
+
+  @override
+  String ui3StickerAddFailed(Object error) {
+    return 'Không thể thêm: $error';
+  }
+
+  @override
+  String get ui3StickerRemoveTitle => 'Gỡ nhãn dán';
+
+  @override
+  String get ui3StickerRemoveConfirm => 'Gỡ nhãn dán này khỏi gói?';
+
+  @override
+  String get ui3StickerRemoveFailed => 'Không thể gỡ';
+
+  @override
+  String get ui3StickerRenamePack => 'Đổi tên gói';
+
+  @override
+  String get ui3StickerPackName => 'Tên gói';
+
+  @override
+  String get ui3StickerRenameFailed => 'Không thể đổi tên';
+
+  @override
+  String get ui3StickerDeletePack => 'Xóa gói';
+
+  @override
+  String get ui3StickerThisPack => 'gói này';
+
+  @override
+  String ui3StickerDeletePackConfirm(Object name) {
+    return 'Xóa \"$name\" và tất cả nhãn dán trong đó? Không thể hoàn tác thao tác này.';
+  }
+
+  @override
+  String get ui3StickerDeleteFailed => 'Không thể xóa';
+
+  @override
+  String get ui3StickerPack => 'Gói nhãn dán';
+
+  @override
+  String get ui3StickerAdding => 'Đang thêm…';
+
+  @override
+  String get ui3StickerAddStickers => 'Thêm nhãn dán';
+
+  @override
+  String get ui3StickerPackNotFound => 'Không tìm thấy gói';
+
+  @override
+  String get ui3StickerEmptyHint => 'Nhấn \"Thêm nhãn dán\" để tải ảnh lên';
+
+  @override
+  String get ui3StickerNewPack => 'Gói nhãn dán mới';
+
+  @override
+  String get ui3StickerCreate => 'Tạo';
+
+  @override
+  String get ui3StickerCreateFailed => 'Không thể tạo gói';
+
+  @override
+  String ui3StickerInstalled(Object name) {
+    return 'Đã cài đặt \"$name\"';
+  }
+
+  @override
+  String get ui3StickerRemovePackTitle => 'Gỡ gói nhãn dán';
+
+  @override
+  String ui3StickerRemovePackConfirm(Object name) {
+    return 'Gỡ \"$name\" khỏi nhãn dán của bạn?';
+  }
+
+  @override
+  String ui3StickerRemoved(Object name) {
+    return 'Đã gỡ \"$name\"';
+  }
+
+  @override
+  String get ui3StickerAiSticker => 'Nhãn dán AI';
+
+  @override
+  String get ui3StickerStoreTab => 'Cửa hàng';
+
+  @override
+  String get ui3StickerMyStickersTab => 'Nhãn dán của tôi';
+
+  @override
+  String get ui3StickerNoneFound => 'Không tìm thấy nhãn dán';
+
+  @override
+  String ui3StickerByAuthor(Object author) {
+    return 'của $author';
+  }
+
+  @override
+  String get ui3StickerManage => 'Quản lý';
+
+  @override
+  String ui3StickerCount(Object count) {
+    return '$count nhãn dán';
+  }
+
+  @override
+  String get ui3StickerNoneInstalled => 'Chưa cài đặt nhãn dán nào';
+
+  @override
+  String get ui3StickerGetFromStore => 'Tải nhãn dán từ cửa hàng';
+
+  @override
+  String get ui3StickerBrowseStore => 'Duyệt cửa hàng';
+
+  @override
+  String get ui3StickerAddedToAi => 'Đã thêm vào \"Nhãn dán AI\"';
+
+  @override
+  String get ui3StickerAddOneFailed => 'Không thể thêm nhãn dán';
+
+  @override
+  String get ui3StickerPromptLabel => 'Mô tả nhãn dán của bạn';
+
+  @override
+  String get ui3StickerPromptHint => 'VD: một chú mèo cam vui vẻ đeo kính râm';
+
+  @override
+  String get ui3StickerGenerating => 'Đang tạo…';
+
+  @override
+  String get ui3StickerGenerate => 'Tạo';
+
+  @override
+  String get ui3StickerAddToStickers => 'Thêm vào nhãn dán';
+
+  @override
+  String get ui3StickerGeneratingPreview => 'Đang tạo nhãn dán của bạn…';
+
+  @override
+  String get ui3StickerGenerateEmpty => 'Mô tả nhãn dán rồi nhấn \"Tạo\"';
 }

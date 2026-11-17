@@ -6188,6 +6188,1894 @@ class SZh extends S {
   String scheduledSendTomorrowMorningAt(String time) {
     return '明早 ($time)';
   }
+
+  @override
+  String get a11yScrollToBottom => '滚动到底部';
+
+  @override
+  String get ui3EnterMessageBeforeScheduling => '请先输入消息再定时发送';
+
+  @override
+  String get ui3SendCode => '发送代码';
+
+  @override
+  String get ui3CodeLanguage => '语言';
+
+  @override
+  String get ui3PasteCodeHere => '在此粘贴代码';
+
+  @override
+  String ui3ReminderSetAt(String time) {
+    return '已设置提醒 · $time';
+  }
+
+  @override
+  String get ui3RedPacketCreateFailed => '红包创建失败';
+
+  @override
+  String get ui3SendTip => '打赏';
+
+  @override
+  String get ui3TokenLabel => '代币';
+
+  @override
+  String get ui3NoteOptional => '备注（可选）';
+
+  @override
+  String ui3TipFailed(String error) {
+    return '打赏失败：$error';
+  }
+
+  @override
+  String get ui3GiftNftTitle => '赠送 NFT';
+
+  @override
+  String get ui3TokenId => '代币 ID';
+
+  @override
+  String ui3NftGiftFailed(String error) {
+    return 'NFT 赠送失败：$error';
+  }
+
+  @override
+  String get ui3AiAgentSubtitle => '描述任务，打开合适的小程序';
+
+  @override
+  String get ui3GiftNft => '赠送 NFT';
+
+  @override
+  String get ui3GiftNftSubtitle => '向此联系人发送 NFT';
+
+  @override
+  String get ui3MiniAppUnavailable => '小程序不可用';
+
+  @override
+  String ui3MediaItemsNotSent(int count) {
+    return '$count 个所选媒体未能发送';
+  }
+
+  @override
+  String get ui3PhotosSubtitle => '以适合聊天的格式发送照片和视频';
+
+  @override
+  String get ui3OriginalImages => '原图';
+
+  @override
+  String get ui3OriginalImagesSubtitle => '以文件形式发送未压缩的照片';
+
+  @override
+  String ui3ScheduledFileFor(String filename, String time) {
+    return '已定时发送 $filename：$time';
+  }
+
+  @override
+  String ui3SendingOriginalImage(String filename) {
+    return '正在发送原图：$filename';
+  }
+
+  @override
+  String ui3ScheduledOriginalImage(String filename) {
+    return '已定时发送原图：$filename';
+  }
+
+  @override
+  String get ui3PaymentAlreadySent => '已付款';
+
+  @override
+  String get ui3PaymentProcessing => '付款处理中';
+
+  @override
+  String ui3ChainStatus(String status) {
+    return '链上状态：$status';
+  }
+
+  @override
+  String get ui3NotChecked => '未检查';
+
+  @override
+  String ui3ConfirmationsCount(int confirmations, int required) {
+    return '已确认：$confirmations / $required 个区块';
+  }
+
+  @override
+  String get ui3CopyTxHash => '复制交易哈希';
+
+  @override
+  String get ui3VerifyAgain => '重新验证';
+
+  @override
+  String get ui3VerifyOnChain => '链上验证';
+
+  @override
+  String get ui3TransferMissingChainDetails => '此转账未包含确切的链和资产信息。';
+
+  @override
+  String get ui3ReceiptPending => '链上待确认';
+
+  @override
+  String get ui3ReceiptConfirmed => '已确认';
+
+  @override
+  String get ui3ReceiptFailed => '链上失败';
+
+  @override
+  String get ui3ReceiptMismatch => '交易详情不匹配';
+
+  @override
+  String get ui3ReceiptUnsupported => '不支持链上验证';
+
+  @override
+  String get ui3ReceiptUnavailable => '验证不可用';
+
+  @override
+  String get ui3OpenOrSave => '打开 / 保存';
+
+  @override
+  String get ui3UnableToOpenFile => '无法打开此文件。';
+
+  @override
+  String ui3AiRewriteFailed(String error) {
+    return 'AI 改写失败：$error';
+  }
+
+  @override
+  String get ui3AiShareMessagesTitle => '与 AI 共享消息？';
+
+  @override
+  String get ui3AiShareMessagesBody =>
+      '选择 AI 可用于本次回复的消息。此次单次授权将在两分钟后失效。关闭快捷回复会取消待处理的结果。该授权不允许付款或导出。';
+
+  @override
+  String get ui3OtherParticipant => '对方';
+
+  @override
+  String get ui3ShareSelected => '共享所选';
+
+  @override
+  String get ui3BotCommandError => '命令错误';
+
+  @override
+  String get ui3BotUnknownCommand => '未知命令';
+
+  @override
+  String get ui3BotTypeHelp => '输入 /help 查看可用命令。';
+
+  @override
+  String get ui3FilesMediaLinks => '文件、媒体和链接';
+
+  @override
+  String get ui3ChatStorage => '聊天存储';
+
+  @override
+  String get ui3EncryptionKeysDevices => '加密密钥和设备';
+
+  @override
+  String get ui3EncryptionServiceUnavailable => '加密服务暂不可用';
+
+  @override
+  String get ui3ExportLoadingHistory => '正在加载更多聊天记录用于导出…';
+
+  @override
+  String get ui3ExportTxtDesc => '纯文本记录，可用于笔记、备份或合规审查';
+
+  @override
+  String get ui3ExportCustomRange => '自定义范围';
+
+  @override
+  String get ui3ExportStart => '开始';
+
+  @override
+  String get ui3ExportEnd => '结束';
+
+  @override
+  String get ui3ExportSelectDate => '选择日期';
+
+  @override
+  String get ui3FolderFilterUnreadOnly => '仅未读';
+
+  @override
+  String get ui3FolderFilterMutedOnly => '仅免打扰';
+
+  @override
+  String get ui3FolderFilterNoDms => '不含私聊';
+
+  @override
+  String get ui3FolderFilterNoGroups => '不含群聊';
+
+  @override
+  String get ui3FolderFilterNoChannels => '不含频道';
+
+  @override
+  String get ui3FolderFilterAllChats => '全部聊天';
+
+  @override
+  String get ui3Create => '创建';
+
+  @override
+  String ui3DeleteFolderConfirm(String name) {
+    return '删除文件夹“$name”？';
+  }
+
+  @override
+  String get a11yDecreaseTextSize => '减小字号';
+
+  @override
+  String get a11yIncreaseTextSize => '增大字号';
+
+  @override
+  String ui3MinutesRead(int minutes) {
+    return '阅读约 $minutes 分钟';
+  }
+
+  @override
+  String get ui3TipOnChain => '已上链 ✓';
+
+  @override
+  String get ui3ViewSource => '查看源码';
+
+  @override
+  String get a11yPreviousPage => '上一页';
+
+  @override
+  String get a11yNextPage => '下一页';
+
+  @override
+  String get ui3OpenExternalLinkTitle => '打开外部链接？';
+
+  @override
+  String get ui3Open => '打开';
+
+  @override
+  String get ui3UnableToOpenLink => '无法打开此链接。';
+
+  @override
+  String get ui3ImageUnavailable => '图片不可用';
+
+  @override
+  String ui3LoadImageFrom(Object host) {
+    return '从 $host 加载图片';
+  }
+
+  @override
+  String ui3RetryImageFrom(Object host) {
+    return '重新从 $host 加载图片';
+  }
+
+  @override
+  String get ui3TranslatedByN42 => '由 N42 翻译';
+
+  @override
+  String ui3TranslatedFromByN42(Object language) {
+    return '由 N42 从$language翻译';
+  }
+
+  @override
+  String get ui3ClearWhiteboardTitle => '清空白板？';
+
+  @override
+  String get ui3ClearWhiteboardMessage => '所有人的笔迹都将被清除，且无法撤销。';
+
+  @override
+  String get ui3WhiteboardLive => '白板 · 实时';
+
+  @override
+  String get a11yPenColor => '画笔颜色';
+
+  @override
+  String get ui3AiDescribeOcr => 'AI 识图 / 文字识别';
+
+  @override
+  String get ui3DocumentPreviewFailed => '无法安全预览此文档。请检查网络连接和文件大小（最大 2MB）。';
+
+  @override
+  String get ui3AiConsentMessage => '选择 AI 可用于本次摘要的消息。此单次授权两分钟后失效，不允许付款或导出。';
+
+  @override
+  String get ui3AiSuggestedReplies => '建议回复';
+
+  @override
+  String get ui3AiGeneratingSuggestions => '正在生成建议…';
+
+  @override
+  String get ui3StickersEmpty => '还没有贴纸';
+
+  @override
+  String get ui3StickersGet => '获取贴纸';
+
+  @override
+  String get a11yFormatBold => '粗体';
+
+  @override
+  String get a11yFormatItalic => '斜体';
+
+  @override
+  String get a11yFormatStrikethrough => '删除线';
+
+  @override
+  String get a11yFormatInlineCode => '行内代码';
+
+  @override
+  String get a11yFormatCodeBlock => '代码块';
+
+  @override
+  String get a11yFormatChecklistItem => '待办事项';
+
+  @override
+  String get a11yFormatBulletList => '项目符号列表';
+
+  @override
+  String get a11yFormatNumberedList => '编号列表';
+
+  @override
+  String get a11yFormatLink => '链接';
+
+  @override
+  String get a11yFormatTable => '表格';
+
+  @override
+  String get a11yFormatMeetingTemplate => '会议模板';
+
+  @override
+  String get a11yEmojiSmileys => '表情与人物';
+
+  @override
+  String get a11yEmojiHearts => '爱心';
+
+  @override
+  String get a11yEmojiAnimals => '动物与自然';
+
+  @override
+  String get a11yEmojiFood => '食物与饮料';
+
+  @override
+  String get a11yEmojiTravel => '旅行与地点';
+
+  @override
+  String get a11yEmojiActivities => '活动';
+
+  @override
+  String get a11yEmojiObjects => '物品';
+
+  @override
+  String get a11yEmojiSymbols => '符号';
+
+  @override
+  String get ui3FrequentlyUsed => '常用';
+
+  @override
+  String get ui3NoEditHistory => '暂无编辑记录';
+
+  @override
+  String get ui3EventNew => '新建日程';
+
+  @override
+  String get ui3EventTitleLabel => '标题';
+
+  @override
+  String get ui3EventLocationOptional => '地点（可选）';
+
+  @override
+  String get ui3EventDescriptionOptional => '描述（可选）';
+
+  @override
+  String get ui3EventSend => '发送日程';
+
+  @override
+  String get ui3EventTitleRequired => '请输入标题';
+
+  @override
+  String get ui3EventEndAfterStart => '结束时间必须晚于开始时间';
+
+  @override
+  String get ui3MiniAppAgentIntro => '描述你想做的事，我会为你打开合适的小程序。';
+
+  @override
+  String get ui3MiniAppAgentExample => '例如：把 ETH 兑换成 USDC';
+
+  @override
+  String get ui3MiniAppAgentNoMatch => '未找到匹配的小程序，请换个说法试试。';
+
+  @override
+  String ui3MiniAppOpen(Object appName) {
+    return '打开$appName';
+  }
+
+  @override
+  String get ui3MusicLinkPlatforms => '支持网易云、QQ音乐、酷狗、酷我等平台的歌曲链接';
+
+  @override
+  String get ui3PollMarkCorrectAnswer => '请为非空选项标记正确答案';
+
+  @override
+  String get ui3PollQuizMode => '测验模式';
+
+  @override
+  String get ui3PollAnswerExplanationHint => '答案解析（可选）';
+
+  @override
+  String get a11yCorrectAnswer => '正确答案';
+
+  @override
+  String get ui3AiSuggestions => 'AI 建议';
+
+  @override
+  String get a11yPaste => '粘贴';
+
+  @override
+  String get a11yRefresh => '刷新';
+
+  @override
+  String get ui3RecoveryKeyStoreWarning =>
+      '请妥善保管此密钥。如果您无法访问所有设备，这是恢复加密消息的唯一方式。';
+
+  @override
+  String ui3SavedToPath(Object path) {
+    return '已保存：$path';
+  }
+
+  @override
+  String get ui3UnknownAccount => '未知账号';
+
+  @override
+  String get ui3UnknownHomeserver => '未知服务器';
+
+  @override
+  String get ui3ImportRecoveryKey => '导入恢复密钥';
+
+  @override
+  String get ui3ImportRecoveryKeyDesc => '输入或粘贴恢复密钥，以恢复加密消息历史的房间密钥。';
+
+  @override
+  String ui3RecoveryKeyAccountInfo(Object account, Object homeserver) {
+    return '账号：$account\\n服务器：$homeserver';
+  }
+
+  @override
+  String get ui3Import => '导入';
+
+  @override
+  String get ui3InvalidRecoveryKeyFormat => '恢复密钥格式无效';
+
+  @override
+  String ui3RecoveryKeyPartialRestore(
+    Object restored,
+    Object total,
+    Object failed,
+  ) {
+    return '已恢复 $restored/$total 个密钥，$failed 个失败。请检查账号、网络和备份后重试。部分历史消息可能仍无法读取。';
+  }
+
+  @override
+  String ui3RecoveryKeyRestoreSuccess(Object restored, Object total) {
+    return '已成功恢复 $restored/$total 个密钥';
+  }
+
+  @override
+  String ui3ImportFailed(Object error) {
+    return '导入失败：$error';
+  }
+
+  @override
+  String ui3PasskeyRegistrationFailed(Object error) {
+    return '通行密钥注册失败：$error';
+  }
+
+  @override
+  String get ui3PasskeyDefaultName => '我的通行密钥';
+
+  @override
+  String get ui3PasskeyNameHint => '例如：iPhone、MacBook';
+
+  @override
+  String get ui3PasskeyDeleteFailed => '删除通行密钥失败';
+
+  @override
+  String get ui3TwoFactorAuth => '两步验证';
+
+  @override
+  String get ui3TwoFactorOnSubtitle => '已开启 — 需要验证器 App 的验证码';
+
+  @override
+  String get ui3TwoFactorOffSubtitle => '已关闭 — 使用验证器 App（TOTP）保护';
+
+  @override
+  String get ui3ShowRecoveryKey => '显示恢复密钥';
+
+  @override
+  String get ui3ShowRecoveryKeyDesc => '显示恢复密钥以便备份';
+
+  @override
+  String get ui3ImportRecoveryKeyHint => '使用恢复密钥恢复消息';
+
+  @override
+  String get ui3RecoveryKeyCreateFailed => '创建恢复密钥失败';
+
+  @override
+  String get ui3TotpIncorrectCode => '验证码错误，请重试';
+
+  @override
+  String get ui3TwoFactorEnabled => '两步验证已开启';
+
+  @override
+  String get ui3TwoFactorDisabled => '两步验证已关闭';
+
+  @override
+  String get ui3TwoFactorTurnOffTitle => '关闭两步验证？';
+
+  @override
+  String get ui3TwoFactorTurnOffMessage => '将不再需要验证器 App。之后可以使用新密钥重新设置。';
+
+  @override
+  String get ui3TurnOff => '关闭';
+
+  @override
+  String get ui3TwoFactorTotpTitle => '两步验证（TOTP）';
+
+  @override
+  String get ui3TwoFactorIsOn => '两步验证已开启';
+
+  @override
+  String get ui3TwoFactorCodeRequired => '需要验证器 App 生成的验证码。';
+
+  @override
+  String get ui3TotpStepScan =>
+      '1. 使用验证器 App（Google Authenticator、Authy、1Password 等）扫描此二维码，或手动输入密钥。';
+
+  @override
+  String get ui3TotpKeyCopied => '密钥已复制';
+
+  @override
+  String get ui3TotpStepConfirm => '2. 输入 6 位验证码以确认。';
+
+  @override
+  String get ui3Enable => '开启';
+
+  @override
+  String get ui3BackupSettingsDesc => '备份本地聊天设置。重新登录后将从服务器恢复消息。';
+
+  @override
+  String get ui3BackupKeysSeparate => '加密密钥单独管理';
+
+  @override
+  String get ui3BackupKeysSeparateHint => '请在“安全 > 恢复密钥”中备份加密消息的访问权限。';
+
+  @override
+  String ui3BackupRoomsSize(Object rooms, Object size) {
+    return '$rooms 个房间  $size';
+  }
+
+  @override
+  String get ui3BackupRestoreFromFileDesc =>
+      '从其他设备或以前的备份导入 .n42backup 文件。加密密钥需使用恢复密钥单独恢复。';
+
+  @override
+  String get ui3UsernameSessionRequired => '设置用户名需要有效的登录会话';
+
+  @override
+  String get ui3SecuritySessionRequired => '安全设置需要有效的登录会话';
+
+  @override
+  String get ui3ConnectedAccountsSessionRequired => '关联账号需要有效的登录会话';
+
+  @override
+  String get ui3SystemAccounts => '系统与账号';
+
+  @override
+  String get ui3AccountIdentity => '账号与身份';
+
+  @override
+  String get ui3Accounts => '账号';
+
+  @override
+  String get ui3DevicesSessions => '设备与会话';
+
+  @override
+  String get ui3Integrations => '集成';
+
+  @override
+  String get ui3ConnectedAccounts => '关联账号';
+
+  @override
+  String get ui3ConnectedAccountsDesc => 'Telegram、WhatsApp、Discord 及 API 桥接集成';
+
+  @override
+  String get ui3SystemOverview => '系统概览';
+
+  @override
+  String ui3AccountCount(num count) {
+    return '$count 个账号';
+  }
+
+  @override
+  String ui3DeviceCount(num count) {
+    return '$count 台设备';
+  }
+
+  @override
+  String get ui3PrivacySecurityOverview => '端到端加密、截屏保护和代理控制';
+
+  @override
+  String get ui3ConversationPrivacy => '会话隐私';
+
+  @override
+  String get ui3NetworkPrivacy => '网络隐私';
+
+  @override
+  String get ui3IdentityPrivacy => '身份隐私';
+
+  @override
+  String get ui3EncryptionKeyBackup => '加密与密钥备份';
+
+  @override
+  String get ui3DevicesVerification => '设备与验证';
+
+  @override
+  String get ui3ChipE2eeDefault => '默认端到端加密';
+
+  @override
+  String get ui3ChipManualE2ee => '手动端到端加密';
+
+  @override
+  String get ui3ChipSelfDestruct => '阅后即焚';
+
+  @override
+  String get ui3ChipScreenshotGuard => '截屏保护';
+
+  @override
+  String get ui3ChipIpProxy => 'IP / 代理';
+
+  @override
+  String get ui3ChipLinkPreviewsOff => '链接预览已关闭';
+
+  @override
+  String get ui3ChipPublicHandle => '公开用户名';
+
+  @override
+  String get a11yShowPassword => '显示密码';
+
+  @override
+  String get a11yHidePassword => '隐藏密码';
+
+  @override
+  String get a11yCheckServer => '检查服务器';
+
+  @override
+  String get ui3AuthAnonymousRegistration => '匿名注册';
+
+  @override
+  String get ui3AuthAnonymousRegistrationDesc => '无需绑定手机号或邮箱即可创建账号，系统将自动生成用户名。';
+
+  @override
+  String get ui3AuthAnonymousModeOn => '已开启匿名模式';
+
+  @override
+  String get ui3AuthAnonymousModeOnDesc =>
+      '应用将为你创建一个随机的 Matrix 用户名。之后你仍可使用生成的账号和密码登录。';
+
+  @override
+  String get ui3AuthChooseLoginMethod => '选择登录方式';
+
+  @override
+  String get ui3AuthSsoOpenFailed => '无法打开 SSO 登录页面';
+
+  @override
+  String get ui3AuthWalletUnavailable => '钱包不可用';
+
+  @override
+  String get ui3ProfileSubscriptions => '订阅';
+
+  @override
+  String get ui3ProfileBuySellCrypto => '买卖加密货币';
+
+  @override
+  String get ui3ProfileOnDeviceAi => '端侧 AI';
+
+  @override
+  String get ui3ProfileSetAUsername => '设置用户名';
+
+  @override
+  String get ui3ProfileAvatarStudio => '头像工作室';
+
+  @override
+  String get ui3ProfileAvatarStudioSubtitle => 'NFT 头像 / 装饰';
+
+  @override
+  String get ui3ProfileCustomize => '自定义';
+
+  @override
+  String get ui3ProfileQrSubtitle => '扫码查看此资料或发起聊天';
+
+  @override
+  String get ui3PrivacyHardening => '隐私加固';
+
+  @override
+  String get ui3HidePhoneNumber => '隐藏手机号';
+
+  @override
+  String get ui3HidePhoneNumberDesc => '在本设备的个人资料相关页面中遮盖已绑定的手机号';
+
+  @override
+  String get ui3EncryptNewChatsByDefault => '默认加密新聊天';
+
+  @override
+  String get ui3EncryptNewChatsByDefaultDesc => '新建单聊和私密群聊时默认开启端到端加密';
+
+  @override
+  String get ui3PrivateChatMode => '私密聊天模式';
+
+  @override
+  String get ui3PrivateChatModeDesc => '查看私密或加密聊天时临时启用防截屏';
+
+  @override
+  String get ui3DefaultSelfDestructTimer => '默认阅后即焚时长';
+
+  @override
+  String get ui3DefaultSelfDestructTimerDesc => '为新发送的消息应用默认阅后即焚时长';
+
+  @override
+  String get ui3LinkPreviews => '链接预览';
+
+  @override
+  String get ui3LinkPreviewsDesc => '消息包含网址时获取标题、描述和缩略图';
+
+  @override
+  String get ui3IpAddressProtection => 'IP 地址保护';
+
+  @override
+  String get ui3IpAddressProtectionDesc =>
+      '在可用时通过你配置的 HTTP 隐私代理转发 Matrix 和链接预览请求';
+
+  @override
+  String get ui3UseTorProxy => '使用 Tor / Privoxy HTTP 代理';
+
+  @override
+  String get ui3UseTorProxyDesc =>
+      '使用本地 HTTP 代理端点，例如 127.0.0.1:8118 上的 Privoxy。此处不支持原生 SOCKS5 Tor 路由。';
+
+  @override
+  String get ui3CustomProxy => '自定义代理';
+
+  @override
+  String get ui3CustomProxyDesc => '为 Matrix 流量和链接预览使用自定义 HTTP 或 HTTPS 代理';
+
+  @override
+  String get ui3ProxyEndpoint => '代理地址';
+
+  @override
+  String get ui3ProxyEndpointDesc => 'HTTP/HTTPS 代理地址（不支持 SOCKS）';
+
+  @override
+  String get ui3InvalidEndpoint => '地址无效';
+
+  @override
+  String get ui3CustomProxyStaysOff => '设置有效地址前，自定义代理保持关闭';
+
+  @override
+  String get ui3NotificationFilterNote => '优先规则始终通知（忽略静音、仅提及和免打扰）。屏蔽关键词会抑制通知。';
+
+  @override
+  String get ui3PriorityKeywords => '优先关键词';
+
+  @override
+  String get ui3PriorityKeywordHint => '例如：紧急';
+
+  @override
+  String get ui3MutedKeywords => '屏蔽关键词';
+
+  @override
+  String get ui3MutedKeywordHint => '例如：广告';
+
+  @override
+  String get ui3PrioritySenders => '优先发送者';
+
+  @override
+  String get ui3CaseSensitive => '区分大小写';
+
+  @override
+  String get ui3None => '无';
+
+  @override
+  String get ui3SmartReplyTranslation => '智能回复翻译';
+
+  @override
+  String get ui3SmartReplyTranslationDesc => '发送前自动将你的消息翻译为对方的语言。';
+
+  @override
+  String get ui3FromPhotos => '来自相册';
+
+  @override
+  String get ui3ChangePhoto => '更换照片';
+
+  @override
+  String get ui3RoamingUsesMobileData => '漫游沿用移动数据规则';
+
+  @override
+  String get ui3RoamingUsesMobileDataDesc => '暂不支持单独检测漫游，因此漫游时沿用移动数据的自动下载设置。';
+
+  @override
+  String ui3DeleteQuickReplyConfirm(String content) {
+    return '删除“$content”？';
+  }
+
+  @override
+  String get ui3ResetToDefaults => '恢复默认';
+
+  @override
+  String get ui3ResetQuickRepliesMessage => '这将删除所有自定义快捷回复并恢复默认，是否继续？';
+
+  @override
+  String get ui3LocalLlmUnavailable => '此设备不支持';
+
+  @override
+  String get ui3LocalLlmNotDownloaded => '模型未下载';
+
+  @override
+  String get ui3LocalLlmReady => '已就绪（端侧）';
+
+  @override
+  String get ui3LocalLlmDescription =>
+      '启用并就绪后，AI 功能（摘要、改写、翻译、回复）完全在设备上运行，数据不会离开你的手机；否则使用云端服务。';
+
+  @override
+  String get ui3UseOnDeviceAi => '使用端侧 AI';
+
+  @override
+  String get ui3UseOnDeviceAiDesc => '就绪时优先本地推理';
+
+  @override
+  String get ui3DownloadModel => '下载模型';
+
+  @override
+  String get ui3LocalLlmRuntimeRequired =>
+      '端侧推理需要原生运行时（Android MediaPipe / iOS Core ML），平台处理程序可用后将自动启用。';
+
+  @override
+  String get ui3PhotoAvatar => '照片头像';
+
+  @override
+  String get ui3AvatarStyles => '头像样式';
+
+  @override
+  String get ui3AvatarStylesDesc => '个人资料与头像入口共用同一套装饰样式。';
+
+  @override
+  String get ui3ReplaceNftAvatar => '更换 NFT 头像';
+
+  @override
+  String get ui3NftAvatarDesc => '使用链上藏品作为头像。';
+
+  @override
+  String get ui3UsePhotoAvatar => '使用照片头像';
+
+  @override
+  String get ui3UsePhotoAvatarDesc => '保留已上传的头像并解除 NFT 绑定。';
+
+  @override
+  String ui3AvatarStyleSet(Object name) {
+    return '头像样式已设为：$name';
+  }
+
+  @override
+  String get ui3NftAvatarUpdated => 'NFT 头像已更新';
+
+  @override
+  String get ui3SwitchedToPhotoAvatar => '已切换回照片头像';
+
+  @override
+  String get ui3SignInToViewRedPacketHistory => '登录后查看红包记录';
+
+  @override
+  String get ui3RedPacketActive => '进行中';
+
+  @override
+  String get ui3RedPacketCompleted => '已领完';
+
+  @override
+  String get ui3CardsAndPasses => '卡券与通行证';
+
+  @override
+  String get ui3CardsAndPassesDesc => '钱包卡片、优惠券和通行证由主应用管理。';
+
+  @override
+  String get ui3CardPackRequiresMainApp => '卡包需要在主应用中使用';
+
+  @override
+  String get ui3OpenCardPack => '打开卡包';
+
+  @override
+  String get ui3UnableToOpenChat => '无法与该联系人开启聊天';
+
+  @override
+  String get ui3WalletManagedInMainApp => '钱包由主应用管理';
+
+  @override
+  String ui3CreatorPlans(Object name) {
+    return '$name · 订阅计划';
+  }
+
+  @override
+  String get ui3NewPlan => '新建计划';
+
+  @override
+  String get ui3MySubscriptions => '我的订阅';
+
+  @override
+  String get ui3AvailablePlans => '可用计划';
+
+  @override
+  String get ui3NoPlansYet => '暂无计划 · 点按“新建计划”创建';
+
+  @override
+  String ui3DaysLeft(Object days) {
+    return '剩余 $days 天';
+  }
+
+  @override
+  String get ui3SubscriptionCancelled => '已取消';
+
+  @override
+  String get ui3AutoRenewOn => '自动续订：开';
+
+  @override
+  String get ui3AutoRenewOff => '自动续订：关';
+
+  @override
+  String get ui3CancelSubscriptionTitle => '取消订阅？';
+
+  @override
+  String ui3CancelSubscriptionConfirm(Object name) {
+    return '你对 $name 的订阅将保持有效至到期，之后不再续订。';
+  }
+
+  @override
+  String get ui3Subscribe => '订阅';
+
+  @override
+  String ui3SubscribedTo(Object name) {
+    return '已订阅 $name';
+  }
+
+  @override
+  String get ui3PlanPriceLabel => '价格（例如 9.9 USDT）';
+
+  @override
+  String get ui3PlanDescriptionLabel => '描述（可选）';
+
+  @override
+  String get ui3PlanBenefitsLabel => '权益（用逗号分隔）';
+
+  @override
+  String get ui3PlanPeriod => '周期：';
+
+  @override
+  String get ui3Monthly => '按月';
+
+  @override
+  String get ui3Yearly => '按年';
+
+  @override
+  String get ui3SaveRemarkFailed => '备注保存失败';
+
+  @override
+  String get ui3CopyLink => '复制链接';
+
+  @override
+  String get ui3Connect => '连接';
+
+  @override
+  String get ui3CommonTokens => '共同代币';
+
+  @override
+  String get ui3SharedNfts => '共同 NFT';
+
+  @override
+  String get ui3TransactionHistory => '交易记录';
+
+  @override
+  String get ui3CommonDaos => '共同 DAO';
+
+  @override
+  String get ui3SameChains => '相同链';
+
+  @override
+  String get ui3ChatInitFailed => '聊天初始化失败';
+
+  @override
+  String get ui3CheckNetworkRetry => '请检查网络后重试';
+
+  @override
+  String get ui3FromContacts => '从通讯录添加';
+
+  @override
+  String get ui3FindFriendsFromContacts => '从手机通讯录查找好友';
+
+  @override
+  String get ui3EnsOrDomain => 'ENS / 域名';
+
+  @override
+  String get ui3LoadingContacts => '正在加载通讯录...';
+
+  @override
+  String get ui3ContactsPermissionRequired => '需要通讯录权限';
+
+  @override
+  String get ui3ContactsPermissionMessage => '如需从通讯录查找好友，请允许访问通讯录。';
+
+  @override
+  String get ui3AllowAccess => '允许访问';
+
+  @override
+  String get ui3NoContactMatches => '未找到匹配';
+
+  @override
+  String get ui3NoContactMatchesMessage => '你的通讯录联系人还没有使用此应用，邀请他们加入吧！';
+
+  @override
+  String ui3ScannedContacts(Object count) {
+    return '已扫描 $count 位联系人';
+  }
+
+  @override
+  String ui3FoundContactMatches(Object count) {
+    return '在通讯录中找到 $count 个匹配';
+  }
+
+  @override
+  String ui3InContactsAs(Object name) {
+    return '通讯录中：$name';
+  }
+
+  @override
+  String get ui3DeletePhotoConfirm => '删除这张照片？';
+
+  @override
+  String get ui3InviteLink => '邀请链接';
+
+  @override
+  String get ui3ShareJoinLink => '分享此群的加入链接';
+
+  @override
+  String get ui3ShareRoomReference => '向受邀成员分享群聊引用';
+
+  @override
+  String get ui3ScanToJoinGroup => '扫码直接加入此群';
+
+  @override
+  String get ui3ScanToShareRoomReference => '扫码向受邀成员分享群聊引用';
+
+  @override
+  String get ui3InviteLinkLoadFailed => '邀请链接加载失败';
+
+  @override
+  String get ui3InviteLinkCopied => '邀请链接已复制';
+
+  @override
+  String get ui3ChannelCategoryOptional => '分类（可选）';
+
+  @override
+  String get ui3ChannelCategoryHint => '公告 / 产品 / 支持';
+
+  @override
+  String get ui3DescriptionOptional => '描述（可选）';
+
+  @override
+  String get ui3WebhookEnable => '启用 Webhook 自动化';
+
+  @override
+  String get ui3WebhookEnableDesc => '将成员加入和欢迎事件推送到你的集成端点。';
+
+  @override
+  String get ui3WebhookUrl => 'Webhook 地址';
+
+  @override
+  String get ui3WebhookSecretOptional => '签名密钥（可选）';
+
+  @override
+  String get ui3WebhookSecretHint => '用于 X-N42-Signature';
+
+  @override
+  String get ui3WebhookNotifyMemberJoined => '成员加入时通知';
+
+  @override
+  String get ui3WebhookNotifyWelcomeSent => '发送欢迎语时通知';
+
+  @override
+  String get ui3WebhookTestSend => '发送测试 Webhook';
+
+  @override
+  String get ui3WebhookTestSending => '正在发送测试 Webhook...';
+
+  @override
+  String get ui3WebhookTestSent => '测试 Webhook 发送成功';
+
+  @override
+  String get ui3WebhookTestFailed => '测试 Webhook 发送失败';
+
+  @override
+  String get ui3WebhookUrlInvalid => 'Webhook 地址必须是公开的 HTTPS 地址';
+
+  @override
+  String get ui3WebhookSelectEvent => '请至少选择一个 Webhook 事件';
+
+  @override
+  String get ui3SensitiveDataDetection => '敏感信息检测';
+
+  @override
+  String get ui3Email => '邮箱';
+
+  @override
+  String get ui3CreditCard => '银行卡';
+
+  @override
+  String get ui3DetectEmailDesc => '检测文本消息中的邮箱地址';
+
+  @override
+  String get ui3DetectPhoneDesc => '检测手机号和国际号码';
+
+  @override
+  String get ui3DetectCardDesc => '检测疑似银行卡号';
+
+  @override
+  String get ui3DetectWalletDesc => '检测以太坊格式的钱包地址';
+
+  @override
+  String get ui3GeneralTopic => '综合';
+
+  @override
+  String get a11yPreviousResult => '上一个结果';
+
+  @override
+  String get a11yNextResult => '下一个结果';
+
+  @override
+  String get ui3TryDifferentKeywords => '试试其他关键词';
+
+  @override
+  String ui3FiltersActive(Object count) {
+    return '已启用筛选：$count';
+  }
+
+  @override
+  String ui3MessageFiltersActive(Object count) {
+    return '已启用消息筛选：$count';
+  }
+
+  @override
+  String get ui3LoadMore => '加载更多';
+
+  @override
+  String get ui3MessageFilters => '消息筛选';
+
+  @override
+  String get ui3SenderUserId => '发送者用户 ID';
+
+  @override
+  String get ui3FilterType => '类型';
+
+  @override
+  String get ui3FilterAny => '全部';
+
+  @override
+  String get ui3FilterImage => '图片';
+
+  @override
+  String get ui3FilterTime => '时间';
+
+  @override
+  String get ui3AnyTime => '不限时间';
+
+  @override
+  String get ui3OnlyMyMessages => '仅我的消息';
+
+  @override
+  String get ui3MediaOnly => '仅媒体';
+
+  @override
+  String get ui3Apply => '应用';
+
+  @override
+  String get ui3QrStyleClassic => '经典';
+
+  @override
+  String get ui3QrStyleOcean => '海洋';
+
+  @override
+  String get ui3QrStyleBerry => '莓果';
+
+  @override
+  String get ui3NfcUnavailable => 'NFC 不可用或不支持该标签。请开启 NFC、换一个标签或使用二维码。';
+
+  @override
+  String get ui3CancelNfc => '取消 NFC';
+
+  @override
+  String get ui3ReadNfcTag => '读取 NFC 标签';
+
+  @override
+  String get ui3HoldNearNfcTag => '请将手机靠近服务标签。';
+
+  @override
+  String get a11yFlashlightOn => '打开手电筒';
+
+  @override
+  String get a11yFlashlightOff => '关闭手电筒';
+
+  @override
+  String get ui3SocialGraph => '社交图谱';
+
+  @override
+  String get ui3RecommendedConnections => '推荐连接';
+
+  @override
+  String get ui3Portfolio => '资产组合';
+
+  @override
+  String get ui3Chains => '链';
+
+  @override
+  String get ui3Tokens => '代币';
+
+  @override
+  String get ui3NoConnectionsFound => '暂无连接';
+
+  @override
+  String get ui3ConnectionsHint => '随着你的链上活动增加，连接会逐渐出现';
+
+  @override
+  String get ui3SocialGraphLoadFailed => '社交图谱加载失败';
+
+  @override
+  String get ui3Similarity => '相似度';
+
+  @override
+  String get ui3Breakdown => '明细';
+
+  @override
+  String get ui3TokenHoldings => '代币持仓';
+
+  @override
+  String get ui3NftCollections => 'NFT 合集';
+
+  @override
+  String get ui3ChainUsage => '链使用';
+
+  @override
+  String get ui3Transactions => '交易';
+
+  @override
+  String get ui3DaoMembership => 'DAO 成员资格';
+
+  @override
+  String get ui3NotWeighted => '不计权重';
+
+  @override
+  String ui3PercentWithWeight(Object percent, Object weight) {
+    return '$percent%（权重：$weight）';
+  }
+
+  @override
+  String get ui3CommonOnChainActivity => '共同链上活动';
+
+  @override
+  String get ui3SharedTokens => '共同代币';
+
+  @override
+  String get ui3SharedNftCollections => '共同 NFT 合集';
+
+  @override
+  String get ui3SharedChains => '共同链';
+
+  @override
+  String get ui3NoSharedTokens => '未发现共同代币';
+
+  @override
+  String get ui3NoSharedNftCollections => '未发现共同 NFT 合集';
+
+  @override
+  String get ui3NoSharedChains => '未发现共同链';
+
+  @override
+  String get ui3SimilarityFailed => '相似度计算失败';
+
+  @override
+  String ui3ItemsAndMore(Object items, Object count) {
+    return '$items 等另外 $count 项';
+  }
+
+  @override
+  String get a11yGovernance => '治理';
+
+  @override
+  String get ui3CommunityLink => '社区链接';
+
+  @override
+  String get ui3CommunityQrCode => '社区二维码';
+
+  @override
+  String get ui3CommunityQrSubtitle => '扫码加入此社区并浏览其频道';
+
+  @override
+  String get ui3CommunityLinkLoadFailed => '社区链接加载失败';
+
+  @override
+  String get ui3CommunityLinkCopied => '社区链接已复制';
+
+  @override
+  String ui3KickMemberConfirm(Object name) {
+    return '$name 将被移出此社区。';
+  }
+
+  @override
+  String ui3BanMemberConfirm(Object name) {
+    return '$name 将被移出且无法重新加入。';
+  }
+
+  @override
+  String get ui3SignInToDiscoverChannels => '登录后即可发现公开频道';
+
+  @override
+  String ui3UnableToJoinChannel(Object name, Object error) {
+    return '无法加入 $name：$error';
+  }
+
+  @override
+  String get ui3CategoryTech => '科技';
+
+  @override
+  String get ui3CategorySocial => '社交';
+
+  @override
+  String get ui3NoPublicChannels => '未找到公开频道';
+
+  @override
+  String get ui3StoriesAndFun => '故事与趣味';
+
+  @override
+  String get ui3SearchMusicHint => '搜索歌曲、艺人或好友';
+
+  @override
+  String get ui3ForYou => '为你推荐';
+
+  @override
+  String get ui3Liked => '已喜欢';
+
+  @override
+  String get ui3NoLikedMusic => '还没有喜欢的音乐';
+
+  @override
+  String get ui3NoMusicStories => '还没有音乐动态';
+
+  @override
+  String get ui3LikedMusicHint => '点击歌曲旁的爱心即可收藏到这里。';
+
+  @override
+  String get ui3MusicStoriesHint => '动态中分享的音乐会显示在这里。';
+
+  @override
+  String ui3SharedBy(Object artist, Object name) {
+    return '$artist · 由 $name 分享';
+  }
+
+  @override
+  String ui3UnableToPlay(Object title, Object error) {
+    return '无法播放 $title：$error';
+  }
+
+  @override
+  String get a11yPreviousTrack => '上一首';
+
+  @override
+  String get a11yNextTrack => '下一首';
+
+  @override
+  String get a11yPlay => '播放';
+
+  @override
+  String get a11yPause => '暂停';
+
+  @override
+  String get ui3Refresh => '刷新';
+
+  @override
+  String get ui3NearbyIntroTitle => '发现附近的公开动态';
+
+  @override
+  String get ui3NearbyIntroBody => '你的位置仅在本设备上使用一次，用于对公开朋友圈排序，不会上传、广播或展示给他人。';
+
+  @override
+  String get ui3UseMyLocation => '使用我的位置';
+
+  @override
+  String get ui3NearbyUnavailable => '附近功能不可用';
+
+  @override
+  String get ui3NoNearbyPosts => '附近暂无动态';
+
+  @override
+  String get ui3NoNearbyPostsHint => '带位置的公开朋友圈会显示在这里。';
+
+  @override
+  String get ui3NearbyDistanceNote => '大致距离 · 仅显示公开的位置动态';
+
+  @override
+  String get ui3PublicLocationPost => '公开位置动态';
+
+  @override
+  String get ui3LocationServicesOff => '定位服务已关闭';
+
+  @override
+  String get ui3LocationPermissionDenied => '定位权限被拒绝';
+
+  @override
+  String get ui3EnableLocationInSettings => '请在系统设置中开启定位权限';
+
+  @override
+  String get ui3CreateStory => '发布动态';
+
+  @override
+  String get ui3CreateStoryDesc => '发布文字或照片状态。';
+
+  @override
+  String get ui3StoryCamera => '动态相机';
+
+  @override
+  String get ui3StoryCameraDesc => '直接进入滤镜和照片编辑。';
+
+  @override
+  String get ui3MomentsDesc => '打开完整动态和评论。';
+
+  @override
+  String get ui3MomentCamera => '朋友圈相机';
+
+  @override
+  String get ui3MomentCameraDesc => '发布帖子并立即选择媒体。';
+
+  @override
+  String get ui3GamesDesc => '打开内置休闲游戏中心。';
+
+  @override
+  String get ui3AvatarStudio => '头像工作室';
+
+  @override
+  String get ui3AvatarStudioDesc => '装饰、NFT 头像与身份标识。';
+
+  @override
+  String get ui3SocialGraphDesc => '链上关注、粉丝与连接。';
+
+  @override
+  String get ui3SocialHubHeroTitle => '动态、朋友圈、游戏和头像';
+
+  @override
+  String get ui3SocialHubHeroBody => '统一使用现有社交功能，而不是把入口分散在聊天、个人资料和发现中。';
+
+  @override
+  String get ui3SocialGraphNotConfigured => '此版本未配置社交图谱';
+
+  @override
+  String get ui3ConnectWalletForSocialGraph => '连接钱包以查看你的社交图谱';
+
+  @override
+  String get ui3AvatarStudioSignIn => '头像工作室需要登录';
+
+  @override
+  String get a11yRemoveImage => '移除图片';
+
+  @override
+  String get a11yBack => '返回';
+
+  @override
+  String get ui3MiniAppConfirmTransactionTitle => '确认交易';
+
+  @override
+  String get ui3MiniAppConfirmTransactionBody => '小程序正在请求代表你发送一笔交易。';
+
+  @override
+  String ui3MiniAppOpenTitle(Object name) {
+    return '打开 $name？';
+  }
+
+  @override
+  String get ui3MiniAppOpenButton => '打开';
+
+  @override
+  String get ui3StoryReplySendFailed => '故事回复发送失败';
+
+  @override
+  String get ui3RedPacketDemoNotice => '演示红包——仅为聊天内记录，不会转移真实的链上资产。';
+
+  @override
+  String get ui3RedPacketCoverClassic => '经典红';
+
+  @override
+  String get ui3RedPacketCoverGolden => '金色';
+
+  @override
+  String get ui3RedPacketCoverPurple => '紫色';
+
+  @override
+  String get ui3RedPacketCoverOceanBlue => '海洋蓝';
+
+  @override
+  String get ui3RedPacketCoverNatureGreen => '自然绿';
+
+  @override
+  String get ui3RedPacketCoverRosePink => '玫瑰粉';
+
+  @override
+  String get ui3RedPacketHistoryEmpty => '暂无红包';
+
+  @override
+  String get ui3TransferMerchantQrWithAmount => '商户收款码（含金额）';
+
+  @override
+  String get ui3TransferMerchantQrTitle => '商户收款码';
+
+  @override
+  String get ui3TransferOpenAmountHint => '留空则不限金额';
+
+  @override
+  String get ui3FiatRampTitle => '买入 / 卖出加密货币';
+
+  @override
+  String get ui3FiatRampBuy => '买入';
+
+  @override
+  String get ui3FiatRampSell => '卖出';
+
+  @override
+  String get ui3FiatRampNotConfigured => '未配置法币出入金通道';
+
+  @override
+  String get a11yPointsAddRule => '添加奖励规则';
+
+  @override
+  String get a11yGovernanceRemoveChoice => '移除选项';
+
+  @override
+  String get a11yGovernanceCreateProposal => '创建提案';
+
+  @override
+  String get ui3MiniAppUpdateN42 => '更新 N42';
+
+  @override
+  String get ui3MiniAppOfficial => '官方';
+
+  @override
+  String ui3MiniAppUserCount(Object count) {
+    return '$count 位用户';
+  }
+
+  @override
+  String a11yStoryBackgroundColor(Object index) {
+    return '背景颜色 $index';
+  }
+
+  @override
+  String get a11yStoryAdd => '添加动态';
+
+  @override
+  String get ui3StoryPostFailed => '发布动态失败';
+
+  @override
+  String get ui3StoryTapToSelectImage => '点击选择图片';
+
+  @override
+  String get ui3StoryChangeImage => '更换';
+
+  @override
+  String ui3StoryMusicReadFailed(Object error) {
+    return '无法读取所选音乐：$error';
+  }
+
+  @override
+  String get ui3StoryDeleteConfirm => '删除这条动态？';
+
+  @override
+  String get ui3StoryDeleteFailed => '删除动态失败';
+
+  @override
+  String get ui3MomentCreateTitle => '发布动态';
+
+  @override
+  String get ui3MomentContentHint => '这一刻的想法…';
+
+  @override
+  String get ui3MomentAddPhotos => '添加照片';
+
+  @override
+  String get ui3MomentAddLocation => '添加位置';
+
+  @override
+  String ui3MomentSelectedMedia(Object count) {
+    return '已选媒体（$count）';
+  }
+
+  @override
+  String get ui3MomentClearAll => '全部清除';
+
+  @override
+  String get ui3MomentClearMediaConfirm => '移除所有已选的照片/视频？';
+
+  @override
+  String get ui3MomentVisibilityPublicDesc => '所有朋友可见';
+
+  @override
+  String get ui3MomentVisibilityPrivateDesc => '仅自己可见';
+
+  @override
+  String get ui3MomentVisibilityPartialDesc => '选择谁可以看';
+
+  @override
+  String get ui3MomentVisibilityExcludedDesc => '不给指定朋友看';
+
+  @override
+  String get ui3MomentVideos => '视频';
+
+  @override
+  String get ui3MomentNoVideos => '暂无视频';
+
+  @override
+  String get a11yCallMinimize => '最小化';
+
+  @override
+  String get a11yCallGridView => '宫格视图';
+
+  @override
+  String get a11yCallFocusView => '聚焦视图';
+
+  @override
+  String get ui3CallTools => '通话工具';
+
+  @override
+  String get ui3CallMeetingTools => '会议工具';
+
+  @override
+  String get ui3CallToolsSubtitle => '无需离开通话即可调整音视频质量。';
+
+  @override
+  String get ui3CallAudioEnhancement => '音频增强';
+
+  @override
+  String get ui3CallNoiseSuppression => '降噪';
+
+  @override
+  String get ui3CallNoiseSuppressionDesc => '减少键盘声和背景噪音。';
+
+  @override
+  String get ui3CallEchoCancellation => '回声消除';
+
+  @override
+  String get ui3CallEchoCancellationDesc => '防止扬声器声音回传到麦克风。';
+
+  @override
+  String get ui3CallAutoGainControl => '自动增益';
+
+  @override
+  String get ui3CallAutoGainControlDesc => '让麦克风音量更稳定。';
+
+  @override
+  String get ui3CallVoiceIsolation => '增强人声隔离';
+
+  @override
+  String get ui3CallVoiceIsolationDesc => '使用更强的降噪配置。';
+
+  @override
+  String get ui3CallVideoSection => '视频';
+
+  @override
+  String get ui3CallBackgroundBlur => '背景虚化（测试版）';
+
+  @override
+  String get ui3CallBlurDescReady => '偏好已生效，实际虚化效果仍取决于视频处理器的上线。';
+
+  @override
+  String get ui3CallBlurDescSaved => '虚化偏好已保存，摄像头处理可用时将生效。';
+
+  @override
+  String get ui3CallBlurDescCameraOff => '背景处理可用后请打开摄像头。';
+
+  @override
+  String get ui3CallRecordingSection => '录制';
+
+  @override
+  String get ui3CallRecordingDesc => '需要服务端录制服务后才能保存录音。';
+
+  @override
+  String ui3CallSettingsUpdateFailed(Object error) {
+    return '更新通话设置失败：$error';
+  }
+
+  @override
+  String get ui3CallRecordingStarted => '已开始录制';
+
+  @override
+  String get ui3VoiceRoomNotFound => '房间不存在';
+
+  @override
+  String get ui3VoiceRoomEndConfirm => '确定要结束这个语音房间吗？';
+
+  @override
+  String get a11yGameMoveUp => '向上移动';
+
+  @override
+  String get a11yGameMoveDown => '向下移动';
+
+  @override
+  String get a11yGameMoveLeft => '向左移动';
+
+  @override
+  String get a11yGameMoveRight => '向右移动';
+
+  @override
+  String get a11yGameRotate => '旋转';
+
+  @override
+  String get a11yGameDrop => '落下';
+
+  @override
+  String ui3StickerAddedCount(Object count) {
+    return '已添加 $count 个贴纸';
+  }
+
+  @override
+  String ui3StickerAddFailed(Object error) {
+    return '添加失败：$error';
+  }
+
+  @override
+  String get ui3StickerRemoveTitle => '移除贴纸';
+
+  @override
+  String get ui3StickerRemoveConfirm => '要从贴纸包中移除此贴纸吗？';
+
+  @override
+  String get ui3StickerRemoveFailed => '移除失败';
+
+  @override
+  String get ui3StickerRenamePack => '重命名贴纸包';
+
+  @override
+  String get ui3StickerPackName => '贴纸包名称';
+
+  @override
+  String get ui3StickerRenameFailed => '重命名失败';
+
+  @override
+  String get ui3StickerDeletePack => '删除贴纸包';
+
+  @override
+  String get ui3StickerThisPack => '此贴纸包';
+
+  @override
+  String ui3StickerDeletePackConfirm(Object name) {
+    return '要删除“$name”及其所有贴纸吗？此操作无法撤销。';
+  }
+
+  @override
+  String get ui3StickerDeleteFailed => '删除失败';
+
+  @override
+  String get ui3StickerPack => '贴纸包';
+
+  @override
+  String get ui3StickerAdding => '正在添加…';
+
+  @override
+  String get ui3StickerAddStickers => '添加贴纸';
+
+  @override
+  String get ui3StickerPackNotFound => '未找到贴纸包';
+
+  @override
+  String get ui3StickerEmptyHint => '点按“添加贴纸”上传图片';
+
+  @override
+  String get ui3StickerNewPack => '新建贴纸包';
+
+  @override
+  String get ui3StickerCreate => '创建';
+
+  @override
+  String get ui3StickerCreateFailed => '创建贴纸包失败';
+
+  @override
+  String ui3StickerInstalled(Object name) {
+    return '已添加“$name”';
+  }
+
+  @override
+  String get ui3StickerRemovePackTitle => '移除贴纸包';
+
+  @override
+  String ui3StickerRemovePackConfirm(Object name) {
+    return '要从你的贴纸中移除“$name”吗？';
+  }
+
+  @override
+  String ui3StickerRemoved(Object name) {
+    return '已移除“$name”';
+  }
+
+  @override
+  String get ui3StickerAiSticker => 'AI 贴纸';
+
+  @override
+  String get ui3StickerStoreTab => '商店';
+
+  @override
+  String get ui3StickerMyStickersTab => '我的贴纸';
+
+  @override
+  String get ui3StickerNoneFound => '未找到贴纸';
+
+  @override
+  String ui3StickerByAuthor(Object author) {
+    return '作者：$author';
+  }
+
+  @override
+  String get ui3StickerManage => '管理';
+
+  @override
+  String ui3StickerCount(Object count) {
+    return '$count 个贴纸';
+  }
+
+  @override
+  String get ui3StickerNoneInstalled => '尚未添加贴纸';
+
+  @override
+  String get ui3StickerGetFromStore => '去商店获取贴纸';
+
+  @override
+  String get ui3StickerBrowseStore => '浏览商店';
+
+  @override
+  String get ui3StickerAddedToAi => '已添加到“AI 贴纸”';
+
+  @override
+  String get ui3StickerAddOneFailed => '添加贴纸失败';
+
+  @override
+  String get ui3StickerPromptLabel => '描述你的贴纸';
+
+  @override
+  String get ui3StickerPromptHint => '例如：一只戴墨镜的开心橘猫';
+
+  @override
+  String get ui3StickerGenerating => '正在生成…';
+
+  @override
+  String get ui3StickerGenerate => '生成';
+
+  @override
+  String get ui3StickerAddToStickers => '添加到贴纸';
+
+  @override
+  String get ui3StickerGeneratingPreview => '正在生成你的贴纸…';
+
+  @override
+  String get ui3StickerGenerateEmpty => '描述一个贴纸，然后点按“生成”';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -12374,4 +14262,1893 @@ class SZhTw extends SZh {
   String scheduledSendTomorrowMorningAt(String time) {
     return '明早 ($time)';
   }
+
+  @override
+  String get a11yScrollToBottom => '捲動到底部';
+
+  @override
+  String get ui3EnterMessageBeforeScheduling => '請先輸入訊息再排程傳送';
+
+  @override
+  String get ui3SendCode => '傳送程式碼';
+
+  @override
+  String get ui3CodeLanguage => '語言';
+
+  @override
+  String get ui3PasteCodeHere => '在此貼上程式碼';
+
+  @override
+  String ui3ReminderSetAt(String time) {
+    return '已設定提醒 · $time';
+  }
+
+  @override
+  String get ui3RedPacketCreateFailed => '紅包建立失敗';
+
+  @override
+  String get ui3SendTip => '打賞';
+
+  @override
+  String get ui3TokenLabel => '代幣';
+
+  @override
+  String get ui3NoteOptional => '備註（選填）';
+
+  @override
+  String ui3TipFailed(String error) {
+    return '打賞失敗：$error';
+  }
+
+  @override
+  String get ui3GiftNftTitle => '贈送 NFT';
+
+  @override
+  String get ui3TokenId => '代幣 ID';
+
+  @override
+  String ui3NftGiftFailed(String error) {
+    return 'NFT 贈送失敗：$error';
+  }
+
+  @override
+  String get ui3AiAgentSubtitle => '描述任務，開啟合適的小程式';
+
+  @override
+  String get ui3GiftNft => '贈送 NFT';
+
+  @override
+  String get ui3GiftNftSubtitle => '向此聯絡人傳送 NFT';
+
+  @override
+  String get ui3MiniAppUnavailable => '小程式無法使用';
+
+  @override
+  String ui3MediaItemsNotSent(int count) {
+    return '$count 個所選媒體無法傳送';
+  }
+
+  @override
+  String get ui3PhotosSubtitle => '以適合聊天的格式傳送相片和影片';
+
+  @override
+  String get ui3OriginalImages => '原圖';
+
+  @override
+  String get ui3OriginalImagesSubtitle => '以檔案形式傳送未壓縮的相片';
+
+  @override
+  String ui3ScheduledFileFor(String filename, String time) {
+    return '已排程傳送 $filename：$time';
+  }
+
+  @override
+  String ui3SendingOriginalImage(String filename) {
+    return '正在傳送原圖：$filename';
+  }
+
+  @override
+  String ui3ScheduledOriginalImage(String filename) {
+    return '已排程傳送原圖：$filename';
+  }
+
+  @override
+  String get ui3PaymentAlreadySent => '已付款';
+
+  @override
+  String get ui3PaymentProcessing => '付款處理中';
+
+  @override
+  String ui3ChainStatus(String status) {
+    return '鏈上狀態：$status';
+  }
+
+  @override
+  String get ui3NotChecked => '未檢查';
+
+  @override
+  String ui3ConfirmationsCount(int confirmations, int required) {
+    return '已確認：$confirmations / $required 個區塊';
+  }
+
+  @override
+  String get ui3CopyTxHash => '複製交易雜湊';
+
+  @override
+  String get ui3VerifyAgain => '重新驗證';
+
+  @override
+  String get ui3VerifyOnChain => '鏈上驗證';
+
+  @override
+  String get ui3TransferMissingChainDetails => '此轉帳未包含確切的鏈與資產資訊。';
+
+  @override
+  String get ui3ReceiptPending => '鏈上待確認';
+
+  @override
+  String get ui3ReceiptConfirmed => '已確認';
+
+  @override
+  String get ui3ReceiptFailed => '鏈上失敗';
+
+  @override
+  String get ui3ReceiptMismatch => '交易詳情不符';
+
+  @override
+  String get ui3ReceiptUnsupported => '不支援鏈上驗證';
+
+  @override
+  String get ui3ReceiptUnavailable => '無法驗證';
+
+  @override
+  String get ui3OpenOrSave => '開啟 / 儲存';
+
+  @override
+  String get ui3UnableToOpenFile => '無法開啟此檔案。';
+
+  @override
+  String ui3AiRewriteFailed(String error) {
+    return 'AI 改寫失敗：$error';
+  }
+
+  @override
+  String get ui3AiShareMessagesTitle => '與 AI 分享訊息？';
+
+  @override
+  String get ui3AiShareMessagesBody =>
+      '選擇 AI 可用於本次回覆的訊息。此次單次授權將在兩分鐘後失效。關閉快速回覆會取消待處理的結果。此授權不允許付款或匯出。';
+
+  @override
+  String get ui3OtherParticipant => '對方';
+
+  @override
+  String get ui3ShareSelected => '分享所選';
+
+  @override
+  String get ui3BotCommandError => '指令錯誤';
+
+  @override
+  String get ui3BotUnknownCommand => '未知指令';
+
+  @override
+  String get ui3BotTypeHelp => '輸入 /help 查看可用指令。';
+
+  @override
+  String get ui3FilesMediaLinks => '檔案、媒體和連結';
+
+  @override
+  String get ui3ChatStorage => '聊天儲存空間';
+
+  @override
+  String get ui3EncryptionKeysDevices => '加密金鑰和裝置';
+
+  @override
+  String get ui3EncryptionServiceUnavailable => '加密服務暫不可用';
+
+  @override
+  String get ui3ExportLoadingHistory => '正在載入更多聊天記錄以供匯出…';
+
+  @override
+  String get ui3ExportTxtDesc => '純文字記錄，可用於筆記、備份或合規審查';
+
+  @override
+  String get ui3ExportCustomRange => '自訂範圍';
+
+  @override
+  String get ui3ExportStart => '開始';
+
+  @override
+  String get ui3ExportEnd => '結束';
+
+  @override
+  String get ui3ExportSelectDate => '選擇日期';
+
+  @override
+  String get ui3FolderFilterUnreadOnly => '僅未讀';
+
+  @override
+  String get ui3FolderFilterMutedOnly => '僅勿擾';
+
+  @override
+  String get ui3FolderFilterNoDms => '不含私訊';
+
+  @override
+  String get ui3FolderFilterNoGroups => '不含群組';
+
+  @override
+  String get ui3FolderFilterNoChannels => '不含頻道';
+
+  @override
+  String get ui3FolderFilterAllChats => '全部聊天';
+
+  @override
+  String get ui3Create => '建立';
+
+  @override
+  String ui3DeleteFolderConfirm(String name) {
+    return '刪除資料夾「$name」？';
+  }
+
+  @override
+  String get a11yDecreaseTextSize => '縮小字級';
+
+  @override
+  String get a11yIncreaseTextSize => '放大字級';
+
+  @override
+  String ui3MinutesRead(int minutes) {
+    return '閱讀約 $minutes 分鐘';
+  }
+
+  @override
+  String get ui3TipOnChain => '已上鏈 ✓';
+
+  @override
+  String get ui3ViewSource => '檢視原始碼';
+
+  @override
+  String get a11yPreviousPage => '上一頁';
+
+  @override
+  String get a11yNextPage => '下一頁';
+
+  @override
+  String get ui3OpenExternalLinkTitle => '開啟外部連結？';
+
+  @override
+  String get ui3Open => '開啟';
+
+  @override
+  String get ui3UnableToOpenLink => '無法開啟此連結。';
+
+  @override
+  String get ui3ImageUnavailable => '圖片無法使用';
+
+  @override
+  String ui3LoadImageFrom(Object host) {
+    return '從 $host 載入圖片';
+  }
+
+  @override
+  String ui3RetryImageFrom(Object host) {
+    return '重新從 $host 載入圖片';
+  }
+
+  @override
+  String get ui3TranslatedByN42 => '由 N42 翻譯';
+
+  @override
+  String ui3TranslatedFromByN42(Object language) {
+    return '由 N42 從$language翻譯';
+  }
+
+  @override
+  String get ui3ClearWhiteboardTitle => '清空白板？';
+
+  @override
+  String get ui3ClearWhiteboardMessage => '所有人的筆跡都將被清除，且無法復原。';
+
+  @override
+  String get ui3WhiteboardLive => '白板 · 即時';
+
+  @override
+  String get a11yPenColor => '畫筆顏色';
+
+  @override
+  String get ui3AiDescribeOcr => 'AI 識圖 / 文字辨識';
+
+  @override
+  String get ui3DocumentPreviewFailed => '無法安全預覽此文件。請檢查網路連線與檔案大小（最大 2MB）。';
+
+  @override
+  String get ui3AiConsentMessage => '選擇 AI 可用於本次摘要的訊息。此單次授權兩分鐘後失效，不允許付款或匯出。';
+
+  @override
+  String get ui3AiSuggestedReplies => '建議回覆';
+
+  @override
+  String get ui3AiGeneratingSuggestions => '正在產生建議…';
+
+  @override
+  String get ui3StickersEmpty => '還沒有貼圖';
+
+  @override
+  String get ui3StickersGet => '取得貼圖';
+
+  @override
+  String get a11yFormatBold => '粗體';
+
+  @override
+  String get a11yFormatItalic => '斜體';
+
+  @override
+  String get a11yFormatStrikethrough => '刪除線';
+
+  @override
+  String get a11yFormatInlineCode => '行內程式碼';
+
+  @override
+  String get a11yFormatCodeBlock => '程式碼區塊';
+
+  @override
+  String get a11yFormatChecklistItem => '待辦事項';
+
+  @override
+  String get a11yFormatBulletList => '項目符號清單';
+
+  @override
+  String get a11yFormatNumberedList => '編號清單';
+
+  @override
+  String get a11yFormatLink => '連結';
+
+  @override
+  String get a11yFormatTable => '表格';
+
+  @override
+  String get a11yFormatMeetingTemplate => '會議範本';
+
+  @override
+  String get a11yEmojiSmileys => '表情與人物';
+
+  @override
+  String get a11yEmojiHearts => '愛心';
+
+  @override
+  String get a11yEmojiAnimals => '動物與自然';
+
+  @override
+  String get a11yEmojiFood => '食物與飲料';
+
+  @override
+  String get a11yEmojiTravel => '旅行與地點';
+
+  @override
+  String get a11yEmojiActivities => '活動';
+
+  @override
+  String get a11yEmojiObjects => '物品';
+
+  @override
+  String get a11yEmojiSymbols => '符號';
+
+  @override
+  String get ui3FrequentlyUsed => '常用';
+
+  @override
+  String get ui3NoEditHistory => '暫無編輯記錄';
+
+  @override
+  String get ui3EventNew => '新增行程';
+
+  @override
+  String get ui3EventTitleLabel => '標題';
+
+  @override
+  String get ui3EventLocationOptional => '地點（選填）';
+
+  @override
+  String get ui3EventDescriptionOptional => '描述（選填）';
+
+  @override
+  String get ui3EventSend => '傳送行程';
+
+  @override
+  String get ui3EventTitleRequired => '請輸入標題';
+
+  @override
+  String get ui3EventEndAfterStart => '結束時間必須晚於開始時間';
+
+  @override
+  String get ui3MiniAppAgentIntro => '描述你想做的事，我會為你開啟合適的小程式。';
+
+  @override
+  String get ui3MiniAppAgentExample => '例如：把 ETH 兌換成 USDC';
+
+  @override
+  String get ui3MiniAppAgentNoMatch => '找不到相符的小程式，請換個說法試試。';
+
+  @override
+  String ui3MiniAppOpen(Object appName) {
+    return '開啟$appName';
+  }
+
+  @override
+  String get ui3MusicLinkPlatforms => '支援網易雲、QQ音樂、酷狗、酷我等平台的歌曲連結';
+
+  @override
+  String get ui3PollMarkCorrectAnswer => '請為非空選項標記正確答案';
+
+  @override
+  String get ui3PollQuizMode => '測驗模式';
+
+  @override
+  String get ui3PollAnswerExplanationHint => '答案解析（選填）';
+
+  @override
+  String get a11yCorrectAnswer => '正確答案';
+
+  @override
+  String get ui3AiSuggestions => 'AI 建議';
+
+  @override
+  String get a11yPaste => '貼上';
+
+  @override
+  String get a11yRefresh => '重新整理';
+
+  @override
+  String get ui3RecoveryKeyStoreWarning =>
+      '請妥善保管此金鑰。如果您無法存取所有裝置，這是復原加密訊息的唯一方式。';
+
+  @override
+  String ui3SavedToPath(Object path) {
+    return '已儲存：$path';
+  }
+
+  @override
+  String get ui3UnknownAccount => '未知帳號';
+
+  @override
+  String get ui3UnknownHomeserver => '未知伺服器';
+
+  @override
+  String get ui3ImportRecoveryKey => '匯入復原金鑰';
+
+  @override
+  String get ui3ImportRecoveryKeyDesc => '輸入或貼上復原金鑰，以復原加密訊息記錄的聊天室金鑰。';
+
+  @override
+  String ui3RecoveryKeyAccountInfo(Object account, Object homeserver) {
+    return '帳號：$account\\n伺服器：$homeserver';
+  }
+
+  @override
+  String get ui3Import => '匯入';
+
+  @override
+  String get ui3InvalidRecoveryKeyFormat => '復原金鑰格式無效';
+
+  @override
+  String ui3RecoveryKeyPartialRestore(
+    Object restored,
+    Object total,
+    Object failed,
+  ) {
+    return '已復原 $restored/$total 個金鑰，$failed 個失敗。請檢查帳號、網路和備份後重試。部分歷史訊息可能仍無法讀取。';
+  }
+
+  @override
+  String ui3RecoveryKeyRestoreSuccess(Object restored, Object total) {
+    return '已成功復原 $restored/$total 個金鑰';
+  }
+
+  @override
+  String ui3ImportFailed(Object error) {
+    return '匯入失敗：$error';
+  }
+
+  @override
+  String ui3PasskeyRegistrationFailed(Object error) {
+    return '通行金鑰註冊失敗：$error';
+  }
+
+  @override
+  String get ui3PasskeyDefaultName => '我的通行金鑰';
+
+  @override
+  String get ui3PasskeyNameHint => '例如：iPhone、MacBook';
+
+  @override
+  String get ui3PasskeyDeleteFailed => '刪除通行金鑰失敗';
+
+  @override
+  String get ui3TwoFactorAuth => '兩步驟驗證';
+
+  @override
+  String get ui3TwoFactorOnSubtitle => '已開啟 — 需要驗證器 App 的驗證碼';
+
+  @override
+  String get ui3TwoFactorOffSubtitle => '已關閉 — 使用驗證器 App（TOTP）保護';
+
+  @override
+  String get ui3ShowRecoveryKey => '顯示復原金鑰';
+
+  @override
+  String get ui3ShowRecoveryKeyDesc => '顯示復原金鑰以便備份';
+
+  @override
+  String get ui3ImportRecoveryKeyHint => '使用復原金鑰復原訊息';
+
+  @override
+  String get ui3RecoveryKeyCreateFailed => '建立復原金鑰失敗';
+
+  @override
+  String get ui3TotpIncorrectCode => '驗證碼錯誤，請重試';
+
+  @override
+  String get ui3TwoFactorEnabled => '兩步驟驗證已開啟';
+
+  @override
+  String get ui3TwoFactorDisabled => '兩步驟驗證已關閉';
+
+  @override
+  String get ui3TwoFactorTurnOffTitle => '關閉兩步驟驗證？';
+
+  @override
+  String get ui3TwoFactorTurnOffMessage => '將不再需要驗證器 App。之後可以使用新金鑰重新設定。';
+
+  @override
+  String get ui3TurnOff => '關閉';
+
+  @override
+  String get ui3TwoFactorTotpTitle => '兩步驟驗證（TOTP）';
+
+  @override
+  String get ui3TwoFactorIsOn => '兩步驟驗證已開啟';
+
+  @override
+  String get ui3TwoFactorCodeRequired => '需要驗證器 App 產生的驗證碼。';
+
+  @override
+  String get ui3TotpStepScan =>
+      '1. 使用驗證器 App（Google Authenticator、Authy、1Password 等）掃描此 QR 碼，或手動輸入金鑰。';
+
+  @override
+  String get ui3TotpKeyCopied => '金鑰已複製';
+
+  @override
+  String get ui3TotpStepConfirm => '2. 輸入 6 位數驗證碼以確認。';
+
+  @override
+  String get ui3Enable => '開啟';
+
+  @override
+  String get ui3BackupSettingsDesc => '備份本機聊天設定。重新登入後將從伺服器復原訊息。';
+
+  @override
+  String get ui3BackupKeysSeparate => '加密金鑰另行管理';
+
+  @override
+  String get ui3BackupKeysSeparateHint => '請在「安全性 > 復原金鑰」中備份加密訊息的存取權限。';
+
+  @override
+  String ui3BackupRoomsSize(Object rooms, Object size) {
+    return '$rooms 個聊天室  $size';
+  }
+
+  @override
+  String get ui3BackupRestoreFromFileDesc =>
+      '從其他裝置或先前的備份匯入 .n42backup 檔案。加密金鑰需使用復原金鑰另行復原。';
+
+  @override
+  String get ui3UsernameSessionRequired => '設定使用者名稱需要有效的登入工作階段';
+
+  @override
+  String get ui3SecuritySessionRequired => '安全性設定需要有效的登入工作階段';
+
+  @override
+  String get ui3ConnectedAccountsSessionRequired => '關聯帳號需要有效的登入工作階段';
+
+  @override
+  String get ui3SystemAccounts => '系統與帳號';
+
+  @override
+  String get ui3AccountIdentity => '帳號與身分';
+
+  @override
+  String get ui3Accounts => '帳號';
+
+  @override
+  String get ui3DevicesSessions => '裝置與工作階段';
+
+  @override
+  String get ui3Integrations => '整合';
+
+  @override
+  String get ui3ConnectedAccounts => '關聯帳號';
+
+  @override
+  String get ui3ConnectedAccountsDesc => 'Telegram、WhatsApp、Discord 及 API 橋接整合';
+
+  @override
+  String get ui3SystemOverview => '系統概覽';
+
+  @override
+  String ui3AccountCount(num count) {
+    return '$count 個帳號';
+  }
+
+  @override
+  String ui3DeviceCount(num count) {
+    return '$count 台裝置';
+  }
+
+  @override
+  String get ui3PrivacySecurityOverview => '端對端加密、螢幕截圖保護和代理控制';
+
+  @override
+  String get ui3ConversationPrivacy => '對話隱私';
+
+  @override
+  String get ui3NetworkPrivacy => '網路隱私';
+
+  @override
+  String get ui3IdentityPrivacy => '身分隱私';
+
+  @override
+  String get ui3EncryptionKeyBackup => '加密與金鑰備份';
+
+  @override
+  String get ui3DevicesVerification => '裝置與驗證';
+
+  @override
+  String get ui3ChipE2eeDefault => '預設端對端加密';
+
+  @override
+  String get ui3ChipManualE2ee => '手動端對端加密';
+
+  @override
+  String get ui3ChipSelfDestruct => '閱後即焚';
+
+  @override
+  String get ui3ChipScreenshotGuard => '螢幕截圖保護';
+
+  @override
+  String get ui3ChipIpProxy => 'IP / 代理';
+
+  @override
+  String get ui3ChipLinkPreviewsOff => '連結預覽已關閉';
+
+  @override
+  String get ui3ChipPublicHandle => '公開使用者名稱';
+
+  @override
+  String get a11yShowPassword => '顯示密碼';
+
+  @override
+  String get a11yHidePassword => '隱藏密碼';
+
+  @override
+  String get a11yCheckServer => '檢查伺服器';
+
+  @override
+  String get ui3AuthAnonymousRegistration => '匿名註冊';
+
+  @override
+  String get ui3AuthAnonymousRegistrationDesc =>
+      '無需綁定手機號碼或電子郵件即可建立帳號，系統將自動產生使用者名稱。';
+
+  @override
+  String get ui3AuthAnonymousModeOn => '已開啟匿名模式';
+
+  @override
+  String get ui3AuthAnonymousModeOnDesc =>
+      '應用程式將為你建立一個隨機的 Matrix 使用者名稱。之後你仍可使用產生的帳號和密碼登入。';
+
+  @override
+  String get ui3AuthChooseLoginMethod => '選擇登入方式';
+
+  @override
+  String get ui3AuthSsoOpenFailed => '無法開啟 SSO 登入頁面';
+
+  @override
+  String get ui3AuthWalletUnavailable => '錢包無法使用';
+
+  @override
+  String get ui3ProfileSubscriptions => '訂閱';
+
+  @override
+  String get ui3ProfileBuySellCrypto => '買賣加密貨幣';
+
+  @override
+  String get ui3ProfileOnDeviceAi => '裝置端 AI';
+
+  @override
+  String get ui3ProfileSetAUsername => '設定使用者名稱';
+
+  @override
+  String get ui3ProfileAvatarStudio => '頭像工作室';
+
+  @override
+  String get ui3ProfileAvatarStudioSubtitle => 'NFT 頭像 / 裝飾';
+
+  @override
+  String get ui3ProfileCustomize => '自訂';
+
+  @override
+  String get ui3ProfileQrSubtitle => '掃描以查看此個人資料或開始聊天';
+
+  @override
+  String get ui3PrivacyHardening => '隱私強化';
+
+  @override
+  String get ui3HidePhoneNumber => '隱藏手機號碼';
+
+  @override
+  String get ui3HidePhoneNumberDesc => '在本裝置的個人資料相關頁面中遮蓋已綁定的手機號碼';
+
+  @override
+  String get ui3EncryptNewChatsByDefault => '預設加密新聊天';
+
+  @override
+  String get ui3EncryptNewChatsByDefaultDesc => '新建單聊和私密群組時預設啟用端對端加密';
+
+  @override
+  String get ui3PrivateChatMode => '私密聊天模式';
+
+  @override
+  String get ui3PrivateChatModeDesc => '檢視私密或加密聊天時暫時啟用防截圖';
+
+  @override
+  String get ui3DefaultSelfDestructTimer => '預設閱後即焚時長';
+
+  @override
+  String get ui3DefaultSelfDestructTimerDesc => '為新傳送的訊息套用預設閱後即焚時長';
+
+  @override
+  String get ui3LinkPreviews => '連結預覽';
+
+  @override
+  String get ui3LinkPreviewsDesc => '訊息包含網址時擷取標題、描述和縮圖';
+
+  @override
+  String get ui3IpAddressProtection => 'IP 位址保護';
+
+  @override
+  String get ui3IpAddressProtectionDesc =>
+      '可用時透過你設定的 HTTP 隱私代理轉送 Matrix 和連結預覽請求';
+
+  @override
+  String get ui3UseTorProxy => '使用 Tor / Privoxy HTTP 代理';
+
+  @override
+  String get ui3UseTorProxyDesc =>
+      '使用本機 HTTP 代理端點，例如 127.0.0.1:8118 上的 Privoxy。此處不支援原生 SOCKS5 Tor 路由。';
+
+  @override
+  String get ui3CustomProxy => '自訂代理';
+
+  @override
+  String get ui3CustomProxyDesc => '為 Matrix 流量和連結預覽使用自訂 HTTP 或 HTTPS 代理';
+
+  @override
+  String get ui3ProxyEndpoint => '代理位址';
+
+  @override
+  String get ui3ProxyEndpointDesc => 'HTTP/HTTPS 代理位址（不支援 SOCKS）';
+
+  @override
+  String get ui3InvalidEndpoint => '位址無效';
+
+  @override
+  String get ui3CustomProxyStaysOff => '設定有效位址前，自訂代理保持關閉';
+
+  @override
+  String get ui3NotificationFilterNote => '優先規則一律通知（略過靜音、僅提及和勿擾）。封鎖關鍵字會抑制通知。';
+
+  @override
+  String get ui3PriorityKeywords => '優先關鍵字';
+
+  @override
+  String get ui3PriorityKeywordHint => '例如：緊急';
+
+  @override
+  String get ui3MutedKeywords => '封鎖關鍵字';
+
+  @override
+  String get ui3MutedKeywordHint => '例如：廣告';
+
+  @override
+  String get ui3PrioritySenders => '優先傳送者';
+
+  @override
+  String get ui3CaseSensitive => '區分大小寫';
+
+  @override
+  String get ui3None => '無';
+
+  @override
+  String get ui3SmartReplyTranslation => '智慧回覆翻譯';
+
+  @override
+  String get ui3SmartReplyTranslationDesc => '傳送前自動將你的訊息翻譯為對方的語言。';
+
+  @override
+  String get ui3FromPhotos => '來自相簿';
+
+  @override
+  String get ui3ChangePhoto => '更換照片';
+
+  @override
+  String get ui3RoamingUsesMobileData => '漫遊沿用行動數據規則';
+
+  @override
+  String get ui3RoamingUsesMobileDataDesc => '暫不支援單獨偵測漫遊，因此漫遊時沿用行動數據的自動下載設定。';
+
+  @override
+  String ui3DeleteQuickReplyConfirm(String content) {
+    return '刪除「$content」？';
+  }
+
+  @override
+  String get ui3ResetToDefaults => '恢復預設';
+
+  @override
+  String get ui3ResetQuickRepliesMessage => '這將刪除所有自訂快速回覆並恢復預設，是否繼續？';
+
+  @override
+  String get ui3LocalLlmUnavailable => '此裝置不支援';
+
+  @override
+  String get ui3LocalLlmNotDownloaded => '模型未下載';
+
+  @override
+  String get ui3LocalLlmReady => '已就緒（裝置端）';
+
+  @override
+  String get ui3LocalLlmDescription =>
+      '啟用並就緒後，AI 功能（摘要、改寫、翻譯、回覆）完全在裝置上執行，資料不會離開你的手機；否則使用雲端服務。';
+
+  @override
+  String get ui3UseOnDeviceAi => '使用裝置端 AI';
+
+  @override
+  String get ui3UseOnDeviceAiDesc => '就緒時優先本機推論';
+
+  @override
+  String get ui3DownloadModel => '下載模型';
+
+  @override
+  String get ui3LocalLlmRuntimeRequired =>
+      '裝置端推論需要原生執行環境（Android MediaPipe / iOS Core ML），平台處理程式可用後將自動啟用。';
+
+  @override
+  String get ui3PhotoAvatar => '照片頭像';
+
+  @override
+  String get ui3AvatarStyles => '頭像樣式';
+
+  @override
+  String get ui3AvatarStylesDesc => '個人資料與頭像入口共用同一套裝飾樣式。';
+
+  @override
+  String get ui3ReplaceNftAvatar => '更換 NFT 頭像';
+
+  @override
+  String get ui3NftAvatarDesc => '使用鏈上藏品作為頭像。';
+
+  @override
+  String get ui3UsePhotoAvatar => '使用照片頭像';
+
+  @override
+  String get ui3UsePhotoAvatarDesc => '保留已上傳的頭像並解除 NFT 綁定。';
+
+  @override
+  String ui3AvatarStyleSet(Object name) {
+    return '頭像樣式已設為：$name';
+  }
+
+  @override
+  String get ui3NftAvatarUpdated => 'NFT 頭像已更新';
+
+  @override
+  String get ui3SwitchedToPhotoAvatar => '已切換回照片頭像';
+
+  @override
+  String get ui3SignInToViewRedPacketHistory => '登入後查看紅包記錄';
+
+  @override
+  String get ui3RedPacketActive => '進行中';
+
+  @override
+  String get ui3RedPacketCompleted => '已領完';
+
+  @override
+  String get ui3CardsAndPasses => '卡券與通行證';
+
+  @override
+  String get ui3CardsAndPassesDesc => '錢包卡片、優惠券和通行證由主應用管理。';
+
+  @override
+  String get ui3CardPackRequiresMainApp => '卡包需要在主應用中使用';
+
+  @override
+  String get ui3OpenCardPack => '打開卡包';
+
+  @override
+  String get ui3UnableToOpenChat => '無法與該聯絡人開啟聊天';
+
+  @override
+  String get ui3WalletManagedInMainApp => '錢包由主應用管理';
+
+  @override
+  String ui3CreatorPlans(Object name) {
+    return '$name · 訂閱方案';
+  }
+
+  @override
+  String get ui3NewPlan => '新增方案';
+
+  @override
+  String get ui3MySubscriptions => '我的訂閱';
+
+  @override
+  String get ui3AvailablePlans => '可用方案';
+
+  @override
+  String get ui3NoPlansYet => '尚無方案 · 點按「新增方案」建立';
+
+  @override
+  String ui3DaysLeft(Object days) {
+    return '剩餘 $days 天';
+  }
+
+  @override
+  String get ui3SubscriptionCancelled => '已取消';
+
+  @override
+  String get ui3AutoRenewOn => '自動續訂：開';
+
+  @override
+  String get ui3AutoRenewOff => '自動續訂：關';
+
+  @override
+  String get ui3CancelSubscriptionTitle => '取消訂閱？';
+
+  @override
+  String ui3CancelSubscriptionConfirm(Object name) {
+    return '你對 $name 的訂閱將維持有效至到期，之後不再續訂。';
+  }
+
+  @override
+  String get ui3Subscribe => '訂閱';
+
+  @override
+  String ui3SubscribedTo(Object name) {
+    return '已訂閱 $name';
+  }
+
+  @override
+  String get ui3PlanPriceLabel => '價格（例如 9.9 USDT）';
+
+  @override
+  String get ui3PlanDescriptionLabel => '描述（選填）';
+
+  @override
+  String get ui3PlanBenefitsLabel => '權益（以逗號分隔）';
+
+  @override
+  String get ui3PlanPeriod => '週期：';
+
+  @override
+  String get ui3Monthly => '按月';
+
+  @override
+  String get ui3Yearly => '按年';
+
+  @override
+  String get ui3SaveRemarkFailed => '備註儲存失敗';
+
+  @override
+  String get ui3CopyLink => '複製連結';
+
+  @override
+  String get ui3Connect => '連接';
+
+  @override
+  String get ui3CommonTokens => '共同代幣';
+
+  @override
+  String get ui3SharedNfts => '共同 NFT';
+
+  @override
+  String get ui3TransactionHistory => '交易紀錄';
+
+  @override
+  String get ui3CommonDaos => '共同 DAO';
+
+  @override
+  String get ui3SameChains => '相同鏈';
+
+  @override
+  String get ui3ChatInitFailed => '聊天初始化失敗';
+
+  @override
+  String get ui3CheckNetworkRetry => '請檢查網路後重試';
+
+  @override
+  String get ui3FromContacts => '從通訊錄新增';
+
+  @override
+  String get ui3FindFriendsFromContacts => '從手機通訊錄尋找好友';
+
+  @override
+  String get ui3EnsOrDomain => 'ENS / 網域';
+
+  @override
+  String get ui3LoadingContacts => '正在載入通訊錄...';
+
+  @override
+  String get ui3ContactsPermissionRequired => '需要通訊錄權限';
+
+  @override
+  String get ui3ContactsPermissionMessage => '如需從通訊錄尋找好友，請允許存取通訊錄。';
+
+  @override
+  String get ui3AllowAccess => '允許存取';
+
+  @override
+  String get ui3NoContactMatches => '找不到相符項目';
+
+  @override
+  String get ui3NoContactMatchesMessage => '你的通訊錄聯絡人尚未使用此應用程式，邀請他們加入吧！';
+
+  @override
+  String ui3ScannedContacts(Object count) {
+    return '已掃描 $count 位聯絡人';
+  }
+
+  @override
+  String ui3FoundContactMatches(Object count) {
+    return '在通訊錄中找到 $count 個相符項目';
+  }
+
+  @override
+  String ui3InContactsAs(Object name) {
+    return '通訊錄中：$name';
+  }
+
+  @override
+  String get ui3DeletePhotoConfirm => '刪除這張照片？';
+
+  @override
+  String get ui3InviteLink => '邀請連結';
+
+  @override
+  String get ui3ShareJoinLink => '分享此群組的加入連結';
+
+  @override
+  String get ui3ShareRoomReference => '向受邀成員分享群組參照';
+
+  @override
+  String get ui3ScanToJoinGroup => '掃碼直接加入此群組';
+
+  @override
+  String get ui3ScanToShareRoomReference => '掃碼向受邀成員分享群組參照';
+
+  @override
+  String get ui3InviteLinkLoadFailed => '邀請連結載入失敗';
+
+  @override
+  String get ui3InviteLinkCopied => '邀請連結已複製';
+
+  @override
+  String get ui3ChannelCategoryOptional => '分類（選填）';
+
+  @override
+  String get ui3ChannelCategoryHint => '公告 / 產品 / 支援';
+
+  @override
+  String get ui3DescriptionOptional => '描述（選填）';
+
+  @override
+  String get ui3WebhookEnable => '啟用 Webhook 自動化';
+
+  @override
+  String get ui3WebhookEnableDesc => '將成員加入和歡迎事件推送到你的整合端點。';
+
+  @override
+  String get ui3WebhookUrl => 'Webhook 網址';
+
+  @override
+  String get ui3WebhookSecretOptional => '簽章密鑰（選填）';
+
+  @override
+  String get ui3WebhookSecretHint => '用於 X-N42-Signature';
+
+  @override
+  String get ui3WebhookNotifyMemberJoined => '成員加入時通知';
+
+  @override
+  String get ui3WebhookNotifyWelcomeSent => '傳送歡迎語時通知';
+
+  @override
+  String get ui3WebhookTestSend => '傳送測試 Webhook';
+
+  @override
+  String get ui3WebhookTestSending => '正在傳送測試 Webhook...';
+
+  @override
+  String get ui3WebhookTestSent => '測試 Webhook 傳送成功';
+
+  @override
+  String get ui3WebhookTestFailed => '測試 Webhook 傳送失敗';
+
+  @override
+  String get ui3WebhookUrlInvalid => 'Webhook 網址必須是公開的 HTTPS 位址';
+
+  @override
+  String get ui3WebhookSelectEvent => '請至少選擇一個 Webhook 事件';
+
+  @override
+  String get ui3SensitiveDataDetection => '敏感資訊偵測';
+
+  @override
+  String get ui3Email => '電子郵件';
+
+  @override
+  String get ui3CreditCard => '信用卡';
+
+  @override
+  String get ui3DetectEmailDesc => '偵測文字訊息中的電子郵件地址';
+
+  @override
+  String get ui3DetectPhoneDesc => '偵測手機號碼與國際號碼';
+
+  @override
+  String get ui3DetectCardDesc => '偵測疑似銀行卡號';
+
+  @override
+  String get ui3DetectWalletDesc => '偵測以太坊格式的錢包地址';
+
+  @override
+  String get ui3GeneralTopic => '綜合';
+
+  @override
+  String get a11yPreviousResult => '上一個結果';
+
+  @override
+  String get a11yNextResult => '下一個結果';
+
+  @override
+  String get ui3TryDifferentKeywords => '試試其他關鍵字';
+
+  @override
+  String ui3FiltersActive(Object count) {
+    return '已啟用篩選：$count';
+  }
+
+  @override
+  String ui3MessageFiltersActive(Object count) {
+    return '已啟用訊息篩選：$count';
+  }
+
+  @override
+  String get ui3LoadMore => '載入更多';
+
+  @override
+  String get ui3MessageFilters => '訊息篩選';
+
+  @override
+  String get ui3SenderUserId => '傳送者使用者 ID';
+
+  @override
+  String get ui3FilterType => '類型';
+
+  @override
+  String get ui3FilterAny => '全部';
+
+  @override
+  String get ui3FilterImage => '圖片';
+
+  @override
+  String get ui3FilterTime => '時間';
+
+  @override
+  String get ui3AnyTime => '不限時間';
+
+  @override
+  String get ui3OnlyMyMessages => '僅我的訊息';
+
+  @override
+  String get ui3MediaOnly => '僅媒體';
+
+  @override
+  String get ui3Apply => '套用';
+
+  @override
+  String get ui3QrStyleClassic => '經典';
+
+  @override
+  String get ui3QrStyleOcean => '海洋';
+
+  @override
+  String get ui3QrStyleBerry => '莓果';
+
+  @override
+  String get ui3NfcUnavailable => 'NFC 無法使用或不支援此標籤。請開啟 NFC、換一個標籤或使用 QR 碼。';
+
+  @override
+  String get ui3CancelNfc => '取消 NFC';
+
+  @override
+  String get ui3ReadNfcTag => '讀取 NFC 標籤';
+
+  @override
+  String get ui3HoldNearNfcTag => '請將手機靠近服務標籤。';
+
+  @override
+  String get a11yFlashlightOn => '開啟手電筒';
+
+  @override
+  String get a11yFlashlightOff => '關閉手電筒';
+
+  @override
+  String get ui3SocialGraph => '社交圖譜';
+
+  @override
+  String get ui3RecommendedConnections => '推薦連結';
+
+  @override
+  String get ui3Portfolio => '資產組合';
+
+  @override
+  String get ui3Chains => '鏈';
+
+  @override
+  String get ui3Tokens => '代幣';
+
+  @override
+  String get ui3NoConnectionsFound => '暫無連結';
+
+  @override
+  String get ui3ConnectionsHint => '隨著你的鏈上活動增加，連結會逐漸出現';
+
+  @override
+  String get ui3SocialGraphLoadFailed => '社交圖譜載入失敗';
+
+  @override
+  String get ui3Similarity => '相似度';
+
+  @override
+  String get ui3Breakdown => '明細';
+
+  @override
+  String get ui3TokenHoldings => '代幣持倉';
+
+  @override
+  String get ui3NftCollections => 'NFT 系列';
+
+  @override
+  String get ui3ChainUsage => '鏈使用';
+
+  @override
+  String get ui3Transactions => '交易';
+
+  @override
+  String get ui3DaoMembership => 'DAO 成員資格';
+
+  @override
+  String get ui3NotWeighted => '不計權重';
+
+  @override
+  String ui3PercentWithWeight(Object percent, Object weight) {
+    return '$percent%（權重：$weight）';
+  }
+
+  @override
+  String get ui3CommonOnChainActivity => '共同鏈上活動';
+
+  @override
+  String get ui3SharedTokens => '共同代幣';
+
+  @override
+  String get ui3SharedNftCollections => '共同 NFT 系列';
+
+  @override
+  String get ui3SharedChains => '共同鏈';
+
+  @override
+  String get ui3NoSharedTokens => '未發現共同代幣';
+
+  @override
+  String get ui3NoSharedNftCollections => '未發現共同 NFT 系列';
+
+  @override
+  String get ui3NoSharedChains => '未發現共同鏈';
+
+  @override
+  String get ui3SimilarityFailed => '相似度計算失敗';
+
+  @override
+  String ui3ItemsAndMore(Object items, Object count) {
+    return '$items 等另外 $count 項';
+  }
+
+  @override
+  String get a11yGovernance => '治理';
+
+  @override
+  String get ui3CommunityLink => '社群連結';
+
+  @override
+  String get ui3CommunityQrCode => '社群 QR 碼';
+
+  @override
+  String get ui3CommunityQrSubtitle => '掃碼加入此社群並瀏覽其頻道';
+
+  @override
+  String get ui3CommunityLinkLoadFailed => '社群連結載入失敗';
+
+  @override
+  String get ui3CommunityLinkCopied => '社群連結已複製';
+
+  @override
+  String ui3KickMemberConfirm(Object name) {
+    return '$name 將被移出此社群。';
+  }
+
+  @override
+  String ui3BanMemberConfirm(Object name) {
+    return '$name 將被移出且無法重新加入。';
+  }
+
+  @override
+  String get ui3SignInToDiscoverChannels => '登入後即可探索公開頻道';
+
+  @override
+  String ui3UnableToJoinChannel(Object name, Object error) {
+    return '無法加入 $name：$error';
+  }
+
+  @override
+  String get ui3CategoryTech => '科技';
+
+  @override
+  String get ui3CategorySocial => '社交';
+
+  @override
+  String get ui3NoPublicChannels => '找不到公開頻道';
+
+  @override
+  String get ui3StoriesAndFun => '故事與趣味';
+
+  @override
+  String get ui3SearchMusicHint => '搜尋歌曲、藝人或好友';
+
+  @override
+  String get ui3ForYou => '為你推薦';
+
+  @override
+  String get ui3Liked => '已喜歡';
+
+  @override
+  String get ui3NoLikedMusic => '還沒有喜歡的音樂';
+
+  @override
+  String get ui3NoMusicStories => '還沒有音樂動態';
+
+  @override
+  String get ui3LikedMusicHint => '點擊歌曲旁的愛心即可收藏到這裡。';
+
+  @override
+  String get ui3MusicStoriesHint => '動態中分享的音樂會顯示在這裡。';
+
+  @override
+  String ui3SharedBy(Object artist, Object name) {
+    return '$artist · 由 $name 分享';
+  }
+
+  @override
+  String ui3UnableToPlay(Object title, Object error) {
+    return '無法播放 $title：$error';
+  }
+
+  @override
+  String get a11yPreviousTrack => '上一首';
+
+  @override
+  String get a11yNextTrack => '下一首';
+
+  @override
+  String get a11yPlay => '播放';
+
+  @override
+  String get a11yPause => '暫停';
+
+  @override
+  String get ui3Refresh => '重新整理';
+
+  @override
+  String get ui3NearbyIntroTitle => '探索附近的公開動態';
+
+  @override
+  String get ui3NearbyIntroBody => '你的位置僅在本裝置上使用一次，用於排序公開動態，不會上傳、廣播或顯示給他人。';
+
+  @override
+  String get ui3UseMyLocation => '使用我的位置';
+
+  @override
+  String get ui3NearbyUnavailable => '附近功能無法使用';
+
+  @override
+  String get ui3NoNearbyPosts => '附近暫無動態';
+
+  @override
+  String get ui3NoNearbyPostsHint => '帶位置的公開動態會顯示在這裡。';
+
+  @override
+  String get ui3NearbyDistanceNote => '大致距離 · 僅顯示公開的位置動態';
+
+  @override
+  String get ui3PublicLocationPost => '公開位置動態';
+
+  @override
+  String get ui3LocationServicesOff => '定位服務已關閉';
+
+  @override
+  String get ui3LocationPermissionDenied => '定位權限遭拒';
+
+  @override
+  String get ui3EnableLocationInSettings => '請在系統設定中開啟定位權限';
+
+  @override
+  String get ui3CreateStory => '發佈限時動態';
+
+  @override
+  String get ui3CreateStoryDesc => '發佈文字或照片狀態。';
+
+  @override
+  String get ui3StoryCamera => '限時動態相機';
+
+  @override
+  String get ui3StoryCameraDesc => '直接進入濾鏡和照片編輯。';
+
+  @override
+  String get ui3MomentsDesc => '開啟完整動態和留言。';
+
+  @override
+  String get ui3MomentCamera => '動態相機';
+
+  @override
+  String get ui3MomentCameraDesc => '發佈貼文並立即選擇媒體。';
+
+  @override
+  String get ui3GamesDesc => '開啟內建休閒遊戲中心。';
+
+  @override
+  String get ui3AvatarStudio => '頭像工作室';
+
+  @override
+  String get ui3AvatarStudioDesc => '裝飾、NFT 頭像與身分標誌。';
+
+  @override
+  String get ui3SocialGraphDesc => '鏈上追蹤、粉絲與連結。';
+
+  @override
+  String get ui3SocialHubHeroTitle => '限時動態、動態、遊戲和頭像';
+
+  @override
+  String get ui3SocialHubHeroBody => '統一使用現有社交功能，而不是把入口分散在聊天、個人資料和探索中。';
+
+  @override
+  String get ui3SocialGraphNotConfigured => '此版本未設定社交圖譜';
+
+  @override
+  String get ui3ConnectWalletForSocialGraph => '連接錢包以查看你的社交圖譜';
+
+  @override
+  String get ui3AvatarStudioSignIn => '頭像工作室需要登入';
+
+  @override
+  String get a11yRemoveImage => '移除圖片';
+
+  @override
+  String get a11yBack => '返回';
+
+  @override
+  String get ui3MiniAppConfirmTransactionTitle => '確認交易';
+
+  @override
+  String get ui3MiniAppConfirmTransactionBody => '小程式正在請求代表你發送一筆交易。';
+
+  @override
+  String ui3MiniAppOpenTitle(Object name) {
+    return '開啟 $name？';
+  }
+
+  @override
+  String get ui3MiniAppOpenButton => '開啟';
+
+  @override
+  String get ui3StoryReplySendFailed => '限時動態回覆傳送失敗';
+
+  @override
+  String get ui3RedPacketDemoNotice => '示範紅包——僅為聊天內紀錄，不會轉移真實的鏈上資產。';
+
+  @override
+  String get ui3RedPacketCoverClassic => '經典紅';
+
+  @override
+  String get ui3RedPacketCoverGolden => '金色';
+
+  @override
+  String get ui3RedPacketCoverPurple => '紫色';
+
+  @override
+  String get ui3RedPacketCoverOceanBlue => '海洋藍';
+
+  @override
+  String get ui3RedPacketCoverNatureGreen => '自然綠';
+
+  @override
+  String get ui3RedPacketCoverRosePink => '玫瑰粉';
+
+  @override
+  String get ui3RedPacketHistoryEmpty => '尚無紅包';
+
+  @override
+  String get ui3TransferMerchantQrWithAmount => '商戶收款碼（含金額）';
+
+  @override
+  String get ui3TransferMerchantQrTitle => '商戶收款碼';
+
+  @override
+  String get ui3TransferOpenAmountHint => '留空則不限金額';
+
+  @override
+  String get ui3FiatRampTitle => '買入 / 賣出加密貨幣';
+
+  @override
+  String get ui3FiatRampBuy => '買入';
+
+  @override
+  String get ui3FiatRampSell => '賣出';
+
+  @override
+  String get ui3FiatRampNotConfigured => '未設定法幣出入金通道';
+
+  @override
+  String get a11yPointsAddRule => '新增獎勵規則';
+
+  @override
+  String get a11yGovernanceRemoveChoice => '移除選項';
+
+  @override
+  String get a11yGovernanceCreateProposal => '建立提案';
+
+  @override
+  String get ui3MiniAppUpdateN42 => '更新 N42';
+
+  @override
+  String get ui3MiniAppOfficial => '官方';
+
+  @override
+  String ui3MiniAppUserCount(Object count) {
+    return '$count 位使用者';
+  }
+
+  @override
+  String a11yStoryBackgroundColor(Object index) {
+    return '背景顏色 $index';
+  }
+
+  @override
+  String get a11yStoryAdd => '新增限時動態';
+
+  @override
+  String get ui3StoryPostFailed => '發佈限時動態失敗';
+
+  @override
+  String get ui3StoryTapToSelectImage => '點擊選擇圖片';
+
+  @override
+  String get ui3StoryChangeImage => '更換';
+
+  @override
+  String ui3StoryMusicReadFailed(Object error) {
+    return '無法讀取所選音樂：$error';
+  }
+
+  @override
+  String get ui3StoryDeleteConfirm => '刪除這則限時動態？';
+
+  @override
+  String get ui3StoryDeleteFailed => '刪除限時動態失敗';
+
+  @override
+  String get ui3MomentCreateTitle => '發佈動態';
+
+  @override
+  String get ui3MomentContentHint => '這一刻的想法…';
+
+  @override
+  String get ui3MomentAddPhotos => '新增照片';
+
+  @override
+  String get ui3MomentAddLocation => '新增位置';
+
+  @override
+  String ui3MomentSelectedMedia(Object count) {
+    return '已選媒體（$count）';
+  }
+
+  @override
+  String get ui3MomentClearAll => '全部清除';
+
+  @override
+  String get ui3MomentClearMediaConfirm => '移除所有已選的照片/影片？';
+
+  @override
+  String get ui3MomentVisibilityPublicDesc => '所有朋友可見';
+
+  @override
+  String get ui3MomentVisibilityPrivateDesc => '僅自己可見';
+
+  @override
+  String get ui3MomentVisibilityPartialDesc => '選擇誰可以看';
+
+  @override
+  String get ui3MomentVisibilityExcludedDesc => '不給指定朋友看';
+
+  @override
+  String get ui3MomentVideos => '影片';
+
+  @override
+  String get ui3MomentNoVideos => '暫無影片';
+
+  @override
+  String get a11yCallMinimize => '最小化';
+
+  @override
+  String get a11yCallGridView => '格狀檢視';
+
+  @override
+  String get a11yCallFocusView => '聚焦檢視';
+
+  @override
+  String get ui3CallTools => '通話工具';
+
+  @override
+  String get ui3CallMeetingTools => '會議工具';
+
+  @override
+  String get ui3CallToolsSubtitle => '無需離開通話即可調整音訊與視訊品質。';
+
+  @override
+  String get ui3CallAudioEnhancement => '音訊增強';
+
+  @override
+  String get ui3CallNoiseSuppression => '降噪';
+
+  @override
+  String get ui3CallNoiseSuppressionDesc => '減少鍵盤聲與背景雜音。';
+
+  @override
+  String get ui3CallEchoCancellation => '回音消除';
+
+  @override
+  String get ui3CallEchoCancellationDesc => '防止揚聲器聲音回傳到麥克風。';
+
+  @override
+  String get ui3CallAutoGainControl => '自動增益';
+
+  @override
+  String get ui3CallAutoGainControlDesc => '讓麥克風音量更穩定。';
+
+  @override
+  String get ui3CallVoiceIsolation => '增強人聲隔離';
+
+  @override
+  String get ui3CallVoiceIsolationDesc => '使用更強的降噪設定。';
+
+  @override
+  String get ui3CallVideoSection => '視訊';
+
+  @override
+  String get ui3CallBackgroundBlur => '背景模糊（測試版）';
+
+  @override
+  String get ui3CallBlurDescReady => '偏好已生效，實際模糊效果仍取決於視訊處理器的上線。';
+
+  @override
+  String get ui3CallBlurDescSaved => '模糊偏好已儲存，相機處理可用時將生效。';
+
+  @override
+  String get ui3CallBlurDescCameraOff => '背景處理可用後請開啟相機。';
+
+  @override
+  String get ui3CallRecordingSection => '錄製';
+
+  @override
+  String get ui3CallRecordingDesc => '需要伺服器端錄製服務後才能儲存錄音。';
+
+  @override
+  String ui3CallSettingsUpdateFailed(Object error) {
+    return '更新通話設定失敗：$error';
+  }
+
+  @override
+  String get ui3CallRecordingStarted => '已開始錄製';
+
+  @override
+  String get ui3VoiceRoomNotFound => '房間不存在';
+
+  @override
+  String get ui3VoiceRoomEndConfirm => '確定要結束這個語音房間嗎？';
+
+  @override
+  String get a11yGameMoveUp => '向上移動';
+
+  @override
+  String get a11yGameMoveDown => '向下移動';
+
+  @override
+  String get a11yGameMoveLeft => '向左移動';
+
+  @override
+  String get a11yGameMoveRight => '向右移動';
+
+  @override
+  String get a11yGameRotate => '旋轉';
+
+  @override
+  String get a11yGameDrop => '落下';
+
+  @override
+  String ui3StickerAddedCount(Object count) {
+    return '已新增 $count 個貼圖';
+  }
+
+  @override
+  String ui3StickerAddFailed(Object error) {
+    return '新增失敗：$error';
+  }
+
+  @override
+  String get ui3StickerRemoveTitle => '移除貼圖';
+
+  @override
+  String get ui3StickerRemoveConfirm => '要從貼圖包中移除此貼圖嗎？';
+
+  @override
+  String get ui3StickerRemoveFailed => '移除失敗';
+
+  @override
+  String get ui3StickerRenamePack => '重新命名貼圖包';
+
+  @override
+  String get ui3StickerPackName => '貼圖包名稱';
+
+  @override
+  String get ui3StickerRenameFailed => '重新命名失敗';
+
+  @override
+  String get ui3StickerDeletePack => '刪除貼圖包';
+
+  @override
+  String get ui3StickerThisPack => '此貼圖包';
+
+  @override
+  String ui3StickerDeletePackConfirm(Object name) {
+    return '要刪除「$name」及其所有貼圖嗎？此操作無法復原。';
+  }
+
+  @override
+  String get ui3StickerDeleteFailed => '刪除失敗';
+
+  @override
+  String get ui3StickerPack => '貼圖包';
+
+  @override
+  String get ui3StickerAdding => '正在新增…';
+
+  @override
+  String get ui3StickerAddStickers => '新增貼圖';
+
+  @override
+  String get ui3StickerPackNotFound => '找不到貼圖包';
+
+  @override
+  String get ui3StickerEmptyHint => '點按「新增貼圖」上傳圖片';
+
+  @override
+  String get ui3StickerNewPack => '新增貼圖包';
+
+  @override
+  String get ui3StickerCreate => '建立';
+
+  @override
+  String get ui3StickerCreateFailed => '建立貼圖包失敗';
+
+  @override
+  String ui3StickerInstalled(Object name) {
+    return '已新增「$name」';
+  }
+
+  @override
+  String get ui3StickerRemovePackTitle => '移除貼圖包';
+
+  @override
+  String ui3StickerRemovePackConfirm(Object name) {
+    return '要從你的貼圖中移除「$name」嗎？';
+  }
+
+  @override
+  String ui3StickerRemoved(Object name) {
+    return '已移除「$name」';
+  }
+
+  @override
+  String get ui3StickerAiSticker => 'AI 貼圖';
+
+  @override
+  String get ui3StickerStoreTab => '商店';
+
+  @override
+  String get ui3StickerMyStickersTab => '我的貼圖';
+
+  @override
+  String get ui3StickerNoneFound => '找不到貼圖';
+
+  @override
+  String ui3StickerByAuthor(Object author) {
+    return '作者：$author';
+  }
+
+  @override
+  String get ui3StickerManage => '管理';
+
+  @override
+  String ui3StickerCount(Object count) {
+    return '$count 個貼圖';
+  }
+
+  @override
+  String get ui3StickerNoneInstalled => '尚未新增貼圖';
+
+  @override
+  String get ui3StickerGetFromStore => '前往商店取得貼圖';
+
+  @override
+  String get ui3StickerBrowseStore => '瀏覽商店';
+
+  @override
+  String get ui3StickerAddedToAi => '已新增至「AI 貼圖」';
+
+  @override
+  String get ui3StickerAddOneFailed => '新增貼圖失敗';
+
+  @override
+  String get ui3StickerPromptLabel => '描述你的貼圖';
+
+  @override
+  String get ui3StickerPromptHint => '例如：一隻戴墨鏡的開心橘貓';
+
+  @override
+  String get ui3StickerGenerating => '正在產生…';
+
+  @override
+  String get ui3StickerGenerate => '產生';
+
+  @override
+  String get ui3StickerAddToStickers => '新增至貼圖';
+
+  @override
+  String get ui3StickerGeneratingPreview => '正在產生你的貼圖…';
+
+  @override
+  String get ui3StickerGenerateEmpty => '描述一個貼圖，然後點按「產生」';
 }

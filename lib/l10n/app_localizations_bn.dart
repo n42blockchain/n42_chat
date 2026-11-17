@@ -6371,4 +6371,1989 @@ class SBn extends S {
   String scheduledSendTomorrowMorningAt(String time) {
     return 'আগামীকাল সকাল ($time)';
   }
+
+  @override
+  String get a11yScrollToBottom => 'নিচে স্ক্রল করুন';
+
+  @override
+  String get ui3EnterMessageBeforeScheduling =>
+      'সময়সূচি করার আগে একটি বার্তা লিখুন';
+
+  @override
+  String get ui3SendCode => 'কোড পাঠান';
+
+  @override
+  String get ui3CodeLanguage => 'ভাষা';
+
+  @override
+  String get ui3PasteCodeHere => 'এখানে কোড পেস্ট করুন';
+
+  @override
+  String ui3ReminderSetAt(String time) {
+    return 'রিমাইন্ডার সেট হয়েছে · $time';
+  }
+
+  @override
+  String get ui3RedPacketCreateFailed => 'লাল খাম তৈরি করা যায়নি';
+
+  @override
+  String get ui3SendTip => 'টিপ পাঠান';
+
+  @override
+  String get ui3TokenLabel => 'টোকেন';
+
+  @override
+  String get ui3NoteOptional => 'নোট (ঐচ্ছিক)';
+
+  @override
+  String ui3TipFailed(String error) {
+    return 'টিপ ব্যর্থ হয়েছে: $error';
+  }
+
+  @override
+  String get ui3GiftNftTitle => 'একটি NFT উপহার দিন';
+
+  @override
+  String get ui3TokenId => 'টোকেন আইডি';
+
+  @override
+  String ui3NftGiftFailed(String error) {
+    return 'NFT উপহার ব্যর্থ হয়েছে: $error';
+  }
+
+  @override
+  String get ui3AiAgentSubtitle =>
+      'একটি কাজ বর্ণনা করুন, সঠিক মিনি অ্যাপ খুলুন';
+
+  @override
+  String get ui3GiftNft => 'NFT উপহার';
+
+  @override
+  String get ui3GiftNftSubtitle => 'এই পরিচিতিকে একটি NFT পাঠান';
+
+  @override
+  String get ui3MiniAppUnavailable => 'মিনি অ্যাপ উপলব্ধ নেই';
+
+  @override
+  String ui3MediaItemsNotSent(int count) {
+    return 'নির্বাচিত $countটি মিডিয়া পাঠানো যায়নি';
+  }
+
+  @override
+  String get ui3PhotosSubtitle => 'চ্যাট-উপযোগী ফরম্যাটে ছবি ও ভিডিও পাঠান';
+
+  @override
+  String get ui3OriginalImages => 'আসল ছবি';
+
+  @override
+  String get ui3OriginalImagesSubtitle => 'অসংকুচিত ছবি ফাইল হিসেবে পাঠান';
+
+  @override
+  String ui3ScheduledFileFor(String filename, String time) {
+    return '$filename $time-এর জন্য নির্ধারিত হয়েছে';
+  }
+
+  @override
+  String ui3SendingOriginalImage(String filename) {
+    return 'আসল ছবি পাঠানো হচ্ছে: $filename';
+  }
+
+  @override
+  String ui3ScheduledOriginalImage(String filename) {
+    return 'আসল ছবি নির্ধারিত হয়েছে: $filename';
+  }
+
+  @override
+  String get ui3PaymentAlreadySent => 'পেমেন্ট ইতিমধ্যে পাঠানো হয়েছে';
+
+  @override
+  String get ui3PaymentProcessing => 'পেমেন্ট প্রক্রিয়াধীন';
+
+  @override
+  String ui3ChainStatus(String status) {
+    return 'চেইন স্ট্যাটাস: $status';
+  }
+
+  @override
+  String get ui3NotChecked => 'যাচাই করা হয়নি';
+
+  @override
+  String ui3ConfirmationsCount(int confirmations, int required) {
+    return 'নিশ্চিত: $confirmations / $required ব্লক';
+  }
+
+  @override
+  String get ui3CopyTxHash => 'লেনদেন হ্যাশ কপি করুন';
+
+  @override
+  String get ui3VerifyAgain => 'আবার যাচাই করুন';
+
+  @override
+  String get ui3VerifyOnChain => 'চেইনে যাচাই করুন';
+
+  @override
+  String get ui3TransferMissingChainDetails =>
+      'এই ট্রান্সফারে সঠিক চেইন ও সম্পদের বিবরণ নেই।';
+
+  @override
+  String get ui3ReceiptPending => 'চেইনে অপেক্ষমাণ';
+
+  @override
+  String get ui3ReceiptConfirmed => 'নিশ্চিত';
+
+  @override
+  String get ui3ReceiptFailed => 'চেইনে ব্যর্থ';
+
+  @override
+  String get ui3ReceiptMismatch => 'লেনদেনের বিবরণ মিলছে না';
+
+  @override
+  String get ui3ReceiptUnsupported => 'চেইন যাচাই সমর্থিত নয়';
+
+  @override
+  String get ui3ReceiptUnavailable => 'যাচাই উপলব্ধ নেই';
+
+  @override
+  String get ui3OpenOrSave => 'খুলুন / সংরক্ষণ করুন';
+
+  @override
+  String get ui3UnableToOpenFile => 'এই ফাইলটি খোলা যাচ্ছে না।';
+
+  @override
+  String ui3AiRewriteFailed(String error) {
+    return 'AI পুনর্লিখন ব্যর্থ: $error';
+  }
+
+  @override
+  String get ui3AiShareMessagesTitle => 'AI-এর সাথে বার্তা শেয়ার করবেন?';
+
+  @override
+  String get ui3AiShareMessagesBody =>
+      'এই উত্তরের জন্য AI কোন বার্তাগুলো ব্যবহার করতে পারবে তা নির্বাচন করুন। এই একবারের অনুমোদনের মেয়াদ দুই মিনিট পরে শেষ হয়ে যাবে। দ্রুত উত্তর বন্ধ করলে অপেক্ষমাণ ফলাফল বাতিল হবে। এটি পেমেন্ট বা এক্সপোর্টের অনুমতি দেয় না।';
+
+  @override
+  String get ui3OtherParticipant => 'অপর পক্ষ';
+
+  @override
+  String get ui3ShareSelected => 'নির্বাচিতগুলো শেয়ার করুন';
+
+  @override
+  String get ui3BotCommandError => 'কমান্ড ত্রুটি';
+
+  @override
+  String get ui3BotUnknownCommand => 'অজানা কমান্ড';
+
+  @override
+  String get ui3BotTypeHelp => 'উপলব্ধ কমান্ড দেখতে /help লিখুন।';
+
+  @override
+  String get ui3FilesMediaLinks => 'ফাইল, মিডিয়া ও লিংক';
+
+  @override
+  String get ui3ChatStorage => 'চ্যাট স্টোরেজ';
+
+  @override
+  String get ui3EncryptionKeysDevices => 'এনক্রিপশন কী ও ডিভাইস';
+
+  @override
+  String get ui3EncryptionServiceUnavailable =>
+      'এনক্রিপশন পরিষেবা এখনও উপলব্ধ নয়';
+
+  @override
+  String get ui3ExportLoadingHistory =>
+      'এক্সপোর্টের জন্য আরও চ্যাট ইতিহাস লোড হচ্ছে...';
+
+  @override
+  String get ui3ExportTxtDesc =>
+      'নোট, ব্যাকআপ বা কমপ্লায়েন্স পর্যালোচনার জন্য সাধারণ টেক্সট ট্রান্সক্রিপ্ট';
+
+  @override
+  String get ui3ExportCustomRange => 'কাস্টম পরিসর';
+
+  @override
+  String get ui3ExportStart => 'শুরু';
+
+  @override
+  String get ui3ExportEnd => 'শেষ';
+
+  @override
+  String get ui3ExportSelectDate => 'তারিখ নির্বাচন করুন';
+
+  @override
+  String get ui3FolderFilterUnreadOnly => 'শুধু অপঠিত';
+
+  @override
+  String get ui3FolderFilterMutedOnly => 'শুধু মিউট করা';
+
+  @override
+  String get ui3FolderFilterNoDms => 'সরাসরি বার্তা বাদে';
+
+  @override
+  String get ui3FolderFilterNoGroups => 'গ্রুপ বাদে';
+
+  @override
+  String get ui3FolderFilterNoChannels => 'চ্যানেল বাদে';
+
+  @override
+  String get ui3FolderFilterAllChats => 'সব চ্যাট';
+
+  @override
+  String get ui3Create => 'তৈরি করুন';
+
+  @override
+  String ui3DeleteFolderConfirm(String name) {
+    return '\"$name\" ফোল্ডার মুছবেন?';
+  }
+
+  @override
+  String get a11yDecreaseTextSize => 'লেখার আকার কমান';
+
+  @override
+  String get a11yIncreaseTextSize => 'লেখার আকার বাড়ান';
+
+  @override
+  String ui3MinutesRead(int minutes) {
+    return '$minutes মিনিটে পড়া';
+  }
+
+  @override
+  String get ui3TipOnChain => 'অন-চেইন ✓';
+
+  @override
+  String get ui3ViewSource => 'সোর্স দেখুন';
+
+  @override
+  String get a11yPreviousPage => 'আগের পৃষ্ঠা';
+
+  @override
+  String get a11yNextPage => 'পরের পৃষ্ঠা';
+
+  @override
+  String get ui3OpenExternalLinkTitle => 'বাহ্যিক লিংক খুলবেন?';
+
+  @override
+  String get ui3Open => 'খুলুন';
+
+  @override
+  String get ui3UnableToOpenLink => 'এই লিংকটি খোলা যাচ্ছে না।';
+
+  @override
+  String get ui3ImageUnavailable => 'ছবি উপলব্ধ নেই';
+
+  @override
+  String ui3LoadImageFrom(Object host) {
+    return '$host থেকে ছবি লোড করুন';
+  }
+
+  @override
+  String ui3RetryImageFrom(Object host) {
+    return '$host থেকে আবার ছবি লোড করুন';
+  }
+
+  @override
+  String get ui3TranslatedByN42 => 'N42 দ্বারা অনূদিত';
+
+  @override
+  String ui3TranslatedFromByN42(Object language) {
+    return 'N42 দ্বারা $language থেকে অনূদিত';
+  }
+
+  @override
+  String get ui3ClearWhiteboardTitle => 'হোয়াইটবোর্ড মুছবেন?';
+
+  @override
+  String get ui3ClearWhiteboardMessage =>
+      'সবার জন্য সব আঁচড় মুছে যাবে। এটি আর ফেরানো যাবে না।';
+
+  @override
+  String get ui3WhiteboardLive => 'হোয়াইটবোর্ড · লাইভ';
+
+  @override
+  String get a11yPenColor => 'কলমের রং';
+
+  @override
+  String get ui3AiDescribeOcr => 'AI বর্ণনা / OCR';
+
+  @override
+  String get ui3DocumentPreviewFailed =>
+      'এই ডকুমেন্টটি নিরাপদে প্রিভিউ করা যাচ্ছে না। সংযোগ ও ফাইলের আকার পরীক্ষা করুন (সর্বোচ্চ 2MB)।';
+
+  @override
+  String get ui3AiConsentMessage =>
+      'এই সারাংশের জন্য AI কোন বার্তাগুলো ব্যবহার করতে পারবে তা নির্বাচন করুন। এই একবারের অনুমোদনের মেয়াদ দুই মিনিট পরে শেষ হয়ে যাবে। এটি পেমেন্ট বা এক্সপোর্টের অনুমতি দেয় না।';
+
+  @override
+  String get ui3AiSuggestedReplies => 'প্রস্তাবিত উত্তর';
+
+  @override
+  String get ui3AiGeneratingSuggestions => 'পরামর্শ তৈরি হচ্ছে...';
+
+  @override
+  String get ui3StickersEmpty => 'এখনও কোনো স্টিকার নেই';
+
+  @override
+  String get ui3StickersGet => 'স্টিকার নিন';
+
+  @override
+  String get a11yFormatBold => 'বোল্ড';
+
+  @override
+  String get a11yFormatItalic => 'ইটালিক';
+
+  @override
+  String get a11yFormatStrikethrough => 'স্ট্রাইকথ্রু';
+
+  @override
+  String get a11yFormatInlineCode => 'ইনলাইন কোড';
+
+  @override
+  String get a11yFormatCodeBlock => 'কোড ব্লক';
+
+  @override
+  String get a11yFormatChecklistItem => 'চেকলিস্ট আইটেম';
+
+  @override
+  String get a11yFormatBulletList => 'বুলেট তালিকা';
+
+  @override
+  String get a11yFormatNumberedList => 'সংখ্যাযুক্ত তালিকা';
+
+  @override
+  String get a11yFormatLink => 'লিঙ্ক';
+
+  @override
+  String get a11yFormatTable => 'টেবিল';
+
+  @override
+  String get a11yFormatMeetingTemplate => 'মিটিং টেমপ্লেট';
+
+  @override
+  String get a11yEmojiSmileys => 'স্মাইলি ও মানুষ';
+
+  @override
+  String get a11yEmojiHearts => 'হৃদয়';
+
+  @override
+  String get a11yEmojiAnimals => 'প্রাণী ও প্রকৃতি';
+
+  @override
+  String get a11yEmojiFood => 'খাবার ও পানীয়';
+
+  @override
+  String get a11yEmojiTravel => 'ভ্রমণ ও স্থান';
+
+  @override
+  String get a11yEmojiActivities => 'কার্যকলাপ';
+
+  @override
+  String get a11yEmojiObjects => 'বস্তু';
+
+  @override
+  String get a11yEmojiSymbols => 'প্রতীক';
+
+  @override
+  String get ui3FrequentlyUsed => 'প্রায়ই ব্যবহৃত';
+
+  @override
+  String get ui3NoEditHistory => 'কোনো সম্পাদনার ইতিহাস নেই';
+
+  @override
+  String get ui3EventNew => 'নতুন ইভেন্ট';
+
+  @override
+  String get ui3EventTitleLabel => 'শিরোনাম';
+
+  @override
+  String get ui3EventLocationOptional => 'স্থান (ঐচ্ছিক)';
+
+  @override
+  String get ui3EventDescriptionOptional => 'বিবরণ (ঐচ্ছিক)';
+
+  @override
+  String get ui3EventSend => 'ইভেন্ট পাঠান';
+
+  @override
+  String get ui3EventTitleRequired => 'শিরোনাম আবশ্যক';
+
+  @override
+  String get ui3EventEndAfterStart => 'শেষের সময় শুরুর পরে হতে হবে';
+
+  @override
+  String get ui3MiniAppAgentIntro =>
+      'আপনি কী করতে চান তা লিখুন — আমি সঠিক মিনি অ্যাপ খুলে দেব।';
+
+  @override
+  String get ui3MiniAppAgentExample => 'যেমন: ETH থেকে USDC-তে সোয়াপ';
+
+  @override
+  String get ui3MiniAppAgentNoMatch =>
+      'মিলে যাওয়া কোনো মিনি অ্যাপ পাওয়া যায়নি। অন্যভাবে লিখে দেখুন।';
+
+  @override
+  String ui3MiniAppOpen(Object appName) {
+    return '$appName খুলুন';
+  }
+
+  @override
+  String get ui3MusicLinkPlatforms =>
+      'NetEase Cloud Music, QQ Music, Kugou, Kuwo ও আরও অনেকের গানের লিঙ্ক সমর্থিত';
+
+  @override
+  String get ui3PollMarkCorrectAnswer =>
+      'একটি খালি নয় এমন সঠিক উত্তর চিহ্নিত করুন';
+
+  @override
+  String get ui3PollQuizMode => 'কুইজ মোড';
+
+  @override
+  String get ui3PollAnswerExplanationHint => 'উত্তরের ব্যাখ্যা (ঐচ্ছিক)';
+
+  @override
+  String get a11yCorrectAnswer => 'সঠিক উত্তর';
+
+  @override
+  String get ui3AiSuggestions => 'AI পরামর্শ';
+
+  @override
+  String get a11yPaste => 'পেস্ট করুন';
+
+  @override
+  String get a11yRefresh => 'রিফ্রেশ করুন';
+
+  @override
+  String get ui3RecoveryKeyStoreWarning =>
+      'এই কী নিরাপদে রাখুন। সব ডিভাইসে অ্যাক্সেস হারালে আপনার এনক্রিপ্ট করা বার্তা পুনরুদ্ধারের এটিই একমাত্র উপায়।';
+
+  @override
+  String ui3SavedToPath(Object path) {
+    return 'সংরক্ষিত: $path';
+  }
+
+  @override
+  String get ui3UnknownAccount => 'অজানা অ্যাকাউন্ট';
+
+  @override
+  String get ui3UnknownHomeserver => 'অজানা হোমসার্ভার';
+
+  @override
+  String get ui3ImportRecoveryKey => 'রিকভারি কী ইমপোর্ট করুন';
+
+  @override
+  String get ui3ImportRecoveryKeyDesc =>
+      'এনক্রিপ্ট করা বার্তার ইতিহাসের রুম কী পুনরুদ্ধার করতে আপনার রিকভারি কী লিখুন বা পেস্ট করুন।';
+
+  @override
+  String ui3RecoveryKeyAccountInfo(Object account, Object homeserver) {
+    return 'অ্যাকাউন্ট: $account\\nহোমসার্ভার: $homeserver';
+  }
+
+  @override
+  String get ui3Import => 'ইমপোর্ট করুন';
+
+  @override
+  String get ui3InvalidRecoveryKeyFormat => 'রিকভারি কী-এর ফরম্যাট অবৈধ';
+
+  @override
+  String ui3RecoveryKeyPartialRestore(
+    Object restored,
+    Object total,
+    Object failed,
+  ) {
+    return '$totalটির মধ্যে $restoredটি কী পুনরুদ্ধার হয়েছে। $failedটি কী ব্যর্থ হয়েছে। অ্যাকাউন্ট, নেটওয়ার্ক ও ব্যাকআপ যাচাই করে আবার চেষ্টা করুন। কিছু ইতিহাস অপাঠযোগ্য থেকে যেতে পারে।';
+  }
+
+  @override
+  String ui3RecoveryKeyRestoreSuccess(Object restored, Object total) {
+    return '$totalটির মধ্যে $restoredটি কী সফলভাবে পুনরুদ্ধার হয়েছে';
+  }
+
+  @override
+  String ui3ImportFailed(Object error) {
+    return 'ইমপোর্ট ব্যর্থ: $error';
+  }
+
+  @override
+  String ui3PasskeyRegistrationFailed(Object error) {
+    return 'পাসকি নিবন্ধন ব্যর্থ: $error';
+  }
+
+  @override
+  String get ui3PasskeyDefaultName => 'আমার পাসকি';
+
+  @override
+  String get ui3PasskeyNameHint => 'যেমন: iPhone, MacBook';
+
+  @override
+  String get ui3PasskeyDeleteFailed => 'পাসকি মুছতে ব্যর্থ';
+
+  @override
+  String get ui3TwoFactorAuth => 'টু-ফ্যাক্টর অথেনটিকেশন';
+
+  @override
+  String get ui3TwoFactorOnSubtitle => 'চালু — অথেনটিকেটর অ্যাপের কোড প্রয়োজন';
+
+  @override
+  String get ui3TwoFactorOffSubtitle =>
+      'বন্ধ — অথেনটিকেটর অ্যাপ (TOTP) দিয়ে সুরক্ষিত করুন';
+
+  @override
+  String get ui3ShowRecoveryKey => 'রিকভারি কী দেখান';
+
+  @override
+  String get ui3ShowRecoveryKeyDesc => 'ব্যাকআপের জন্য আপনার রিকভারি কী দেখান';
+
+  @override
+  String get ui3ImportRecoveryKeyHint =>
+      'রিকভারি কী দিয়ে বার্তা পুনরুদ্ধার করুন';
+
+  @override
+  String get ui3RecoveryKeyCreateFailed => 'রিকভারি কী তৈরি করা যায়নি';
+
+  @override
+  String get ui3TotpIncorrectCode => 'ভুল কোড, আবার চেষ্টা করুন';
+
+  @override
+  String get ui3TwoFactorEnabled => 'টু-ফ্যাক্টর অথেনটিকেশন চালু হয়েছে';
+
+  @override
+  String get ui3TwoFactorDisabled => 'টু-ফ্যাক্টর অথেনটিকেশন বন্ধ হয়েছে';
+
+  @override
+  String get ui3TwoFactorTurnOffTitle => 'টু-ফ্যাক্টর অথেনটিকেশন বন্ধ করবেন?';
+
+  @override
+  String get ui3TwoFactorTurnOffMessage =>
+      'আপনার অথেনটিকেটর অ্যাপ আর প্রয়োজন হবে না। পরে নতুন কী দিয়ে আবার সেট আপ করতে পারবেন।';
+
+  @override
+  String get ui3TurnOff => 'বন্ধ করুন';
+
+  @override
+  String get ui3TwoFactorTotpTitle => 'টু-ফ্যাক্টর (TOTP)';
+
+  @override
+  String get ui3TwoFactorIsOn => 'টু-ফ্যাক্টর অথেনটিকেশন চালু আছে';
+
+  @override
+  String get ui3TwoFactorCodeRequired =>
+      'আপনার অথেনটিকেটর অ্যাপের একটি কোড প্রয়োজন।';
+
+  @override
+  String get ui3TotpStepScan =>
+      '1. একটি অথেনটিকেটর অ্যাপ (Google Authenticator, Authy, 1Password…) দিয়ে এই QR স্ক্যান করুন, অথবা কী ম্যানুয়ালি লিখুন।';
+
+  @override
+  String get ui3TotpKeyCopied => 'কী কপি হয়েছে';
+
+  @override
+  String get ui3TotpStepConfirm => '2. নিশ্চিত করতে 6 সংখ্যার কোড লিখুন।';
+
+  @override
+  String get ui3Enable => 'চালু করুন';
+
+  @override
+  String get ui3BackupSettingsDesc =>
+      'আপনার স্থানীয় চ্যাট সেটিংসের ব্যাকআপ নিন। আবার লগ ইন করার পর বার্তাগুলো সার্ভার থেকে পুনরুদ্ধার হবে।';
+
+  @override
+  String get ui3BackupKeysSeparate => 'এনক্রিপশন কী আলাদাভাবে পরিচালিত হয়';
+
+  @override
+  String get ui3BackupKeysSeparateHint =>
+      'এনক্রিপ্ট করা বার্তার অ্যাক্সেসের ব্যাকআপ নিতে নিরাপত্তা > রিকভারি কী ব্যবহার করুন।';
+
+  @override
+  String ui3BackupRoomsSize(Object rooms, Object size) {
+    return '$roomsটি রুম  $size';
+  }
+
+  @override
+  String get ui3BackupRestoreFromFileDesc =>
+      'অন্য ডিভাইস বা আগের ব্যাকআপ থেকে একটি .n42backup ফাইল ইমপোর্ট করুন। এনক্রিপশন কী আপনার রিকভারি কী দিয়ে আলাদাভাবে পুনরুদ্ধার হয়।';
+
+  @override
+  String get ui3UsernameSessionRequired =>
+      'ইউজারনেমের জন্য সক্রিয় সেশন প্রয়োজন';
+
+  @override
+  String get ui3SecuritySessionRequired =>
+      'নিরাপত্তা সেটিংসের জন্য সক্রিয় সেশন প্রয়োজন';
+
+  @override
+  String get ui3ConnectedAccountsSessionRequired =>
+      'সংযুক্ত অ্যাকাউন্টের জন্য সক্রিয় সেশন প্রয়োজন';
+
+  @override
+  String get ui3SystemAccounts => 'সিস্টেম ও অ্যাকাউন্ট';
+
+  @override
+  String get ui3AccountIdentity => 'অ্যাকাউন্ট ও পরিচয়';
+
+  @override
+  String get ui3Accounts => 'অ্যাকাউন্ট';
+
+  @override
+  String get ui3DevicesSessions => 'ডিভাইস ও সেশন';
+
+  @override
+  String get ui3Integrations => 'ইন্টিগ্রেশন';
+
+  @override
+  String get ui3ConnectedAccounts => 'সংযুক্ত অ্যাকাউন্ট';
+
+  @override
+  String get ui3ConnectedAccountsDesc =>
+      'Telegram, WhatsApp, Discord ও API ব্রিজ ইন্টিগ্রেশন';
+
+  @override
+  String get ui3SystemOverview => 'সিস্টেমের সারসংক্ষেপ';
+
+  @override
+  String ui3AccountCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countটি অ্যাকাউন্ট',
+      one: '1টি অ্যাকাউন্ট',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String ui3DeviceCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countটি ডিভাইস',
+      one: '1টি ডিভাইস',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get ui3PrivacySecurityOverview =>
+      'এন্ড-টু-এন্ড এনক্রিপশন, স্ক্রিনশট সুরক্ষা ও প্রক্সি নিয়ন্ত্রণ';
+
+  @override
+  String get ui3ConversationPrivacy => 'কথোপকথনের গোপনীয়তা';
+
+  @override
+  String get ui3NetworkPrivacy => 'নেটওয়ার্ক গোপনীয়তা';
+
+  @override
+  String get ui3IdentityPrivacy => 'পরিচয়ের গোপনীয়তা';
+
+  @override
+  String get ui3EncryptionKeyBackup => 'এনক্রিপশন ও কী ব্যাকআপ';
+
+  @override
+  String get ui3DevicesVerification => 'ডিভাইস ও যাচাইকরণ';
+
+  @override
+  String get ui3ChipE2eeDefault => 'ডিফল্ট E2EE';
+
+  @override
+  String get ui3ChipManualE2ee => 'ম্যানুয়াল E2EE';
+
+  @override
+  String get ui3ChipSelfDestruct => 'স্ব-ধ্বংস';
+
+  @override
+  String get ui3ChipScreenshotGuard => 'স্ক্রিনশট সুরক্ষা';
+
+  @override
+  String get ui3ChipIpProxy => 'IP / প্রক্সি';
+
+  @override
+  String get ui3ChipLinkPreviewsOff => 'লিঙ্ক প্রিভিউ বন্ধ';
+
+  @override
+  String get ui3ChipPublicHandle => 'পাবলিক ইউজারনেম';
+
+  @override
+  String get a11yShowPassword => 'পাসওয়ার্ড দেখান';
+
+  @override
+  String get a11yHidePassword => 'পাসওয়ার্ড লুকান';
+
+  @override
+  String get a11yCheckServer => 'সার্ভার যাচাই করুন';
+
+  @override
+  String get ui3AuthAnonymousRegistration => 'বেনামী নিবন্ধন';
+
+  @override
+  String get ui3AuthAnonymousRegistrationDesc =>
+      'ফোন বা ইমেল যুক্ত না করেই অ্যাকাউন্ট তৈরি করুন। একটি ইউজারনেম স্বয়ংক্রিয়ভাবে তৈরি হবে।';
+
+  @override
+  String get ui3AuthAnonymousModeOn => 'বেনামী মোড চালু আছে';
+
+  @override
+  String get ui3AuthAnonymousModeOnDesc =>
+      'অ্যাপটি আপনার জন্য একটি র‍্যান্ডম Matrix ইউজারনেম তৈরি করবে। পরে আপনি তৈরি করা অ্যাকাউন্ট ও পাসওয়ার্ড দিয়ে সাইন ইন করতে পারবেন।';
+
+  @override
+  String get ui3AuthChooseLoginMethod => 'লগইন পদ্ধতি বেছে নিন';
+
+  @override
+  String get ui3AuthSsoOpenFailed => 'SSO লগইন পেজ খোলা যায়নি';
+
+  @override
+  String get ui3AuthWalletUnavailable => 'ওয়ালেট উপলব্ধ নেই';
+
+  @override
+  String get ui3ProfileSubscriptions => 'সাবস্ক্রিপশন';
+
+  @override
+  String get ui3ProfileBuySellCrypto => 'ক্রিপ্টো কিনুন / বিক্রি করুন';
+
+  @override
+  String get ui3ProfileOnDeviceAi => 'ডিভাইসে AI';
+
+  @override
+  String get ui3ProfileSetAUsername => 'একটি ইউজারনেম সেট করুন';
+
+  @override
+  String get ui3ProfileAvatarStudio => 'অবতার স্টুডিও';
+
+  @override
+  String get ui3ProfileAvatarStudioSubtitle => 'NFT অবতার / সজ্জা';
+
+  @override
+  String get ui3ProfileCustomize => 'কাস্টমাইজ করুন';
+
+  @override
+  String get ui3ProfileQrSubtitle =>
+      'এই প্রোফাইল খুলতে বা চ্যাট শুরু করতে স্ক্যান করুন';
+
+  @override
+  String get ui3PrivacyHardening => 'গোপনীয়তা জোরদার';
+
+  @override
+  String get ui3HidePhoneNumber => 'ফোন নম্বর লুকান';
+
+  @override
+  String get ui3HidePhoneNumberDesc =>
+      'এই ডিভাইসে প্রোফাইল-সংক্রান্ত পেজে যুক্ত ফোন নম্বর আড়াল করুন';
+
+  @override
+  String get ui3EncryptNewChatsByDefault =>
+      'নতুন চ্যাট ডিফল্টভাবে এনক্রিপ্ট করুন';
+
+  @override
+  String get ui3EncryptNewChatsByDefaultDesc =>
+      'নতুন সরাসরি চ্যাট ও প্রাইভেট রুম E2EE চালু রেখে শুরু করুন';
+
+  @override
+  String get ui3PrivateChatMode => 'প্রাইভেট চ্যাট মোড';
+
+  @override
+  String get ui3PrivateChatModeDesc =>
+      'প্রাইভেট বা এনক্রিপ্টেড চ্যাট দেখার সময় সাময়িকভাবে স্ক্রিনশট ব্লক চালু করুন';
+
+  @override
+  String get ui3DefaultSelfDestructTimer => 'ডিফল্ট স্ব-ধ্বংস টাইমার';
+
+  @override
+  String get ui3DefaultSelfDestructTimerDesc =>
+      'নতুন পাঠানো বার্তায় একটি ডিফল্ট স্ব-ধ্বংস টাইমার প্রয়োগ করুন';
+
+  @override
+  String get ui3LinkPreviews => 'লিঙ্ক প্রিভিউ';
+
+  @override
+  String get ui3LinkPreviewsDesc =>
+      'বার্তায় URL থাকলে শিরোনাম, বিবরণ ও থাম্বনেইল আনুন';
+
+  @override
+  String get ui3IpAddressProtection => 'IP ঠিকানা সুরক্ষা';
+
+  @override
+  String get ui3IpAddressProtectionDesc =>
+      'উপলব্ধ থাকলে Matrix ও লিঙ্ক প্রিভিউ অনুরোধ আপনার কনফিগার করা HTTP প্রাইভেসি প্রক্সির মাধ্যমে পাঠান';
+
+  @override
+  String get ui3UseTorProxy => 'Tor / Privoxy HTTP প্রক্সি ব্যবহার করুন';
+
+  @override
+  String get ui3UseTorProxyDesc =>
+      '127.0.0.1:8118-এ Privoxy-এর মতো একটি লোকাল HTTP প্রক্সি এন্ডপয়েন্ট ব্যবহার করুন। এখানে নেটিভ SOCKS5 Tor রাউটিং সমর্থিত নয়।';
+
+  @override
+  String get ui3CustomProxy => 'কাস্টম প্রক্সি';
+
+  @override
+  String get ui3CustomProxyDesc =>
+      'Matrix ট্রাফিক ও লিঙ্ক প্রিভিউর জন্য একটি কাস্টম HTTP বা HTTPS প্রক্সি ব্যবহার করুন';
+
+  @override
+  String get ui3ProxyEndpoint => 'প্রক্সি ঠিকানা';
+
+  @override
+  String get ui3ProxyEndpointDesc =>
+      'HTTP/HTTPS প্রক্সি ঠিকানা (SOCKS সমর্থিত নয়)';
+
+  @override
+  String get ui3InvalidEndpoint => 'অবৈধ ঠিকানা';
+
+  @override
+  String get ui3CustomProxyStaysOff =>
+      'বৈধ ঠিকানা সেট না করা পর্যন্ত কাস্টম প্রক্সি বন্ধ থাকবে';
+
+  @override
+  String get ui3NotificationFilterNote =>
+      'অগ্রাধিকার নিয়ম সবসময় বিজ্ঞপ্তি দেয় (মিউট, শুধু উল্লেখ ও বিরক্ত করবেন না উপেক্ষা করে)। মিউট করা কীওয়ার্ড বিজ্ঞপ্তি বন্ধ রাখে।';
+
+  @override
+  String get ui3PriorityKeywords => 'অগ্রাধিকার কীওয়ার্ড';
+
+  @override
+  String get ui3PriorityKeywordHint => 'যেমন: জরুরি';
+
+  @override
+  String get ui3MutedKeywords => 'মিউট করা কীওয়ার্ড';
+
+  @override
+  String get ui3MutedKeywordHint => 'যেমন: স্প্যাম';
+
+  @override
+  String get ui3PrioritySenders => 'অগ্রাধিকার প্রেরক';
+
+  @override
+  String get ui3CaseSensitive => 'বড়/ছোট হাতের অক্ষর আলাদা';
+
+  @override
+  String get ui3None => 'কিছুই নেই';
+
+  @override
+  String get ui3SmartReplyTranslation => 'স্মার্ট রিপ্লাই অনুবাদ';
+
+  @override
+  String get ui3SmartReplyTranslationDesc =>
+      'পাঠানোর আগে আপনার বার্তা প্রাপকের ভাষায় স্বয়ংক্রিয়ভাবে অনুবাদ করুন।';
+
+  @override
+  String get ui3FromPhotos => 'ফটো থেকে';
+
+  @override
+  String get ui3ChangePhoto => 'ছবি পরিবর্তন করুন';
+
+  @override
+  String get ui3RoamingUsesMobileData => 'রোমিং-এ মোবাইল ডেটার নিয়ম প্রযোজ্য';
+
+  @override
+  String get ui3RoamingUsesMobileDataDesc =>
+      'আলাদা রোমিং শনাক্তকরণ এখনও উপলব্ধ নয়, তাই রোমিং বর্তমানে মোবাইল ডেটার স্বয়ংক্রিয় ডাউনলোড সেটিংস অনুসরণ করে।';
+
+  @override
+  String ui3DeleteQuickReplyConfirm(String content) {
+    return '\"$content\" মুছবেন?';
+  }
+
+  @override
+  String get ui3ResetToDefaults => 'ডিফল্টে রিসেট করুন';
+
+  @override
+  String get ui3ResetQuickRepliesMessage =>
+      'এটি সব কাস্টম দ্রুত উত্তর মুছে ডিফল্ট ফিরিয়ে আনবে। চালিয়ে যাবেন?';
+
+  @override
+  String get ui3LocalLlmUnavailable => 'এই ডিভাইসে সমর্থিত নয়';
+
+  @override
+  String get ui3LocalLlmNotDownloaded => 'মডেল ডাউনলোড করা হয়নি';
+
+  @override
+  String get ui3LocalLlmReady => 'প্রস্তুত (ডিভাইসে)';
+
+  @override
+  String get ui3LocalLlmDescription =>
+      'চালু ও প্রস্তুত থাকলে AI ফিচারগুলো (সারাংশ, পুনর্লিখন, অনুবাদ, উত্তর) সম্পূর্ণভাবে ডিভাইসে চলে — ডেটা কখনও আপনার ফোনের বাইরে যায় না। অন্যথায় সেগুলো ক্লাউড প্রদানকারী ব্যবহার করে।';
+
+  @override
+  String get ui3UseOnDeviceAi => 'ডিভাইসে AI ব্যবহার করুন';
+
+  @override
+  String get ui3UseOnDeviceAiDesc =>
+      'প্রস্তুত থাকলে লোকাল ইনফারেন্স অগ্রাধিকার পাবে';
+
+  @override
+  String get ui3DownloadModel => 'মডেল ডাউনলোড করুন';
+
+  @override
+  String get ui3LocalLlmRuntimeRequired =>
+      'ডিভাইসে ইনফারেন্সের জন্য নেটিভ রানটাইম (Android MediaPipe / iOS Core ML) প্রয়োজন। প্ল্যাটফর্ম হ্যান্ডলার উপলব্ধ হলে এটি স্বয়ংক্রিয়ভাবে চালু হবে।';
+
+  @override
+  String get ui3PhotoAvatar => 'ছবি অবতার';
+
+  @override
+  String get ui3AvatarStyles => 'অবতার স্টাইল';
+
+  @override
+  String get ui3AvatarStylesDesc =>
+      'প্রোফাইল ও অবতার এন্ট্রি পয়েন্টে একই সজ্জা নির্বাচক ব্যবহার করুন।';
+
+  @override
+  String get ui3ReplaceNftAvatar => 'NFT অবতার বদলান';
+
+  @override
+  String get ui3NftAvatarDesc =>
+      'একটি অন-চেইন সংগ্রহযোগ্য আইটেমকে আপনার অবতার হিসেবে ব্যবহার করুন।';
+
+  @override
+  String get ui3UsePhotoAvatar => 'ছবি অবতার ব্যবহার করুন';
+
+  @override
+  String get ui3UsePhotoAvatarDesc =>
+      'আপলোড করা অবতার রাখুন এবং NFT সংযোগ মুছে দিন।';
+
+  @override
+  String ui3AvatarStyleSet(Object name) {
+    return 'অবতার স্টাইল সেট হয়েছে: $name';
+  }
+
+  @override
+  String get ui3NftAvatarUpdated => 'NFT অবতার আপডেট হয়েছে';
+
+  @override
+  String get ui3SwitchedToPhotoAvatar => 'ছবি অবতারে ফিরে যাওয়া হয়েছে';
+
+  @override
+  String get ui3SignInToViewRedPacketHistory =>
+      'রেড প্যাকেটের ইতিহাস দেখতে সাইন ইন করুন';
+
+  @override
+  String get ui3RedPacketActive => 'সক্রিয়';
+
+  @override
+  String get ui3RedPacketCompleted => 'সম্পূর্ণ';
+
+  @override
+  String get ui3CardsAndPasses => 'কার্ড ও পাস';
+
+  @override
+  String get ui3CardsAndPassesDesc =>
+      'ওয়ালেট কার্ড, কুপন ও পাস মূল অ্যাপে পরিচালিত হয়।';
+
+  @override
+  String get ui3CardPackRequiresMainApp =>
+      'কার্ড প্যাকের জন্য মূল অ্যাপ প্রয়োজন';
+
+  @override
+  String get ui3OpenCardPack => 'কার্ড প্যাক খুলুন';
+
+  @override
+  String get ui3UnableToOpenChat => 'এই পরিচিতির সাথে চ্যাট খোলা যায়নি';
+
+  @override
+  String get ui3WalletManagedInMainApp => 'ওয়ালেট মূল অ্যাপে পরিচালিত হয়';
+
+  @override
+  String ui3CreatorPlans(Object name) {
+    return '$name · প্ল্যান';
+  }
+
+  @override
+  String get ui3NewPlan => 'নতুন প্ল্যান';
+
+  @override
+  String get ui3MySubscriptions => 'আমার সাবস্ক্রিপশন';
+
+  @override
+  String get ui3AvailablePlans => 'উপলব্ধ প্ল্যান';
+
+  @override
+  String get ui3NoPlansYet =>
+      'এখনও কোনো প্ল্যান নেই · তৈরি করতে \"নতুন প্ল্যান\" ট্যাপ করুন';
+
+  @override
+  String ui3DaysLeft(Object days) {
+    return '$days দিন বাকি';
+  }
+
+  @override
+  String get ui3SubscriptionCancelled => 'বাতিল হয়েছে';
+
+  @override
+  String get ui3AutoRenewOn => 'স্বয়ংক্রিয় নবায়ন: চালু';
+
+  @override
+  String get ui3AutoRenewOff => 'স্বয়ংক্রিয় নবায়ন: বন্ধ';
+
+  @override
+  String get ui3CancelSubscriptionTitle => 'সাবস্ক্রিপশন বাতিল করবেন?';
+
+  @override
+  String ui3CancelSubscriptionConfirm(Object name) {
+    return '$name-এ আপনার সাবস্ক্রিপশন মেয়াদ শেষ না হওয়া পর্যন্ত সক্রিয় থাকবে এবং আর নবায়ন হবে না।';
+  }
+
+  @override
+  String get ui3Subscribe => 'সাবস্ক্রাইব করুন';
+
+  @override
+  String ui3SubscribedTo(Object name) {
+    return '$name-এ সাবস্ক্রাইব করা হয়েছে';
+  }
+
+  @override
+  String get ui3PlanPriceLabel => 'মূল্য (যেমন 9.9 USDT)';
+
+  @override
+  String get ui3PlanDescriptionLabel => 'বিবরণ (ঐচ্ছিক)';
+
+  @override
+  String get ui3PlanBenefitsLabel => 'সুবিধা (কমা দিয়ে আলাদা করুন)';
+
+  @override
+  String get ui3PlanPeriod => 'মেয়াদ:';
+
+  @override
+  String get ui3Monthly => 'মাসিক';
+
+  @override
+  String get ui3Yearly => 'বার্ষিক';
+
+  @override
+  String get ui3SaveRemarkFailed => 'নোট সংরক্ষণ করা যায়নি';
+
+  @override
+  String get ui3CopyLink => 'লিঙ্ক কপি করুন';
+
+  @override
+  String get ui3Connect => 'সংযুক্ত হোন';
+
+  @override
+  String get ui3CommonTokens => 'সাধারণ টোকেন';
+
+  @override
+  String get ui3SharedNfts => 'সাধারণ NFT';
+
+  @override
+  String get ui3TransactionHistory => 'লেনদেনের ইতিহাস';
+
+  @override
+  String get ui3CommonDaos => 'সাধারণ DAO';
+
+  @override
+  String get ui3SameChains => 'একই চেইন';
+
+  @override
+  String get ui3ChatInitFailed => 'চ্যাট চালু করা যায়নি';
+
+  @override
+  String get ui3CheckNetworkRetry =>
+      'আপনার নেটওয়ার্ক পরীক্ষা করে আবার চেষ্টা করুন';
+
+  @override
+  String get ui3FromContacts => 'পরিচিতি থেকে';
+
+  @override
+  String get ui3FindFriendsFromContacts =>
+      'আপনার ফোনের পরিচিতি থেকে বন্ধু খুঁজুন';
+
+  @override
+  String get ui3EnsOrDomain => 'ENS / ডোমেইন';
+
+  @override
+  String get ui3LoadingContacts => 'পরিচিতি লোড হচ্ছে...';
+
+  @override
+  String get ui3ContactsPermissionRequired => 'পরিচিতির অনুমতি প্রয়োজন';
+
+  @override
+  String get ui3ContactsPermissionMessage =>
+      'পরিচিতি থেকে বন্ধু খুঁজতে, অনুগ্রহ করে আপনার পরিচিতিতে অ্যাক্সেসের অনুমতি দিন।';
+
+  @override
+  String get ui3AllowAccess => 'অ্যাক্সেসের অনুমতি দিন';
+
+  @override
+  String get ui3NoContactMatches => 'কোনো মিল পাওয়া যায়নি';
+
+  @override
+  String get ui3NoContactMatchesMessage =>
+      'আপনার কোনো পরিচিতি এখনও এই অ্যাপ ব্যবহার করছেন না। তাদের যোগ দিতে আমন্ত্রণ জানান!';
+
+  @override
+  String ui3ScannedContacts(Object count) {
+    return '$countটি পরিচিতি স্ক্যান করা হয়েছে';
+  }
+
+  @override
+  String ui3FoundContactMatches(Object count) {
+    return 'আপনার পরিচিতিতে $countটি মিল পাওয়া গেছে';
+  }
+
+  @override
+  String ui3InContactsAs(Object name) {
+    return 'পরিচিতিতে: $name';
+  }
+
+  @override
+  String get ui3DeletePhotoConfirm => 'এই ছবিটি মুছবেন?';
+
+  @override
+  String get ui3InviteLink => 'আমন্ত্রণ লিঙ্ক';
+
+  @override
+  String get ui3ShareJoinLink => 'এই রুমে যোগ দেওয়ার লিঙ্ক শেয়ার করুন';
+
+  @override
+  String get ui3ShareRoomReference =>
+      'আমন্ত্রিত সদস্যদের সাথে রুমের রেফারেন্স শেয়ার করুন';
+
+  @override
+  String get ui3ScanToJoinGroup => 'সরাসরি এই গ্রুপে যোগ দিতে স্ক্যান করুন';
+
+  @override
+  String get ui3ScanToShareRoomReference =>
+      'আমন্ত্রিত সদস্যদের সাথে এই রুমের রেফারেন্স শেয়ার করতে স্ক্যান করুন';
+
+  @override
+  String get ui3InviteLinkLoadFailed => 'আমন্ত্রণ লিঙ্ক লোড করা যায়নি';
+
+  @override
+  String get ui3InviteLinkCopied => 'আমন্ত্রণ লিঙ্ক কপি করা হয়েছে';
+
+  @override
+  String get ui3ChannelCategoryOptional => 'বিভাগ (ঐচ্ছিক)';
+
+  @override
+  String get ui3ChannelCategoryHint => 'ঘোষণা / পণ্য / সহায়তা';
+
+  @override
+  String get ui3DescriptionOptional => 'বিবরণ (ঐচ্ছিক)';
+
+  @override
+  String get ui3WebhookEnable => 'webhook অটোমেশন চালু করুন';
+
+  @override
+  String get ui3WebhookEnableDesc =>
+      'সদস্য যোগদান ও স্বাগত ইভেন্ট আপনার ইন্টিগ্রেশন এন্ডপয়েন্টে পাঠান।';
+
+  @override
+  String get ui3WebhookUrl => 'webhook URL';
+
+  @override
+  String get ui3WebhookSecretOptional => 'সাইনিং সিক্রেট (ঐচ্ছিক)';
+
+  @override
+  String get ui3WebhookSecretHint => 'X-N42-Signature-এর জন্য ব্যবহৃত';
+
+  @override
+  String get ui3WebhookNotifyMemberJoined => 'সদস্য যোগ দিলে জানান';
+
+  @override
+  String get ui3WebhookNotifyWelcomeSent => 'স্বাগত বার্তা পাঠানো হলে জানান';
+
+  @override
+  String get ui3WebhookTestSend => 'টেস্ট webhook পাঠান';
+
+  @override
+  String get ui3WebhookTestSending => 'টেস্ট webhook পাঠানো হচ্ছে...';
+
+  @override
+  String get ui3WebhookTestSent => 'টেস্ট webhook সফলভাবে পাঠানো হয়েছে';
+
+  @override
+  String get ui3WebhookTestFailed => 'টেস্ট webhook পাঠানো যায়নি';
+
+  @override
+  String get ui3WebhookUrlInvalid =>
+      'webhook URL অবশ্যই একটি পাবলিক HTTPS ঠিকানা হতে হবে';
+
+  @override
+  String get ui3WebhookSelectEvent => 'অন্তত একটি webhook ইভেন্ট নির্বাচন করুন';
+
+  @override
+  String get ui3SensitiveDataDetection => 'সংবেদনশীল তথ্য শনাক্তকরণ';
+
+  @override
+  String get ui3Email => 'ইমেইল';
+
+  @override
+  String get ui3CreditCard => 'ক্রেডিট কার্ড';
+
+  @override
+  String get ui3DetectEmailDesc => 'টেক্সট বার্তায় ইমেইল ঠিকানা শনাক্ত করুন';
+
+  @override
+  String get ui3DetectPhoneDesc => 'ফোন নম্বর ও আন্তর্জাতিক নম্বর শনাক্ত করুন';
+
+  @override
+  String get ui3DetectCardDesc => 'সম্ভাব্য ব্যাংক ও কার্ড নম্বর শনাক্ত করুন';
+
+  @override
+  String get ui3DetectWalletDesc => 'Ethereum-ধরনের ওয়ালেট ঠিকানা শনাক্ত করুন';
+
+  @override
+  String get ui3GeneralTopic => 'সাধারণ';
+
+  @override
+  String get a11yPreviousResult => 'আগের ফলাফল';
+
+  @override
+  String get a11yNextResult => 'পরের ফলাফল';
+
+  @override
+  String get ui3TryDifferentKeywords => 'অন্য কীওয়ার্ড দিয়ে চেষ্টা করুন';
+
+  @override
+  String ui3FiltersActive(Object count) {
+    return 'সক্রিয় ফিল্টার: $count';
+  }
+
+  @override
+  String ui3MessageFiltersActive(Object count) {
+    return 'সক্রিয় বার্তা ফিল্টার: $count';
+  }
+
+  @override
+  String get ui3LoadMore => 'আরও লোড করুন';
+
+  @override
+  String get ui3MessageFilters => 'বার্তা ফিল্টার';
+
+  @override
+  String get ui3SenderUserId => 'প্রেরকের ইউজার আইডি';
+
+  @override
+  String get ui3FilterType => 'ধরন';
+
+  @override
+  String get ui3FilterAny => 'যেকোনো';
+
+  @override
+  String get ui3FilterImage => 'ছবি';
+
+  @override
+  String get ui3FilterTime => 'সময়';
+
+  @override
+  String get ui3AnyTime => 'যেকোনো সময়';
+
+  @override
+  String get ui3OnlyMyMessages => 'শুধু আমার বার্তা';
+
+  @override
+  String get ui3MediaOnly => 'শুধু মিডিয়া';
+
+  @override
+  String get ui3Apply => 'প্রয়োগ করুন';
+
+  @override
+  String get ui3QrStyleClassic => 'ক্লাসিক';
+
+  @override
+  String get ui3QrStyleOcean => 'সমুদ্র';
+
+  @override
+  String get ui3QrStyleBerry => 'বেরি';
+
+  @override
+  String get ui3NfcUnavailable =>
+      'NFC উপলভ্য নয় বা ট্যাগটি সমর্থিত নয়। NFC চালু করুন, অন্য ট্যাগ চেষ্টা করুন বা QR ব্যবহার করুন।';
+
+  @override
+  String get ui3CancelNfc => 'NFC বাতিল করুন';
+
+  @override
+  String get ui3ReadNfcTag => 'NFC ট্যাগ পড়ুন';
+
+  @override
+  String get ui3HoldNearNfcTag => 'আপনার ফোনটি সার্ভিস ট্যাগের কাছে ধরুন।';
+
+  @override
+  String get a11yFlashlightOn => 'ফ্ল্যাশলাইট চালু করুন';
+
+  @override
+  String get a11yFlashlightOff => 'ফ্ল্যাশলাইট বন্ধ করুন';
+
+  @override
+  String get ui3SocialGraph => 'সোশ্যাল গ্রাফ';
+
+  @override
+  String get ui3RecommendedConnections => 'প্রস্তাবিত সংযোগ';
+
+  @override
+  String get ui3Portfolio => 'পোর্টফোলিও';
+
+  @override
+  String get ui3Chains => 'চেইন';
+
+  @override
+  String get ui3Tokens => 'টোকেন';
+
+  @override
+  String get ui3NoConnectionsFound => 'কোনো সংযোগ পাওয়া যায়নি';
+
+  @override
+  String get ui3ConnectionsHint =>
+      'আপনার অন-চেইন কার্যকলাপ বাড়ার সাথে সংযোগ দেখা যাবে';
+
+  @override
+  String get ui3SocialGraphLoadFailed => 'সোশ্যাল গ্রাফ লোড করা যায়নি';
+
+  @override
+  String get ui3Similarity => 'সাদৃশ্য';
+
+  @override
+  String get ui3Breakdown => 'বিশ্লেষণ';
+
+  @override
+  String get ui3TokenHoldings => 'টোকেন হোল্ডিং';
+
+  @override
+  String get ui3NftCollections => 'NFT সংগ্রহ';
+
+  @override
+  String get ui3ChainUsage => 'চেইন ব্যবহার';
+
+  @override
+  String get ui3Transactions => 'লেনদেন';
+
+  @override
+  String get ui3DaoMembership => 'DAO সদস্যপদ';
+
+  @override
+  String get ui3NotWeighted => 'ওজনহীন';
+
+  @override
+  String ui3PercentWithWeight(Object percent, Object weight) {
+    return '$percent% (ওজন: $weight)';
+  }
+
+  @override
+  String get ui3CommonOnChainActivity => 'অন-চেইন সাধারণ কার্যকলাপ';
+
+  @override
+  String get ui3SharedTokens => 'সাধারণ টোকেন';
+
+  @override
+  String get ui3SharedNftCollections => 'সাধারণ NFT সংগ্রহ';
+
+  @override
+  String get ui3SharedChains => 'সাধারণ চেইন';
+
+  @override
+  String get ui3NoSharedTokens => 'কোনো সাধারণ টোকেন পাওয়া যায়নি';
+
+  @override
+  String get ui3NoSharedNftCollections =>
+      'কোনো সাধারণ NFT সংগ্রহ পাওয়া যায়নি';
+
+  @override
+  String get ui3NoSharedChains => 'কোনো সাধারণ চেইন পাওয়া যায়নি';
+
+  @override
+  String get ui3SimilarityFailed => 'সাদৃশ্য গণনা করা যায়নি';
+
+  @override
+  String ui3ItemsAndMore(Object items, Object count) {
+    return '$items +আরও $countটি';
+  }
+
+  @override
+  String get a11yGovernance => 'গভর্ন্যান্স';
+
+  @override
+  String get ui3CommunityLink => 'কমিউনিটি লিঙ্ক';
+
+  @override
+  String get ui3CommunityQrCode => 'কমিউনিটি QR কোড';
+
+  @override
+  String get ui3CommunityQrSubtitle =>
+      'এই কমিউনিটিতে যোগ দিতে ও এর চ্যানেলগুলো দেখতে স্ক্যান করুন';
+
+  @override
+  String get ui3CommunityLinkLoadFailed => 'কমিউনিটি লিঙ্ক লোড করা যায়নি';
+
+  @override
+  String get ui3CommunityLinkCopied => 'কমিউনিটি লিঙ্ক কপি হয়েছে';
+
+  @override
+  String ui3KickMemberConfirm(Object name) {
+    return '$name-কে এই কমিউনিটি থেকে সরিয়ে দেওয়া হবে।';
+  }
+
+  @override
+  String ui3BanMemberConfirm(Object name) {
+    return '$name-কে সরিয়ে দেওয়া হবে এবং আর যোগ দিতে পারবেন না।';
+  }
+
+  @override
+  String get ui3SignInToDiscoverChannels =>
+      'সর্বজনীন চ্যানেল খুঁজতে সাইন ইন করুন';
+
+  @override
+  String ui3UnableToJoinChannel(Object name, Object error) {
+    return '$name-এ যোগ দেওয়া যায়নি: $error';
+  }
+
+  @override
+  String get ui3CategoryTech => 'প্রযুক্তি';
+
+  @override
+  String get ui3CategorySocial => 'সামাজিক';
+
+  @override
+  String get ui3NoPublicChannels => 'কোনো সর্বজনীন চ্যানেল পাওয়া যায়নি';
+
+  @override
+  String get ui3StoriesAndFun => 'স্টোরি ও মজা';
+
+  @override
+  String get ui3SearchMusicHint => 'গান, শিল্পী বা বন্ধু খুঁজুন';
+
+  @override
+  String get ui3ForYou => 'আপনার জন্য';
+
+  @override
+  String get ui3Liked => 'পছন্দের';
+
+  @override
+  String get ui3NoLikedMusic => 'এখনো কোনো পছন্দের গান নেই';
+
+  @override
+  String get ui3NoMusicStories => 'এখনো কোনো মিউজিক স্টোরি নেই';
+
+  @override
+  String get ui3LikedMusicHint => 'গানের পাশে হার্টে ট্যাপ করে এখানে রাখুন।';
+
+  @override
+  String get ui3MusicStoriesHint => 'স্টোরিতে শেয়ার করা গান এখানে দেখা যাবে।';
+
+  @override
+  String ui3SharedBy(Object artist, Object name) {
+    return '$artist · শেয়ার করেছেন $name';
+  }
+
+  @override
+  String ui3UnableToPlay(Object title, Object error) {
+    return '$title চালানো যায়নি: $error';
+  }
+
+  @override
+  String get a11yPreviousTrack => 'আগের ট্র্যাক';
+
+  @override
+  String get a11yNextTrack => 'পরের ট্র্যাক';
+
+  @override
+  String get a11yPlay => 'চালান';
+
+  @override
+  String get a11yPause => 'বিরতি';
+
+  @override
+  String get ui3Refresh => 'রিফ্রেশ';
+
+  @override
+  String get ui3NearbyIntroTitle => 'কাছাকাছি সর্বজনীন পোস্ট দেখুন';
+
+  @override
+  String get ui3NearbyIntroBody =>
+      'সর্বজনীন মোমেন্ট সাজাতে আপনার অবস্থান এই ডিভাইসে একবার ব্যবহার করা হয়। এটি আপলোড, সম্প্রচার বা অন্যদের দেখানো হয় না।';
+
+  @override
+  String get ui3UseMyLocation => 'আমার অবস্থান ব্যবহার করুন';
+
+  @override
+  String get ui3NearbyUnavailable => 'কাছাকাছি ফিচারটি উপলব্ধ নয়';
+
+  @override
+  String get ui3NoNearbyPosts => 'কাছাকাছি এখনো কোনো পোস্ট নেই';
+
+  @override
+  String get ui3NoNearbyPostsHint =>
+      'অবস্থানসহ সর্বজনীন মোমেন্ট এখানে দেখা যাবে।';
+
+  @override
+  String get ui3NearbyDistanceNote =>
+      'আনুমানিক দূরত্ব · শুধু সর্বজনীন অবস্থান পোস্ট';
+
+  @override
+  String get ui3PublicLocationPost => 'সর্বজনীন অবস্থান পোস্ট';
+
+  @override
+  String get ui3LocationServicesOff => 'লোকেশন সার্ভিস বন্ধ আছে';
+
+  @override
+  String get ui3LocationPermissionDenied =>
+      'অবস্থানের অনুমতি প্রত্যাখ্যান করা হয়েছে';
+
+  @override
+  String get ui3EnableLocationInSettings =>
+      'সিস্টেম সেটিংসে অবস্থানের অনুমতি চালু করুন';
+
+  @override
+  String get ui3CreateStory => 'স্টোরি তৈরি করুন';
+
+  @override
+  String get ui3CreateStoryDesc => 'টেক্সট বা ছবির স্ট্যাটাস পোস্ট করুন।';
+
+  @override
+  String get ui3StoryCamera => 'স্টোরি ক্যামেরা';
+
+  @override
+  String get ui3StoryCameraDesc => 'সরাসরি ফিল্টার ও ছবি সম্পাদনায় যান।';
+
+  @override
+  String get ui3MomentsDesc => 'পুরো ফিড ও মন্তব্য খুলুন।';
+
+  @override
+  String get ui3MomentCamera => 'মোমেন্ট ক্যামেরা';
+
+  @override
+  String get ui3MomentCameraDesc =>
+      'একটি পোস্ট তৈরি করুন এবং সঙ্গে সঙ্গে মিডিয়া বেছে নিন।';
+
+  @override
+  String get ui3GamesDesc => 'বিল্ট-ইন ক্যাজুয়াল গেম সেন্টার চালু করুন।';
+
+  @override
+  String get ui3AvatarStudio => 'অ্যাভাটার স্টুডিও';
+
+  @override
+  String get ui3AvatarStudioDesc =>
+      'সাজসজ্জা, NFT অ্যাভাটার ও পরিচয়ের স্টাইল।';
+
+  @override
+  String get ui3SocialGraphDesc => 'অন-চেইন ফলো, ফ্যান ও সংযোগ।';
+
+  @override
+  String get ui3SocialHubHeroTitle => 'স্টোরি, মোমেন্ট, গেম ও অ্যাভাটার';
+
+  @override
+  String get ui3SocialHubHeroBody =>
+      'চ্যাট, প্রোফাইল ও ডিসকভারে ছড়িয়ে না রেখে সব সামাজিক ফিচার এক জায়গায়।';
+
+  @override
+  String get ui3SocialGraphNotConfigured =>
+      'এই বিল্ডে সোশ্যাল গ্রাফ কনফিগার করা নেই';
+
+  @override
+  String get ui3ConnectWalletForSocialGraph =>
+      'আপনার সোশ্যাল গ্রাফ দেখতে একটি ওয়ালেট সংযুক্ত করুন';
+
+  @override
+  String get ui3AvatarStudioSignIn =>
+      'অ্যাভাটার স্টুডিও ব্যবহারে সাইন ইন প্রয়োজন';
+
+  @override
+  String get a11yRemoveImage => 'ছবি সরান';
+
+  @override
+  String get a11yBack => 'ফিরে যান';
+
+  @override
+  String get ui3MiniAppConfirmTransactionTitle => 'লেনদেন নিশ্চিত করুন';
+
+  @override
+  String get ui3MiniAppConfirmTransactionBody =>
+      'একটি মিনি অ্যাপ আপনার পক্ষ থেকে একটি লেনদেন পাঠাতে চাইছে।';
+
+  @override
+  String ui3MiniAppOpenTitle(Object name) {
+    return '$name খুলবেন?';
+  }
+
+  @override
+  String get ui3MiniAppOpenButton => 'খুলুন';
+
+  @override
+  String get ui3StoryReplySendFailed => 'স্টোরির উত্তর পাঠানো যায়নি';
+
+  @override
+  String get ui3RedPacketDemoNotice =>
+      'ডেমো রেড প্যাকেট — শুধু চ্যাটের ভেতরের রেকর্ড, কোনো আসল অন-চেইন সম্পদ স্থানান্তরিত হয় না।';
+
+  @override
+  String get ui3RedPacketCoverClassic => 'ক্লাসিক লাল';
+
+  @override
+  String get ui3RedPacketCoverGolden => 'সোনালি';
+
+  @override
+  String get ui3RedPacketCoverPurple => 'বেগুনি';
+
+  @override
+  String get ui3RedPacketCoverOceanBlue => 'সমুদ্র নীল';
+
+  @override
+  String get ui3RedPacketCoverNatureGreen => 'প্রকৃতি সবুজ';
+
+  @override
+  String get ui3RedPacketCoverRosePink => 'গোলাপি';
+
+  @override
+  String get ui3RedPacketHistoryEmpty => 'এখনো কোনো রেড প্যাকেট নেই';
+
+  @override
+  String get ui3TransferMerchantQrWithAmount => 'মার্চেন্ট QR (পরিমাণসহ)';
+
+  @override
+  String get ui3TransferMerchantQrTitle => 'মার্চেন্ট QR';
+
+  @override
+  String get ui3TransferOpenAmountHint => 'যেকোনো পরিমাণের জন্য খালি রাখুন';
+
+  @override
+  String get ui3FiatRampTitle => 'ক্রিপ্টো কিনুন / বিক্রি করুন';
+
+  @override
+  String get ui3FiatRampBuy => 'কিনুন';
+
+  @override
+  String get ui3FiatRampSell => 'বিক্রি করুন';
+
+  @override
+  String get ui3FiatRampNotConfigured =>
+      'ফিয়াট অন/অফ-র‍্যাম্প কনফিগার করা নেই';
+
+  @override
+  String get a11yPointsAddRule => 'পুরস্কারের নিয়ম যোগ করুন';
+
+  @override
+  String get a11yGovernanceRemoveChoice => 'বিকল্প সরান';
+
+  @override
+  String get a11yGovernanceCreateProposal => 'প্রস্তাব তৈরি করুন';
+
+  @override
+  String get ui3MiniAppUpdateN42 => 'N42 আপডেট করুন';
+
+  @override
+  String get ui3MiniAppOfficial => 'অফিসিয়াল';
+
+  @override
+  String ui3MiniAppUserCount(Object count) {
+    return '$count জন ব্যবহারকারী';
+  }
+
+  @override
+  String a11yStoryBackgroundColor(Object index) {
+    return 'ব্যাকগ্রাউন্ড রং $index';
+  }
+
+  @override
+  String get a11yStoryAdd => 'স্টোরি যোগ করুন';
+
+  @override
+  String get ui3StoryPostFailed => 'স্টোরি পোস্ট করা যায়নি';
+
+  @override
+  String get ui3StoryTapToSelectImage => 'ছবি নির্বাচন করতে ট্যাপ করুন';
+
+  @override
+  String get ui3StoryChangeImage => 'বদলান';
+
+  @override
+  String ui3StoryMusicReadFailed(Object error) {
+    return 'নির্বাচিত মিউজিক পড়া যায়নি: $error';
+  }
+
+  @override
+  String get ui3StoryDeleteConfirm => 'এই স্টোরিটি মুছবেন?';
+
+  @override
+  String get ui3StoryDeleteFailed => 'স্টোরি মোছা যায়নি';
+
+  @override
+  String get ui3MomentCreateTitle => 'মুহূর্ত তৈরি করুন';
+
+  @override
+  String get ui3MomentContentHint => 'আপনি কী ভাবছেন?';
+
+  @override
+  String get ui3MomentAddPhotos => 'ছবি যোগ করুন';
+
+  @override
+  String get ui3MomentAddLocation => 'লোকেশন যোগ করুন';
+
+  @override
+  String ui3MomentSelectedMedia(Object count) {
+    return 'নির্বাচিত মিডিয়া ($count)';
+  }
+
+  @override
+  String get ui3MomentClearAll => 'সব মুছুন';
+
+  @override
+  String get ui3MomentClearMediaConfirm => 'নির্বাচিত সব ছবি/ভিডিও সরাবেন?';
+
+  @override
+  String get ui3MomentVisibilityPublicDesc => 'সব বন্ধু দেখতে পারবে';
+
+  @override
+  String get ui3MomentVisibilityPrivateDesc => 'শুধু আপনি দেখতে পারবেন';
+
+  @override
+  String get ui3MomentVisibilityPartialDesc => 'কারা দেখতে পারবে বেছে নিন';
+
+  @override
+  String get ui3MomentVisibilityExcludedDesc => 'নির্দিষ্ট বন্ধুদের থেকে লুকান';
+
+  @override
+  String get ui3MomentVideos => 'ভিডিও';
+
+  @override
+  String get ui3MomentNoVideos => 'এখনও কোনো ভিডিও নেই';
+
+  @override
+  String get a11yCallMinimize => 'ছোট করুন';
+
+  @override
+  String get a11yCallGridView => 'গ্রিড ভিউ';
+
+  @override
+  String get a11yCallFocusView => 'ফোকাস ভিউ';
+
+  @override
+  String get ui3CallTools => 'কল টুল';
+
+  @override
+  String get ui3CallMeetingTools => 'মিটিং টুল';
+
+  @override
+  String get ui3CallToolsSubtitle => 'কল না ছেড়েই অডিও ও ভিডিওর মান ঠিক করুন।';
+
+  @override
+  String get ui3CallAudioEnhancement => 'অডিও উন্নতকরণ';
+
+  @override
+  String get ui3CallNoiseSuppression => 'নয়েজ কমানো';
+
+  @override
+  String get ui3CallNoiseSuppressionDesc => 'কিবোর্ড ও পটভূমির আওয়াজ কমায়।';
+
+  @override
+  String get ui3CallEchoCancellation => 'প্রতিধ্বনি বাতিল';
+
+  @override
+  String get ui3CallEchoCancellationDesc =>
+      'স্পিকারের শব্দ মাইকে ফিরে আসা রোধ করে।';
+
+  @override
+  String get ui3CallAutoGainControl => 'স্বয়ংক্রিয় গেইন নিয়ন্ত্রণ';
+
+  @override
+  String get ui3CallAutoGainControlDesc =>
+      'মাইক্রোফোনের ভলিউম আরও স্থিতিশীল রাখে।';
+
+  @override
+  String get ui3CallVoiceIsolation => 'উন্নত ভয়েস আইসোলেশন';
+
+  @override
+  String get ui3CallVoiceIsolationDesc =>
+      'আরও শক্তিশালী নয়েজ রিডাকশন প্রোফাইল ব্যবহার করুন।';
+
+  @override
+  String get ui3CallVideoSection => 'ভিডিও';
+
+  @override
+  String get ui3CallBackgroundBlur => 'ব্যাকগ্রাউন্ড ঝাপসা (বিটা)';
+
+  @override
+  String get ui3CallBlurDescReady =>
+      'পছন্দটি চালু হয়েছে। আসল ঝাপসা প্রভাব ভিডিও প্রসেসর চালু হওয়ার ওপর নির্ভর করে।';
+
+  @override
+  String get ui3CallBlurDescSaved =>
+      'ঝাপসা করার পছন্দ সংরক্ষিত হয়েছে, ক্যামেরা প্রসেসিং উপলব্ধ হলে প্রযোজ্য হবে।';
+
+  @override
+  String get ui3CallBlurDescCameraOff =>
+      'ব্যাকগ্রাউন্ড প্রসেসিং উপলব্ধ হলে ক্যামেরা চালু করুন।';
+
+  @override
+  String get ui3CallRecordingSection => 'রেকর্ডিং';
+
+  @override
+  String get ui3CallRecordingDesc =>
+      'রেকর্ডিং সংরক্ষণের আগে সার্ভার-সাইড এগ্রেস প্রয়োজন।';
+
+  @override
+  String ui3CallSettingsUpdateFailed(Object error) {
+    return 'কল সেটিংস আপডেট করা যায়নি: $error';
+  }
+
+  @override
+  String get ui3CallRecordingStarted => 'রেকর্ডিং শুরু হয়েছে';
+
+  @override
+  String get ui3VoiceRoomNotFound => 'রুম পাওয়া যায়নি';
+
+  @override
+  String get ui3VoiceRoomEndConfirm =>
+      'আপনি কি নিশ্চিত যে এই ভয়েস রুমটি শেষ করতে চান?';
+
+  @override
+  String get a11yGameMoveUp => 'উপরে সরান';
+
+  @override
+  String get a11yGameMoveDown => 'নিচে সরান';
+
+  @override
+  String get a11yGameMoveLeft => 'বাঁয়ে সরান';
+
+  @override
+  String get a11yGameMoveRight => 'ডানে সরান';
+
+  @override
+  String get a11yGameRotate => 'ঘোরান';
+
+  @override
+  String get a11yGameDrop => 'নামান';
+
+  @override
+  String ui3StickerAddedCount(Object count) {
+    return '$countটি স্টিকার যোগ করা হয়েছে';
+  }
+
+  @override
+  String ui3StickerAddFailed(Object error) {
+    return 'যোগ করা যায়নি: $error';
+  }
+
+  @override
+  String get ui3StickerRemoveTitle => 'স্টিকার সরান';
+
+  @override
+  String get ui3StickerRemoveConfirm => 'প্যাক থেকে এই স্টিকারটি সরাবেন?';
+
+  @override
+  String get ui3StickerRemoveFailed => 'সরানো যায়নি';
+
+  @override
+  String get ui3StickerRenamePack => 'প্যাকের নাম বদলান';
+
+  @override
+  String get ui3StickerPackName => 'প্যাকের নাম';
+
+  @override
+  String get ui3StickerRenameFailed => 'নাম বদলানো যায়নি';
+
+  @override
+  String get ui3StickerDeletePack => 'প্যাক মুছুন';
+
+  @override
+  String get ui3StickerThisPack => 'এই প্যাক';
+
+  @override
+  String ui3StickerDeletePackConfirm(Object name) {
+    return '\"$name\" এবং এর সব স্টিকার মুছবেন? এটি আর ফেরানো যাবে না।';
+  }
+
+  @override
+  String get ui3StickerDeleteFailed => 'মোছা যায়নি';
+
+  @override
+  String get ui3StickerPack => 'স্টিকার প্যাক';
+
+  @override
+  String get ui3StickerAdding => 'যোগ করা হচ্ছে…';
+
+  @override
+  String get ui3StickerAddStickers => 'স্টিকার যোগ করুন';
+
+  @override
+  String get ui3StickerPackNotFound => 'প্যাক পাওয়া যায়নি';
+
+  @override
+  String get ui3StickerEmptyHint =>
+      'ছবি আপলোড করতে \"স্টিকার যোগ করুন\"-এ ট্যাপ করুন';
+
+  @override
+  String get ui3StickerNewPack => 'নতুন স্টিকার প্যাক';
+
+  @override
+  String get ui3StickerCreate => 'তৈরি করুন';
+
+  @override
+  String get ui3StickerCreateFailed => 'প্যাক তৈরি করা যায়নি';
+
+  @override
+  String ui3StickerInstalled(Object name) {
+    return '\"$name\" যোগ করা হয়েছে';
+  }
+
+  @override
+  String get ui3StickerRemovePackTitle => 'স্টিকার প্যাক সরান';
+
+  @override
+  String ui3StickerRemovePackConfirm(Object name) {
+    return 'আপনার স্টিকার থেকে \"$name\" সরাবেন?';
+  }
+
+  @override
+  String ui3StickerRemoved(Object name) {
+    return '\"$name\" সরানো হয়েছে';
+  }
+
+  @override
+  String get ui3StickerAiSticker => 'AI স্টিকার';
+
+  @override
+  String get ui3StickerStoreTab => 'স্টোর';
+
+  @override
+  String get ui3StickerMyStickersTab => 'আমার স্টিকার';
+
+  @override
+  String get ui3StickerNoneFound => 'কোনো স্টিকার পাওয়া যায়নি';
+
+  @override
+  String ui3StickerByAuthor(Object author) {
+    return 'নির্মাতা: $author';
+  }
+
+  @override
+  String get ui3StickerManage => 'পরিচালনা করুন';
+
+  @override
+  String ui3StickerCount(Object count) {
+    return '$countটি স্টিকার';
+  }
+
+  @override
+  String get ui3StickerNoneInstalled => 'কোনো স্টিকার ইনস্টল করা নেই';
+
+  @override
+  String get ui3StickerGetFromStore => 'স্টোর থেকে স্টিকার নিন';
+
+  @override
+  String get ui3StickerBrowseStore => 'স্টোর ঘুরে দেখুন';
+
+  @override
+  String get ui3StickerAddedToAi => '\"AI স্টিকার\"-এ যোগ করা হয়েছে';
+
+  @override
+  String get ui3StickerAddOneFailed => 'স্টিকার যোগ করা যায়নি';
+
+  @override
+  String get ui3StickerPromptLabel => 'আপনার স্টিকারের বর্ণনা দিন';
+
+  @override
+  String get ui3StickerPromptHint => 'যেমন: সানগ্লাস পরা একটি খুশি কমলা বিড়াল';
+
+  @override
+  String get ui3StickerGenerating => 'তৈরি করা হচ্ছে…';
+
+  @override
+  String get ui3StickerGenerate => 'তৈরি করুন';
+
+  @override
+  String get ui3StickerAddToStickers => 'স্টিকারে যোগ করুন';
+
+  @override
+  String get ui3StickerGeneratingPreview => 'আপনার স্টিকার তৈরি হচ্ছে…';
+
+  @override
+  String get ui3StickerGenerateEmpty =>
+      'একটি স্টিকারের বর্ণনা দিন এবং \"তৈরি করুন\" ট্যাপ করুন';
 }

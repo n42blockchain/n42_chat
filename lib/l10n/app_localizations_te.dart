@@ -6417,4 +6417,2010 @@ class STe extends S {
   String scheduledSendTomorrowMorningAt(String time) {
     return 'రేపు ఉదయం ($time)';
   }
+
+  @override
+  String get a11yScrollToBottom => 'కిందికి స్క్రోల్ చేయండి';
+
+  @override
+  String get ui3EnterMessageBeforeScheduling =>
+      'షెడ్యూల్ చేసే ముందు సందేశాన్ని నమోదు చేయండి';
+
+  @override
+  String get ui3SendCode => 'కోడ్ పంపండి';
+
+  @override
+  String get ui3CodeLanguage => 'భాష';
+
+  @override
+  String get ui3PasteCodeHere => 'కోడ్‌ను ఇక్కడ అతికించండి';
+
+  @override
+  String ui3ReminderSetAt(String time) {
+    return 'రిమైండర్ సెట్ చేయబడింది · $time';
+  }
+
+  @override
+  String get ui3RedPacketCreateFailed =>
+      'రెడ్ ప్యాకెట్‌ను సృష్టించడం విఫలమైంది';
+
+  @override
+  String get ui3SendTip => 'టిప్ పంపండి';
+
+  @override
+  String get ui3TokenLabel => 'టోకెన్';
+
+  @override
+  String get ui3NoteOptional => 'గమనిక (ఐచ్ఛికం)';
+
+  @override
+  String ui3TipFailed(String error) {
+    return 'టిప్ విఫలమైంది: $error';
+  }
+
+  @override
+  String get ui3GiftNftTitle => 'NFT బహుమతిగా ఇవ్వండి';
+
+  @override
+  String get ui3TokenId => 'టోకెన్ ID';
+
+  @override
+  String ui3NftGiftFailed(String error) {
+    return 'NFT బహుమతి విఫలమైంది: $error';
+  }
+
+  @override
+  String get ui3AiAgentSubtitle =>
+      'ఒక పనిని వివరించండి, సరైన మినీ యాప్‌ను తెరవండి';
+
+  @override
+  String get ui3GiftNft => 'NFT బహుమతి';
+
+  @override
+  String get ui3GiftNftSubtitle => 'ఈ పరిచయానికి NFT పంపండి';
+
+  @override
+  String get ui3MiniAppUnavailable => 'మినీ యాప్ అందుబాటులో లేదు';
+
+  @override
+  String ui3MediaItemsNotSent(int count) {
+    return 'ఎంచుకున్న $count మీడియా అంశాలను పంపడం సాధ్యం కాలేదు';
+  }
+
+  @override
+  String get ui3PhotosSubtitle =>
+      'చాట్‌కు అనువైన ఫార్మాట్‌లో ఫోటోలు, వీడియోలు పంపండి';
+
+  @override
+  String get ui3OriginalImages => 'అసలు చిత్రాలు';
+
+  @override
+  String get ui3OriginalImagesSubtitle =>
+      'కంప్రెస్ చేయని ఫోటోలను ఫైల్‌లుగా పంపండి';
+
+  @override
+  String ui3ScheduledFileFor(String filename, String time) {
+    return '$filename $timeకి షెడ్యూల్ చేయబడింది';
+  }
+
+  @override
+  String ui3SendingOriginalImage(String filename) {
+    return 'అసలు చిత్రాన్ని పంపుతోంది: $filename';
+  }
+
+  @override
+  String ui3ScheduledOriginalImage(String filename) {
+    return 'అసలు చిత్రం షెడ్యూల్ చేయబడింది: $filename';
+  }
+
+  @override
+  String get ui3PaymentAlreadySent => 'చెల్లింపు ఇప్పటికే పంపబడింది';
+
+  @override
+  String get ui3PaymentProcessing => 'చెల్లింపు ప్రాసెస్ అవుతోంది';
+
+  @override
+  String ui3ChainStatus(String status) {
+    return 'చైన్ స్థితి: $status';
+  }
+
+  @override
+  String get ui3NotChecked => 'తనిఖీ చేయలేదు';
+
+  @override
+  String ui3ConfirmationsCount(int confirmations, int required) {
+    return 'నిర్ధారించబడింది: $confirmations / $required బ్లాక్‌లు';
+  }
+
+  @override
+  String get ui3CopyTxHash => 'లావాదేవీ హ్యాష్‌ను కాపీ చేయండి';
+
+  @override
+  String get ui3VerifyAgain => 'మళ్లీ ధృవీకరించండి';
+
+  @override
+  String get ui3VerifyOnChain => 'చైన్‌లో ధృవీకరించండి';
+
+  @override
+  String get ui3TransferMissingChainDetails =>
+      'ఈ బదిలీలో ఖచ్చితమైన చైన్, ఆస్తి వివరాలు లేవు.';
+
+  @override
+  String get ui3ReceiptPending => 'చైన్‌లో పెండింగ్‌లో ఉంది';
+
+  @override
+  String get ui3ReceiptConfirmed => 'నిర్ధారించబడింది';
+
+  @override
+  String get ui3ReceiptFailed => 'చైన్‌లో విఫలమైంది';
+
+  @override
+  String get ui3ReceiptMismatch => 'లావాదేవీ వివరాలు సరిపోలడం లేదు';
+
+  @override
+  String get ui3ReceiptUnsupported => 'చైన్ ధృవీకరణకు మద్దతు లేదు';
+
+  @override
+  String get ui3ReceiptUnavailable => 'ధృవీకరణ అందుబాటులో లేదు';
+
+  @override
+  String get ui3OpenOrSave => 'తెరువు / సేవ్ చేయి';
+
+  @override
+  String get ui3UnableToOpenFile => 'ఈ ఫైల్‌ను తెరవడం సాధ్యం కాలేదు.';
+
+  @override
+  String ui3AiRewriteFailed(String error) {
+    return 'AI తిరిగి రాయడం విఫలమైంది: $error';
+  }
+
+  @override
+  String get ui3AiShareMessagesTitle => 'AIతో సందేశాలను షేర్ చేయాలా?';
+
+  @override
+  String get ui3AiShareMessagesBody =>
+      'ఈ ప్రత్యుత్తరం కోసం AI ఉపయోగించగల సందేశాలను ఎంచుకోండి. ఈ ఒక్కసారి అనుమతి రెండు నిమిషాల తర్వాత గడువు ముగుస్తుంది. క్విక్ రిప్లైని మూసివేస్తే పెండింగ్ ఫలితాలు రద్దవుతాయి. ఇది చెల్లింపులు లేదా ఎగుమతులను అనుమతించదు.';
+
+  @override
+  String get ui3OtherParticipant => 'అవతలి వ్యక్తి';
+
+  @override
+  String get ui3ShareSelected => 'ఎంచుకున్నవి షేర్ చేయండి';
+
+  @override
+  String get ui3BotCommandError => 'కమాండ్ లోపం';
+
+  @override
+  String get ui3BotUnknownCommand => 'తెలియని కమాండ్';
+
+  @override
+  String get ui3BotTypeHelp =>
+      'అందుబాటులో ఉన్న కమాండ్‌లను చూడటానికి /help టైప్ చేయండి.';
+
+  @override
+  String get ui3FilesMediaLinks => 'ఫైల్‌లు, మీడియా & లింక్‌లు';
+
+  @override
+  String get ui3ChatStorage => 'చాట్ నిల్వ';
+
+  @override
+  String get ui3EncryptionKeysDevices => 'ఎన్‌క్రిప్షన్ కీలు & పరికరాలు';
+
+  @override
+  String get ui3EncryptionServiceUnavailable =>
+      'ఎన్‌క్రిప్షన్ సేవ ఇంకా అందుబాటులో లేదు';
+
+  @override
+  String get ui3ExportLoadingHistory =>
+      'ఎగుమతి కోసం మరింత చాట్ చరిత్రను లోడ్ చేస్తోంది...';
+
+  @override
+  String get ui3ExportTxtDesc =>
+      'గమనికలు, బ్యాకప్ లేదా సమ్మతి సమీక్ష కోసం సాదా టెక్స్ట్ ట్రాన్స్‌క్రిప్ట్';
+
+  @override
+  String get ui3ExportCustomRange => 'అనుకూల పరిధి';
+
+  @override
+  String get ui3ExportStart => 'ప్రారంభం';
+
+  @override
+  String get ui3ExportEnd => 'ముగింపు';
+
+  @override
+  String get ui3ExportSelectDate => 'తేదీని ఎంచుకోండి';
+
+  @override
+  String get ui3FolderFilterUnreadOnly => 'చదవనివి మాత్రమే';
+
+  @override
+  String get ui3FolderFilterMutedOnly => 'మ్యూట్ చేసినవి మాత్రమే';
+
+  @override
+  String get ui3FolderFilterNoDms => 'ప్రత్యక్ష సందేశాలు మినహా';
+
+  @override
+  String get ui3FolderFilterNoGroups => 'గ్రూప్‌లు మినహా';
+
+  @override
+  String get ui3FolderFilterNoChannels => 'ఛానెల్‌లు మినహా';
+
+  @override
+  String get ui3FolderFilterAllChats => 'అన్ని చాట్‌లు';
+
+  @override
+  String get ui3Create => 'సృష్టించు';
+
+  @override
+  String ui3DeleteFolderConfirm(String name) {
+    return '\"$name\" ఫోల్డర్‌ను తొలగించాలా?';
+  }
+
+  @override
+  String get a11yDecreaseTextSize => 'టెక్స్ట్ పరిమాణం తగ్గించండి';
+
+  @override
+  String get a11yIncreaseTextSize => 'టెక్స్ట్ పరిమాణం పెంచండి';
+
+  @override
+  String ui3MinutesRead(int minutes) {
+    return '$minutes నిమిషాల పఠనం';
+  }
+
+  @override
+  String get ui3TipOnChain => 'ఆన్-చైన్ ✓';
+
+  @override
+  String get ui3ViewSource => 'సోర్స్ చూడండి';
+
+  @override
+  String get a11yPreviousPage => 'మునుపటి పేజీ';
+
+  @override
+  String get a11yNextPage => 'తదుపరి పేజీ';
+
+  @override
+  String get ui3OpenExternalLinkTitle => 'బాహ్య లింక్‌ను తెరవాలా?';
+
+  @override
+  String get ui3Open => 'తెరువు';
+
+  @override
+  String get ui3UnableToOpenLink => 'ఈ లింక్‌ను తెరవడం సాధ్యం కాలేదు.';
+
+  @override
+  String get ui3ImageUnavailable => 'చిత్రం అందుబాటులో లేదు';
+
+  @override
+  String ui3LoadImageFrom(Object host) {
+    return '$host నుండి చిత్రాన్ని లోడ్ చేయండి';
+  }
+
+  @override
+  String ui3RetryImageFrom(Object host) {
+    return '$host నుండి చిత్రాన్ని మళ్లీ లోడ్ చేయండి';
+  }
+
+  @override
+  String get ui3TranslatedByN42 => 'N42 ద్వారా అనువదించబడింది';
+
+  @override
+  String ui3TranslatedFromByN42(Object language) {
+    return 'N42 ద్వారా $language నుండి అనువదించబడింది';
+  }
+
+  @override
+  String get ui3ClearWhiteboardTitle => 'వైట్‌బోర్డ్‌ను క్లియర్ చేయాలా?';
+
+  @override
+  String get ui3ClearWhiteboardMessage =>
+      'అందరికీ అన్ని గీతలు తీసివేయబడతాయి. దీన్ని రద్దు చేయలేరు.';
+
+  @override
+  String get ui3WhiteboardLive => 'వైట్‌బోర్డ్ · లైవ్';
+
+  @override
+  String get a11yPenColor => 'పెన్ రంగు';
+
+  @override
+  String get ui3AiDescribeOcr => 'AI వివరణ / OCR';
+
+  @override
+  String get ui3DocumentPreviewFailed =>
+      'ఈ పత్రాన్ని సురక్షితంగా ప్రివ్యూ చేయడం సాధ్యం కాలేదు. కనెక్షన్, ఫైల్ పరిమాణాన్ని తనిఖీ చేయండి (గరిష్ఠం 2MB).';
+
+  @override
+  String get ui3AiConsentMessage =>
+      'ఈ సారాంశం కోసం AI ఉపయోగించగల సందేశాలను ఎంచుకోండి. ఈ ఒక్కసారి అనుమతి రెండు నిమిషాల తర్వాత గడువు ముగుస్తుంది. ఇది చెల్లింపులు లేదా ఎగుమతులను అనుమతించదు.';
+
+  @override
+  String get ui3AiSuggestedReplies => 'సూచించిన ప్రత్యుత్తరాలు';
+
+  @override
+  String get ui3AiGeneratingSuggestions => 'సూచనలను రూపొందిస్తోంది...';
+
+  @override
+  String get ui3StickersEmpty => 'ఇంకా స్టిక్కర్‌లు లేవు';
+
+  @override
+  String get ui3StickersGet => 'స్టిక్కర్‌లను పొందండి';
+
+  @override
+  String get a11yFormatBold => 'బోల్డ్';
+
+  @override
+  String get a11yFormatItalic => 'ఇటాలిక్';
+
+  @override
+  String get a11yFormatStrikethrough => 'స్ట్రైక్‌త్రూ';
+
+  @override
+  String get a11yFormatInlineCode => 'ఇన్‌లైన్ కోడ్';
+
+  @override
+  String get a11yFormatCodeBlock => 'కోడ్ బ్లాక్';
+
+  @override
+  String get a11yFormatChecklistItem => 'చెక్‌లిస్ట్ అంశం';
+
+  @override
+  String get a11yFormatBulletList => 'బుల్లెట్ జాబితా';
+
+  @override
+  String get a11yFormatNumberedList => 'సంఖ్యల జాబితా';
+
+  @override
+  String get a11yFormatLink => 'లింక్';
+
+  @override
+  String get a11yFormatTable => 'పట్టిక';
+
+  @override
+  String get a11yFormatMeetingTemplate => 'మీటింగ్ టెంప్లేట్';
+
+  @override
+  String get a11yEmojiSmileys => 'స్మైలీలు & వ్యక్తులు';
+
+  @override
+  String get a11yEmojiHearts => 'హృదయాలు';
+
+  @override
+  String get a11yEmojiAnimals => 'జంతువులు & ప్రకృతి';
+
+  @override
+  String get a11yEmojiFood => 'ఆహారం & పానీయాలు';
+
+  @override
+  String get a11yEmojiTravel => 'ప్రయాణం & ప్రదేశాలు';
+
+  @override
+  String get a11yEmojiActivities => 'కార్యకలాపాలు';
+
+  @override
+  String get a11yEmojiObjects => 'వస్తువులు';
+
+  @override
+  String get a11yEmojiSymbols => 'చిహ్నాలు';
+
+  @override
+  String get ui3FrequentlyUsed => 'తరచుగా ఉపయోగించినవి';
+
+  @override
+  String get ui3NoEditHistory => 'సవరణ చరిత్ర లేదు';
+
+  @override
+  String get ui3EventNew => 'కొత్త ఈవెంట్';
+
+  @override
+  String get ui3EventTitleLabel => 'శీర్షిక';
+
+  @override
+  String get ui3EventLocationOptional => 'స్థానం (ఐచ్ఛికం)';
+
+  @override
+  String get ui3EventDescriptionOptional => 'వివరణ (ఐచ్ఛికం)';
+
+  @override
+  String get ui3EventSend => 'ఈవెంట్ పంపండి';
+
+  @override
+  String get ui3EventTitleRequired => 'శీర్షిక అవసరం';
+
+  @override
+  String get ui3EventEndAfterStart => 'ముగింపు సమయం ప్రారంభం తర్వాత ఉండాలి';
+
+  @override
+  String get ui3MiniAppAgentIntro =>
+      'మీరు ఏం చేయాలనుకుంటున్నారో వివరించండి — సరైన మినీ యాప్‌ను తెరుస్తాను.';
+
+  @override
+  String get ui3MiniAppAgentExample => 'ఉదా. ETHని USDCకి స్వాప్ చేయండి';
+
+  @override
+  String get ui3MiniAppAgentNoMatch =>
+      'సరిపోలే మినీ యాప్ కనుగొనబడలేదు. వేరే విధంగా చెప్పి చూడండి.';
+
+  @override
+  String ui3MiniAppOpen(Object appName) {
+    return '$appName తెరవండి';
+  }
+
+  @override
+  String get ui3MusicLinkPlatforms =>
+      'NetEase Cloud Music, QQ Music, Kugou, Kuwo మరియు మరిన్నింటి పాటల లింక్‌లకు మద్దతు ఉంది';
+
+  @override
+  String get ui3PollMarkCorrectAnswer =>
+      'ఖాళీ కాని సరైన సమాధానాన్ని గుర్తించండి';
+
+  @override
+  String get ui3PollQuizMode => 'క్విజ్ మోడ్';
+
+  @override
+  String get ui3PollAnswerExplanationHint => 'సమాధాన వివరణ (ఐచ్ఛికం)';
+
+  @override
+  String get a11yCorrectAnswer => 'సరైన సమాధానం';
+
+  @override
+  String get ui3AiSuggestions => 'AI సూచనలు';
+
+  @override
+  String get a11yPaste => 'అతికించండి';
+
+  @override
+  String get a11yRefresh => 'రిఫ్రెష్ చేయండి';
+
+  @override
+  String get ui3RecoveryKeyStoreWarning =>
+      'ఈ కీని సురక్షితంగా భద్రపరచండి. అన్ని పరికరాలకు యాక్సెస్ కోల్పోతే, మీ ఎన్‌క్రిప్ట్ చేసిన సందేశాలను తిరిగి పొందడానికి ఇదే ఏకైక మార్గం.';
+
+  @override
+  String ui3SavedToPath(Object path) {
+    return 'సేవ్ చేయబడింది: $path';
+  }
+
+  @override
+  String get ui3UnknownAccount => 'తెలియని ఖాతా';
+
+  @override
+  String get ui3UnknownHomeserver => 'తెలియని హోమ్‌సర్వర్';
+
+  @override
+  String get ui3ImportRecoveryKey => 'రికవరీ కీని దిగుమతి చేయండి';
+
+  @override
+  String get ui3ImportRecoveryKeyDesc =>
+      'ఎన్‌క్రిప్ట్ చేసిన సందేశ చరిత్రకు రూమ్ కీలను పునరుద్ధరించడానికి మీ రికవరీ కీని నమోదు చేయండి లేదా అతికించండి.';
+
+  @override
+  String ui3RecoveryKeyAccountInfo(Object account, Object homeserver) {
+    return 'ఖాతా: $account\\nహోమ్‌సర్వర్: $homeserver';
+  }
+
+  @override
+  String get ui3Import => 'దిగుమతి చేయండి';
+
+  @override
+  String get ui3InvalidRecoveryKeyFormat => 'రికవరీ కీ ఫార్మాట్ చెల్లదు';
+
+  @override
+  String ui3RecoveryKeyPartialRestore(
+    Object restored,
+    Object total,
+    Object failed,
+  ) {
+    return '$total కీలలో $restored పునరుద్ధరించబడ్డాయి. $failed కీలు విఫలమయ్యాయి. ఖాతా, నెట్‌వర్క్, బ్యాకప్‌ను తనిఖీ చేసి మళ్లీ ప్రయత్నించండి. కొంత చరిత్ర చదవలేనిదిగా ఉండిపోవచ్చు.';
+  }
+
+  @override
+  String ui3RecoveryKeyRestoreSuccess(Object restored, Object total) {
+    return '$total కీలలో $restored విజయవంతంగా పునరుద్ధరించబడ్డాయి';
+  }
+
+  @override
+  String ui3ImportFailed(Object error) {
+    return 'దిగుమతి విఫలమైంది: $error';
+  }
+
+  @override
+  String ui3PasskeyRegistrationFailed(Object error) {
+    return 'పాస్‌కీ నమోదు విఫలమైంది: $error';
+  }
+
+  @override
+  String get ui3PasskeyDefaultName => 'నా పాస్‌కీ';
+
+  @override
+  String get ui3PasskeyNameHint => 'ఉదా. iPhone, MacBook';
+
+  @override
+  String get ui3PasskeyDeleteFailed => 'పాస్‌కీని తొలగించడం విఫలమైంది';
+
+  @override
+  String get ui3TwoFactorAuth => 'రెండు-దశల ప్రమాణీకరణ';
+
+  @override
+  String get ui3TwoFactorOnSubtitle => 'ఆన్ — ప్రమాణీకరణ యాప్ కోడ్ అవసరం';
+
+  @override
+  String get ui3TwoFactorOffSubtitle =>
+      'ఆఫ్ — ప్రమాణీకరణ యాప్‌తో (TOTP) రక్షించండి';
+
+  @override
+  String get ui3ShowRecoveryKey => 'రికవరీ కీని చూపించు';
+
+  @override
+  String get ui3ShowRecoveryKeyDesc =>
+      'బ్యాకప్ కోసం మీ రికవరీ కీని ప్రదర్శించండి';
+
+  @override
+  String get ui3ImportRecoveryKeyHint =>
+      'రికవరీ కీతో సందేశాలను పునరుద్ధరించండి';
+
+  @override
+  String get ui3RecoveryKeyCreateFailed => 'రికవరీ కీని సృష్టించడం విఫలమైంది';
+
+  @override
+  String get ui3TotpIncorrectCode => 'తప్పు కోడ్, మళ్లీ ప్రయత్నించండి';
+
+  @override
+  String get ui3TwoFactorEnabled => 'రెండు-దశల ప్రమాణీకరణ ప్రారంభించబడింది';
+
+  @override
+  String get ui3TwoFactorDisabled => 'రెండు-దశల ప్రమాణీకరణ నిలిపివేయబడింది';
+
+  @override
+  String get ui3TwoFactorTurnOffTitle => 'రెండు-దశల ప్రమాణీకరణను ఆఫ్ చేయాలా?';
+
+  @override
+  String get ui3TwoFactorTurnOffMessage =>
+      'మీ ప్రమాణీకరణ యాప్ ఇకపై అవసరం ఉండదు. తర్వాత కొత్త కీతో మళ్లీ సెటప్ చేయవచ్చు.';
+
+  @override
+  String get ui3TurnOff => 'ఆఫ్ చేయండి';
+
+  @override
+  String get ui3TwoFactorTotpTitle => 'రెండు-దశలు (TOTP)';
+
+  @override
+  String get ui3TwoFactorIsOn => 'రెండు-దశల ప్రమాణీకరణ ఆన్‌లో ఉంది';
+
+  @override
+  String get ui3TwoFactorCodeRequired => 'మీ ప్రమాణీకరణ యాప్ నుండి కోడ్ అవసరం.';
+
+  @override
+  String get ui3TotpStepScan =>
+      '1. ఈ QRని ప్రమాణీకరణ యాప్‌తో (Google Authenticator, Authy, 1Password…) స్కాన్ చేయండి, లేదా కీని మాన్యువల్‌గా నమోదు చేయండి.';
+
+  @override
+  String get ui3TotpKeyCopied => 'కీ కాపీ చేయబడింది';
+
+  @override
+  String get ui3TotpStepConfirm =>
+      '2. నిర్ధారించడానికి 6 అంకెల కోడ్‌ను నమోదు చేయండి.';
+
+  @override
+  String get ui3Enable => 'ప్రారంభించండి';
+
+  @override
+  String get ui3BackupSettingsDesc =>
+      'మీ స్థానిక చాట్ సెట్టింగ్‌లను బ్యాకప్ చేయండి. మళ్లీ లాగిన్ అయిన తర్వాత సందేశాలు సర్వర్ నుండి పునరుద్ధరించబడతాయి.';
+
+  @override
+  String get ui3BackupKeysSeparate =>
+      'ఎన్‌క్రిప్షన్ కీలు విడిగా నిర్వహించబడతాయి';
+
+  @override
+  String get ui3BackupKeysSeparateHint =>
+      'ఎన్‌క్రిప్ట్ చేసిన సందేశాల యాక్సెస్‌ను బ్యాకప్ చేయడానికి భద్రత > రికవరీ కీని ఉపయోగించండి.';
+
+  @override
+  String ui3BackupRoomsSize(Object rooms, Object size) {
+    return '$rooms రూమ్‌లు  $size';
+  }
+
+  @override
+  String get ui3BackupRestoreFromFileDesc =>
+      'మరొక పరికరం లేదా మునుపటి బ్యాకప్ నుండి .n42backup ఫైల్‌ను దిగుమతి చేయండి. ఎన్‌క్రిప్షన్ కీలు మీ రికవరీ కీతో విడిగా పునరుద్ధరించబడతాయి.';
+
+  @override
+  String get ui3UsernameSessionRequired => 'యూజర్‌నేమ్‌కు సక్రియ సెషన్ అవసరం';
+
+  @override
+  String get ui3SecuritySessionRequired =>
+      'భద్రతా సెట్టింగ్‌లకు సక్రియ సెషన్ అవసరం';
+
+  @override
+  String get ui3ConnectedAccountsSessionRequired =>
+      'కనెక్ట్ చేసిన ఖాతాలకు సక్రియ సెషన్ అవసరం';
+
+  @override
+  String get ui3SystemAccounts => 'సిస్టమ్ & ఖాతాలు';
+
+  @override
+  String get ui3AccountIdentity => 'ఖాతా & గుర్తింపు';
+
+  @override
+  String get ui3Accounts => 'ఖాతాలు';
+
+  @override
+  String get ui3DevicesSessions => 'పరికరాలు & సెషన్‌లు';
+
+  @override
+  String get ui3Integrations => 'ఇంటిగ్రేషన్‌లు';
+
+  @override
+  String get ui3ConnectedAccounts => 'కనెక్ట్ చేసిన ఖాతాలు';
+
+  @override
+  String get ui3ConnectedAccountsDesc =>
+      'Telegram, WhatsApp, Discord మరియు API బ్రిడ్జ్ ఇంటిగ్రేషన్‌లు';
+
+  @override
+  String get ui3SystemOverview => 'సిస్టమ్ అవలోకనం';
+
+  @override
+  String ui3AccountCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ఖాతాలు',
+      one: '1 ఖాతా',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String ui3DeviceCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count పరికరాలు',
+      one: '1 పరికరం',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get ui3PrivacySecurityOverview =>
+      'ఎండ్-టు-ఎండ్ ఎన్‌క్రిప్షన్, స్క్రీన్‌షాట్ రక్షణ మరియు ప్రాక్సీ నియంత్రణలు';
+
+  @override
+  String get ui3ConversationPrivacy => 'సంభాషణ గోప్యత';
+
+  @override
+  String get ui3NetworkPrivacy => 'నెట్‌వర్క్ గోప్యత';
+
+  @override
+  String get ui3IdentityPrivacy => 'గుర్తింపు గోప్యత';
+
+  @override
+  String get ui3EncryptionKeyBackup => 'ఎన్‌క్రిప్షన్ & కీ బ్యాకప్';
+
+  @override
+  String get ui3DevicesVerification => 'పరికరాలు & ధృవీకరణ';
+
+  @override
+  String get ui3ChipE2eeDefault => 'డిఫాల్ట్ E2EE';
+
+  @override
+  String get ui3ChipManualE2ee => 'మాన్యువల్ E2EE';
+
+  @override
+  String get ui3ChipSelfDestruct => 'స్వీయ వినాశనం';
+
+  @override
+  String get ui3ChipScreenshotGuard => 'స్క్రీన్‌షాట్ రక్షణ';
+
+  @override
+  String get ui3ChipIpProxy => 'IP / ప్రాక్సీ';
+
+  @override
+  String get ui3ChipLinkPreviewsOff => 'లింక్ ప్రివ్యూలు ఆఫ్';
+
+  @override
+  String get ui3ChipPublicHandle => 'పబ్లిక్ యూజర్‌నేమ్';
+
+  @override
+  String get a11yShowPassword => 'పాస్‌వర్డ్ చూపించు';
+
+  @override
+  String get a11yHidePassword => 'పాస్‌వర్డ్ దాచు';
+
+  @override
+  String get a11yCheckServer => 'సర్వర్‌ను తనిఖీ చేయి';
+
+  @override
+  String get ui3AuthAnonymousRegistration => 'అనామక నమోదు';
+
+  @override
+  String get ui3AuthAnonymousRegistrationDesc =>
+      'ఫోన్ లేదా ఈమెయిల్ లింక్ చేయకుండానే ఖాతాను సృష్టించండి. యూజర్‌నేమ్ ఆటోమేటిక్‌గా రూపొందించబడుతుంది.';
+
+  @override
+  String get ui3AuthAnonymousModeOn => 'అనామక మోడ్ ఆన్‌లో ఉంది';
+
+  @override
+  String get ui3AuthAnonymousModeOnDesc =>
+      'యాప్ మీ కోసం యాదృచ్ఛిక Matrix యూజర్‌నేమ్‌ను సృష్టిస్తుంది. తర్వాత రూపొందించిన ఖాతా మరియు పాస్‌వర్డ్‌తో సైన్ ఇన్ చేయవచ్చు.';
+
+  @override
+  String get ui3AuthChooseLoginMethod => 'లాగిన్ పద్ధతిని ఎంచుకోండి';
+
+  @override
+  String get ui3AuthSsoOpenFailed => 'SSO లాగిన్ పేజీని తెరవడం విఫలమైంది';
+
+  @override
+  String get ui3AuthWalletUnavailable => 'వాలెట్ అందుబాటులో లేదు';
+
+  @override
+  String get ui3ProfileSubscriptions => 'సబ్‌స్క్రిప్షన్‌లు';
+
+  @override
+  String get ui3ProfileBuySellCrypto => 'క్రిప్టో కొనండి / అమ్మండి';
+
+  @override
+  String get ui3ProfileOnDeviceAi => 'పరికరంలోనే AI';
+
+  @override
+  String get ui3ProfileSetAUsername => 'యూజర్‌నేమ్ సెట్ చేయండి';
+
+  @override
+  String get ui3ProfileAvatarStudio => 'అవతార్ స్టూడియో';
+
+  @override
+  String get ui3ProfileAvatarStudioSubtitle => 'NFT అవతార్ / అలంకరణలు';
+
+  @override
+  String get ui3ProfileCustomize => 'అనుకూలీకరించు';
+
+  @override
+  String get ui3ProfileQrSubtitle =>
+      'ఈ ప్రొఫైల్‌ను తెరవడానికి లేదా చాట్ ప్రారంభించడానికి స్కాన్ చేయండి';
+
+  @override
+  String get ui3PrivacyHardening => 'గోప్యత బలోపేతం';
+
+  @override
+  String get ui3HidePhoneNumber => 'ఫోన్ నంబర్ దాచు';
+
+  @override
+  String get ui3HidePhoneNumberDesc =>
+      'ఈ పరికరంలోని ప్రొఫైల్ పేజీలలో లింక్ చేసిన ఫోన్ నంబర్‌ను దాచండి';
+
+  @override
+  String get ui3EncryptNewChatsByDefault =>
+      'కొత్త చాట్‌లను డిఫాల్ట్‌గా ఎన్‌క్రిప్ట్ చేయి';
+
+  @override
+  String get ui3EncryptNewChatsByDefaultDesc =>
+      'కొత్త డైరెక్ట్ చాట్‌లు మరియు ప్రైవేట్ రూమ్‌లను E2EE ఆన్‌తో ప్రారంభించండి';
+
+  @override
+  String get ui3PrivateChatMode => 'ప్రైవేట్ చాట్ మోడ్';
+
+  @override
+  String get ui3PrivateChatModeDesc =>
+      'ప్రైవేట్ లేదా ఎన్‌క్రిప్ట్ చేసిన చాట్‌లను చూస్తున్నప్పుడు తాత్కాలికంగా స్క్రీన్‌షాట్‌లను నిరోధించండి';
+
+  @override
+  String get ui3DefaultSelfDestructTimer => 'డిఫాల్ట్ స్వీయ వినాశన టైమర్';
+
+  @override
+  String get ui3DefaultSelfDestructTimerDesc =>
+      'కొత్తగా పంపే సందేశాలకు డిఫాల్ట్ స్వీయ వినాశన టైమర్‌ను వర్తింపజేయండి';
+
+  @override
+  String get ui3LinkPreviews => 'లింక్ ప్రివ్యూలు';
+
+  @override
+  String get ui3LinkPreviewsDesc =>
+      'సందేశాలలో URLలు ఉన్నప్పుడు శీర్షికలు, వివరణలు, థంబ్‌నెయిల్‌లను పొందండి';
+
+  @override
+  String get ui3IpAddressProtection => 'IP చిరునామా రక్షణ';
+
+  @override
+  String get ui3IpAddressProtectionDesc =>
+      'అందుబాటులో ఉన్నప్పుడు Matrix మరియు లింక్ ప్రివ్యూ అభ్యర్థనలను మీరు కాన్ఫిగర్ చేసిన HTTP గోప్యతా ప్రాక్సీ ద్వారా పంపండి';
+
+  @override
+  String get ui3UseTorProxy => 'Tor / Privoxy HTTP ప్రాక్సీని ఉపయోగించు';
+
+  @override
+  String get ui3UseTorProxyDesc =>
+      '127.0.0.1:8118లో Privoxy వంటి లోకల్ HTTP ప్రాక్సీ ఎండ్‌పాయింట్‌ను ఉపయోగించండి. నేటివ్ SOCKS5 Tor రూటింగ్‌కు ఇక్కడ మద్దతు లేదు.';
+
+  @override
+  String get ui3CustomProxy => 'అనుకూల ప్రాక్సీ';
+
+  @override
+  String get ui3CustomProxyDesc =>
+      'Matrix ట్రాఫిక్ మరియు లింక్ ప్రివ్యూల కోసం అనుకూల HTTP లేదా HTTPS ప్రాక్సీని ఉపయోగించండి';
+
+  @override
+  String get ui3ProxyEndpoint => 'ప్రాక్సీ చిరునామా';
+
+  @override
+  String get ui3ProxyEndpointDesc =>
+      'HTTP/HTTPS ప్రాక్సీ చిరునామా (SOCKSకు మద్దతు లేదు)';
+
+  @override
+  String get ui3InvalidEndpoint => 'చెల్లని చిరునామా';
+
+  @override
+  String get ui3CustomProxyStaysOff =>
+      'చెల్లుబాటు అయ్యే చిరునామాను సెట్ చేసే వరకు అనుకూల ప్రాక్సీ ఆఫ్‌లోనే ఉంటుంది';
+
+  @override
+  String get ui3NotificationFilterNote =>
+      'ప్రాధాన్యత నియమాలు ఎల్లప్పుడూ తెలియజేస్తాయి (మ్యూట్, ప్రస్తావనలు మాత్రమే, అంతరాయం కలిగించవద్దు వాటిని దాటవేసి). మ్యూట్ చేసిన కీవర్డ్‌లు నోటిఫికేషన్‌లను ఆపుతాయి.';
+
+  @override
+  String get ui3PriorityKeywords => 'ప్రాధాన్యత కీవర్డ్‌లు';
+
+  @override
+  String get ui3PriorityKeywordHint => 'ఉదా. అత్యవసరం';
+
+  @override
+  String get ui3MutedKeywords => 'మ్యూట్ చేసిన కీవర్డ్‌లు';
+
+  @override
+  String get ui3MutedKeywordHint => 'ఉదా. స్పామ్';
+
+  @override
+  String get ui3PrioritySenders => 'ప్రాధాన్యత పంపినవారు';
+
+  @override
+  String get ui3CaseSensitive => 'అక్షరాల కేస్‌ను పరిగణించు';
+
+  @override
+  String get ui3None => 'ఏవీ లేవు';
+
+  @override
+  String get ui3SmartReplyTranslation => 'స్మార్ట్ రిప్లై అనువాదం';
+
+  @override
+  String get ui3SmartReplyTranslationDesc =>
+      'పంపే ముందు మీ సందేశాలను స్వీకర్త భాషలోకి ఆటోమేటిక్‌గా అనువదించండి.';
+
+  @override
+  String get ui3FromPhotos => 'ఫోటోల నుండి';
+
+  @override
+  String get ui3ChangePhoto => 'ఫోటో మార్చు';
+
+  @override
+  String get ui3RoamingUsesMobileData =>
+      'రోమింగ్‌లో మొబైల్ డేటా నియమాలు వర్తిస్తాయి';
+
+  @override
+  String get ui3RoamingUsesMobileDataDesc =>
+      'ప్రత్యేక రోమింగ్ గుర్తింపు ఇంకా అందుబాటులో లేదు, కాబట్టి రోమింగ్ ప్రస్తుతం మొబైల్ డేటా ఆటో-డౌన్‌లోడ్ సెట్టింగ్‌లను అనుసరిస్తుంది.';
+
+  @override
+  String ui3DeleteQuickReplyConfirm(String content) {
+    return '\"$content\"ను తొలగించాలా?';
+  }
+
+  @override
+  String get ui3ResetToDefaults => 'డిఫాల్ట్‌లకు రీసెట్ చేయి';
+
+  @override
+  String get ui3ResetQuickRepliesMessage =>
+      'ఇది అన్ని అనుకూల త్వరిత ప్రత్యుత్తరాలను తీసివేసి డిఫాల్ట్‌లను పునరుద్ధరిస్తుంది. కొనసాగించాలా?';
+
+  @override
+  String get ui3LocalLlmUnavailable => 'ఈ పరికరంలో మద్దతు లేదు';
+
+  @override
+  String get ui3LocalLlmNotDownloaded => 'మోడల్ డౌన్‌లోడ్ కాలేదు';
+
+  @override
+  String get ui3LocalLlmReady => 'సిద్ధం (పరికరంలో)';
+
+  @override
+  String get ui3LocalLlmDescription =>
+      'ఆన్ చేసి సిద్ధంగా ఉన్నప్పుడు AI ఫీచర్‌లు (సారాంశం, తిరిగి రాయడం, అనువాదం, ప్రత్యుత్తరాలు) పూర్తిగా పరికరంలోనే నడుస్తాయి — డేటా మీ ఫోన్‌ను ఎప్పటికీ దాటదు. లేకపోతే అవి క్లౌడ్ ప్రొవైడర్‌ను ఉపయోగిస్తాయి.';
+
+  @override
+  String get ui3UseOnDeviceAi => 'పరికరంలోనే AIని ఉపయోగించు';
+
+  @override
+  String get ui3UseOnDeviceAiDesc =>
+      'సిద్ధంగా ఉన్నప్పుడు లోకల్ ఇన్ఫరెన్స్‌కు ప్రాధాన్యం';
+
+  @override
+  String get ui3DownloadModel => 'మోడల్‌ను డౌన్‌లోడ్ చేయి';
+
+  @override
+  String get ui3LocalLlmRuntimeRequired =>
+      'పరికరంలో ఇన్ఫరెన్స్‌కు నేటివ్ రన్‌టైమ్ (Android MediaPipe / iOS Core ML) అవసరం. ప్లాట్‌ఫామ్ హ్యాండ్లర్ అందుబాటులోకి రాగానే ఇది ఆటోమేటిక్‌గా సక్రియం అవుతుంది.';
+
+  @override
+  String get ui3PhotoAvatar => 'ఫోటో అవతార్';
+
+  @override
+  String get ui3AvatarStyles => 'అవతార్ శైలులు';
+
+  @override
+  String get ui3AvatarStylesDesc =>
+      'ప్రొఫైల్ మరియు అవతార్ ఎంట్రీ పాయింట్‌ల కోసం ఒకే అలంకరణ సెలెక్టర్‌ను ఉపయోగించండి.';
+
+  @override
+  String get ui3ReplaceNftAvatar => 'NFT అవతార్‌ను మార్చు';
+
+  @override
+  String get ui3NftAvatarDesc =>
+      'ఆన్-చెయిన్ సేకరణ వస్తువును మీ అవతార్‌గా ఉపయోగించండి.';
+
+  @override
+  String get ui3UsePhotoAvatar => 'ఫోటో అవతార్‌ను ఉపయోగించు';
+
+  @override
+  String get ui3UsePhotoAvatarDesc =>
+      'అప్‌లోడ్ చేసిన అవతార్‌ను ఉంచి NFT లింక్‌ను తీసివేయండి.';
+
+  @override
+  String ui3AvatarStyleSet(Object name) {
+    return 'అవతార్ శైలి సెట్ చేయబడింది: $name';
+  }
+
+  @override
+  String get ui3NftAvatarUpdated => 'NFT అవతార్ అప్‌డేట్ అయింది';
+
+  @override
+  String get ui3SwitchedToPhotoAvatar => 'ఫోటో అవతార్‌కు తిరిగి మారింది';
+
+  @override
+  String get ui3SignInToViewRedPacketHistory =>
+      'రెడ్ ప్యాకెట్ చరిత్రను చూడటానికి సైన్ ఇన్ చేయండి';
+
+  @override
+  String get ui3RedPacketActive => 'సక్రియం';
+
+  @override
+  String get ui3RedPacketCompleted => 'పూర్తయింది';
+
+  @override
+  String get ui3CardsAndPasses => 'కార్డ్‌లు మరియు పాస్‌లు';
+
+  @override
+  String get ui3CardsAndPassesDesc =>
+      'వాలెట్ కార్డ్‌లు, కూపన్‌లు మరియు పాస్‌లు ప్రధాన యాప్‌లో నిర్వహించబడతాయి.';
+
+  @override
+  String get ui3CardPackRequiresMainApp => 'కార్డ్ ప్యాక్‌కు ప్రధాన యాప్ అవసరం';
+
+  @override
+  String get ui3OpenCardPack => 'కార్డ్ ప్యాక్‌ను తెరువు';
+
+  @override
+  String get ui3UnableToOpenChat => 'ఈ పరిచయంతో చాట్‌ను తెరవడం సాధ్యం కాలేదు';
+
+  @override
+  String get ui3WalletManagedInMainApp =>
+      'వాలెట్ ప్రధాన యాప్‌లో నిర్వహించబడుతుంది';
+
+  @override
+  String ui3CreatorPlans(Object name) {
+    return '$name · ప్లాన్‌లు';
+  }
+
+  @override
+  String get ui3NewPlan => 'కొత్త ప్లాన్';
+
+  @override
+  String get ui3MySubscriptions => 'నా సబ్‌స్క్రిప్షన్‌లు';
+
+  @override
+  String get ui3AvailablePlans => 'అందుబాటులో ఉన్న ప్లాన్‌లు';
+
+  @override
+  String get ui3NoPlansYet =>
+      'ఇంకా ప్లాన్‌లు లేవు · సృష్టించడానికి \"కొత్త ప్లాన్\" నొక్కండి';
+
+  @override
+  String ui3DaysLeft(Object days) {
+    return '$days రోజులు మిగిలి ఉన్నాయి';
+  }
+
+  @override
+  String get ui3SubscriptionCancelled => 'రద్దు చేయబడింది';
+
+  @override
+  String get ui3AutoRenewOn => 'ఆటో-రెన్యూ: ఆన్';
+
+  @override
+  String get ui3AutoRenewOff => 'ఆటో-రెన్యూ: ఆఫ్';
+
+  @override
+  String get ui3CancelSubscriptionTitle => 'సబ్‌స్క్రిప్షన్ రద్దు చేయాలా?';
+
+  @override
+  String ui3CancelSubscriptionConfirm(Object name) {
+    return '$nameకు మీ సబ్‌స్క్రిప్షన్ గడువు ముగిసే వరకు సక్రియంగా ఉంటుంది, పునరుద్ధరించబడదు.';
+  }
+
+  @override
+  String get ui3Subscribe => 'సబ్‌స్క్రైబ్ చేయండి';
+
+  @override
+  String ui3SubscribedTo(Object name) {
+    return '$nameకు సబ్‌స్క్రైబ్ అయ్యారు';
+  }
+
+  @override
+  String get ui3PlanPriceLabel => 'ధర (ఉదా. 9.9 USDT)';
+
+  @override
+  String get ui3PlanDescriptionLabel => 'వివరణ (ఐచ్ఛికం)';
+
+  @override
+  String get ui3PlanBenefitsLabel => 'ప్రయోజనాలు (కామాలతో వేరు చేయండి)';
+
+  @override
+  String get ui3PlanPeriod => 'వ్యవధి:';
+
+  @override
+  String get ui3Monthly => 'నెలవారీ';
+
+  @override
+  String get ui3Yearly => 'వార్షిక';
+
+  @override
+  String get ui3SaveRemarkFailed => 'గమనికను సేవ్ చేయడం విఫలమైంది';
+
+  @override
+  String get ui3CopyLink => 'లింక్ కాపీ చేయండి';
+
+  @override
+  String get ui3Connect => 'కనెక్ట్ అవ్వండి';
+
+  @override
+  String get ui3CommonTokens => 'ఉమ్మడి టోకెన్‌లు';
+
+  @override
+  String get ui3SharedNfts => 'ఉమ్మడి NFTలు';
+
+  @override
+  String get ui3TransactionHistory => 'లావాదేవీ చరిత్ర';
+
+  @override
+  String get ui3CommonDaos => 'ఉమ్మడి DAOలు';
+
+  @override
+  String get ui3SameChains => 'ఒకే చైన్‌లు';
+
+  @override
+  String get ui3ChatInitFailed => 'చాట్ ప్రారంభం విఫలమైంది';
+
+  @override
+  String get ui3CheckNetworkRetry =>
+      'దయచేసి మీ నెట్‌వర్క్‌ను తనిఖీ చేసి మళ్లీ ప్రయత్నించండి';
+
+  @override
+  String get ui3FromContacts => 'పరిచయాల నుండి';
+
+  @override
+  String get ui3FindFriendsFromContacts =>
+      'మీ ఫోన్ పరిచయాల నుండి స్నేహితులను కనుగొనండి';
+
+  @override
+  String get ui3EnsOrDomain => 'ENS / డొమైన్';
+
+  @override
+  String get ui3LoadingContacts => 'పరిచయాలు లోడ్ అవుతున్నాయి...';
+
+  @override
+  String get ui3ContactsPermissionRequired => 'పరిచయాల అనుమతి అవసరం';
+
+  @override
+  String get ui3ContactsPermissionMessage =>
+      'మీ పరిచయాల నుండి స్నేహితులను కనుగొనడానికి, దయచేసి పరిచయాలకు యాక్సెస్ అనుమతించండి.';
+
+  @override
+  String get ui3AllowAccess => 'యాక్సెస్ అనుమతించండి';
+
+  @override
+  String get ui3NoContactMatches => 'సరిపోలికలు ఏవీ కనుగొనబడలేదు';
+
+  @override
+  String get ui3NoContactMatchesMessage =>
+      'మీ పరిచయాల్లో ఎవరూ ఇంకా ఈ యాప్‌ను ఉపయోగించడం లేదు. వారిని ఆహ్వానించండి!';
+
+  @override
+  String ui3ScannedContacts(Object count) {
+    return '$count పరిచయాలు స్కాన్ చేయబడ్డాయి';
+  }
+
+  @override
+  String ui3FoundContactMatches(Object count) {
+    return 'మీ పరిచయాల్లో $count సరిపోలికలు కనుగొనబడ్డాయి';
+  }
+
+  @override
+  String ui3InContactsAs(Object name) {
+    return 'పరిచయాల్లో: $name';
+  }
+
+  @override
+  String get ui3DeletePhotoConfirm => 'ఈ ఫోటోను తొలగించాలా?';
+
+  @override
+  String get ui3InviteLink => 'ఆహ్వాన లింక్';
+
+  @override
+  String get ui3ShareJoinLink => 'ఈ రూమ్‌లో చేరడానికి లింక్‌ను షేర్ చేయండి';
+
+  @override
+  String get ui3ShareRoomReference =>
+      'ఆహ్వానించిన సభ్యులతో రూమ్ రిఫరెన్స్‌ను షేర్ చేయండి';
+
+  @override
+  String get ui3ScanToJoinGroup => 'ఈ గ్రూప్‌లో నేరుగా చేరడానికి స్కాన్ చేయండి';
+
+  @override
+  String get ui3ScanToShareRoomReference =>
+      'ఆహ్వానించిన సభ్యులతో ఈ రూమ్ రిఫరెన్స్‌ను షేర్ చేయడానికి స్కాన్ చేయండి';
+
+  @override
+  String get ui3InviteLinkLoadFailed => 'ఆహ్వాన లింక్‌ను లోడ్ చేయడం విఫలమైంది';
+
+  @override
+  String get ui3InviteLinkCopied => 'ఆహ్వాన లింక్ కాపీ చేయబడింది';
+
+  @override
+  String get ui3ChannelCategoryOptional => 'వర్గం (ఐచ్ఛికం)';
+
+  @override
+  String get ui3ChannelCategoryHint => 'ప్రకటనలు / ఉత్పత్తి / మద్దతు';
+
+  @override
+  String get ui3DescriptionOptional => 'వివరణ (ఐచ్ఛికం)';
+
+  @override
+  String get ui3WebhookEnable => 'webhook ఆటోమేషన్‌ను ప్రారంభించండి';
+
+  @override
+  String get ui3WebhookEnableDesc =>
+      'సభ్యుల చేరిక మరియు స్వాగత ఈవెంట్‌లను మీ ఇంటిగ్రేషన్ ఎండ్‌పాయింట్‌కు పంపండి.';
+
+  @override
+  String get ui3WebhookUrl => 'webhook URL';
+
+  @override
+  String get ui3WebhookSecretOptional => 'సంతకం సీక్రెట్ (ఐచ్ఛికం)';
+
+  @override
+  String get ui3WebhookSecretHint => 'X-N42-Signature కోసం ఉపయోగించబడుతుంది';
+
+  @override
+  String get ui3WebhookNotifyMemberJoined => 'సభ్యుడు చేరినప్పుడు తెలియజేయండి';
+
+  @override
+  String get ui3WebhookNotifyWelcomeSent =>
+      'స్వాగత సందేశం పంపినప్పుడు తెలియజేయండి';
+
+  @override
+  String get ui3WebhookTestSend => 'టెస్ట్ webhook పంపండి';
+
+  @override
+  String get ui3WebhookTestSending => 'టెస్ట్ webhook పంపుతోంది...';
+
+  @override
+  String get ui3WebhookTestSent => 'టెస్ట్ webhook విజయవంతంగా పంపబడింది';
+
+  @override
+  String get ui3WebhookTestFailed => 'టెస్ట్ webhook పంపడం విఫలమైంది';
+
+  @override
+  String get ui3WebhookUrlInvalid =>
+      'webhook URL తప్పనిసరిగా పబ్లిక్ HTTPS చిరునామా అయి ఉండాలి';
+
+  @override
+  String get ui3WebhookSelectEvent => 'కనీసం ఒక webhook ఈవెంట్‌ను ఎంచుకోండి';
+
+  @override
+  String get ui3SensitiveDataDetection => 'సున్నితమైన డేటా గుర్తింపు';
+
+  @override
+  String get ui3Email => 'ఇమెయిల్';
+
+  @override
+  String get ui3CreditCard => 'క్రెడిట్ కార్డ్';
+
+  @override
+  String get ui3DetectEmailDesc =>
+      'టెక్స్ట్ సందేశాల్లో ఇమెయిల్ చిరునామాలను గుర్తించండి';
+
+  @override
+  String get ui3DetectPhoneDesc =>
+      'ఫోన్ నంబర్‌లు మరియు అంతర్జాతీయ నంబర్‌లను గుర్తించండి';
+
+  @override
+  String get ui3DetectCardDesc =>
+      'బ్యాంక్ మరియు కార్డ్ నంబర్‌లుగా అనిపించేవాటిని గుర్తించండి';
+
+  @override
+  String get ui3DetectWalletDesc =>
+      'Ethereum తరహా వాలెట్ చిరునామాలను గుర్తించండి';
+
+  @override
+  String get ui3GeneralTopic => 'సాధారణం';
+
+  @override
+  String get a11yPreviousResult => 'మునుపటి ఫలితం';
+
+  @override
+  String get a11yNextResult => 'తదుపరి ఫలితం';
+
+  @override
+  String get ui3TryDifferentKeywords => 'వేరే కీవర్డ్‌లను ప్రయత్నించండి';
+
+  @override
+  String ui3FiltersActive(Object count) {
+    return 'సక్రియ ఫిల్టర్‌లు: $count';
+  }
+
+  @override
+  String ui3MessageFiltersActive(Object count) {
+    return 'సక్రియ సందేశ ఫిల్టర్‌లు: $count';
+  }
+
+  @override
+  String get ui3LoadMore => 'మరిన్ని లోడ్ చేయండి';
+
+  @override
+  String get ui3MessageFilters => 'సందేశ ఫిల్టర్‌లు';
+
+  @override
+  String get ui3SenderUserId => 'పంపినవారి యూజర్ ID';
+
+  @override
+  String get ui3FilterType => 'రకం';
+
+  @override
+  String get ui3FilterAny => 'ఏదైనా';
+
+  @override
+  String get ui3FilterImage => 'చిత్రం';
+
+  @override
+  String get ui3FilterTime => 'సమయం';
+
+  @override
+  String get ui3AnyTime => 'ఎప్పుడైనా';
+
+  @override
+  String get ui3OnlyMyMessages => 'నా సందేశాలు మాత్రమే';
+
+  @override
+  String get ui3MediaOnly => 'మీడియా మాత్రమే';
+
+  @override
+  String get ui3Apply => 'వర్తింపజేయండి';
+
+  @override
+  String get ui3QrStyleClassic => 'క్లాసిక్';
+
+  @override
+  String get ui3QrStyleOcean => 'సముద్రం';
+
+  @override
+  String get ui3QrStyleBerry => 'బెర్రీ';
+
+  @override
+  String get ui3NfcUnavailable =>
+      'NFC అందుబాటులో లేదు లేదా ట్యాగ్‌కు మద్దతు లేదు. NFCని ఆన్ చేయండి, వేరే ట్యాగ్ ప్రయత్నించండి లేదా QR ఉపయోగించండి.';
+
+  @override
+  String get ui3CancelNfc => 'NFC రద్దు చేయండి';
+
+  @override
+  String get ui3ReadNfcTag => 'NFC ట్యాగ్ చదవండి';
+
+  @override
+  String get ui3HoldNearNfcTag => 'మీ ఫోన్‌ను సర్వీస్ ట్యాగ్ దగ్గర పట్టుకోండి.';
+
+  @override
+  String get a11yFlashlightOn => 'ఫ్లాష్‌లైట్ ఆన్ చేయండి';
+
+  @override
+  String get a11yFlashlightOff => 'ఫ్లాష్‌లైట్ ఆఫ్ చేయండి';
+
+  @override
+  String get ui3SocialGraph => 'సోషల్ గ్రాఫ్';
+
+  @override
+  String get ui3RecommendedConnections => 'సిఫార్సు చేసిన కనెక్షన్‌లు';
+
+  @override
+  String get ui3Portfolio => 'పోర్ట్‌ఫోలియో';
+
+  @override
+  String get ui3Chains => 'చైన్‌లు';
+
+  @override
+  String get ui3Tokens => 'టోకెన్‌లు';
+
+  @override
+  String get ui3NoConnectionsFound => 'కనెక్షన్‌లు ఏవీ కనుగొనబడలేదు';
+
+  @override
+  String get ui3ConnectionsHint =>
+      'మీ ఆన్-చైన్ కార్యకలాపం పెరిగే కొద్దీ కనెక్షన్‌లు కనిపిస్తాయి';
+
+  @override
+  String get ui3SocialGraphLoadFailed => 'సోషల్ గ్రాఫ్ లోడ్ చేయడం విఫలమైంది';
+
+  @override
+  String get ui3Similarity => 'సారూప్యత';
+
+  @override
+  String get ui3Breakdown => 'వివరాలు';
+
+  @override
+  String get ui3TokenHoldings => 'టోకెన్ హోల్డింగ్‌లు';
+
+  @override
+  String get ui3NftCollections => 'NFT సేకరణలు';
+
+  @override
+  String get ui3ChainUsage => 'చెయిన్ వినియోగం';
+
+  @override
+  String get ui3Transactions => 'లావాదేవీలు';
+
+  @override
+  String get ui3DaoMembership => 'DAO సభ్యత్వం';
+
+  @override
+  String get ui3NotWeighted => 'వెయిట్ లేదు';
+
+  @override
+  String ui3PercentWithWeight(Object percent, Object weight) {
+    return '$percent% (వెయిట్: $weight)';
+  }
+
+  @override
+  String get ui3CommonOnChainActivity => 'ఉమ్మడి ఆన్-చెయిన్ కార్యకలాపం';
+
+  @override
+  String get ui3SharedTokens => 'ఉమ్మడి టోకెన్‌లు';
+
+  @override
+  String get ui3SharedNftCollections => 'ఉమ్మడి NFT సేకరణలు';
+
+  @override
+  String get ui3SharedChains => 'ఉమ్మడి చెయిన్‌లు';
+
+  @override
+  String get ui3NoSharedTokens => 'ఉమ్మడి టోకెన్‌లు ఏవీ కనుగొనబడలేదు';
+
+  @override
+  String get ui3NoSharedNftCollections => 'ఉమ్మడి NFT సేకరణలు ఏవీ కనుగొనబడలేదు';
+
+  @override
+  String get ui3NoSharedChains => 'ఉమ్మడి చెయిన్‌లు ఏవీ కనుగొనబడలేదు';
+
+  @override
+  String get ui3SimilarityFailed => 'సారూప్యతను లెక్కించడం విఫలమైంది';
+
+  @override
+  String ui3ItemsAndMore(Object items, Object count) {
+    return '$items +మరో $count';
+  }
+
+  @override
+  String get a11yGovernance => 'పాలన';
+
+  @override
+  String get ui3CommunityLink => 'కమ్యూనిటీ లింక్';
+
+  @override
+  String get ui3CommunityQrCode => 'కమ్యూనిటీ QR కోడ్';
+
+  @override
+  String get ui3CommunityQrSubtitle =>
+      'ఈ కమ్యూనిటీలో చేరి దాని ఛానెల్‌లను చూడటానికి స్కాన్ చేయండి';
+
+  @override
+  String get ui3CommunityLinkLoadFailed =>
+      'కమ్యూనిటీ లింక్‌ను లోడ్ చేయడం విఫలమైంది';
+
+  @override
+  String get ui3CommunityLinkCopied => 'కమ్యూనిటీ లింక్ కాపీ చేయబడింది';
+
+  @override
+  String ui3KickMemberConfirm(Object name) {
+    return '$name ఈ కమ్యూనిటీ నుండి తీసివేయబడతారు.';
+  }
+
+  @override
+  String ui3BanMemberConfirm(Object name) {
+    return '$name తీసివేయబడతారు, మళ్లీ చేరలేరు.';
+  }
+
+  @override
+  String get ui3SignInToDiscoverChannels =>
+      'పబ్లిక్ ఛానెల్‌లను కనుగొనడానికి సైన్ ఇన్ చేయండి';
+
+  @override
+  String ui3UnableToJoinChannel(Object name, Object error) {
+    return '$nameలో చేరడం సాధ్యం కాలేదు: $error';
+  }
+
+  @override
+  String get ui3CategoryTech => 'టెక్';
+
+  @override
+  String get ui3CategorySocial => 'సోషల్';
+
+  @override
+  String get ui3NoPublicChannels => 'పబ్లిక్ ఛానెల్‌లు ఏవీ కనుగొనబడలేదు';
+
+  @override
+  String get ui3StoriesAndFun => 'స్టోరీలు & వినోదం';
+
+  @override
+  String get ui3SearchMusicHint => 'పాటలు, కళాకారులు లేదా స్నేహితులను వెతకండి';
+
+  @override
+  String get ui3ForYou => 'మీ కోసం';
+
+  @override
+  String get ui3Liked => 'నచ్చినవి';
+
+  @override
+  String get ui3NoLikedMusic => 'ఇంకా నచ్చిన సంగీతం లేదు';
+
+  @override
+  String get ui3NoMusicStories => 'ఇంకా సంగీత స్టోరీలు లేవు';
+
+  @override
+  String get ui3LikedMusicHint =>
+      'పాట పక్కన ఉన్న హార్ట్‌ను నొక్కితే అది ఇక్కడ ఉంటుంది.';
+
+  @override
+  String get ui3MusicStoriesHint =>
+      'స్టోరీలలో షేర్ చేసిన సంగీతం ఇక్కడ కనిపిస్తుంది.';
+
+  @override
+  String ui3SharedBy(Object artist, Object name) {
+    return '$artist · $name షేర్ చేశారు';
+  }
+
+  @override
+  String ui3UnableToPlay(Object title, Object error) {
+    return '$title ప్లే చేయడం సాధ్యం కాలేదు: $error';
+  }
+
+  @override
+  String get a11yPreviousTrack => 'మునుపటి ట్రాక్';
+
+  @override
+  String get a11yNextTrack => 'తదుపరి ట్రాక్';
+
+  @override
+  String get a11yPlay => 'ప్లే చేయి';
+
+  @override
+  String get a11yPause => 'పాజ్ చేయి';
+
+  @override
+  String get ui3Refresh => 'రిఫ్రెష్ చేయి';
+
+  @override
+  String get ui3NearbyIntroTitle => 'సమీపంలోని పబ్లిక్ పోస్ట్‌లను కనుగొనండి';
+
+  @override
+  String get ui3NearbyIntroBody =>
+      'పబ్లిక్ మూమెంట్స్‌ను క్రమబద్ధీకరించడానికి మీ స్థానం ఈ పరికరంలో ఒకసారి మాత్రమే ఉపయోగించబడుతుంది. ఇది అప్‌లోడ్ చేయబడదు, ప్రసారం చేయబడదు, ఇతరులకు చూపబడదు.';
+
+  @override
+  String get ui3UseMyLocation => 'నా స్థానాన్ని ఉపయోగించు';
+
+  @override
+  String get ui3NearbyUnavailable => 'సమీపం ఫీచర్ అందుబాటులో లేదు';
+
+  @override
+  String get ui3NoNearbyPosts => 'సమీపంలో ఇంకా పోస్ట్‌లు లేవు';
+
+  @override
+  String get ui3NoNearbyPostsHint =>
+      'స్థానం ఉన్న పబ్లిక్ మూమెంట్స్ ఇక్కడ కనిపిస్తాయి.';
+
+  @override
+  String get ui3NearbyDistanceNote =>
+      'సుమారు దూరం · పబ్లిక్ స్థాన పోస్ట్‌లు మాత్రమే';
+
+  @override
+  String get ui3PublicLocationPost => 'పబ్లిక్ స్థాన పోస్ట్';
+
+  @override
+  String get ui3LocationServicesOff => 'లొకేషన్ సేవలు ఆఫ్‌లో ఉన్నాయి';
+
+  @override
+  String get ui3LocationPermissionDenied => 'స్థాన అనుమతి తిరస్కరించబడింది';
+
+  @override
+  String get ui3EnableLocationInSettings =>
+      'సిస్టమ్ సెట్టింగ్‌లలో స్థాన అనుమతిని ప్రారంభించండి';
+
+  @override
+  String get ui3CreateStory => 'స్టోరీని సృష్టించు';
+
+  @override
+  String get ui3CreateStoryDesc => 'టెక్స్ట్ లేదా ఫోటో స్టేటస్ పోస్ట్ చేయండి.';
+
+  @override
+  String get ui3StoryCamera => 'స్టోరీ కెమెరా';
+
+  @override
+  String get ui3StoryCameraDesc =>
+      'నేరుగా ఫిల్టర్‌లు, ఫోటో ఎడిటింగ్‌కు వెళ్లండి.';
+
+  @override
+  String get ui3MomentsDesc => 'పూర్తి ఫీడ్ మరియు వ్యాఖ్యలను తెరవండి.';
+
+  @override
+  String get ui3MomentCamera => 'మూమెంట్ కెమెరా';
+
+  @override
+  String get ui3MomentCameraDesc =>
+      'పోస్ట్ సృష్టించి వెంటనే మీడియాను ఎంచుకోండి.';
+
+  @override
+  String get ui3GamesDesc =>
+      'అంతర్నిర్మిత క్యాజువల్ గేమ్ సెంటర్‌ను ప్రారంభించండి.';
+
+  @override
+  String get ui3AvatarStudio => 'అవతార్ స్టూడియో';
+
+  @override
+  String get ui3AvatarStudioDesc =>
+      'అలంకరణలు, NFT అవతార్ మరియు గుర్తింపు శైలి.';
+
+  @override
+  String get ui3SocialGraphDesc =>
+      'ఆన్-చెయిన్ ఫాలోలు, అభిమానులు మరియు కనెక్షన్‌లు.';
+
+  @override
+  String get ui3SocialHubHeroTitle =>
+      'స్టోరీలు, మూమెంట్స్, గేమ్‌లు మరియు అవతార్‌లు';
+
+  @override
+  String get ui3SocialHubHeroBody =>
+      'చాట్, ప్రొఫైల్, డిస్కవర్‌లలో చెల్లాచెదురుగా కాకుండా అన్ని సోషల్ ఫీచర్లు ఒకే చోట.';
+
+  @override
+  String get ui3SocialGraphNotConfigured =>
+      'ఈ బిల్డ్‌లో సోషల్ గ్రాఫ్ కాన్ఫిగర్ చేయబడలేదు';
+
+  @override
+  String get ui3ConnectWalletForSocialGraph =>
+      'మీ సోషల్ గ్రాఫ్‌ను చూడటానికి వాలెట్‌ను కనెక్ట్ చేయండి';
+
+  @override
+  String get ui3AvatarStudioSignIn => 'అవతార్ స్టూడియోకు సైన్ ఇన్ అవసరం';
+
+  @override
+  String get a11yRemoveImage => 'చిత్రాన్ని తీసివేయి';
+
+  @override
+  String get a11yBack => 'వెనుకకు';
+
+  @override
+  String get ui3MiniAppConfirmTransactionTitle => 'లావాదేవీని నిర్ధారించండి';
+
+  @override
+  String get ui3MiniAppConfirmTransactionBody =>
+      'ఒక మినీ యాప్ మీ తరపున లావాదేవీని పంపాలని అభ్యర్థిస్తోంది.';
+
+  @override
+  String ui3MiniAppOpenTitle(Object name) {
+    return '$nameను తెరవాలా?';
+  }
+
+  @override
+  String get ui3MiniAppOpenButton => 'తెరువు';
+
+  @override
+  String get ui3StoryReplySendFailed => 'స్టోరీకి ప్రత్యుత్తరం పంపడం విఫలమైంది';
+
+  @override
+  String get ui3RedPacketDemoNotice =>
+      'డెమో రెడ్ ప్యాకెట్ — చాట్‌లోని రికార్డ్ మాత్రమే, నిజమైన ఆన్-చెయిన్ ఆస్తి బదిలీ కాదు.';
+
+  @override
+  String get ui3RedPacketCoverClassic => 'క్లాసిక్ ఎరుపు';
+
+  @override
+  String get ui3RedPacketCoverGolden => 'బంగారు';
+
+  @override
+  String get ui3RedPacketCoverPurple => 'ఊదా';
+
+  @override
+  String get ui3RedPacketCoverOceanBlue => 'సముద్ర నీలం';
+
+  @override
+  String get ui3RedPacketCoverNatureGreen => 'ప్రకృతి ఆకుపచ్చ';
+
+  @override
+  String get ui3RedPacketCoverRosePink => 'గులాబీ రంగు';
+
+  @override
+  String get ui3RedPacketHistoryEmpty => 'ఇంకా రెడ్ ప్యాకెట్‌లు లేవు';
+
+  @override
+  String get ui3TransferMerchantQrWithAmount => 'వ్యాపారి QR (మొత్తంతో)';
+
+  @override
+  String get ui3TransferMerchantQrTitle => 'వ్యాపారి QR';
+
+  @override
+  String get ui3TransferOpenAmountHint => 'ఏ మొత్తానికైనా ఖాళీగా ఉంచండి';
+
+  @override
+  String get ui3FiatRampTitle => 'క్రిప్టో కొనండి / అమ్మండి';
+
+  @override
+  String get ui3FiatRampBuy => 'కొనండి';
+
+  @override
+  String get ui3FiatRampSell => 'అమ్మండి';
+
+  @override
+  String get ui3FiatRampNotConfigured =>
+      'ఫియట్ ఆన్/ఆఫ్-ర్యాంప్ కాన్ఫిగర్ చేయబడలేదు';
+
+  @override
+  String get a11yPointsAddRule => 'రివార్డ్ నియమాన్ని జోడించు';
+
+  @override
+  String get a11yGovernanceRemoveChoice => 'ఎంపికను తీసివేయి';
+
+  @override
+  String get a11yGovernanceCreateProposal => 'ప్రతిపాదనను సృష్టించు';
+
+  @override
+  String get ui3MiniAppUpdateN42 => 'N42ను అప్‌డేట్ చేయండి';
+
+  @override
+  String get ui3MiniAppOfficial => 'అధికారిక';
+
+  @override
+  String ui3MiniAppUserCount(Object count) {
+    return '$count వినియోగదారులు';
+  }
+
+  @override
+  String a11yStoryBackgroundColor(Object index) {
+    return 'నేపథ్య రంగు $index';
+  }
+
+  @override
+  String get a11yStoryAdd => 'స్టోరీని జోడించండి';
+
+  @override
+  String get ui3StoryPostFailed => 'స్టోరీని పోస్ట్ చేయడం విఫలమైంది';
+
+  @override
+  String get ui3StoryTapToSelectImage => 'చిత్రాన్ని ఎంచుకోవడానికి నొక్కండి';
+
+  @override
+  String get ui3StoryChangeImage => 'మార్చు';
+
+  @override
+  String ui3StoryMusicReadFailed(Object error) {
+    return 'ఎంచుకున్న సంగీతాన్ని చదవలేకపోయాము: $error';
+  }
+
+  @override
+  String get ui3StoryDeleteConfirm => 'ఈ స్టోరీని తొలగించాలా?';
+
+  @override
+  String get ui3StoryDeleteFailed => 'స్టోరీని తొలగించడం విఫలమైంది';
+
+  @override
+  String get ui3MomentCreateTitle => 'మూమెంట్ సృష్టించండి';
+
+  @override
+  String get ui3MomentContentHint => 'మీరు ఏమి ఆలోచిస్తున్నారు?';
+
+  @override
+  String get ui3MomentAddPhotos => 'ఫోటోలను జోడించండి';
+
+  @override
+  String get ui3MomentAddLocation => 'స్థానాన్ని జోడించండి';
+
+  @override
+  String ui3MomentSelectedMedia(Object count) {
+    return 'ఎంచుకున్న మీడియా ($count)';
+  }
+
+  @override
+  String get ui3MomentClearAll => 'అన్నీ క్లియర్ చేయండి';
+
+  @override
+  String get ui3MomentClearMediaConfirm =>
+      'ఎంచుకున్న అన్ని ఫోటోలు/వీడియోలను తీసివేయాలా?';
+
+  @override
+  String get ui3MomentVisibilityPublicDesc => 'స్నేహితులందరూ చూడగలరు';
+
+  @override
+  String get ui3MomentVisibilityPrivateDesc => 'మీరు మాత్రమే చూడగలరు';
+
+  @override
+  String get ui3MomentVisibilityPartialDesc => 'ఎవరు చూడగలరో ఎంచుకోండి';
+
+  @override
+  String get ui3MomentVisibilityExcludedDesc =>
+      'నిర్దిష్ట స్నేహితుల నుండి దాచండి';
+
+  @override
+  String get ui3MomentVideos => 'వీడియోలు';
+
+  @override
+  String get ui3MomentNoVideos => 'ఇంకా వీడియోలు లేవు';
+
+  @override
+  String get a11yCallMinimize => 'చిన్నదిగా చేయండి';
+
+  @override
+  String get a11yCallGridView => 'గ్రిడ్ వీక్షణ';
+
+  @override
+  String get a11yCallFocusView => 'ఫోకస్ వీక్షణ';
+
+  @override
+  String get ui3CallTools => 'కాల్ సాధనాలు';
+
+  @override
+  String get ui3CallMeetingTools => 'మీటింగ్ సాధనాలు';
+
+  @override
+  String get ui3CallToolsSubtitle =>
+      'కాల్ నుండి నిష్క్రమించకుండానే ఆడియో, వీడియో నాణ్యతను సర్దుబాటు చేయండి.';
+
+  @override
+  String get ui3CallAudioEnhancement => 'ఆడియో మెరుగుదల';
+
+  @override
+  String get ui3CallNoiseSuppression => 'నాయిస్ అణచివేత';
+
+  @override
+  String get ui3CallNoiseSuppressionDesc =>
+      'కీబోర్డ్ మరియు నేపథ్య శబ్దాన్ని తగ్గిస్తుంది.';
+
+  @override
+  String get ui3CallEchoCancellation => 'ప్రతిధ్వని రద్దు';
+
+  @override
+  String get ui3CallEchoCancellationDesc =>
+      'స్పీకర్ శబ్దం తిరిగి మైక్‌లోకి రాకుండా నిరోధిస్తుంది.';
+
+  @override
+  String get ui3CallAutoGainControl => 'ఆటోమేటిక్ గెయిన్ నియంత్రణ';
+
+  @override
+  String get ui3CallAutoGainControlDesc =>
+      'మైక్రోఫోన్ వాల్యూమ్‌ను మరింత స్థిరంగా ఉంచుతుంది.';
+
+  @override
+  String get ui3CallVoiceIsolation => 'మెరుగైన వాయిస్ ఐసోలేషన్';
+
+  @override
+  String get ui3CallVoiceIsolationDesc =>
+      'మరింత బలమైన నాయిస్ తగ్గింపు ప్రొఫైల్‌ను ఉపయోగించండి.';
+
+  @override
+  String get ui3CallVideoSection => 'వీడియో';
+
+  @override
+  String get ui3CallBackgroundBlur => 'నేపథ్యం బ్లర్ (బీటా)';
+
+  @override
+  String get ui3CallBlurDescReady =>
+      'ప్రాధాన్యత అమలులో ఉంది. వాస్తవ బ్లర్ వీడియో ప్రాసెసర్ విడుదలపై ఆధారపడి ఉంటుంది.';
+
+  @override
+  String get ui3CallBlurDescSaved =>
+      'బ్లర్ ప్రాధాన్యత సేవ్ చేయబడింది, కెమెరా ప్రాసెసింగ్ అందుబాటులోకి వచ్చినప్పుడు వర్తిస్తుంది.';
+
+  @override
+  String get ui3CallBlurDescCameraOff =>
+      'నేపథ్య ప్రాసెసింగ్ అందుబాటులోకి వచ్చిన తర్వాత కెమెరాను ఆన్ చేయండి.';
+
+  @override
+  String get ui3CallRecordingSection => 'రికార్డింగ్';
+
+  @override
+  String get ui3CallRecordingDesc =>
+      'రికార్డింగ్‌లను సేవ్ చేయడానికి సర్వర్ వైపు egress అవసరం.';
+
+  @override
+  String ui3CallSettingsUpdateFailed(Object error) {
+    return 'కాల్ సెట్టింగ్‌లను నవీకరించడం విఫలమైంది: $error';
+  }
+
+  @override
+  String get ui3CallRecordingStarted => 'రికార్డింగ్ ప్రారంభమైంది';
+
+  @override
+  String get ui3VoiceRoomNotFound => 'రూమ్ కనుగొనబడలేదు';
+
+  @override
+  String get ui3VoiceRoomEndConfirm =>
+      'ఈ వాయిస్ రూమ్‌ను ముగించాలనుకుంటున్నారా?';
+
+  @override
+  String get a11yGameMoveUp => 'పైకి జరపండి';
+
+  @override
+  String get a11yGameMoveDown => 'కిందికి జరపండి';
+
+  @override
+  String get a11yGameMoveLeft => 'ఎడమకు జరపండి';
+
+  @override
+  String get a11yGameMoveRight => 'కుడికి జరపండి';
+
+  @override
+  String get a11yGameRotate => 'తిప్పండి';
+
+  @override
+  String get a11yGameDrop => 'కిందకు వదలండి';
+
+  @override
+  String ui3StickerAddedCount(Object count) {
+    return '$count స్టిక్కర్‌లు జోడించబడ్డాయి';
+  }
+
+  @override
+  String ui3StickerAddFailed(Object error) {
+    return 'జోడించడం విఫలమైంది: $error';
+  }
+
+  @override
+  String get ui3StickerRemoveTitle => 'స్టిక్కర్‌ను తీసివేయండి';
+
+  @override
+  String get ui3StickerRemoveConfirm =>
+      'ఈ స్టిక్కర్‌ను ప్యాక్ నుండి తీసివేయాలా?';
+
+  @override
+  String get ui3StickerRemoveFailed => 'తీసివేయడం విఫలమైంది';
+
+  @override
+  String get ui3StickerRenamePack => 'ప్యాక్ పేరు మార్చండి';
+
+  @override
+  String get ui3StickerPackName => 'ప్యాక్ పేరు';
+
+  @override
+  String get ui3StickerRenameFailed => 'పేరు మార్చడం విఫలమైంది';
+
+  @override
+  String get ui3StickerDeletePack => 'ప్యాక్‌ను తొలగించండి';
+
+  @override
+  String get ui3StickerThisPack => 'ఈ ప్యాక్';
+
+  @override
+  String ui3StickerDeletePackConfirm(Object name) {
+    return '\"$name\" మరియు దానిలోని అన్ని స్టిక్కర్‌లను తొలగించాలా? దీన్ని రద్దు చేయలేరు.';
+  }
+
+  @override
+  String get ui3StickerDeleteFailed => 'తొలగించడం విఫలమైంది';
+
+  @override
+  String get ui3StickerPack => 'స్టిక్కర్ ప్యాక్';
+
+  @override
+  String get ui3StickerAdding => 'జోడిస్తోంది…';
+
+  @override
+  String get ui3StickerAddStickers => 'స్టిక్కర్‌లను జోడించండి';
+
+  @override
+  String get ui3StickerPackNotFound => 'ప్యాక్ కనుగొనబడలేదు';
+
+  @override
+  String get ui3StickerEmptyHint =>
+      'చిత్రాలను అప్‌లోడ్ చేయడానికి \"స్టిక్కర్‌లను జోడించండి\" నొక్కండి';
+
+  @override
+  String get ui3StickerNewPack => 'కొత్త స్టిక్కర్ ప్యాక్';
+
+  @override
+  String get ui3StickerCreate => 'సృష్టించండి';
+
+  @override
+  String get ui3StickerCreateFailed => 'ప్యాక్‌ను సృష్టించడం విఫలమైంది';
+
+  @override
+  String ui3StickerInstalled(Object name) {
+    return '\"$name\" ఇన్‌స్టాల్ చేయబడింది';
+  }
+
+  @override
+  String get ui3StickerRemovePackTitle => 'స్టిక్కర్ ప్యాక్‌ను తీసివేయండి';
+
+  @override
+  String ui3StickerRemovePackConfirm(Object name) {
+    return 'మీ స్టిక్కర్‌ల నుండి \"$name\"ను తీసివేయాలా?';
+  }
+
+  @override
+  String ui3StickerRemoved(Object name) {
+    return '\"$name\" తీసివేయబడింది';
+  }
+
+  @override
+  String get ui3StickerAiSticker => 'AI స్టిక్కర్';
+
+  @override
+  String get ui3StickerStoreTab => 'స్టోర్';
+
+  @override
+  String get ui3StickerMyStickersTab => 'నా స్టిక్కర్‌లు';
+
+  @override
+  String get ui3StickerNoneFound => 'స్టిక్కర్‌లు కనుగొనబడలేదు';
+
+  @override
+  String ui3StickerByAuthor(Object author) {
+    return '$author రూపొందించింది';
+  }
+
+  @override
+  String get ui3StickerManage => 'నిర్వహించండి';
+
+  @override
+  String ui3StickerCount(Object count) {
+    return '$count స్టిక్కర్‌లు';
+  }
+
+  @override
+  String get ui3StickerNoneInstalled => 'స్టిక్కర్‌లు ఏవీ ఇన్‌స్టాల్ కాలేదు';
+
+  @override
+  String get ui3StickerGetFromStore => 'స్టోర్ నుండి స్టిక్కర్‌లను పొందండి';
+
+  @override
+  String get ui3StickerBrowseStore => 'స్టోర్‌ను బ్రౌజ్ చేయండి';
+
+  @override
+  String get ui3StickerAddedToAi => '\"AI స్టిక్కర్‌లు\"కు జోడించబడింది';
+
+  @override
+  String get ui3StickerAddOneFailed => 'స్టిక్కర్‌ను జోడించడం విఫలమైంది';
+
+  @override
+  String get ui3StickerPromptLabel => 'మీ స్టిక్కర్‌ను వివరించండి';
+
+  @override
+  String get ui3StickerPromptHint =>
+      'ఉదా. సన్‌గ్లాసెస్ పెట్టుకున్న సంతోషంగా ఉన్న నారింజ పిల్లి';
+
+  @override
+  String get ui3StickerGenerating => 'రూపొందిస్తోంది…';
+
+  @override
+  String get ui3StickerGenerate => 'రూపొందించండి';
+
+  @override
+  String get ui3StickerAddToStickers => 'స్టిక్కర్‌లకు జోడించండి';
+
+  @override
+  String get ui3StickerGeneratingPreview => 'మీ స్టిక్కర్‌ను రూపొందిస్తోంది…';
+
+  @override
+  String get ui3StickerGenerateEmpty =>
+      'స్టిక్కర్‌ను వివరించి \"రూపొందించండి\" నొక్కండి';
 }

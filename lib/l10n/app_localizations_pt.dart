@@ -6406,6 +6406,2029 @@ class SPt extends S {
   String scheduledSendTomorrowMorningAt(String time) {
     return 'Amanhã de manhã ($time)';
   }
+
+  @override
+  String get a11yScrollToBottom => 'Deslocar para o fim';
+
+  @override
+  String get ui3EnterMessageBeforeScheduling =>
+      'Introduza uma mensagem antes de agendar';
+
+  @override
+  String get ui3SendCode => 'Enviar código';
+
+  @override
+  String get ui3CodeLanguage => 'Linguagem';
+
+  @override
+  String get ui3PasteCodeHere => 'Cole o código aqui';
+
+  @override
+  String ui3ReminderSetAt(String time) {
+    return 'Lembrete definido · $time';
+  }
+
+  @override
+  String get ui3RedPacketCreateFailed =>
+      'Não foi possível criar o envelope vermelho';
+
+  @override
+  String get ui3SendTip => 'Enviar gorjeta';
+
+  @override
+  String get ui3TokenLabel => 'Criptomoeda';
+
+  @override
+  String get ui3NoteOptional => 'Nota (opcional)';
+
+  @override
+  String ui3TipFailed(String error) {
+    return 'Falha na gorjeta: $error';
+  }
+
+  @override
+  String get ui3GiftNftTitle => 'Oferecer um NFT';
+
+  @override
+  String get ui3TokenId => 'ID do token';
+
+  @override
+  String ui3NftGiftFailed(String error) {
+    return 'Falha ao oferecer o NFT: $error';
+  }
+
+  @override
+  String get ui3AiAgentSubtitle => 'Descreva uma tarefa e abra a miniapp certa';
+
+  @override
+  String get ui3GiftNft => 'Oferecer NFT';
+
+  @override
+  String get ui3GiftNftSubtitle => 'Enviar um NFT a este contacto';
+
+  @override
+  String get ui3MiniAppUnavailable => 'A miniapp não está disponível';
+
+  @override
+  String ui3MediaItemsNotSent(int count) {
+    return 'Não foi possível enviar $count item(ns) multimédia selecionado(s)';
+  }
+
+  @override
+  String get ui3PhotosSubtitle =>
+      'Enviar fotos e vídeos num formato adequado ao chat';
+
+  @override
+  String get ui3OriginalImages => 'Imagens originais';
+
+  @override
+  String get ui3OriginalImagesSubtitle =>
+      'Enviar fotos sem compressão como ficheiros';
+
+  @override
+  String ui3ScheduledFileFor(String filename, String time) {
+    return '$filename agendado para $time';
+  }
+
+  @override
+  String ui3SendingOriginalImage(String filename) {
+    return 'A enviar imagem original: $filename';
+  }
+
+  @override
+  String ui3ScheduledOriginalImage(String filename) {
+    return 'Imagem original agendada: $filename';
+  }
+
+  @override
+  String get ui3PaymentAlreadySent => 'Pagamento já enviado';
+
+  @override
+  String get ui3PaymentProcessing => 'O pagamento está a ser processado';
+
+  @override
+  String ui3ChainStatus(String status) {
+    return 'Estado na cadeia: $status';
+  }
+
+  @override
+  String get ui3NotChecked => 'Não verificado';
+
+  @override
+  String ui3ConfirmationsCount(int confirmations, int required) {
+    return 'Confirmado: $confirmations / $required blocos';
+  }
+
+  @override
+  String get ui3CopyTxHash => 'Copiar hash da transação';
+
+  @override
+  String get ui3VerifyAgain => 'Verificar novamente';
+
+  @override
+  String get ui3VerifyOnChain => 'Verificar na cadeia';
+
+  @override
+  String get ui3TransferMissingChainDetails =>
+      'Esta transferência não inclui os detalhes exatos da cadeia e do ativo.';
+
+  @override
+  String get ui3ReceiptPending => 'Pendente na cadeia';
+
+  @override
+  String get ui3ReceiptConfirmed => 'Confirmado';
+
+  @override
+  String get ui3ReceiptFailed => 'Falhou na cadeia';
+
+  @override
+  String get ui3ReceiptMismatch => 'Os detalhes da transação não coincidem';
+
+  @override
+  String get ui3ReceiptUnsupported => 'Verificação na cadeia não suportada';
+
+  @override
+  String get ui3ReceiptUnavailable => 'Verificação indisponível';
+
+  @override
+  String get ui3OpenOrSave => 'Abrir / Guardar';
+
+  @override
+  String get ui3UnableToOpenFile => 'Não é possível abrir este ficheiro.';
+
+  @override
+  String ui3AiRewriteFailed(String error) {
+    return 'Falha na reescrita com IA: $error';
+  }
+
+  @override
+  String get ui3AiShareMessagesTitle => 'Partilhar mensagens com a IA?';
+
+  @override
+  String get ui3AiShareMessagesBody =>
+      'Selecione as mensagens que a IA pode usar para esta resposta. Esta autorização de pedido único expira após dois minutos. Fechar a Resposta rápida cancela os resultados pendentes. Não permite pagamentos nem exportações.';
+
+  @override
+  String get ui3OtherParticipant => 'Outra pessoa';
+
+  @override
+  String get ui3ShareSelected => 'Partilhar selecionadas';
+
+  @override
+  String get ui3BotCommandError => 'Erro de comando';
+
+  @override
+  String get ui3BotUnknownCommand => 'Comando desconhecido';
+
+  @override
+  String get ui3BotTypeHelp =>
+      'Escreva /help para ver os comandos disponíveis.';
+
+  @override
+  String get ui3FilesMediaLinks => 'Ficheiros, multimédia e ligações';
+
+  @override
+  String get ui3ChatStorage => 'Armazenamento do chat';
+
+  @override
+  String get ui3EncryptionKeysDevices => 'Chaves de encriptação e dispositivos';
+
+  @override
+  String get ui3EncryptionServiceUnavailable =>
+      'O serviço de encriptação ainda não está disponível';
+
+  @override
+  String get ui3ExportLoadingHistory =>
+      'A carregar mais histórico do chat para exportação...';
+
+  @override
+  String get ui3ExportTxtDesc =>
+      'Transcrição em texto simples para notas, cópia de segurança ou revisão de conformidade';
+
+  @override
+  String get ui3ExportCustomRange => 'Intervalo personalizado';
+
+  @override
+  String get ui3ExportStart => 'Início';
+
+  @override
+  String get ui3ExportEnd => 'Fim';
+
+  @override
+  String get ui3ExportSelectDate => 'Selecionar data';
+
+  @override
+  String get ui3FolderFilterUnreadOnly => 'Apenas não lidas';
+
+  @override
+  String get ui3FolderFilterMutedOnly => 'Apenas silenciadas';
+
+  @override
+  String get ui3FolderFilterNoDms => 'Sem mensagens diretas';
+
+  @override
+  String get ui3FolderFilterNoGroups => 'Sem grupos';
+
+  @override
+  String get ui3FolderFilterNoChannels => 'Sem canais';
+
+  @override
+  String get ui3FolderFilterAllChats => 'Todos os chats';
+
+  @override
+  String get ui3Create => 'Criar';
+
+  @override
+  String ui3DeleteFolderConfirm(String name) {
+    return 'Eliminar a pasta \"$name\"?';
+  }
+
+  @override
+  String get a11yDecreaseTextSize => 'Diminuir tamanho do texto';
+
+  @override
+  String get a11yIncreaseTextSize => 'Aumentar tamanho do texto';
+
+  @override
+  String ui3MinutesRead(int minutes) {
+    return '$minutes min de leitura';
+  }
+
+  @override
+  String get ui3TipOnChain => 'Na cadeia ✓';
+
+  @override
+  String get ui3ViewSource => 'Ver código-fonte';
+
+  @override
+  String get a11yPreviousPage => 'Página anterior';
+
+  @override
+  String get a11yNextPage => 'Página seguinte';
+
+  @override
+  String get ui3OpenExternalLinkTitle => 'Abrir ligação externa?';
+
+  @override
+  String get ui3Open => 'Abrir';
+
+  @override
+  String get ui3UnableToOpenLink => 'Não é possível abrir esta ligação.';
+
+  @override
+  String get ui3ImageUnavailable => 'Imagem indisponível';
+
+  @override
+  String ui3LoadImageFrom(Object host) {
+    return 'Carregar imagem de $host';
+  }
+
+  @override
+  String ui3RetryImageFrom(Object host) {
+    return 'Tentar novamente a imagem de $host';
+  }
+
+  @override
+  String get ui3TranslatedByN42 => 'Traduzido por N42';
+
+  @override
+  String ui3TranslatedFromByN42(Object language) {
+    return 'Traduzido de $language por N42';
+  }
+
+  @override
+  String get ui3ClearWhiteboardTitle => 'Limpar o quadro branco?';
+
+  @override
+  String get ui3ClearWhiteboardMessage =>
+      'Todos os traços serão removidos para todos. Esta ação não pode ser anulada.';
+
+  @override
+  String get ui3WhiteboardLive => 'Quadro branco · Em direto';
+
+  @override
+  String get a11yPenColor => 'Cor da caneta';
+
+  @override
+  String get ui3AiDescribeOcr => 'Descrição por IA / OCR';
+
+  @override
+  String get ui3DocumentPreviewFailed =>
+      'Não é possível pré-visualizar este documento com segurança. Verifique a ligação e o tamanho do ficheiro (máx. 2 MB).';
+
+  @override
+  String get ui3AiConsentMessage =>
+      'Selecione as mensagens que a IA pode usar para este resumo. Esta autorização de pedido único expira após dois minutos. Não permite pagamentos nem exportações.';
+
+  @override
+  String get ui3AiSuggestedReplies => 'Respostas sugeridas';
+
+  @override
+  String get ui3AiGeneratingSuggestions => 'A gerar sugestões...';
+
+  @override
+  String get ui3StickersEmpty => 'Ainda não há autocolantes';
+
+  @override
+  String get ui3StickersGet => 'Obter autocolantes';
+
+  @override
+  String get a11yFormatBold => 'Negrito';
+
+  @override
+  String get a11yFormatItalic => 'Itálico';
+
+  @override
+  String get a11yFormatStrikethrough => 'Rasurado';
+
+  @override
+  String get a11yFormatInlineCode => 'Código em linha';
+
+  @override
+  String get a11yFormatCodeBlock => 'Bloco de código';
+
+  @override
+  String get a11yFormatChecklistItem => 'Item de lista de verificação';
+
+  @override
+  String get a11yFormatBulletList => 'Lista com marcadores';
+
+  @override
+  String get a11yFormatNumberedList => 'Lista numerada';
+
+  @override
+  String get a11yFormatLink => 'Ligação';
+
+  @override
+  String get a11yFormatTable => 'Tabela';
+
+  @override
+  String get a11yFormatMeetingTemplate => 'Modelo de reunião';
+
+  @override
+  String get a11yEmojiSmileys => 'Smileys e pessoas';
+
+  @override
+  String get a11yEmojiHearts => 'Corações';
+
+  @override
+  String get a11yEmojiAnimals => 'Animais e natureza';
+
+  @override
+  String get a11yEmojiFood => 'Comida e bebida';
+
+  @override
+  String get a11yEmojiTravel => 'Viagens e locais';
+
+  @override
+  String get a11yEmojiActivities => 'Atividades';
+
+  @override
+  String get a11yEmojiObjects => 'Objetos';
+
+  @override
+  String get a11yEmojiSymbols => 'Símbolos';
+
+  @override
+  String get ui3FrequentlyUsed => 'Usados frequentemente';
+
+  @override
+  String get ui3NoEditHistory => 'Sem histórico de edições';
+
+  @override
+  String get ui3EventNew => 'Novo evento';
+
+  @override
+  String get ui3EventTitleLabel => 'Título';
+
+  @override
+  String get ui3EventLocationOptional => 'Local (opcional)';
+
+  @override
+  String get ui3EventDescriptionOptional => 'Descrição (opcional)';
+
+  @override
+  String get ui3EventSend => 'Enviar evento';
+
+  @override
+  String get ui3EventTitleRequired => 'O título é obrigatório';
+
+  @override
+  String get ui3EventEndAfterStart =>
+      'A hora de fim tem de ser posterior ao início';
+
+  @override
+  String get ui3MiniAppAgentIntro =>
+      'Descreva o que pretende fazer e eu abro a mini app certa.';
+
+  @override
+  String get ui3MiniAppAgentExample => 'p. ex., trocar ETH por USDC';
+
+  @override
+  String get ui3MiniAppAgentNoMatch =>
+      'Nenhuma mini app correspondente. Tente reformular.';
+
+  @override
+  String ui3MiniAppOpen(Object appName) {
+    return 'Abrir $appName';
+  }
+
+  @override
+  String get ui3MusicLinkPlatforms =>
+      'Suporta ligações de músicas do NetEase Cloud Music, QQ Music, Kugou, Kuwo e outros';
+
+  @override
+  String get ui3PollMarkCorrectAnswer =>
+      'Marque uma resposta correta não vazia';
+
+  @override
+  String get ui3PollQuizMode => 'Modo questionário';
+
+  @override
+  String get ui3PollAnswerExplanationHint =>
+      'Explicação da resposta (opcional)';
+
+  @override
+  String get a11yCorrectAnswer => 'Resposta correta';
+
+  @override
+  String get ui3AiSuggestions => 'Sugestões de IA';
+
+  @override
+  String get a11yPaste => 'Colar';
+
+  @override
+  String get a11yRefresh => 'Atualizar';
+
+  @override
+  String get ui3RecoveryKeyStoreWarning =>
+      'Guarde esta chave em segurança. É a única forma de recuperar as suas mensagens encriptadas se perder o acesso a todos os dispositivos.';
+
+  @override
+  String ui3SavedToPath(Object path) {
+    return 'Guardado: $path';
+  }
+
+  @override
+  String get ui3UnknownAccount => 'Conta desconhecida';
+
+  @override
+  String get ui3UnknownHomeserver => 'Servidor desconhecido';
+
+  @override
+  String get ui3ImportRecoveryKey => 'Importar chave de recuperação';
+
+  @override
+  String get ui3ImportRecoveryKeyDesc =>
+      'Introduza ou cole a sua chave de recuperação para restaurar as chaves das salas do histórico de mensagens encriptadas.';
+
+  @override
+  String ui3RecoveryKeyAccountInfo(Object account, Object homeserver) {
+    return 'Conta: $account\\nServidor: $homeserver';
+  }
+
+  @override
+  String get ui3Import => 'Importar';
+
+  @override
+  String get ui3InvalidRecoveryKeyFormat =>
+      'Formato de chave de recuperação inválido';
+
+  @override
+  String ui3RecoveryKeyPartialRestore(
+    Object restored,
+    Object total,
+    Object failed,
+  ) {
+    return '$restored de $total chaves restauradas. Falharam $failed chaves. Verifique a conta, a rede e a cópia de segurança e tente novamente. Parte do histórico pode continuar ilegível.';
+  }
+
+  @override
+  String ui3RecoveryKeyRestoreSuccess(Object restored, Object total) {
+    return '$restored de $total chaves restauradas com êxito';
+  }
+
+  @override
+  String ui3ImportFailed(Object error) {
+    return 'Falha na importação: $error';
+  }
+
+  @override
+  String ui3PasskeyRegistrationFailed(Object error) {
+    return 'Falha ao registar a chave de acesso: $error';
+  }
+
+  @override
+  String get ui3PasskeyDefaultName => 'A minha chave de acesso';
+
+  @override
+  String get ui3PasskeyNameHint => 'p. ex., iPhone, MacBook';
+
+  @override
+  String get ui3PasskeyDeleteFailed => 'Falha ao eliminar a chave de acesso';
+
+  @override
+  String get ui3TwoFactorAuth => 'Autenticação de dois fatores';
+
+  @override
+  String get ui3TwoFactorOnSubtitle =>
+      'Ativada — é necessário o código da app de autenticação';
+
+  @override
+  String get ui3TwoFactorOffSubtitle =>
+      'Desativada — proteja com uma app de autenticação (TOTP)';
+
+  @override
+  String get ui3ShowRecoveryKey => 'Mostrar chave de recuperação';
+
+  @override
+  String get ui3ShowRecoveryKeyDesc =>
+      'Mostre a sua chave de recuperação para cópia de segurança';
+
+  @override
+  String get ui3ImportRecoveryKeyHint =>
+      'Restaurar mensagens com uma chave de recuperação';
+
+  @override
+  String get ui3RecoveryKeyCreateFailed =>
+      'Falha ao criar a chave de recuperação';
+
+  @override
+  String get ui3TotpIncorrectCode => 'Código incorreto, tente novamente';
+
+  @override
+  String get ui3TwoFactorEnabled => 'Autenticação de dois fatores ativada';
+
+  @override
+  String get ui3TwoFactorDisabled => 'Autenticação de dois fatores desativada';
+
+  @override
+  String get ui3TwoFactorTurnOffTitle =>
+      'Desativar a autenticação de dois fatores?';
+
+  @override
+  String get ui3TwoFactorTurnOffMessage =>
+      'A app de autenticação deixará de ser necessária. Pode configurá-la novamente mais tarde com uma nova chave.';
+
+  @override
+  String get ui3TurnOff => 'Desativar';
+
+  @override
+  String get ui3TwoFactorTotpTitle => 'Dois fatores (TOTP)';
+
+  @override
+  String get ui3TwoFactorIsOn => 'A autenticação de dois fatores está ativada';
+
+  @override
+  String get ui3TwoFactorCodeRequired =>
+      'É necessário um código da sua app de autenticação.';
+
+  @override
+  String get ui3TotpStepScan =>
+      '1. Leia este código QR com uma app de autenticação (Google Authenticator, Authy, 1Password…) ou introduza a chave manualmente.';
+
+  @override
+  String get ui3TotpKeyCopied => 'Chave copiada';
+
+  @override
+  String get ui3TotpStepConfirm =>
+      '2. Introduza o código de 6 dígitos para confirmar.';
+
+  @override
+  String get ui3Enable => 'Ativar';
+
+  @override
+  String get ui3BackupSettingsDesc =>
+      'Faça uma cópia de segurança das definições de chat locais. As mensagens serão restauradas a partir do servidor depois de voltar a iniciar sessão.';
+
+  @override
+  String get ui3BackupKeysSeparate =>
+      'As chaves de encriptação são geridas separadamente';
+
+  @override
+  String get ui3BackupKeysSeparateHint =>
+      'Use Segurança > Chave de recuperação para fazer cópia de segurança do acesso às mensagens encriptadas.';
+
+  @override
+  String ui3BackupRoomsSize(Object rooms, Object size) {
+    return '$rooms salas  $size';
+  }
+
+  @override
+  String get ui3BackupRestoreFromFileDesc =>
+      'Importe um ficheiro .n42backup de outro dispositivo ou de uma cópia anterior. As chaves de encriptação são restauradas separadamente com a sua chave de recuperação.';
+
+  @override
+  String get ui3UsernameSessionRequired =>
+      'O nome de utilizador requer uma sessão ativa';
+
+  @override
+  String get ui3SecuritySessionRequired =>
+      'As definições de segurança requerem uma sessão ativa';
+
+  @override
+  String get ui3ConnectedAccountsSessionRequired =>
+      'As contas associadas requerem uma sessão ativa';
+
+  @override
+  String get ui3SystemAccounts => 'Sistema e contas';
+
+  @override
+  String get ui3AccountIdentity => 'Conta e identidade';
+
+  @override
+  String get ui3Accounts => 'Contas';
+
+  @override
+  String get ui3DevicesSessions => 'Dispositivos e sessões';
+
+  @override
+  String get ui3Integrations => 'Integrações';
+
+  @override
+  String get ui3ConnectedAccounts => 'Contas associadas';
+
+  @override
+  String get ui3ConnectedAccountsDesc =>
+      'Integrações com Telegram, WhatsApp, Discord e pontes de API';
+
+  @override
+  String get ui3SystemOverview => 'Visão geral do sistema';
+
+  @override
+  String ui3AccountCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count contas',
+      one: '1 conta',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String ui3DeviceCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dispositivos',
+      one: '1 dispositivo',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get ui3PrivacySecurityOverview =>
+      'Encriptação ponto a ponto, proteção contra capturas de ecrã e controlo de proxy';
+
+  @override
+  String get ui3ConversationPrivacy => 'Privacidade das conversas';
+
+  @override
+  String get ui3NetworkPrivacy => 'Privacidade da rede';
+
+  @override
+  String get ui3IdentityPrivacy => 'Privacidade da identidade';
+
+  @override
+  String get ui3EncryptionKeyBackup =>
+      'Encriptação e cópia de segurança de chaves';
+
+  @override
+  String get ui3DevicesVerification => 'Dispositivos e verificação';
+
+  @override
+  String get ui3ChipE2eeDefault => 'E2EE por predefinição';
+
+  @override
+  String get ui3ChipManualE2ee => 'E2EE manual';
+
+  @override
+  String get ui3ChipSelfDestruct => 'Autodestruição';
+
+  @override
+  String get ui3ChipScreenshotGuard => 'Proteção de capturas';
+
+  @override
+  String get ui3ChipIpProxy => 'IP / servidor proxy';
+
+  @override
+  String get ui3ChipLinkPreviewsOff =>
+      'Pré-visualizações de ligações desativadas';
+
+  @override
+  String get ui3ChipPublicHandle => 'Nome de utilizador público';
+
+  @override
+  String get a11yShowPassword => 'Mostrar palavra-passe';
+
+  @override
+  String get a11yHidePassword => 'Ocultar palavra-passe';
+
+  @override
+  String get a11yCheckServer => 'Verificar servidor';
+
+  @override
+  String get ui3AuthAnonymousRegistration => 'Registo anónimo';
+
+  @override
+  String get ui3AuthAnonymousRegistrationDesc =>
+      'Crie uma conta sem associar telemóvel ou e-mail. Será gerado automaticamente um nome de utilizador.';
+
+  @override
+  String get ui3AuthAnonymousModeOn => 'O modo anónimo está ativado';
+
+  @override
+  String get ui3AuthAnonymousModeOnDesc =>
+      'A app vai criar um nome de utilizador Matrix aleatório para si. Poderá iniciar sessão mais tarde com a conta e a palavra-passe geradas.';
+
+  @override
+  String get ui3AuthChooseLoginMethod => 'Escolher método de início de sessão';
+
+  @override
+  String get ui3AuthSsoOpenFailed =>
+      'Não foi possível abrir a página de início de sessão SSO';
+
+  @override
+  String get ui3AuthWalletUnavailable => 'A carteira não está disponível';
+
+  @override
+  String get ui3ProfileSubscriptions => 'Subscrições';
+
+  @override
+  String get ui3ProfileBuySellCrypto => 'Comprar / vender cripto';
+
+  @override
+  String get ui3ProfileOnDeviceAi => 'IA no dispositivo';
+
+  @override
+  String get ui3ProfileSetAUsername => 'Definir um nome de utilizador';
+
+  @override
+  String get ui3ProfileAvatarStudio => 'Estúdio de avatar';
+
+  @override
+  String get ui3ProfileAvatarStudioSubtitle => 'Avatar NFT / Decorações';
+
+  @override
+  String get ui3ProfileCustomize => 'Personalizar';
+
+  @override
+  String get ui3ProfileQrSubtitle =>
+      'Leia o código para abrir este perfil ou iniciar uma conversa';
+
+  @override
+  String get ui3PrivacyHardening => 'Reforço da privacidade';
+
+  @override
+  String get ui3HidePhoneNumber => 'Ocultar número de telemóvel';
+
+  @override
+  String get ui3HidePhoneNumberDesc =>
+      'Ocultar o número de telemóvel associado nos ecrãs de perfil deste dispositivo';
+
+  @override
+  String get ui3EncryptNewChatsByDefault =>
+      'Encriptar novas conversas por predefinição';
+
+  @override
+  String get ui3EncryptNewChatsByDefaultDesc =>
+      'Iniciar novas conversas diretas e salas privadas com E2EE ativada';
+
+  @override
+  String get ui3PrivateChatMode => 'Modo de conversa privada';
+
+  @override
+  String get ui3PrivateChatModeDesc =>
+      'Bloquear temporariamente capturas de ecrã ao ver conversas privadas ou encriptadas';
+
+  @override
+  String get ui3DefaultSelfDestructTimer =>
+      'Temporizador de autodestruição predefinido';
+
+  @override
+  String get ui3DefaultSelfDestructTimerDesc =>
+      'Aplicar um temporizador de autodestruição predefinido às novas mensagens enviadas';
+
+  @override
+  String get ui3LinkPreviews => 'Pré-visualizações de ligações';
+
+  @override
+  String get ui3LinkPreviewsDesc =>
+      'Obter títulos, descrições e miniaturas quando as mensagens contêm URL';
+
+  @override
+  String get ui3IpAddressProtection => 'Proteção do endereço IP';
+
+  @override
+  String get ui3IpAddressProtectionDesc =>
+      'Encaminhar os pedidos Matrix e de pré-visualização através do proxy HTTP de privacidade configurado, quando disponível';
+
+  @override
+  String get ui3UseTorProxy => 'Usar proxy HTTP Tor / Privoxy';
+
+  @override
+  String get ui3UseTorProxyDesc =>
+      'Use um endpoint de proxy HTTP local, como o Privoxy em 127.0.0.1:8118. O encaminhamento Tor nativo por SOCKS5 não é suportado aqui.';
+
+  @override
+  String get ui3CustomProxy => 'Proxy personalizado';
+
+  @override
+  String get ui3CustomProxyDesc =>
+      'Usar um proxy HTTP ou HTTPS personalizado para o tráfego Matrix e as pré-visualizações de ligações';
+
+  @override
+  String get ui3ProxyEndpoint => 'Endereço do proxy';
+
+  @override
+  String get ui3ProxyEndpointDesc =>
+      'Endereço de proxy HTTP/HTTPS (SOCKS não suportado)';
+
+  @override
+  String get ui3InvalidEndpoint => 'Endereço inválido';
+
+  @override
+  String get ui3CustomProxyStaysOff =>
+      'O proxy personalizado permanece desativado até definir um endereço válido';
+
+  @override
+  String get ui3NotificationFilterNote =>
+      'As regras prioritárias notificam sempre (ignorando silêncio, só menções e Não incomodar). As palavras-chave silenciadas suprimem as notificações.';
+
+  @override
+  String get ui3PriorityKeywords => 'Palavras-chave prioritárias';
+
+  @override
+  String get ui3PriorityKeywordHint => 'p. ex., urgente';
+
+  @override
+  String get ui3MutedKeywords => 'Palavras-chave silenciadas';
+
+  @override
+  String get ui3MutedKeywordHint => 'p. ex., spam';
+
+  @override
+  String get ui3PrioritySenders => 'Remetentes prioritários';
+
+  @override
+  String get ui3CaseSensitive => 'Distinguir maiúsculas e minúsculas';
+
+  @override
+  String get ui3None => 'Nenhuma';
+
+  @override
+  String get ui3SmartReplyTranslation => 'Tradução de respostas inteligentes';
+
+  @override
+  String get ui3SmartReplyTranslationDesc =>
+      'Traduzir automaticamente as suas mensagens para o idioma do destinatário antes de enviar.';
+
+  @override
+  String get ui3FromPhotos => 'Das Fotografias';
+
+  @override
+  String get ui3ChangePhoto => 'Alterar fotografia';
+
+  @override
+  String get ui3RoamingUsesMobileData =>
+      'O roaming usa as regras de dados móveis';
+
+  @override
+  String get ui3RoamingUsesMobileDataDesc =>
+      'A deteção de roaming ainda não está disponível, pelo que o roaming segue atualmente as definições de transferência automática dos dados móveis.';
+
+  @override
+  String ui3DeleteQuickReplyConfirm(String content) {
+    return 'Eliminar \"$content\"?';
+  }
+
+  @override
+  String get ui3ResetToDefaults => 'Repor predefinições';
+
+  @override
+  String get ui3ResetQuickRepliesMessage =>
+      'Isto irá remover todas as respostas rápidas personalizadas e repor as predefinidas. Continuar?';
+
+  @override
+  String get ui3LocalLlmUnavailable => 'Não suportado neste dispositivo';
+
+  @override
+  String get ui3LocalLlmNotDownloaded => 'Modelo não transferido';
+
+  @override
+  String get ui3LocalLlmReady => 'Pronto (no dispositivo)';
+
+  @override
+  String get ui3LocalLlmDescription =>
+      'Quando ativadas e prontas, as funcionalidades de IA (resumir, reescrever, traduzir, responder) são executadas totalmente no dispositivo — os dados nunca saem do seu telemóvel. Caso contrário, usam o fornecedor na nuvem.';
+
+  @override
+  String get ui3UseOnDeviceAi => 'Usar IA no dispositivo';
+
+  @override
+  String get ui3UseOnDeviceAiDesc =>
+      'Preferir inferência local quando estiver pronta';
+
+  @override
+  String get ui3DownloadModel => 'Transferir modelo';
+
+  @override
+  String get ui3LocalLlmRuntimeRequired =>
+      'A inferência no dispositivo requer o runtime nativo (Android MediaPipe / iOS Core ML). Será ativada automaticamente assim que o handler da plataforma estiver disponível.';
+
+  @override
+  String get ui3PhotoAvatar => 'Avatar de fotografia';
+
+  @override
+  String get ui3AvatarStyles => 'Estilos de avatar';
+
+  @override
+  String get ui3AvatarStylesDesc =>
+      'Usar um único seletor de decorações para o perfil e os pontos de acesso ao avatar.';
+
+  @override
+  String get ui3ReplaceNftAvatar => 'Substituir avatar NFT';
+
+  @override
+  String get ui3NftAvatarDesc => 'Use um colecionável on-chain como avatar.';
+
+  @override
+  String get ui3UsePhotoAvatar => 'Usar avatar de fotografia';
+
+  @override
+  String get ui3UsePhotoAvatarDesc =>
+      'Manter o avatar carregado e remover a associação ao NFT.';
+
+  @override
+  String ui3AvatarStyleSet(Object name) {
+    return 'Estilo de avatar definido para: $name';
+  }
+
+  @override
+  String get ui3NftAvatarUpdated => 'Avatar NFT atualizado';
+
+  @override
+  String get ui3SwitchedToPhotoAvatar => 'Voltou ao avatar de fotografia';
+
+  @override
+  String get ui3SignInToViewRedPacketHistory =>
+      'Inicie sessão para ver o histórico de envelopes vermelhos';
+
+  @override
+  String get ui3RedPacketActive => 'Ativos';
+
+  @override
+  String get ui3RedPacketCompleted => 'Concluídos';
+
+  @override
+  String get ui3CardsAndPasses => 'Cartões e passes';
+
+  @override
+  String get ui3CardsAndPassesDesc =>
+      'Os cartões da carteira, cupões e passes são geridos na app principal.';
+
+  @override
+  String get ui3CardPackRequiresMainApp =>
+      'O pacote de cartões requer a app principal';
+
+  @override
+  String get ui3OpenCardPack => 'Abrir pacote de cartões';
+
+  @override
+  String get ui3UnableToOpenChat =>
+      'Não é possível abrir uma conversa com este contacto';
+
+  @override
+  String get ui3WalletManagedInMainApp =>
+      'A carteira é gerida na app principal';
+
+  @override
+  String ui3CreatorPlans(Object name) {
+    return '$name · Planos';
+  }
+
+  @override
+  String get ui3NewPlan => 'Novo plano';
+
+  @override
+  String get ui3MySubscriptions => 'As minhas subscrições';
+
+  @override
+  String get ui3AvailablePlans => 'Planos disponíveis';
+
+  @override
+  String get ui3NoPlansYet =>
+      'Ainda sem planos · toque em \"Novo plano\" para criar um';
+
+  @override
+  String ui3DaysLeft(Object days) {
+    return 'Faltam $days d';
+  }
+
+  @override
+  String get ui3SubscriptionCancelled => 'Cancelada';
+
+  @override
+  String get ui3AutoRenewOn => 'Renovação automática: ativada';
+
+  @override
+  String get ui3AutoRenewOff => 'Renovação automática: desativada';
+
+  @override
+  String get ui3CancelSubscriptionTitle => 'Cancelar subscrição?';
+
+  @override
+  String ui3CancelSubscriptionConfirm(Object name) {
+    return 'A sua subscrição de $name mantém-se ativa até expirar e não será renovada.';
+  }
+
+  @override
+  String get ui3Subscribe => 'Subscrever';
+
+  @override
+  String ui3SubscribedTo(Object name) {
+    return 'Subscreveu $name';
+  }
+
+  @override
+  String get ui3PlanPriceLabel => 'Preço (ex.: 9.9 USDT)';
+
+  @override
+  String get ui3PlanDescriptionLabel => 'Descrição (opcional)';
+
+  @override
+  String get ui3PlanBenefitsLabel => 'Benefícios (separados por vírgulas)';
+
+  @override
+  String get ui3PlanPeriod => 'Período:';
+
+  @override
+  String get ui3Monthly => 'Mensal';
+
+  @override
+  String get ui3Yearly => 'Anual';
+
+  @override
+  String get ui3SaveRemarkFailed => 'Falha ao guardar a nota';
+
+  @override
+  String get ui3CopyLink => 'Copiar ligação';
+
+  @override
+  String get ui3Connect => 'Ligar';
+
+  @override
+  String get ui3CommonTokens => 'Tokens em comum';
+
+  @override
+  String get ui3SharedNfts => 'NFT em comum';
+
+  @override
+  String get ui3TransactionHistory => 'Histórico de transações';
+
+  @override
+  String get ui3CommonDaos => 'DAO em comum';
+
+  @override
+  String get ui3SameChains => 'Mesmas cadeias';
+
+  @override
+  String get ui3ChatInitFailed => 'Falha ao iniciar o chat';
+
+  @override
+  String get ui3CheckNetworkRetry =>
+      'Verifique a sua ligação de rede e tente novamente';
+
+  @override
+  String get ui3FromContacts => 'A partir dos contactos';
+
+  @override
+  String get ui3FindFriendsFromContacts =>
+      'Encontre amigos nos contactos do telemóvel';
+
+  @override
+  String get ui3EnsOrDomain => 'ENS / Domínio';
+
+  @override
+  String get ui3LoadingContacts => 'A carregar contactos...';
+
+  @override
+  String get ui3ContactsPermissionRequired =>
+      'É necessária permissão de contactos';
+
+  @override
+  String get ui3ContactsPermissionMessage =>
+      'Para encontrar amigos nos seus contactos, permita o acesso aos contactos.';
+
+  @override
+  String get ui3AllowAccess => 'Permitir acesso';
+
+  @override
+  String get ui3NoContactMatches => 'Nenhuma correspondência encontrada';
+
+  @override
+  String get ui3NoContactMatchesMessage =>
+      'Nenhum dos seus contactos usa esta app ainda. Convide-os a aderir!';
+
+  @override
+  String ui3ScannedContacts(Object count) {
+    return '$count contactos analisados';
+  }
+
+  @override
+  String ui3FoundContactMatches(Object count) {
+    return 'Encontradas $count correspondências nos seus contactos';
+  }
+
+  @override
+  String ui3InContactsAs(Object name) {
+    return 'Nos contactos: $name';
+  }
+
+  @override
+  String get ui3DeletePhotoConfirm => 'Eliminar esta foto?';
+
+  @override
+  String get ui3InviteLink => 'Ligação de convite';
+
+  @override
+  String get ui3ShareJoinLink => 'Partilhar uma ligação para entrar nesta sala';
+
+  @override
+  String get ui3ShareRoomReference =>
+      'Partilhar uma referência da sala com membros convidados';
+
+  @override
+  String get ui3ScanToJoinGroup =>
+      'Leia o código para entrar diretamente neste grupo';
+
+  @override
+  String get ui3ScanToShareRoomReference =>
+      'Leia o código para partilhar a referência desta sala com membros convidados';
+
+  @override
+  String get ui3InviteLinkLoadFailed =>
+      'Falha ao carregar a ligação de convite';
+
+  @override
+  String get ui3InviteLinkCopied => 'Ligação de convite copiada';
+
+  @override
+  String get ui3ChannelCategoryOptional => 'Categoria (opcional)';
+
+  @override
+  String get ui3ChannelCategoryHint => 'Anúncios / Produto / Suporte';
+
+  @override
+  String get ui3DescriptionOptional => 'Descrição (opcional)';
+
+  @override
+  String get ui3WebhookEnable => 'Ativar automatização por webhook';
+
+  @override
+  String get ui3WebhookEnableDesc =>
+      'Envia eventos de entrada de membros e boas-vindas para o seu endpoint de integração.';
+
+  @override
+  String get ui3WebhookUrl => 'URL do webhook';
+
+  @override
+  String get ui3WebhookSecretOptional => 'Segredo de assinatura (opcional)';
+
+  @override
+  String get ui3WebhookSecretHint => 'Usado para X-N42-Signature';
+
+  @override
+  String get ui3WebhookNotifyMemberJoined => 'Notificar quando um membro entra';
+
+  @override
+  String get ui3WebhookNotifyWelcomeSent =>
+      'Notificar quando as boas-vindas são enviadas';
+
+  @override
+  String get ui3WebhookTestSend => 'Enviar webhook de teste';
+
+  @override
+  String get ui3WebhookTestSending => 'A enviar webhook de teste...';
+
+  @override
+  String get ui3WebhookTestSent => 'Webhook de teste enviado com sucesso';
+
+  @override
+  String get ui3WebhookTestFailed => 'Falha ao enviar o webhook de teste';
+
+  @override
+  String get ui3WebhookUrlInvalid =>
+      'O URL do webhook tem de ser um endereço HTTPS público';
+
+  @override
+  String get ui3WebhookSelectEvent =>
+      'Selecione pelo menos um evento de webhook';
+
+  @override
+  String get ui3SensitiveDataDetection => 'Deteção de dados sensíveis';
+
+  @override
+  String get ui3Email => 'E-mail';
+
+  @override
+  String get ui3CreditCard => 'Cartão de crédito';
+
+  @override
+  String get ui3DetectEmailDesc =>
+      'Detetar endereços de e-mail em mensagens de texto';
+
+  @override
+  String get ui3DetectPhoneDesc =>
+      'Detetar números de telefone e internacionais';
+
+  @override
+  String get ui3DetectCardDesc =>
+      'Detetar prováveis números bancários e de cartão';
+
+  @override
+  String get ui3DetectWalletDesc =>
+      'Detetar endereços de carteira ao estilo Ethereum';
+
+  @override
+  String get ui3GeneralTopic => 'Geral';
+
+  @override
+  String get a11yPreviousResult => 'Resultado anterior';
+
+  @override
+  String get a11yNextResult => 'Resultado seguinte';
+
+  @override
+  String get ui3TryDifferentKeywords => 'Experimente outras palavras-chave';
+
+  @override
+  String ui3FiltersActive(Object count) {
+    return 'Filtros ativos: $count';
+  }
+
+  @override
+  String ui3MessageFiltersActive(Object count) {
+    return 'Filtros de mensagens ativos: $count';
+  }
+
+  @override
+  String get ui3LoadMore => 'Carregar mais';
+
+  @override
+  String get ui3MessageFilters => 'Filtros de mensagens';
+
+  @override
+  String get ui3SenderUserId => 'ID de utilizador do remetente';
+
+  @override
+  String get ui3FilterType => 'Tipo';
+
+  @override
+  String get ui3FilterAny => 'Qualquer';
+
+  @override
+  String get ui3FilterImage => 'Imagem';
+
+  @override
+  String get ui3FilterTime => 'Data';
+
+  @override
+  String get ui3AnyTime => 'Qualquer data';
+
+  @override
+  String get ui3OnlyMyMessages => 'Apenas as minhas mensagens';
+
+  @override
+  String get ui3MediaOnly => 'Apenas multimédia';
+
+  @override
+  String get ui3Apply => 'Aplicar';
+
+  @override
+  String get ui3QrStyleClassic => 'Clássico';
+
+  @override
+  String get ui3QrStyleOcean => 'Oceano';
+
+  @override
+  String get ui3QrStyleBerry => 'Baga';
+
+  @override
+  String get ui3NfcUnavailable =>
+      'NFC indisponível ou etiqueta não suportada. Ative o NFC, experimente outra etiqueta ou use QR.';
+
+  @override
+  String get ui3CancelNfc => 'Cancelar NFC';
+
+  @override
+  String get ui3ReadNfcTag => 'Ler etiqueta NFC';
+
+  @override
+  String get ui3HoldNearNfcTag =>
+      'Aproxime o telemóvel da etiqueta do serviço.';
+
+  @override
+  String get a11yFlashlightOn => 'Ligar lanterna';
+
+  @override
+  String get a11yFlashlightOff => 'Desligar lanterna';
+
+  @override
+  String get ui3SocialGraph => 'Grafo social';
+
+  @override
+  String get ui3RecommendedConnections => 'Ligações recomendadas';
+
+  @override
+  String get ui3Portfolio => 'Carteira';
+
+  @override
+  String get ui3Chains => 'Cadeias';
+
+  @override
+  String get ui3Tokens => 'Tokens digitais';
+
+  @override
+  String get ui3NoConnectionsFound => 'Nenhuma ligação encontrada';
+
+  @override
+  String get ui3ConnectionsHint =>
+      'As ligações surgem à medida que cria atividade on-chain';
+
+  @override
+  String get ui3SocialGraphLoadFailed => 'Falha ao carregar o grafo social';
+
+  @override
+  String get ui3Similarity => 'Semelhança';
+
+  @override
+  String get ui3Breakdown => 'Detalhe';
+
+  @override
+  String get ui3TokenHoldings => 'Tokens detidos';
+
+  @override
+  String get ui3NftCollections => 'Coleções NFT';
+
+  @override
+  String get ui3ChainUsage => 'Utilização de redes';
+
+  @override
+  String get ui3Transactions => 'Transações';
+
+  @override
+  String get ui3DaoMembership => 'Adesão a DAO';
+
+  @override
+  String get ui3NotWeighted => 'Sem ponderação';
+
+  @override
+  String ui3PercentWithWeight(Object percent, Object weight) {
+    return '$percent% (peso: $weight)';
+  }
+
+  @override
+  String get ui3CommonOnChainActivity => 'Atividade on-chain em comum';
+
+  @override
+  String get ui3SharedTokens => 'Tokens em comum';
+
+  @override
+  String get ui3SharedNftCollections => 'Coleções NFT em comum';
+
+  @override
+  String get ui3SharedChains => 'Redes em comum';
+
+  @override
+  String get ui3NoSharedTokens => 'Nenhum token em comum encontrado';
+
+  @override
+  String get ui3NoSharedNftCollections =>
+      'Nenhuma coleção NFT em comum encontrada';
+
+  @override
+  String get ui3NoSharedChains => 'Nenhuma rede em comum encontrada';
+
+  @override
+  String get ui3SimilarityFailed => 'Não foi possível calcular a semelhança';
+
+  @override
+  String ui3ItemsAndMore(Object items, Object count) {
+    return '$items +$count outros';
+  }
+
+  @override
+  String get a11yGovernance => 'Governação';
+
+  @override
+  String get ui3CommunityLink => 'Link da comunidade';
+
+  @override
+  String get ui3CommunityQrCode => 'Código QR da comunidade';
+
+  @override
+  String get ui3CommunityQrSubtitle =>
+      'Leia para aderir a esta comunidade e explorar os seus canais';
+
+  @override
+  String get ui3CommunityLinkLoadFailed =>
+      'Não foi possível carregar o link da comunidade';
+
+  @override
+  String get ui3CommunityLinkCopied => 'Link da comunidade copiado';
+
+  @override
+  String ui3KickMemberConfirm(Object name) {
+    return '$name será removido desta comunidade.';
+  }
+
+  @override
+  String ui3BanMemberConfirm(Object name) {
+    return '$name será removido e não poderá voltar a aderir.';
+  }
+
+  @override
+  String get ui3SignInToDiscoverChannels =>
+      'Inicie sessão para descobrir canais públicos';
+
+  @override
+  String ui3UnableToJoinChannel(Object name, Object error) {
+    return 'Não foi possível aderir a $name: $error';
+  }
+
+  @override
+  String get ui3CategoryTech => 'Tecnologia';
+
+  @override
+  String get ui3CategorySocial => 'Redes sociais';
+
+  @override
+  String get ui3NoPublicChannels => 'Nenhum canal público encontrado';
+
+  @override
+  String get ui3StoriesAndFun => 'Histórias e diversão';
+
+  @override
+  String get ui3SearchMusicHint => 'Pesquisar músicas, artistas ou amigos';
+
+  @override
+  String get ui3ForYou => 'Para si';
+
+  @override
+  String get ui3Liked => 'Gostos';
+
+  @override
+  String get ui3NoLikedMusic => 'Ainda não há músicas com gosto';
+
+  @override
+  String get ui3NoMusicStories => 'Ainda não há histórias com música';
+
+  @override
+  String get ui3LikedMusicHint =>
+      'Toque no coração junto a uma música para a guardar aqui.';
+
+  @override
+  String get ui3MusicStoriesHint =>
+      'A música partilhada em histórias aparecerá aqui.';
+
+  @override
+  String ui3SharedBy(Object artist, Object name) {
+    return '$artist · partilhado por $name';
+  }
+
+  @override
+  String ui3UnableToPlay(Object title, Object error) {
+    return 'Não é possível reproduzir $title: $error';
+  }
+
+  @override
+  String get a11yPreviousTrack => 'Faixa anterior';
+
+  @override
+  String get a11yNextTrack => 'Faixa seguinte';
+
+  @override
+  String get a11yPlay => 'Reproduzir';
+
+  @override
+  String get a11yPause => 'Pausa';
+
+  @override
+  String get ui3Refresh => 'Atualizar';
+
+  @override
+  String get ui3NearbyIntroTitle => 'Descubra publicações públicas por perto';
+
+  @override
+  String get ui3NearbyIntroBody =>
+      'A sua localização é usada uma vez neste dispositivo para ordenar os Momentos públicos. Não é carregada, difundida nem mostrada a outras pessoas.';
+
+  @override
+  String get ui3UseMyLocation => 'Usar a minha localização';
+
+  @override
+  String get ui3NearbyUnavailable => 'Por perto não está disponível';
+
+  @override
+  String get ui3NoNearbyPosts => 'Ainda não há publicações por perto';
+
+  @override
+  String get ui3NoNearbyPostsHint =>
+      'Os Momentos públicos com localização aparecerão aqui.';
+
+  @override
+  String get ui3NearbyDistanceNote =>
+      'Distância aproximada · apenas publicações públicas com localização';
+
+  @override
+  String get ui3PublicLocationPost => 'Publicação pública com localização';
+
+  @override
+  String get ui3LocationServicesOff =>
+      'Os serviços de localização estão desativados';
+
+  @override
+  String get ui3LocationPermissionDenied =>
+      'A permissão de localização foi recusada';
+
+  @override
+  String get ui3EnableLocationInSettings =>
+      'Ative a permissão de localização nas definições do sistema';
+
+  @override
+  String get ui3CreateStory => 'Criar história';
+
+  @override
+  String get ui3CreateStoryDesc => 'Publique um estado de texto ou foto.';
+
+  @override
+  String get ui3StoryCamera => 'Câmara de histórias';
+
+  @override
+  String get ui3StoryCameraDesc =>
+      'Aceda diretamente aos filtros e à edição de fotos.';
+
+  @override
+  String get ui3MomentsDesc => 'Abra o feed completo e os comentários.';
+
+  @override
+  String get ui3MomentCamera => 'Câmara de Momentos';
+
+  @override
+  String get ui3MomentCameraDesc =>
+      'Crie uma publicação e escolha multimédia de imediato.';
+
+  @override
+  String get ui3GamesDesc => 'Abra o centro de jogos casuais integrado.';
+
+  @override
+  String get ui3AvatarStudio => 'Estúdio de avatares';
+
+  @override
+  String get ui3AvatarStudioDesc =>
+      'Decorações, avatar NFT e estilo de identidade.';
+
+  @override
+  String get ui3SocialGraphDesc => 'Seguimentos, fãs e ligações on-chain.';
+
+  @override
+  String get ui3SocialHubHeroTitle => 'Histórias, momentos, jogos e avatares';
+
+  @override
+  String get ui3SocialHubHeroBody =>
+      'Todas as funcionalidades sociais num só lugar, em vez de espalhadas pelo chat, perfil e descobrir.';
+
+  @override
+  String get ui3SocialGraphNotConfigured =>
+      'O grafo social não está configurado nesta versão';
+
+  @override
+  String get ui3ConnectWalletForSocialGraph =>
+      'Ligue uma carteira para ver o seu grafo social';
+
+  @override
+  String get ui3AvatarStudioSignIn =>
+      'O estúdio de avatares requer sessão iniciada';
+
+  @override
+  String get a11yRemoveImage => 'Remover imagem';
+
+  @override
+  String get a11yBack => 'Voltar';
+
+  @override
+  String get ui3MiniAppConfirmTransactionTitle => 'Confirmar transação';
+
+  @override
+  String get ui3MiniAppConfirmTransactionBody =>
+      'Uma mini app está a pedir para enviar uma transação em seu nome.';
+
+  @override
+  String ui3MiniAppOpenTitle(Object name) {
+    return 'Abrir $name?';
+  }
+
+  @override
+  String get ui3MiniAppOpenButton => 'Abrir';
+
+  @override
+  String get ui3StoryReplySendFailed =>
+      'Não foi possível enviar a resposta à história';
+
+  @override
+  String get ui3RedPacketDemoNotice =>
+      'Envelope vermelho de demonstração — apenas um registo no chat, nenhum ativo on-chain real é transferido.';
+
+  @override
+  String get ui3RedPacketCoverClassic => 'Vermelho clássico';
+
+  @override
+  String get ui3RedPacketCoverGolden => 'Dourado';
+
+  @override
+  String get ui3RedPacketCoverPurple => 'Roxo';
+
+  @override
+  String get ui3RedPacketCoverOceanBlue => 'Azul oceano';
+
+  @override
+  String get ui3RedPacketCoverNatureGreen => 'Verde natureza';
+
+  @override
+  String get ui3RedPacketCoverRosePink => 'Rosa';
+
+  @override
+  String get ui3RedPacketHistoryEmpty => 'Ainda não há envelopes vermelhos';
+
+  @override
+  String get ui3TransferMerchantQrWithAmount => 'QR de comerciante (com valor)';
+
+  @override
+  String get ui3TransferMerchantQrTitle => 'QR de comerciante';
+
+  @override
+  String get ui3TransferOpenAmountHint => 'Deixe vazio para valor livre';
+
+  @override
+  String get ui3FiatRampTitle => 'Comprar / vender cripto';
+
+  @override
+  String get ui3FiatRampBuy => 'Comprar';
+
+  @override
+  String get ui3FiatRampSell => 'Vender';
+
+  @override
+  String get ui3FiatRampNotConfigured =>
+      'A rampa fiat de entrada/saída não está configurada';
+
+  @override
+  String get a11yPointsAddRule => 'Adicionar regra de recompensa';
+
+  @override
+  String get a11yGovernanceRemoveChoice => 'Remover opção';
+
+  @override
+  String get a11yGovernanceCreateProposal => 'Criar proposta';
+
+  @override
+  String get ui3MiniAppUpdateN42 => 'Atualizar N42';
+
+  @override
+  String get ui3MiniAppOfficial => 'Oficial';
+
+  @override
+  String ui3MiniAppUserCount(Object count) {
+    return '$count utilizadores';
+  }
+
+  @override
+  String a11yStoryBackgroundColor(Object index) {
+    return 'Cor de fundo $index';
+  }
+
+  @override
+  String get a11yStoryAdd => 'Adicionar história';
+
+  @override
+  String get ui3StoryPostFailed => 'Falha ao publicar a história';
+
+  @override
+  String get ui3StoryTapToSelectImage => 'Toque para selecionar uma imagem';
+
+  @override
+  String get ui3StoryChangeImage => 'Alterar';
+
+  @override
+  String ui3StoryMusicReadFailed(Object error) {
+    return 'Não foi possível ler a música selecionada: $error';
+  }
+
+  @override
+  String get ui3StoryDeleteConfirm => 'Eliminar esta história?';
+
+  @override
+  String get ui3StoryDeleteFailed => 'Falha ao eliminar a história';
+
+  @override
+  String get ui3MomentCreateTitle => 'Criar momento';
+
+  @override
+  String get ui3MomentContentHint => 'Em que está a pensar?';
+
+  @override
+  String get ui3MomentAddPhotos => 'Adicionar fotografias';
+
+  @override
+  String get ui3MomentAddLocation => 'Adicionar localização';
+
+  @override
+  String ui3MomentSelectedMedia(Object count) {
+    return 'Multimédia selecionado ($count)';
+  }
+
+  @override
+  String get ui3MomentClearAll => 'Limpar tudo';
+
+  @override
+  String get ui3MomentClearMediaConfirm =>
+      'Remover todas as fotografias/vídeos selecionados?';
+
+  @override
+  String get ui3MomentVisibilityPublicDesc => 'Visível para todos os amigos';
+
+  @override
+  String get ui3MomentVisibilityPrivateDesc => 'Visível apenas para si';
+
+  @override
+  String get ui3MomentVisibilityPartialDesc => 'Escolher quem pode ver';
+
+  @override
+  String get ui3MomentVisibilityExcludedDesc => 'Ocultar de amigos específicos';
+
+  @override
+  String get ui3MomentVideos => 'Vídeos';
+
+  @override
+  String get ui3MomentNoVideos => 'Ainda não há vídeos';
+
+  @override
+  String get a11yCallMinimize => 'Minimizar';
+
+  @override
+  String get a11yCallGridView => 'Vista em grelha';
+
+  @override
+  String get a11yCallFocusView => 'Vista em destaque';
+
+  @override
+  String get ui3CallTools => 'Ferramentas de chamada';
+
+  @override
+  String get ui3CallMeetingTools => 'Ferramentas de reunião';
+
+  @override
+  String get ui3CallToolsSubtitle =>
+      'Ajuste a qualidade de áudio e vídeo sem sair da chamada.';
+
+  @override
+  String get ui3CallAudioEnhancement => 'Melhoria de áudio';
+
+  @override
+  String get ui3CallNoiseSuppression => 'Supressão de ruído';
+
+  @override
+  String get ui3CallNoiseSuppressionDesc =>
+      'Reduz o ruído do teclado e de fundo.';
+
+  @override
+  String get ui3CallEchoCancellation => 'Cancelamento de eco';
+
+  @override
+  String get ui3CallEchoCancellationDesc =>
+      'Impede que o som do altifalante volte a entrar no microfone.';
+
+  @override
+  String get ui3CallAutoGainControl => 'Controlo automático de ganho';
+
+  @override
+  String get ui3CallAutoGainControlDesc =>
+      'Mantém o volume do microfone mais estável.';
+
+  @override
+  String get ui3CallVoiceIsolation => 'Isolamento de voz melhorado';
+
+  @override
+  String get ui3CallVoiceIsolationDesc =>
+      'Utilizar um perfil de redução de ruído mais forte.';
+
+  @override
+  String get ui3CallVideoSection => 'Vídeo';
+
+  @override
+  String get ui3CallBackgroundBlur => 'Desfocagem do fundo (beta)';
+
+  @override
+  String get ui3CallBlurDescReady =>
+      'A preferência está ativa. A desfocagem visual ainda depende da disponibilização do processador de vídeo.';
+
+  @override
+  String get ui3CallBlurDescSaved =>
+      'A preferência de desfocagem foi guardada e será aplicada quando o processamento da câmara estiver disponível.';
+
+  @override
+  String get ui3CallBlurDescCameraOff =>
+      'Ligue a câmara quando o processamento do fundo estiver disponível.';
+
+  @override
+  String get ui3CallRecordingSection => 'Gravação';
+
+  @override
+  String get ui3CallRecordingDesc =>
+      'Requer saída do lado do servidor para guardar gravações.';
+
+  @override
+  String ui3CallSettingsUpdateFailed(Object error) {
+    return 'Falha ao atualizar as definições da chamada: $error';
+  }
+
+  @override
+  String get ui3CallRecordingStarted => 'Gravação iniciada';
+
+  @override
+  String get ui3VoiceRoomNotFound => 'Sala não encontrada';
+
+  @override
+  String get ui3VoiceRoomEndConfirm =>
+      'Tem a certeza de que pretende terminar esta sala de voz?';
+
+  @override
+  String get a11yGameMoveUp => 'Mover para cima';
+
+  @override
+  String get a11yGameMoveDown => 'Mover para baixo';
+
+  @override
+  String get a11yGameMoveLeft => 'Mover para a esquerda';
+
+  @override
+  String get a11yGameMoveRight => 'Mover para a direita';
+
+  @override
+  String get a11yGameRotate => 'Rodar';
+
+  @override
+  String get a11yGameDrop => 'Largar';
+
+  @override
+  String ui3StickerAddedCount(Object count) {
+    return '$count autocolante(s) adicionado(s)';
+  }
+
+  @override
+  String ui3StickerAddFailed(Object error) {
+    return 'Falha ao adicionar: $error';
+  }
+
+  @override
+  String get ui3StickerRemoveTitle => 'Remover autocolante';
+
+  @override
+  String get ui3StickerRemoveConfirm => 'Remover este autocolante do pacote?';
+
+  @override
+  String get ui3StickerRemoveFailed => 'Falha ao remover';
+
+  @override
+  String get ui3StickerRenamePack => 'Mudar o nome do pacote';
+
+  @override
+  String get ui3StickerPackName => 'Nome do pacote';
+
+  @override
+  String get ui3StickerRenameFailed => 'Falha ao mudar o nome';
+
+  @override
+  String get ui3StickerDeletePack => 'Eliminar pacote';
+
+  @override
+  String get ui3StickerThisPack => 'este pacote';
+
+  @override
+  String ui3StickerDeletePackConfirm(Object name) {
+    return 'Eliminar \"$name\" e todos os respetivos autocolantes? Esta ação não pode ser anulada.';
+  }
+
+  @override
+  String get ui3StickerDeleteFailed => 'Falha ao eliminar';
+
+  @override
+  String get ui3StickerPack => 'Pacote de autocolantes';
+
+  @override
+  String get ui3StickerAdding => 'A adicionar…';
+
+  @override
+  String get ui3StickerAddStickers => 'Adicionar autocolantes';
+
+  @override
+  String get ui3StickerPackNotFound => 'Pacote não encontrado';
+
+  @override
+  String get ui3StickerEmptyHint =>
+      'Toque em \"Adicionar autocolantes\" para carregar imagens';
+
+  @override
+  String get ui3StickerNewPack => 'Novo pacote de autocolantes';
+
+  @override
+  String get ui3StickerCreate => 'Criar';
+
+  @override
+  String get ui3StickerCreateFailed => 'Falha ao criar o pacote';
+
+  @override
+  String ui3StickerInstalled(Object name) {
+    return '\"$name\" instalado';
+  }
+
+  @override
+  String get ui3StickerRemovePackTitle => 'Remover pacote de autocolantes';
+
+  @override
+  String ui3StickerRemovePackConfirm(Object name) {
+    return 'Remover \"$name\" dos seus autocolantes?';
+  }
+
+  @override
+  String ui3StickerRemoved(Object name) {
+    return '\"$name\" removido';
+  }
+
+  @override
+  String get ui3StickerAiSticker => 'Autocolante IA';
+
+  @override
+  String get ui3StickerStoreTab => 'Loja';
+
+  @override
+  String get ui3StickerMyStickersTab => 'Os meus autocolantes';
+
+  @override
+  String get ui3StickerNoneFound => 'Nenhum autocolante encontrado';
+
+  @override
+  String ui3StickerByAuthor(Object author) {
+    return 'por $author';
+  }
+
+  @override
+  String get ui3StickerManage => 'Gerir';
+
+  @override
+  String ui3StickerCount(Object count) {
+    return '$count autocolantes';
+  }
+
+  @override
+  String get ui3StickerNoneInstalled => 'Nenhum autocolante instalado';
+
+  @override
+  String get ui3StickerGetFromStore => 'Obtenha autocolantes na loja';
+
+  @override
+  String get ui3StickerBrowseStore => 'Explorar loja';
+
+  @override
+  String get ui3StickerAddedToAi => 'Adicionado a \"Autocolantes IA\"';
+
+  @override
+  String get ui3StickerAddOneFailed => 'Falha ao adicionar o autocolante';
+
+  @override
+  String get ui3StickerPromptLabel => 'Descreva o seu autocolante';
+
+  @override
+  String get ui3StickerPromptHint =>
+      'p. ex. um gato laranja feliz com óculos de sol';
+
+  @override
+  String get ui3StickerGenerating => 'A gerar…';
+
+  @override
+  String get ui3StickerGenerate => 'Gerar';
+
+  @override
+  String get ui3StickerAddToStickers => 'Adicionar aos autocolantes';
+
+  @override
+  String get ui3StickerGeneratingPreview => 'A gerar o seu autocolante…';
+
+  @override
+  String get ui3StickerGenerateEmpty =>
+      'Descreva um autocolante e toque em \"Gerar\"';
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).
@@ -12810,4 +14833,2021 @@ class SPtBr extends SPt {
   String scheduledSendTomorrowMorningAt(String time) {
     return 'Amanhã de manhã ($time)';
   }
+
+  @override
+  String get a11yScrollToBottom => 'Rolar até o fim';
+
+  @override
+  String get ui3EnterMessageBeforeScheduling =>
+      'Digite uma mensagem antes de agendar';
+
+  @override
+  String get ui3SendCode => 'Enviar código';
+
+  @override
+  String get ui3CodeLanguage => 'Linguagem';
+
+  @override
+  String get ui3PasteCodeHere => 'Cole o código aqui';
+
+  @override
+  String ui3ReminderSetAt(String time) {
+    return 'Lembrete definido · $time';
+  }
+
+  @override
+  String get ui3RedPacketCreateFailed =>
+      'Não foi possível criar o envelope vermelho';
+
+  @override
+  String get ui3SendTip => 'Enviar gorjeta';
+
+  @override
+  String get ui3TokenLabel => 'Criptomoeda';
+
+  @override
+  String get ui3NoteOptional => 'Observação (opcional)';
+
+  @override
+  String ui3TipFailed(String error) {
+    return 'Falha na gorjeta: $error';
+  }
+
+  @override
+  String get ui3GiftNftTitle => 'Presentear um NFT';
+
+  @override
+  String get ui3TokenId => 'ID do token';
+
+  @override
+  String ui3NftGiftFailed(String error) {
+    return 'Falha ao presentear o NFT: $error';
+  }
+
+  @override
+  String get ui3AiAgentSubtitle => 'Descreva uma tarefa e abra o miniapp certo';
+
+  @override
+  String get ui3GiftNft => 'Presentear NFT';
+
+  @override
+  String get ui3GiftNftSubtitle => 'Enviar um NFT para este contato';
+
+  @override
+  String get ui3MiniAppUnavailable => 'O miniapp não está disponível';
+
+  @override
+  String ui3MediaItemsNotSent(int count) {
+    return 'Não foi possível enviar $count item(ns) de mídia selecionado(s)';
+  }
+
+  @override
+  String get ui3PhotosSubtitle =>
+      'Envie fotos e vídeos em formato adequado para o chat';
+
+  @override
+  String get ui3OriginalImages => 'Imagens originais';
+
+  @override
+  String get ui3OriginalImagesSubtitle =>
+      'Enviar fotos sem compressão como arquivos';
+
+  @override
+  String ui3ScheduledFileFor(String filename, String time) {
+    return '$filename agendado para $time';
+  }
+
+  @override
+  String ui3SendingOriginalImage(String filename) {
+    return 'Enviando imagem original: $filename';
+  }
+
+  @override
+  String ui3ScheduledOriginalImage(String filename) {
+    return 'Imagem original agendada: $filename';
+  }
+
+  @override
+  String get ui3PaymentAlreadySent => 'Pagamento já enviado';
+
+  @override
+  String get ui3PaymentProcessing => 'O pagamento está sendo processado';
+
+  @override
+  String ui3ChainStatus(String status) {
+    return 'Status na blockchain: $status';
+  }
+
+  @override
+  String get ui3NotChecked => 'Não verificado';
+
+  @override
+  String ui3ConfirmationsCount(int confirmations, int required) {
+    return 'Confirmado: $confirmations / $required blocos';
+  }
+
+  @override
+  String get ui3CopyTxHash => 'Copiar hash da transação';
+
+  @override
+  String get ui3VerifyAgain => 'Verificar novamente';
+
+  @override
+  String get ui3VerifyOnChain => 'Verificar na blockchain';
+
+  @override
+  String get ui3TransferMissingChainDetails =>
+      'Esta transferência não inclui os detalhes exatos da rede e do ativo.';
+
+  @override
+  String get ui3ReceiptPending => 'Pendente na blockchain';
+
+  @override
+  String get ui3ReceiptConfirmed => 'Confirmado';
+
+  @override
+  String get ui3ReceiptFailed => 'Falhou na blockchain';
+
+  @override
+  String get ui3ReceiptMismatch => 'Os detalhes da transação não conferem';
+
+  @override
+  String get ui3ReceiptUnsupported => 'Verificação na blockchain não suportada';
+
+  @override
+  String get ui3ReceiptUnavailable => 'Verificação indisponível';
+
+  @override
+  String get ui3OpenOrSave => 'Abrir / Salvar';
+
+  @override
+  String get ui3UnableToOpenFile => 'Não foi possível abrir este arquivo.';
+
+  @override
+  String ui3AiRewriteFailed(String error) {
+    return 'Falha ao reescrever com IA: $error';
+  }
+
+  @override
+  String get ui3AiShareMessagesTitle => 'Compartilhar mensagens com a IA?';
+
+  @override
+  String get ui3AiShareMessagesBody =>
+      'Selecione as mensagens que a IA pode usar nesta resposta. Esta autorização única expira após dois minutos. Fechar a Resposta rápida cancela os resultados pendentes. Ela não permite pagamentos nem exportações.';
+
+  @override
+  String get ui3OtherParticipant => 'Outra pessoa';
+
+  @override
+  String get ui3ShareSelected => 'Compartilhar selecionadas';
+
+  @override
+  String get ui3BotCommandError => 'Erro de comando';
+
+  @override
+  String get ui3BotUnknownCommand => 'Comando desconhecido';
+
+  @override
+  String get ui3BotTypeHelp => 'Digite /help para ver os comandos disponíveis.';
+
+  @override
+  String get ui3FilesMediaLinks => 'Arquivos, mídia e links';
+
+  @override
+  String get ui3ChatStorage => 'Armazenamento da conversa';
+
+  @override
+  String get ui3EncryptionKeysDevices =>
+      'Chaves de criptografia e dispositivos';
+
+  @override
+  String get ui3EncryptionServiceUnavailable =>
+      'O serviço de criptografia ainda não está disponível';
+
+  @override
+  String get ui3ExportLoadingHistory =>
+      'Carregando mais histórico da conversa para exportação...';
+
+  @override
+  String get ui3ExportTxtDesc =>
+      'Transcrição em texto simples para anotações, backup ou revisão de conformidade';
+
+  @override
+  String get ui3ExportCustomRange => 'Período personalizado';
+
+  @override
+  String get ui3ExportStart => 'Início';
+
+  @override
+  String get ui3ExportEnd => 'Fim';
+
+  @override
+  String get ui3ExportSelectDate => 'Selecionar data';
+
+  @override
+  String get ui3FolderFilterUnreadOnly => 'Somente não lidas';
+
+  @override
+  String get ui3FolderFilterMutedOnly => 'Somente silenciadas';
+
+  @override
+  String get ui3FolderFilterNoDms => 'Sem mensagens diretas';
+
+  @override
+  String get ui3FolderFilterNoGroups => 'Sem grupos';
+
+  @override
+  String get ui3FolderFilterNoChannels => 'Sem canais';
+
+  @override
+  String get ui3FolderFilterAllChats => 'Todas as conversas';
+
+  @override
+  String get ui3Create => 'Criar';
+
+  @override
+  String ui3DeleteFolderConfirm(String name) {
+    return 'Excluir a pasta \"$name\"?';
+  }
+
+  @override
+  String get a11yDecreaseTextSize => 'Diminuir tamanho do texto';
+
+  @override
+  String get a11yIncreaseTextSize => 'Aumentar tamanho do texto';
+
+  @override
+  String ui3MinutesRead(int minutes) {
+    return '$minutes min de leitura';
+  }
+
+  @override
+  String get ui3TipOnChain => 'Na blockchain ✓';
+
+  @override
+  String get ui3ViewSource => 'Ver código-fonte';
+
+  @override
+  String get a11yPreviousPage => 'Página anterior';
+
+  @override
+  String get a11yNextPage => 'Próxima página';
+
+  @override
+  String get ui3OpenExternalLinkTitle => 'Abrir link externo?';
+
+  @override
+  String get ui3Open => 'Abrir';
+
+  @override
+  String get ui3UnableToOpenLink => 'Não foi possível abrir este link.';
+
+  @override
+  String get ui3ImageUnavailable => 'Imagem indisponível';
+
+  @override
+  String ui3LoadImageFrom(Object host) {
+    return 'Carregar imagem de $host';
+  }
+
+  @override
+  String ui3RetryImageFrom(Object host) {
+    return 'Tentar carregar a imagem de $host novamente';
+  }
+
+  @override
+  String get ui3TranslatedByN42 => 'Traduzido por N42';
+
+  @override
+  String ui3TranslatedFromByN42(Object language) {
+    return 'Traduzido de $language por N42';
+  }
+
+  @override
+  String get ui3ClearWhiteboardTitle => 'Limpar o quadro branco?';
+
+  @override
+  String get ui3ClearWhiteboardMessage =>
+      'Todos os traços serão removidos para todos. Essa ação não pode ser desfeita.';
+
+  @override
+  String get ui3WhiteboardLive => 'Quadro branco · Ao vivo';
+
+  @override
+  String get a11yPenColor => 'Cor da caneta';
+
+  @override
+  String get ui3AiDescribeOcr => 'Descrição por IA / OCR';
+
+  @override
+  String get ui3DocumentPreviewFailed =>
+      'Não foi possível visualizar este documento com segurança. Verifique a conexão e o tamanho do arquivo (máx. 2 MB).';
+
+  @override
+  String get ui3AiConsentMessage =>
+      'Selecione as mensagens que a IA pode usar neste resumo. Esta autorização única expira após dois minutos. Ela não permite pagamentos nem exportações.';
+
+  @override
+  String get ui3AiSuggestedReplies => 'Respostas sugeridas';
+
+  @override
+  String get ui3AiGeneratingSuggestions => 'Gerando sugestões...';
+
+  @override
+  String get ui3StickersEmpty => 'Nenhuma figurinha ainda';
+
+  @override
+  String get ui3StickersGet => 'Obter figurinhas';
+
+  @override
+  String get a11yFormatBold => 'Negrito';
+
+  @override
+  String get a11yFormatItalic => 'Itálico';
+
+  @override
+  String get a11yFormatStrikethrough => 'Tachado';
+
+  @override
+  String get a11yFormatInlineCode => 'Código embutido';
+
+  @override
+  String get a11yFormatCodeBlock => 'Bloco de código';
+
+  @override
+  String get a11yFormatChecklistItem => 'Item de checklist';
+
+  @override
+  String get a11yFormatBulletList => 'Lista com marcadores';
+
+  @override
+  String get a11yFormatNumberedList => 'Lista numerada';
+
+  @override
+  String get a11yFormatLink => 'Inserir link';
+
+  @override
+  String get a11yFormatTable => 'Tabela';
+
+  @override
+  String get a11yFormatMeetingTemplate => 'Modelo de reunião';
+
+  @override
+  String get a11yEmojiSmileys => 'Emojis e pessoas';
+
+  @override
+  String get a11yEmojiHearts => 'Corações';
+
+  @override
+  String get a11yEmojiAnimals => 'Animais e natureza';
+
+  @override
+  String get a11yEmojiFood => 'Comida e bebida';
+
+  @override
+  String get a11yEmojiTravel => 'Viagens e lugares';
+
+  @override
+  String get a11yEmojiActivities => 'Atividades';
+
+  @override
+  String get a11yEmojiObjects => 'Objetos';
+
+  @override
+  String get a11yEmojiSymbols => 'Símbolos';
+
+  @override
+  String get ui3FrequentlyUsed => 'Usados com frequência';
+
+  @override
+  String get ui3NoEditHistory => 'Nenhum histórico de edição';
+
+  @override
+  String get ui3EventNew => 'Novo evento';
+
+  @override
+  String get ui3EventTitleLabel => 'Título';
+
+  @override
+  String get ui3EventLocationOptional => 'Local (opcional)';
+
+  @override
+  String get ui3EventDescriptionOptional => 'Descrição (opcional)';
+
+  @override
+  String get ui3EventSend => 'Enviar evento';
+
+  @override
+  String get ui3EventTitleRequired => 'O título é obrigatório';
+
+  @override
+  String get ui3EventEndAfterStart =>
+      'O horário de término deve ser após o início';
+
+  @override
+  String get ui3MiniAppAgentIntro =>
+      'Descreva o que você quer fazer e eu abro o miniapp certo.';
+
+  @override
+  String get ui3MiniAppAgentExample => 'ex.: trocar ETH por USDC';
+
+  @override
+  String get ui3MiniAppAgentNoMatch =>
+      'Nenhum miniapp correspondente encontrado. Tente reformular.';
+
+  @override
+  String ui3MiniAppOpen(Object appName) {
+    return 'Abrir $appName';
+  }
+
+  @override
+  String get ui3MusicLinkPlatforms =>
+      'Compatível com links de músicas do NetEase Cloud Music, QQ Music, Kugou, Kuwo e outros';
+
+  @override
+  String get ui3PollMarkCorrectAnswer =>
+      'Marque uma resposta correta não vazia';
+
+  @override
+  String get ui3PollQuizMode => 'Modo quiz';
+
+  @override
+  String get ui3PollAnswerExplanationHint =>
+      'Explicação da resposta (opcional)';
+
+  @override
+  String get a11yCorrectAnswer => 'Resposta correta';
+
+  @override
+  String get ui3AiSuggestions => 'Sugestões de IA';
+
+  @override
+  String get a11yPaste => 'Colar';
+
+  @override
+  String get a11yRefresh => 'Atualizar';
+
+  @override
+  String get ui3RecoveryKeyStoreWarning =>
+      'Guarde esta chave em local seguro. Ela é a única forma de recuperar suas mensagens criptografadas se você perder o acesso a todos os dispositivos.';
+
+  @override
+  String ui3SavedToPath(Object path) {
+    return 'Salvo: $path';
+  }
+
+  @override
+  String get ui3UnknownAccount => 'Conta desconhecida';
+
+  @override
+  String get ui3UnknownHomeserver => 'Servidor desconhecido';
+
+  @override
+  String get ui3ImportRecoveryKey => 'Importar chave de recuperação';
+
+  @override
+  String get ui3ImportRecoveryKeyDesc =>
+      'Digite ou cole sua chave de recuperação para restaurar as chaves das salas do histórico de mensagens criptografadas.';
+
+  @override
+  String ui3RecoveryKeyAccountInfo(Object account, Object homeserver) {
+    return 'Conta: $account\\nServidor: $homeserver';
+  }
+
+  @override
+  String get ui3Import => 'Importar';
+
+  @override
+  String get ui3InvalidRecoveryKeyFormat =>
+      'Formato de chave de recuperação inválido';
+
+  @override
+  String ui3RecoveryKeyPartialRestore(
+    Object restored,
+    Object total,
+    Object failed,
+  ) {
+    return '$restored de $total chaves restauradas. $failed chaves falharam. Verifique a conta, a rede e o backup e tente novamente. Parte do histórico pode continuar ilegível.';
+  }
+
+  @override
+  String ui3RecoveryKeyRestoreSuccess(Object restored, Object total) {
+    return '$restored de $total chaves restauradas com sucesso';
+  }
+
+  @override
+  String ui3ImportFailed(Object error) {
+    return 'Falha na importação: $error';
+  }
+
+  @override
+  String ui3PasskeyRegistrationFailed(Object error) {
+    return 'Falha ao registrar a chave de acesso: $error';
+  }
+
+  @override
+  String get ui3PasskeyDefaultName => 'Minha chave de acesso';
+
+  @override
+  String get ui3PasskeyNameHint => 'ex.: iPhone, MacBook';
+
+  @override
+  String get ui3PasskeyDeleteFailed => 'Falha ao excluir a chave de acesso';
+
+  @override
+  String get ui3TwoFactorAuth => 'Autenticação de dois fatores';
+
+  @override
+  String get ui3TwoFactorOnSubtitle =>
+      'Ativada — código do app autenticador obrigatório';
+
+  @override
+  String get ui3TwoFactorOffSubtitle =>
+      'Desativada — proteja com um app autenticador (TOTP)';
+
+  @override
+  String get ui3ShowRecoveryKey => 'Mostrar chave de recuperação';
+
+  @override
+  String get ui3ShowRecoveryKeyDesc =>
+      'Exibir sua chave de recuperação para backup';
+
+  @override
+  String get ui3ImportRecoveryKeyHint =>
+      'Restaurar mensagens usando uma chave de recuperação';
+
+  @override
+  String get ui3RecoveryKeyCreateFailed =>
+      'Falha ao criar a chave de recuperação';
+
+  @override
+  String get ui3TotpIncorrectCode => 'Código incorreto, tente novamente';
+
+  @override
+  String get ui3TwoFactorEnabled => 'Autenticação de dois fatores ativada';
+
+  @override
+  String get ui3TwoFactorDisabled => 'Autenticação de dois fatores desativada';
+
+  @override
+  String get ui3TwoFactorTurnOffTitle =>
+      'Desativar a autenticação de dois fatores?';
+
+  @override
+  String get ui3TwoFactorTurnOffMessage =>
+      'Seu app autenticador não será mais exigido. Você pode configurá-lo de novo depois com uma nova chave.';
+
+  @override
+  String get ui3TurnOff => 'Desativar';
+
+  @override
+  String get ui3TwoFactorTotpTitle => 'Dois fatores (TOTP)';
+
+  @override
+  String get ui3TwoFactorIsOn => 'A autenticação de dois fatores está ativada';
+
+  @override
+  String get ui3TwoFactorCodeRequired =>
+      'É necessário um código do seu app autenticador.';
+
+  @override
+  String get ui3TotpStepScan =>
+      '1. Escaneie este QR code com um app autenticador (Google Authenticator, Authy, 1Password…) ou digite a chave manualmente.';
+
+  @override
+  String get ui3TotpKeyCopied => 'Chave copiada';
+
+  @override
+  String get ui3TotpStepConfirm =>
+      '2. Digite o código de 6 dígitos para confirmar.';
+
+  @override
+  String get ui3Enable => 'Ativar';
+
+  @override
+  String get ui3BackupSettingsDesc =>
+      'Faça backup das configurações locais do chat. As mensagens serão restauradas do servidor depois de entrar novamente.';
+
+  @override
+  String get ui3BackupKeysSeparate =>
+      'As chaves de criptografia são gerenciadas separadamente';
+
+  @override
+  String get ui3BackupKeysSeparateHint =>
+      'Use Segurança > Chave de recuperação para fazer backup do acesso às mensagens criptografadas.';
+
+  @override
+  String ui3BackupRoomsSize(Object rooms, Object size) {
+    return '$rooms salas  $size';
+  }
+
+  @override
+  String get ui3BackupRestoreFromFileDesc =>
+      'Importe um arquivo .n42backup de outro dispositivo ou de um backup anterior. As chaves de criptografia são restauradas separadamente com sua chave de recuperação.';
+
+  @override
+  String get ui3UsernameSessionRequired =>
+      'O nome de usuário exige uma sessão ativa';
+
+  @override
+  String get ui3SecuritySessionRequired =>
+      'As configurações de segurança exigem uma sessão ativa';
+
+  @override
+  String get ui3ConnectedAccountsSessionRequired =>
+      'As contas conectadas exigem uma sessão ativa';
+
+  @override
+  String get ui3SystemAccounts => 'Sistema e contas';
+
+  @override
+  String get ui3AccountIdentity => 'Conta e identidade';
+
+  @override
+  String get ui3Accounts => 'Contas';
+
+  @override
+  String get ui3DevicesSessions => 'Dispositivos e sessões';
+
+  @override
+  String get ui3Integrations => 'Integrações';
+
+  @override
+  String get ui3ConnectedAccounts => 'Contas conectadas';
+
+  @override
+  String get ui3ConnectedAccountsDesc =>
+      'Integrações com Telegram, WhatsApp, Discord e pontes de API';
+
+  @override
+  String get ui3SystemOverview => 'Visão geral do sistema';
+
+  @override
+  String ui3AccountCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count contas',
+      one: '1 conta',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String ui3DeviceCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dispositivos',
+      one: '1 dispositivo',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get ui3PrivacySecurityOverview =>
+      'Criptografia de ponta a ponta, proteção contra capturas de tela e controle de proxy';
+
+  @override
+  String get ui3ConversationPrivacy => 'Privacidade das conversas';
+
+  @override
+  String get ui3NetworkPrivacy => 'Privacidade de rede';
+
+  @override
+  String get ui3IdentityPrivacy => 'Privacidade de identidade';
+
+  @override
+  String get ui3EncryptionKeyBackup => 'Criptografia e backup de chaves';
+
+  @override
+  String get ui3DevicesVerification => 'Dispositivos e verificação';
+
+  @override
+  String get ui3ChipE2eeDefault => 'E2EE por padrão';
+
+  @override
+  String get ui3ChipManualE2ee => 'E2EE manual';
+
+  @override
+  String get ui3ChipSelfDestruct => 'Autodestruição';
+
+  @override
+  String get ui3ChipScreenshotGuard => 'Proteção contra capturas';
+
+  @override
+  String get ui3ChipIpProxy => 'IP / servidor proxy';
+
+  @override
+  String get ui3ChipLinkPreviewsOff => 'Prévias de links desativadas';
+
+  @override
+  String get ui3ChipPublicHandle => 'Nome de usuário público';
+
+  @override
+  String get a11yShowPassword => 'Mostrar senha';
+
+  @override
+  String get a11yHidePassword => 'Ocultar senha';
+
+  @override
+  String get a11yCheckServer => 'Verificar servidor';
+
+  @override
+  String get ui3AuthAnonymousRegistration => 'Cadastro anônimo';
+
+  @override
+  String get ui3AuthAnonymousRegistrationDesc =>
+      'Crie uma conta sem vincular telefone ou e-mail. Um nome de usuário será gerado automaticamente.';
+
+  @override
+  String get ui3AuthAnonymousModeOn => 'O modo anônimo está ativado';
+
+  @override
+  String get ui3AuthAnonymousModeOnDesc =>
+      'O app vai criar um nome de usuário Matrix aleatório para você. Você ainda pode entrar depois com a conta e a senha geradas.';
+
+  @override
+  String get ui3AuthChooseLoginMethod => 'Escolha a forma de login';
+
+  @override
+  String get ui3AuthSsoOpenFailed =>
+      'Não foi possível abrir a página de login SSO';
+
+  @override
+  String get ui3AuthWalletUnavailable => 'A carteira não está disponível';
+
+  @override
+  String get ui3ProfileSubscriptions => 'Assinaturas';
+
+  @override
+  String get ui3ProfileBuySellCrypto => 'Comprar / vender cripto';
+
+  @override
+  String get ui3ProfileOnDeviceAi => 'IA no dispositivo';
+
+  @override
+  String get ui3ProfileSetAUsername => 'Definir um nome de usuário';
+
+  @override
+  String get ui3ProfileAvatarStudio => 'Estúdio de avatar';
+
+  @override
+  String get ui3ProfileAvatarStudioSubtitle => 'Avatar NFT / Decorações';
+
+  @override
+  String get ui3ProfileCustomize => 'Personalizar';
+
+  @override
+  String get ui3ProfileQrSubtitle =>
+      'Escaneie para abrir este perfil ou iniciar uma conversa';
+
+  @override
+  String get ui3PrivacyHardening => 'Reforço de privacidade';
+
+  @override
+  String get ui3HidePhoneNumber => 'Ocultar número de telefone';
+
+  @override
+  String get ui3HidePhoneNumberDesc =>
+      'Ocultar o número de telefone vinculado nas telas de perfil deste dispositivo';
+
+  @override
+  String get ui3EncryptNewChatsByDefault =>
+      'Criptografar novas conversas por padrão';
+
+  @override
+  String get ui3EncryptNewChatsByDefaultDesc =>
+      'Iniciar novas conversas diretas e salas privadas com E2EE ativada';
+
+  @override
+  String get ui3PrivateChatMode => 'Modo de conversa privada';
+
+  @override
+  String get ui3PrivateChatModeDesc =>
+      'Bloquear temporariamente capturas de tela ao ver conversas privadas ou criptografadas';
+
+  @override
+  String get ui3DefaultSelfDestructTimer => 'Timer de autodestruição padrão';
+
+  @override
+  String get ui3DefaultSelfDestructTimerDesc =>
+      'Aplicar um timer de autodestruição padrão às novas mensagens enviadas';
+
+  @override
+  String get ui3LinkPreviews => 'Prévias de links';
+
+  @override
+  String get ui3LinkPreviewsDesc =>
+      'Buscar títulos, descrições e miniaturas quando as mensagens contêm URLs';
+
+  @override
+  String get ui3IpAddressProtection => 'Proteção de endereço IP';
+
+  @override
+  String get ui3IpAddressProtectionDesc =>
+      'Encaminhar as solicitações do Matrix e das prévias de links pelo proxy HTTP de privacidade configurado, quando disponível';
+
+  @override
+  String get ui3UseTorProxy => 'Usar proxy HTTP Tor / Privoxy';
+
+  @override
+  String get ui3UseTorProxyDesc =>
+      'Use um endpoint de proxy HTTP local, como o Privoxy em 127.0.0.1:8118. O roteamento nativo do Tor via SOCKS5 não é compatível aqui.';
+
+  @override
+  String get ui3CustomProxy => 'Proxy personalizado';
+
+  @override
+  String get ui3CustomProxyDesc =>
+      'Usar um proxy HTTP ou HTTPS personalizado para o tráfego do Matrix e as prévias de links';
+
+  @override
+  String get ui3ProxyEndpoint => 'Endereço do proxy';
+
+  @override
+  String get ui3ProxyEndpointDesc =>
+      'Endereço de proxy HTTP/HTTPS (SOCKS não compatível)';
+
+  @override
+  String get ui3InvalidEndpoint => 'Endereço inválido';
+
+  @override
+  String get ui3CustomProxyStaysOff =>
+      'O proxy personalizado fica desativado até você definir um endereço válido';
+
+  @override
+  String get ui3NotificationFilterNote =>
+      'As regras prioritárias sempre notificam (ignorando silenciamento, só menções e Não perturbe). Palavras-chave silenciadas bloqueiam notificações.';
+
+  @override
+  String get ui3PriorityKeywords => 'Palavras-chave prioritárias';
+
+  @override
+  String get ui3PriorityKeywordHint => 'ex.: urgente';
+
+  @override
+  String get ui3MutedKeywords => 'Palavras-chave silenciadas';
+
+  @override
+  String get ui3MutedKeywordHint => 'ex.: spam';
+
+  @override
+  String get ui3PrioritySenders => 'Remetentes prioritários';
+
+  @override
+  String get ui3CaseSensitive => 'Diferenciar maiúsculas e minúsculas';
+
+  @override
+  String get ui3None => 'Nenhuma';
+
+  @override
+  String get ui3SmartReplyTranslation => 'Tradução de respostas inteligentes';
+
+  @override
+  String get ui3SmartReplyTranslationDesc =>
+      'Traduza automaticamente suas mensagens para o idioma do destinatário antes de enviar.';
+
+  @override
+  String get ui3FromPhotos => 'Das Fotos';
+
+  @override
+  String get ui3ChangePhoto => 'Trocar foto';
+
+  @override
+  String get ui3RoamingUsesMobileData =>
+      'Roaming usa as regras de dados móveis';
+
+  @override
+  String get ui3RoamingUsesMobileDataDesc =>
+      'A detecção de roaming ainda não está disponível, então o roaming segue por enquanto as configurações de download automático dos dados móveis.';
+
+  @override
+  String ui3DeleteQuickReplyConfirm(String content) {
+    return 'Excluir \"$content\"?';
+  }
+
+  @override
+  String get ui3ResetToDefaults => 'Restaurar padrões';
+
+  @override
+  String get ui3ResetQuickRepliesMessage =>
+      'Isso vai remover todas as respostas rápidas personalizadas e restaurar as padrão. Continuar?';
+
+  @override
+  String get ui3LocalLlmUnavailable => 'Não compatível com este dispositivo';
+
+  @override
+  String get ui3LocalLlmNotDownloaded => 'Modelo não baixado';
+
+  @override
+  String get ui3LocalLlmReady => 'Pronto (no dispositivo)';
+
+  @override
+  String get ui3LocalLlmDescription =>
+      'Quando ativados e prontos, os recursos de IA (resumir, reescrever, traduzir, responder) rodam totalmente no dispositivo — os dados nunca saem do seu celular. Caso contrário, usam o provedor em nuvem.';
+
+  @override
+  String get ui3UseOnDeviceAi => 'Usar IA no dispositivo';
+
+  @override
+  String get ui3UseOnDeviceAiDesc =>
+      'Preferir inferência local quando estiver pronta';
+
+  @override
+  String get ui3DownloadModel => 'Baixar modelo';
+
+  @override
+  String get ui3LocalLlmRuntimeRequired =>
+      'A inferência no dispositivo exige o runtime nativo (Android MediaPipe / iOS Core ML). Ela será ativada automaticamente quando o handler da plataforma estiver disponível.';
+
+  @override
+  String get ui3PhotoAvatar => 'Avatar com foto';
+
+  @override
+  String get ui3AvatarStyles => 'Estilos de avatar';
+
+  @override
+  String get ui3AvatarStylesDesc =>
+      'Usar um único seletor de decorações para o perfil e os acessos ao avatar.';
+
+  @override
+  String get ui3ReplaceNftAvatar => 'Substituir avatar NFT';
+
+  @override
+  String get ui3NftAvatarDesc =>
+      'Use um colecionável on-chain como seu avatar.';
+
+  @override
+  String get ui3UsePhotoAvatar => 'Usar avatar com foto';
+
+  @override
+  String get ui3UsePhotoAvatarDesc =>
+      'Manter o avatar enviado e remover o vínculo com o NFT.';
+
+  @override
+  String ui3AvatarStyleSet(Object name) {
+    return 'Estilo de avatar definido: $name';
+  }
+
+  @override
+  String get ui3NftAvatarUpdated => 'Avatar NFT atualizado';
+
+  @override
+  String get ui3SwitchedToPhotoAvatar => 'Voltou para o avatar com foto';
+
+  @override
+  String get ui3SignInToViewRedPacketHistory =>
+      'Entre para ver o histórico de envelopes vermelhos';
+
+  @override
+  String get ui3RedPacketActive => 'Ativos';
+
+  @override
+  String get ui3RedPacketCompleted => 'Concluídos';
+
+  @override
+  String get ui3CardsAndPasses => 'Cartões e passes';
+
+  @override
+  String get ui3CardsAndPassesDesc =>
+      'Cartões da carteira, cupons e passes são gerenciados no app principal.';
+
+  @override
+  String get ui3CardPackRequiresMainApp =>
+      'O pacote de cartões exige o app principal';
+
+  @override
+  String get ui3OpenCardPack => 'Abrir pacote de cartões';
+
+  @override
+  String get ui3UnableToOpenChat =>
+      'Não foi possível abrir uma conversa com este contato';
+
+  @override
+  String get ui3WalletManagedInMainApp =>
+      'A carteira é gerenciada no app principal';
+
+  @override
+  String ui3CreatorPlans(Object name) {
+    return '$name · Planos';
+  }
+
+  @override
+  String get ui3NewPlan => 'Novo plano';
+
+  @override
+  String get ui3MySubscriptions => 'Minhas assinaturas';
+
+  @override
+  String get ui3AvailablePlans => 'Planos disponíveis';
+
+  @override
+  String get ui3NoPlansYet =>
+      'Nenhum plano ainda · toque em \"Novo plano\" para criar um';
+
+  @override
+  String ui3DaysLeft(Object days) {
+    return 'Faltam $days d';
+  }
+
+  @override
+  String get ui3SubscriptionCancelled => 'Cancelada';
+
+  @override
+  String get ui3AutoRenewOn => 'Renovação automática: ativada';
+
+  @override
+  String get ui3AutoRenewOff => 'Renovação automática: desativada';
+
+  @override
+  String get ui3CancelSubscriptionTitle => 'Cancelar assinatura?';
+
+  @override
+  String ui3CancelSubscriptionConfirm(Object name) {
+    return 'Sua assinatura de $name continua ativa até expirar e não será renovada.';
+  }
+
+  @override
+  String get ui3Subscribe => 'Assinar';
+
+  @override
+  String ui3SubscribedTo(Object name) {
+    return 'Você assinou $name';
+  }
+
+  @override
+  String get ui3PlanPriceLabel => 'Preço (ex.: 9.9 USDT)';
+
+  @override
+  String get ui3PlanDescriptionLabel => 'Descrição (opcional)';
+
+  @override
+  String get ui3PlanBenefitsLabel => 'Benefícios (separados por vírgula)';
+
+  @override
+  String get ui3PlanPeriod => 'Período:';
+
+  @override
+  String get ui3Monthly => 'Mensal';
+
+  @override
+  String get ui3Yearly => 'Anual';
+
+  @override
+  String get ui3SaveRemarkFailed => 'Falha ao salvar a observação';
+
+  @override
+  String get ui3CopyLink => 'Copiar link';
+
+  @override
+  String get ui3Connect => 'Conectar';
+
+  @override
+  String get ui3CommonTokens => 'Tokens em comum';
+
+  @override
+  String get ui3SharedNfts => 'NFTs em comum';
+
+  @override
+  String get ui3TransactionHistory => 'Histórico de transações';
+
+  @override
+  String get ui3CommonDaos => 'DAOs em comum';
+
+  @override
+  String get ui3SameChains => 'Mesmas redes';
+
+  @override
+  String get ui3ChatInitFailed => 'Falha ao iniciar o chat';
+
+  @override
+  String get ui3CheckNetworkRetry => 'Verifique sua conexão e tente novamente';
+
+  @override
+  String get ui3FromContacts => 'Dos contatos';
+
+  @override
+  String get ui3FindFriendsFromContacts =>
+      'Encontre amigos nos contatos do celular';
+
+  @override
+  String get ui3EnsOrDomain => 'ENS / Domínio';
+
+  @override
+  String get ui3LoadingContacts => 'Carregando contatos...';
+
+  @override
+  String get ui3ContactsPermissionRequired =>
+      'Permissão de contatos necessária';
+
+  @override
+  String get ui3ContactsPermissionMessage =>
+      'Para encontrar amigos nos seus contatos, permita o acesso aos contatos.';
+
+  @override
+  String get ui3AllowAccess => 'Permitir acesso';
+
+  @override
+  String get ui3NoContactMatches => 'Nenhuma correspondência encontrada';
+
+  @override
+  String get ui3NoContactMatchesMessage =>
+      'Nenhum dos seus contatos usa este app ainda. Convide-os para participar!';
+
+  @override
+  String ui3ScannedContacts(Object count) {
+    return '$count contatos verificados';
+  }
+
+  @override
+  String ui3FoundContactMatches(Object count) {
+    return '$count correspondências encontradas nos seus contatos';
+  }
+
+  @override
+  String ui3InContactsAs(Object name) {
+    return 'Nos contatos: $name';
+  }
+
+  @override
+  String get ui3DeletePhotoConfirm => 'Excluir esta foto?';
+
+  @override
+  String get ui3InviteLink => 'Link de convite';
+
+  @override
+  String get ui3ShareJoinLink => 'Compartilhe um link para entrar nesta sala';
+
+  @override
+  String get ui3ShareRoomReference =>
+      'Compartilhe uma referência da sala com membros convidados';
+
+  @override
+  String get ui3ScanToJoinGroup =>
+      'Escaneie para entrar diretamente neste grupo';
+
+  @override
+  String get ui3ScanToShareRoomReference =>
+      'Escaneie para compartilhar a referência desta sala com membros convidados';
+
+  @override
+  String get ui3InviteLinkLoadFailed => 'Falha ao carregar o link de convite';
+
+  @override
+  String get ui3InviteLinkCopied => 'Link de convite copiado';
+
+  @override
+  String get ui3ChannelCategoryOptional => 'Categoria (opcional)';
+
+  @override
+  String get ui3ChannelCategoryHint => 'Avisos / Produto / Suporte';
+
+  @override
+  String get ui3DescriptionOptional => 'Descrição (opcional)';
+
+  @override
+  String get ui3WebhookEnable => 'Ativar automação por webhook';
+
+  @override
+  String get ui3WebhookEnableDesc =>
+      'Envia eventos de entrada de membros e boas-vindas para seu endpoint de integração.';
+
+  @override
+  String get ui3WebhookUrl => 'URL do webhook';
+
+  @override
+  String get ui3WebhookSecretOptional => 'Segredo de assinatura (opcional)';
+
+  @override
+  String get ui3WebhookSecretHint => 'Usado para X-N42-Signature';
+
+  @override
+  String get ui3WebhookNotifyMemberJoined =>
+      'Notificar quando um membro entrar';
+
+  @override
+  String get ui3WebhookNotifyWelcomeSent =>
+      'Notificar quando a boas-vindas for enviada';
+
+  @override
+  String get ui3WebhookTestSend => 'Enviar webhook de teste';
+
+  @override
+  String get ui3WebhookTestSending => 'Enviando webhook de teste...';
+
+  @override
+  String get ui3WebhookTestSent => 'Webhook de teste enviado com sucesso';
+
+  @override
+  String get ui3WebhookTestFailed => 'Falha ao enviar o webhook de teste';
+
+  @override
+  String get ui3WebhookUrlInvalid =>
+      'A URL do webhook deve ser um endereço HTTPS público';
+
+  @override
+  String get ui3WebhookSelectEvent =>
+      'Selecione pelo menos um evento de webhook';
+
+  @override
+  String get ui3SensitiveDataDetection => 'Detecção de dados sensíveis';
+
+  @override
+  String get ui3Email => 'E-mail';
+
+  @override
+  String get ui3CreditCard => 'Cartão de crédito';
+
+  @override
+  String get ui3DetectEmailDesc =>
+      'Detectar endereços de e-mail em mensagens de texto';
+
+  @override
+  String get ui3DetectPhoneDesc =>
+      'Detectar números de telefone e internacionais';
+
+  @override
+  String get ui3DetectCardDesc =>
+      'Detectar prováveis números bancários e de cartão';
+
+  @override
+  String get ui3DetectWalletDesc =>
+      'Detectar endereços de carteira no formato Ethereum';
+
+  @override
+  String get ui3GeneralTopic => 'Geral';
+
+  @override
+  String get a11yPreviousResult => 'Resultado anterior';
+
+  @override
+  String get a11yNextResult => 'Próximo resultado';
+
+  @override
+  String get ui3TryDifferentKeywords => 'Tente outras palavras-chave';
+
+  @override
+  String ui3FiltersActive(Object count) {
+    return 'Filtros ativos: $count';
+  }
+
+  @override
+  String ui3MessageFiltersActive(Object count) {
+    return 'Filtros de mensagens ativos: $count';
+  }
+
+  @override
+  String get ui3LoadMore => 'Carregar mais';
+
+  @override
+  String get ui3MessageFilters => 'Filtros de mensagens';
+
+  @override
+  String get ui3SenderUserId => 'ID de usuário do remetente';
+
+  @override
+  String get ui3FilterType => 'Tipo';
+
+  @override
+  String get ui3FilterAny => 'Qualquer';
+
+  @override
+  String get ui3FilterImage => 'Imagem';
+
+  @override
+  String get ui3FilterTime => 'Período';
+
+  @override
+  String get ui3AnyTime => 'Qualquer data';
+
+  @override
+  String get ui3OnlyMyMessages => 'Somente minhas mensagens';
+
+  @override
+  String get ui3MediaOnly => 'Somente mídia';
+
+  @override
+  String get ui3Apply => 'Aplicar';
+
+  @override
+  String get ui3QrStyleClassic => 'Clássico';
+
+  @override
+  String get ui3QrStyleOcean => 'Oceano';
+
+  @override
+  String get ui3QrStyleBerry => 'Frutas vermelhas';
+
+  @override
+  String get ui3NfcUnavailable =>
+      'NFC indisponível ou tag não compatível. Ative o NFC, tente outra tag ou use QR.';
+
+  @override
+  String get ui3CancelNfc => 'Cancelar NFC';
+
+  @override
+  String get ui3ReadNfcTag => 'Ler tag NFC';
+
+  @override
+  String get ui3HoldNearNfcTag => 'Aproxime o celular da tag do serviço.';
+
+  @override
+  String get a11yFlashlightOn => 'Ligar lanterna';
+
+  @override
+  String get a11yFlashlightOff => 'Desligar lanterna';
+
+  @override
+  String get ui3SocialGraph => 'Grafo social';
+
+  @override
+  String get ui3RecommendedConnections => 'Conexões recomendadas';
+
+  @override
+  String get ui3Portfolio => 'Portfólio';
+
+  @override
+  String get ui3Chains => 'Redes';
+
+  @override
+  String get ui3Tokens => 'Tokens digitais';
+
+  @override
+  String get ui3NoConnectionsFound => 'Nenhuma conexão encontrada';
+
+  @override
+  String get ui3ConnectionsHint =>
+      'As conexões aparecem conforme você cria atividade on-chain';
+
+  @override
+  String get ui3SocialGraphLoadFailed => 'Falha ao carregar o grafo social';
+
+  @override
+  String get ui3Similarity => 'Similaridade';
+
+  @override
+  String get ui3Breakdown => 'Detalhamento';
+
+  @override
+  String get ui3TokenHoldings => 'Tokens em carteira';
+
+  @override
+  String get ui3NftCollections => 'Coleções de NFT';
+
+  @override
+  String get ui3ChainUsage => 'Uso de redes';
+
+  @override
+  String get ui3Transactions => 'Transações';
+
+  @override
+  String get ui3DaoMembership => 'Participação em DAOs';
+
+  @override
+  String get ui3NotWeighted => 'Sem peso';
+
+  @override
+  String ui3PercentWithWeight(Object percent, Object weight) {
+    return '$percent% (peso: $weight)';
+  }
+
+  @override
+  String get ui3CommonOnChainActivity => 'Atividade on-chain em comum';
+
+  @override
+  String get ui3SharedTokens => 'Tokens em comum';
+
+  @override
+  String get ui3SharedNftCollections => 'Coleções de NFT em comum';
+
+  @override
+  String get ui3SharedChains => 'Redes em comum';
+
+  @override
+  String get ui3NoSharedTokens => 'Nenhum token em comum encontrado';
+
+  @override
+  String get ui3NoSharedNftCollections =>
+      'Nenhuma coleção de NFT em comum encontrada';
+
+  @override
+  String get ui3NoSharedChains => 'Nenhuma rede em comum encontrada';
+
+  @override
+  String get ui3SimilarityFailed => 'Não foi possível calcular a similaridade';
+
+  @override
+  String ui3ItemsAndMore(Object items, Object count) {
+    return '$items +$count outros';
+  }
+
+  @override
+  String get a11yGovernance => 'Governança';
+
+  @override
+  String get ui3CommunityLink => 'Link da comunidade';
+
+  @override
+  String get ui3CommunityQrCode => 'QR code da comunidade';
+
+  @override
+  String get ui3CommunityQrSubtitle =>
+      'Escaneie para entrar nesta comunidade e explorar os canais';
+
+  @override
+  String get ui3CommunityLinkLoadFailed =>
+      'Não foi possível carregar o link da comunidade';
+
+  @override
+  String get ui3CommunityLinkCopied => 'Link da comunidade copiado';
+
+  @override
+  String ui3KickMemberConfirm(Object name) {
+    return '$name será removido desta comunidade.';
+  }
+
+  @override
+  String ui3BanMemberConfirm(Object name) {
+    return '$name será removido e não poderá entrar novamente.';
+  }
+
+  @override
+  String get ui3SignInToDiscoverChannels =>
+      'Entre para descobrir canais públicos';
+
+  @override
+  String ui3UnableToJoinChannel(Object name, Object error) {
+    return 'Não foi possível entrar em $name: $error';
+  }
+
+  @override
+  String get ui3CategoryTech => 'Tecnologia';
+
+  @override
+  String get ui3CategorySocial => 'Redes sociais';
+
+  @override
+  String get ui3NoPublicChannels => 'Nenhum canal público encontrado';
+
+  @override
+  String get ui3StoriesAndFun => 'Stories e diversão';
+
+  @override
+  String get ui3SearchMusicHint => 'Pesquise músicas, artistas ou amigos';
+
+  @override
+  String get ui3ForYou => 'Para você';
+
+  @override
+  String get ui3Liked => 'Curtidas';
+
+  @override
+  String get ui3NoLikedMusic => 'Nenhuma música curtida ainda';
+
+  @override
+  String get ui3NoMusicStories => 'Nenhum Story com música ainda';
+
+  @override
+  String get ui3LikedMusicHint =>
+      'Toque no coração ao lado de uma música para salvá-la aqui.';
+
+  @override
+  String get ui3MusicStoriesHint =>
+      'Músicas compartilhadas em Stories aparecerão aqui.';
+
+  @override
+  String ui3SharedBy(Object artist, Object name) {
+    return '$artist · compartilhado por $name';
+  }
+
+  @override
+  String ui3UnableToPlay(Object title, Object error) {
+    return 'Não foi possível reproduzir $title: $error';
+  }
+
+  @override
+  String get a11yPreviousTrack => 'Faixa anterior';
+
+  @override
+  String get a11yNextTrack => 'Próxima faixa';
+
+  @override
+  String get a11yPlay => 'Reproduzir';
+
+  @override
+  String get a11yPause => 'Pausar';
+
+  @override
+  String get ui3Refresh => 'Atualizar';
+
+  @override
+  String get ui3NearbyIntroTitle => 'Descubra publicações públicas por perto';
+
+  @override
+  String get ui3NearbyIntroBody =>
+      'Sua localização é usada uma vez neste dispositivo para ordenar os Momentos públicos. Ela não é enviada, transmitida nem mostrada a outras pessoas.';
+
+  @override
+  String get ui3UseMyLocation => 'Usar minha localização';
+
+  @override
+  String get ui3NearbyUnavailable => 'Por perto não está disponível';
+
+  @override
+  String get ui3NoNearbyPosts => 'Nenhuma publicação por perto ainda';
+
+  @override
+  String get ui3NoNearbyPostsHint =>
+      'Momentos públicos com localização aparecerão aqui.';
+
+  @override
+  String get ui3NearbyDistanceNote =>
+      'Distância aproximada · apenas publicações públicas com localização';
+
+  @override
+  String get ui3PublicLocationPost => 'Publicação pública com localização';
+
+  @override
+  String get ui3LocationServicesOff =>
+      'Os Serviços de Localização estão desativados';
+
+  @override
+  String get ui3LocationPermissionDenied =>
+      'A permissão de localização foi negada';
+
+  @override
+  String get ui3EnableLocationInSettings =>
+      'Ative a permissão de localização nas configurações do sistema';
+
+  @override
+  String get ui3CreateStory => 'Criar Story';
+
+  @override
+  String get ui3CreateStoryDesc => 'Publique um status de texto ou foto.';
+
+  @override
+  String get ui3StoryCamera => 'Câmera do Story';
+
+  @override
+  String get ui3StoryCameraDesc => 'Vá direto para filtros e edição de fotos.';
+
+  @override
+  String get ui3MomentsDesc => 'Abra o feed completo e os comentários.';
+
+  @override
+  String get ui3MomentCamera => 'Câmera de Momentos';
+
+  @override
+  String get ui3MomentCameraDesc =>
+      'Crie uma publicação e escolha a mídia na hora.';
+
+  @override
+  String get ui3GamesDesc => 'Abra a central de jogos casuais integrada.';
+
+  @override
+  String get ui3AvatarStudio => 'Estúdio de avatar';
+
+  @override
+  String get ui3AvatarStudioDesc =>
+      'Decorações, avatar NFT e estilo de identidade.';
+
+  @override
+  String get ui3SocialGraphDesc => 'Seguidos, fãs e conexões on-chain.';
+
+  @override
+  String get ui3SocialHubHeroTitle => 'Stories, momentos, jogos e avatares';
+
+  @override
+  String get ui3SocialHubHeroBody =>
+      'Todos os recursos sociais em um só lugar, em vez de espalhados pelo chat, perfil e descobrir.';
+
+  @override
+  String get ui3SocialGraphNotConfigured =>
+      'O grafo social não está configurado nesta versão';
+
+  @override
+  String get ui3ConnectWalletForSocialGraph =>
+      'Conecte uma carteira para ver seu grafo social';
+
+  @override
+  String get ui3AvatarStudioSignIn => 'O estúdio de avatar exige login';
+
+  @override
+  String get a11yRemoveImage => 'Remover imagem';
+
+  @override
+  String get a11yBack => 'Voltar';
+
+  @override
+  String get ui3MiniAppConfirmTransactionTitle => 'Confirmar transação';
+
+  @override
+  String get ui3MiniAppConfirmTransactionBody =>
+      'Um Mini App está solicitando o envio de uma transação em seu nome.';
+
+  @override
+  String ui3MiniAppOpenTitle(Object name) {
+    return 'Abrir $name?';
+  }
+
+  @override
+  String get ui3MiniAppOpenButton => 'Abrir';
+
+  @override
+  String get ui3StoryReplySendFailed =>
+      'Não foi possível enviar a resposta ao Story';
+
+  @override
+  String get ui3RedPacketDemoNotice =>
+      'Envelope vermelho de demonstração — apenas um registro no chat, nenhum ativo on-chain real é transferido.';
+
+  @override
+  String get ui3RedPacketCoverClassic => 'Vermelho clássico';
+
+  @override
+  String get ui3RedPacketCoverGolden => 'Dourado';
+
+  @override
+  String get ui3RedPacketCoverPurple => 'Roxo';
+
+  @override
+  String get ui3RedPacketCoverOceanBlue => 'Azul oceano';
+
+  @override
+  String get ui3RedPacketCoverNatureGreen => 'Verde natureza';
+
+  @override
+  String get ui3RedPacketCoverRosePink => 'Rosa';
+
+  @override
+  String get ui3RedPacketHistoryEmpty => 'Nenhum envelope vermelho ainda';
+
+  @override
+  String get ui3TransferMerchantQrWithAmount => 'QR de lojista (com valor)';
+
+  @override
+  String get ui3TransferMerchantQrTitle => 'QR de lojista';
+
+  @override
+  String get ui3TransferOpenAmountHint => 'Deixe em branco para valor livre';
+
+  @override
+  String get ui3FiatRampTitle => 'Comprar / vender cripto';
+
+  @override
+  String get ui3FiatRampBuy => 'Comprar';
+
+  @override
+  String get ui3FiatRampSell => 'Vender';
+
+  @override
+  String get ui3FiatRampNotConfigured =>
+      'A rampa fiat de entrada/saída não está configurada';
+
+  @override
+  String get a11yPointsAddRule => 'Adicionar regra de recompensa';
+
+  @override
+  String get a11yGovernanceRemoveChoice => 'Remover opção';
+
+  @override
+  String get a11yGovernanceCreateProposal => 'Criar proposta';
+
+  @override
+  String get ui3MiniAppUpdateN42 => 'Atualizar N42';
+
+  @override
+  String get ui3MiniAppOfficial => 'Oficial';
+
+  @override
+  String ui3MiniAppUserCount(Object count) {
+    return '$count usuários';
+  }
+
+  @override
+  String a11yStoryBackgroundColor(Object index) {
+    return 'Cor de fundo $index';
+  }
+
+  @override
+  String get a11yStoryAdd => 'Adicionar story';
+
+  @override
+  String get ui3StoryPostFailed => 'Falha ao publicar o story';
+
+  @override
+  String get ui3StoryTapToSelectImage => 'Toque para selecionar uma imagem';
+
+  @override
+  String get ui3StoryChangeImage => 'Trocar';
+
+  @override
+  String ui3StoryMusicReadFailed(Object error) {
+    return 'Não foi possível ler a música selecionada: $error';
+  }
+
+  @override
+  String get ui3StoryDeleteConfirm => 'Excluir este story?';
+
+  @override
+  String get ui3StoryDeleteFailed => 'Falha ao excluir o story';
+
+  @override
+  String get ui3MomentCreateTitle => 'Criar momento';
+
+  @override
+  String get ui3MomentContentHint => 'No que você está pensando?';
+
+  @override
+  String get ui3MomentAddPhotos => 'Adicionar fotos';
+
+  @override
+  String get ui3MomentAddLocation => 'Adicionar localização';
+
+  @override
+  String ui3MomentSelectedMedia(Object count) {
+    return 'Mídia selecionada ($count)';
+  }
+
+  @override
+  String get ui3MomentClearAll => 'Limpar tudo';
+
+  @override
+  String get ui3MomentClearMediaConfirm =>
+      'Remover todas as fotos/vídeos selecionados?';
+
+  @override
+  String get ui3MomentVisibilityPublicDesc => 'Todos os amigos podem ver';
+
+  @override
+  String get ui3MomentVisibilityPrivateDesc => 'Só você pode ver';
+
+  @override
+  String get ui3MomentVisibilityPartialDesc => 'Escolha quem pode ver';
+
+  @override
+  String get ui3MomentVisibilityExcludedDesc => 'Ocultar de amigos específicos';
+
+  @override
+  String get ui3MomentVideos => 'Vídeos';
+
+  @override
+  String get ui3MomentNoVideos => 'Nenhum vídeo ainda';
+
+  @override
+  String get a11yCallMinimize => 'Minimizar';
+
+  @override
+  String get a11yCallGridView => 'Visualização em grade';
+
+  @override
+  String get a11yCallFocusView => 'Visualização em destaque';
+
+  @override
+  String get ui3CallTools => 'Ferramentas de chamada';
+
+  @override
+  String get ui3CallMeetingTools => 'Ferramentas de reunião';
+
+  @override
+  String get ui3CallToolsSubtitle =>
+      'Ajuste a qualidade de áudio e vídeo sem sair da chamada.';
+
+  @override
+  String get ui3CallAudioEnhancement => 'Aprimoramento de áudio';
+
+  @override
+  String get ui3CallNoiseSuppression => 'Supressão de ruído';
+
+  @override
+  String get ui3CallNoiseSuppressionDesc =>
+      'Reduz o ruído do teclado e de fundo.';
+
+  @override
+  String get ui3CallEchoCancellation => 'Cancelamento de eco';
+
+  @override
+  String get ui3CallEchoCancellationDesc =>
+      'Impede que o som do alto-falante volte para o microfone.';
+
+  @override
+  String get ui3CallAutoGainControl => 'Controle automático de ganho';
+
+  @override
+  String get ui3CallAutoGainControlDesc =>
+      'Mantém o volume do microfone mais estável.';
+
+  @override
+  String get ui3CallVoiceIsolation => 'Isolamento de voz aprimorado';
+
+  @override
+  String get ui3CallVoiceIsolationDesc =>
+      'Use um perfil de redução de ruído mais forte.';
+
+  @override
+  String get ui3CallVideoSection => 'Vídeo';
+
+  @override
+  String get ui3CallBackgroundBlur => 'Desfoque de fundo (beta)';
+
+  @override
+  String get ui3CallBlurDescReady =>
+      'A preferência está ativa. O desfoque visual ainda depende da liberação do processador de vídeo.';
+
+  @override
+  String get ui3CallBlurDescSaved =>
+      'A preferência de desfoque foi salva e será aplicada quando o processamento da câmera estiver disponível.';
+
+  @override
+  String get ui3CallBlurDescCameraOff =>
+      'Ligue a câmera quando o processamento de fundo estiver disponível.';
+
+  @override
+  String get ui3CallRecordingSection => 'Gravação';
+
+  @override
+  String get ui3CallRecordingDesc =>
+      'Requer saída no servidor para que as gravações possam ser salvas.';
+
+  @override
+  String ui3CallSettingsUpdateFailed(Object error) {
+    return 'Falha ao atualizar as configurações da chamada: $error';
+  }
+
+  @override
+  String get ui3CallRecordingStarted => 'Gravação iniciada';
+
+  @override
+  String get ui3VoiceRoomNotFound => 'Sala não encontrada';
+
+  @override
+  String get ui3VoiceRoomEndConfirm =>
+      'Tem certeza de que deseja encerrar esta sala de voz?';
+
+  @override
+  String get a11yGameMoveUp => 'Mover para cima';
+
+  @override
+  String get a11yGameMoveDown => 'Mover para baixo';
+
+  @override
+  String get a11yGameMoveLeft => 'Mover para a esquerda';
+
+  @override
+  String get a11yGameMoveRight => 'Mover para a direita';
+
+  @override
+  String get a11yGameRotate => 'Girar';
+
+  @override
+  String get a11yGameDrop => 'Soltar';
+
+  @override
+  String ui3StickerAddedCount(Object count) {
+    return '$count figurinha(s) adicionada(s)';
+  }
+
+  @override
+  String ui3StickerAddFailed(Object error) {
+    return 'Falha ao adicionar: $error';
+  }
+
+  @override
+  String get ui3StickerRemoveTitle => 'Remover figurinha';
+
+  @override
+  String get ui3StickerRemoveConfirm => 'Remover esta figurinha do pacote?';
+
+  @override
+  String get ui3StickerRemoveFailed => 'Falha ao remover';
+
+  @override
+  String get ui3StickerRenamePack => 'Renomear pacote';
+
+  @override
+  String get ui3StickerPackName => 'Nome do pacote';
+
+  @override
+  String get ui3StickerRenameFailed => 'Falha ao renomear';
+
+  @override
+  String get ui3StickerDeletePack => 'Excluir pacote';
+
+  @override
+  String get ui3StickerThisPack => 'este pacote';
+
+  @override
+  String ui3StickerDeletePackConfirm(Object name) {
+    return 'Excluir \"$name\" e todas as figurinhas? Essa ação não pode ser desfeita.';
+  }
+
+  @override
+  String get ui3StickerDeleteFailed => 'Falha ao excluir';
+
+  @override
+  String get ui3StickerPack => 'Pacote de figurinhas';
+
+  @override
+  String get ui3StickerAdding => 'Adicionando…';
+
+  @override
+  String get ui3StickerAddStickers => 'Adicionar figurinhas';
+
+  @override
+  String get ui3StickerPackNotFound => 'Pacote não encontrado';
+
+  @override
+  String get ui3StickerEmptyHint =>
+      'Toque em \"Adicionar figurinhas\" para enviar imagens';
+
+  @override
+  String get ui3StickerNewPack => 'Novo pacote de figurinhas';
+
+  @override
+  String get ui3StickerCreate => 'Criar';
+
+  @override
+  String get ui3StickerCreateFailed => 'Falha ao criar o pacote';
+
+  @override
+  String ui3StickerInstalled(Object name) {
+    return '\"$name\" instalado';
+  }
+
+  @override
+  String get ui3StickerRemovePackTitle => 'Remover pacote de figurinhas';
+
+  @override
+  String ui3StickerRemovePackConfirm(Object name) {
+    return 'Remover \"$name\" das suas figurinhas?';
+  }
+
+  @override
+  String ui3StickerRemoved(Object name) {
+    return '\"$name\" removido';
+  }
+
+  @override
+  String get ui3StickerAiSticker => 'Figurinha de IA';
+
+  @override
+  String get ui3StickerStoreTab => 'Loja';
+
+  @override
+  String get ui3StickerMyStickersTab => 'Minhas figurinhas';
+
+  @override
+  String get ui3StickerNoneFound => 'Nenhuma figurinha encontrada';
+
+  @override
+  String ui3StickerByAuthor(Object author) {
+    return 'por $author';
+  }
+
+  @override
+  String get ui3StickerManage => 'Gerenciar';
+
+  @override
+  String ui3StickerCount(Object count) {
+    return '$count figurinhas';
+  }
+
+  @override
+  String get ui3StickerNoneInstalled => 'Nenhuma figurinha instalada';
+
+  @override
+  String get ui3StickerGetFromStore => 'Obtenha figurinhas na loja';
+
+  @override
+  String get ui3StickerBrowseStore => 'Explorar loja';
+
+  @override
+  String get ui3StickerAddedToAi => 'Adicionada a \"Figurinhas de IA\"';
+
+  @override
+  String get ui3StickerAddOneFailed => 'Falha ao adicionar a figurinha';
+
+  @override
+  String get ui3StickerPromptLabel => 'Descreva sua figurinha';
+
+  @override
+  String get ui3StickerPromptHint =>
+      'ex.: um gato laranja feliz de óculos escuros';
+
+  @override
+  String get ui3StickerGenerating => 'Gerando…';
+
+  @override
+  String get ui3StickerGenerate => 'Gerar';
+
+  @override
+  String get ui3StickerAddToStickers => 'Adicionar às figurinhas';
+
+  @override
+  String get ui3StickerGeneratingPreview => 'Gerando sua figurinha…';
+
+  @override
+  String get ui3StickerGenerateEmpty =>
+      'Descreva uma figurinha e toque em \"Gerar\"';
 }

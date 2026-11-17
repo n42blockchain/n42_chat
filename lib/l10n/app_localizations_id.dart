@@ -6350,7 +6350,7 @@ class SId extends S {
   String get chatRecentVideo => 'Video terbaru';
 
   @override
-  String get chatAttachmentTip => 'Tip';
+  String get chatAttachmentTip => 'Saweran';
 
   @override
   String get chatAttachmentWhiteboard => 'Papan tulis';
@@ -6382,4 +6382,1997 @@ class SId extends S {
   String scheduledSendTomorrowMorningAt(String time) {
     return 'Besok pagi ($time)';
   }
+
+  @override
+  String get a11yScrollToBottom => 'Gulir ke bawah';
+
+  @override
+  String get ui3EnterMessageBeforeScheduling =>
+      'Masukkan pesan sebelum menjadwalkan';
+
+  @override
+  String get ui3SendCode => 'Kirim kode';
+
+  @override
+  String get ui3CodeLanguage => 'Bahasa';
+
+  @override
+  String get ui3PasteCodeHere => 'Tempel kode di sini';
+
+  @override
+  String ui3ReminderSetAt(String time) {
+    return 'Pengingat disetel · $time';
+  }
+
+  @override
+  String get ui3RedPacketCreateFailed => 'Gagal membuat angpao';
+
+  @override
+  String get ui3SendTip => 'Kirim tip';
+
+  @override
+  String get ui3TokenLabel => 'Aset kripto';
+
+  @override
+  String get ui3NoteOptional => 'Catatan (opsional)';
+
+  @override
+  String ui3TipFailed(String error) {
+    return 'Tip gagal: $error';
+  }
+
+  @override
+  String get ui3GiftNftTitle => 'Hadiahkan NFT';
+
+  @override
+  String get ui3TokenId => 'ID token';
+
+  @override
+  String ui3NftGiftFailed(String error) {
+    return 'Gagal menghadiahkan NFT: $error';
+  }
+
+  @override
+  String get ui3AiAgentSubtitle =>
+      'Jelaskan tugas, buka aplikasi mini yang sesuai';
+
+  @override
+  String get ui3GiftNft => 'Hadiahkan NFT';
+
+  @override
+  String get ui3GiftNftSubtitle => 'Kirim NFT ke kontak ini';
+
+  @override
+  String get ui3MiniAppUnavailable => 'Aplikasi mini tidak tersedia';
+
+  @override
+  String ui3MediaItemsNotSent(int count) {
+    return '$count media terpilih tidak dapat dikirim';
+  }
+
+  @override
+  String get ui3PhotosSubtitle =>
+      'Kirim foto dan video dalam format yang sesuai untuk chat';
+
+  @override
+  String get ui3OriginalImages => 'Gambar asli';
+
+  @override
+  String get ui3OriginalImagesSubtitle =>
+      'Kirim foto tanpa kompresi sebagai file';
+
+  @override
+  String ui3ScheduledFileFor(String filename, String time) {
+    return '$filename dijadwalkan pada $time';
+  }
+
+  @override
+  String ui3SendingOriginalImage(String filename) {
+    return 'Mengirim gambar asli: $filename';
+  }
+
+  @override
+  String ui3ScheduledOriginalImage(String filename) {
+    return 'Gambar asli dijadwalkan: $filename';
+  }
+
+  @override
+  String get ui3PaymentAlreadySent => 'Pembayaran sudah dikirim';
+
+  @override
+  String get ui3PaymentProcessing => 'Pembayaran sedang diproses';
+
+  @override
+  String ui3ChainStatus(String status) {
+    return 'Status chain: $status';
+  }
+
+  @override
+  String get ui3NotChecked => 'Belum diperiksa';
+
+  @override
+  String ui3ConfirmationsCount(int confirmations, int required) {
+    return 'Dikonfirmasi: $confirmations / $required blok';
+  }
+
+  @override
+  String get ui3CopyTxHash => 'Salin hash transaksi';
+
+  @override
+  String get ui3VerifyAgain => 'Verifikasi lagi';
+
+  @override
+  String get ui3VerifyOnChain => 'Verifikasi on-chain';
+
+  @override
+  String get ui3TransferMissingChainDetails =>
+      'Transfer ini tidak menyertakan detail chain dan aset yang tepat.';
+
+  @override
+  String get ui3ReceiptPending => 'Tertunda di chain';
+
+  @override
+  String get ui3ReceiptConfirmed => 'Dikonfirmasi';
+
+  @override
+  String get ui3ReceiptFailed => 'Gagal di chain';
+
+  @override
+  String get ui3ReceiptMismatch => 'Detail transaksi tidak cocok';
+
+  @override
+  String get ui3ReceiptUnsupported => 'Verifikasi chain tidak didukung';
+
+  @override
+  String get ui3ReceiptUnavailable => 'Verifikasi tidak tersedia';
+
+  @override
+  String get ui3OpenOrSave => 'Buka / Simpan';
+
+  @override
+  String get ui3UnableToOpenFile => 'Tidak dapat membuka file ini.';
+
+  @override
+  String ui3AiRewriteFailed(String error) {
+    return 'Gagal menulis ulang dengan AI: $error';
+  }
+
+  @override
+  String get ui3AiShareMessagesTitle => 'Bagikan pesan dengan AI?';
+
+  @override
+  String get ui3AiShareMessagesBody =>
+      'Pilih pesan yang boleh digunakan AI untuk balasan ini. Persetujuan sekali pakai ini berakhir setelah dua menit. Menutup Balasan Cepat akan membatalkan hasil yang tertunda. Persetujuan ini tidak mengizinkan pembayaran atau ekspor.';
+
+  @override
+  String get ui3OtherParticipant => 'Lawan bicara';
+
+  @override
+  String get ui3ShareSelected => 'Bagikan yang dipilih';
+
+  @override
+  String get ui3BotCommandError => 'Kesalahan perintah';
+
+  @override
+  String get ui3BotUnknownCommand => 'Perintah tidak dikenal';
+
+  @override
+  String get ui3BotTypeHelp =>
+      'Ketik /help untuk melihat perintah yang tersedia.';
+
+  @override
+  String get ui3FilesMediaLinks => 'File, Media & Tautan';
+
+  @override
+  String get ui3ChatStorage => 'Penyimpanan chat';
+
+  @override
+  String get ui3EncryptionKeysDevices => 'Kunci enkripsi & perangkat';
+
+  @override
+  String get ui3EncryptionServiceUnavailable =>
+      'Layanan enkripsi belum tersedia';
+
+  @override
+  String get ui3ExportLoadingHistory =>
+      'Memuat lebih banyak riwayat chat untuk diekspor...';
+
+  @override
+  String get ui3ExportTxtDesc =>
+      'Transkrip teks biasa untuk catatan, cadangan, atau tinjauan kepatuhan';
+
+  @override
+  String get ui3ExportCustomRange => 'Rentang kustom';
+
+  @override
+  String get ui3ExportStart => 'Mulai';
+
+  @override
+  String get ui3ExportEnd => 'Selesai';
+
+  @override
+  String get ui3ExportSelectDate => 'Pilih tanggal';
+
+  @override
+  String get ui3FolderFilterUnreadOnly => 'Hanya belum dibaca';
+
+  @override
+  String get ui3FolderFilterMutedOnly => 'Hanya yang dibisukan';
+
+  @override
+  String get ui3FolderFilterNoDms => 'Tanpa pesan pribadi';
+
+  @override
+  String get ui3FolderFilterNoGroups => 'Tanpa grup';
+
+  @override
+  String get ui3FolderFilterNoChannels => 'Tanpa saluran';
+
+  @override
+  String get ui3FolderFilterAllChats => 'Semua chat';
+
+  @override
+  String get ui3Create => 'Buat';
+
+  @override
+  String ui3DeleteFolderConfirm(String name) {
+    return 'Hapus folder \"$name\"?';
+  }
+
+  @override
+  String get a11yDecreaseTextSize => 'Perkecil ukuran teks';
+
+  @override
+  String get a11yIncreaseTextSize => 'Perbesar ukuran teks';
+
+  @override
+  String ui3MinutesRead(int minutes) {
+    return '$minutes menit membaca';
+  }
+
+  @override
+  String get ui3TipOnChain => 'Tercatat di chain ✓';
+
+  @override
+  String get ui3ViewSource => 'Lihat sumber';
+
+  @override
+  String get a11yPreviousPage => 'Halaman sebelumnya';
+
+  @override
+  String get a11yNextPage => 'Halaman berikutnya';
+
+  @override
+  String get ui3OpenExternalLinkTitle => 'Buka tautan eksternal?';
+
+  @override
+  String get ui3Open => 'Buka';
+
+  @override
+  String get ui3UnableToOpenLink => 'Tidak dapat membuka tautan ini.';
+
+  @override
+  String get ui3ImageUnavailable => 'Gambar tidak tersedia';
+
+  @override
+  String ui3LoadImageFrom(Object host) {
+    return 'Muat gambar dari $host';
+  }
+
+  @override
+  String ui3RetryImageFrom(Object host) {
+    return 'Coba lagi gambar dari $host';
+  }
+
+  @override
+  String get ui3TranslatedByN42 => 'Diterjemahkan oleh N42';
+
+  @override
+  String ui3TranslatedFromByN42(Object language) {
+    return 'Diterjemahkan dari $language oleh N42';
+  }
+
+  @override
+  String get ui3ClearWhiteboardTitle => 'Bersihkan papan tulis?';
+
+  @override
+  String get ui3ClearWhiteboardMessage =>
+      'Semua goresan akan dihapus untuk semua orang. Tindakan ini tidak dapat diurungkan.';
+
+  @override
+  String get ui3WhiteboardLive => 'Papan tulis · Langsung';
+
+  @override
+  String get a11yPenColor => 'Warna pena';
+
+  @override
+  String get ui3AiDescribeOcr => 'Deskripsi AI / OCR';
+
+  @override
+  String get ui3DocumentPreviewFailed =>
+      'Tidak dapat menampilkan pratinjau dokumen ini dengan aman. Periksa koneksi dan ukuran file (maks. 2MB).';
+
+  @override
+  String get ui3AiConsentMessage =>
+      'Pilih pesan yang boleh digunakan AI untuk ringkasan ini. Persetujuan sekali pakai ini berakhir setelah dua menit. Persetujuan ini tidak mengizinkan pembayaran atau ekspor.';
+
+  @override
+  String get ui3AiSuggestedReplies => 'Balasan yang disarankan';
+
+  @override
+  String get ui3AiGeneratingSuggestions => 'Membuat saran...';
+
+  @override
+  String get ui3StickersEmpty => 'Belum ada stiker';
+
+  @override
+  String get ui3StickersGet => 'Dapatkan stiker';
+
+  @override
+  String get a11yFormatBold => 'Tebal';
+
+  @override
+  String get a11yFormatItalic => 'Miring';
+
+  @override
+  String get a11yFormatStrikethrough => 'Coret';
+
+  @override
+  String get a11yFormatInlineCode => 'Kode sebaris';
+
+  @override
+  String get a11yFormatCodeBlock => 'Blok kode';
+
+  @override
+  String get a11yFormatChecklistItem => 'Item daftar periksa';
+
+  @override
+  String get a11yFormatBulletList => 'Daftar berpoin';
+
+  @override
+  String get a11yFormatNumberedList => 'Daftar bernomor';
+
+  @override
+  String get a11yFormatLink => 'Tautan';
+
+  @override
+  String get a11yFormatTable => 'Tabel';
+
+  @override
+  String get a11yFormatMeetingTemplate => 'Templat rapat';
+
+  @override
+  String get a11yEmojiSmileys => 'Smiley & orang';
+
+  @override
+  String get a11yEmojiHearts => 'Hati';
+
+  @override
+  String get a11yEmojiAnimals => 'Hewan & alam';
+
+  @override
+  String get a11yEmojiFood => 'Makanan & minuman';
+
+  @override
+  String get a11yEmojiTravel => 'Perjalanan & tempat';
+
+  @override
+  String get a11yEmojiActivities => 'Aktivitas';
+
+  @override
+  String get a11yEmojiObjects => 'Objek';
+
+  @override
+  String get a11yEmojiSymbols => 'Simbol';
+
+  @override
+  String get ui3FrequentlyUsed => 'Sering digunakan';
+
+  @override
+  String get ui3NoEditHistory => 'Tidak ada riwayat edit';
+
+  @override
+  String get ui3EventNew => 'Acara baru';
+
+  @override
+  String get ui3EventTitleLabel => 'Judul';
+
+  @override
+  String get ui3EventLocationOptional => 'Lokasi (opsional)';
+
+  @override
+  String get ui3EventDescriptionOptional => 'Deskripsi (opsional)';
+
+  @override
+  String get ui3EventSend => 'Kirim acara';
+
+  @override
+  String get ui3EventTitleRequired => 'Judul wajib diisi';
+
+  @override
+  String get ui3EventEndAfterStart => 'Waktu selesai harus setelah waktu mulai';
+
+  @override
+  String get ui3MiniAppAgentIntro =>
+      'Jelaskan apa yang ingin kamu lakukan — aku akan membuka mini app yang tepat.';
+
+  @override
+  String get ui3MiniAppAgentExample => 'mis. tukar ETH ke USDC';
+
+  @override
+  String get ui3MiniAppAgentNoMatch =>
+      'Mini app yang cocok tidak ditemukan. Coba ubah kalimatnya.';
+
+  @override
+  String ui3MiniAppOpen(Object appName) {
+    return 'Buka $appName';
+  }
+
+  @override
+  String get ui3MusicLinkPlatforms =>
+      'Mendukung tautan lagu dari NetEase Cloud Music, QQ Music, Kugou, Kuwo, dan lainnya';
+
+  @override
+  String get ui3PollMarkCorrectAnswer =>
+      'Tandai jawaban benar yang tidak kosong';
+
+  @override
+  String get ui3PollQuizMode => 'Mode kuis';
+
+  @override
+  String get ui3PollAnswerExplanationHint => 'Penjelasan jawaban (opsional)';
+
+  @override
+  String get a11yCorrectAnswer => 'Jawaban benar';
+
+  @override
+  String get ui3AiSuggestions => 'Saran AI';
+
+  @override
+  String get a11yPaste => 'Tempel';
+
+  @override
+  String get a11yRefresh => 'Muat ulang';
+
+  @override
+  String get ui3RecoveryKeyStoreWarning =>
+      'Simpan kunci ini dengan aman. Ini satu-satunya cara memulihkan pesan terenkripsi jika kamu kehilangan akses ke semua perangkat.';
+
+  @override
+  String ui3SavedToPath(Object path) {
+    return 'Tersimpan: $path';
+  }
+
+  @override
+  String get ui3UnknownAccount => 'Akun tidak dikenal';
+
+  @override
+  String get ui3UnknownHomeserver => 'Homeserver tidak dikenal';
+
+  @override
+  String get ui3ImportRecoveryKey => 'Impor kunci pemulihan';
+
+  @override
+  String get ui3ImportRecoveryKeyDesc =>
+      'Masukkan atau tempel kunci pemulihan untuk memulihkan kunci ruang bagi riwayat pesan terenkripsi.';
+
+  @override
+  String ui3RecoveryKeyAccountInfo(Object account, Object homeserver) {
+    return 'Akun: $account\\nHomeserver: $homeserver';
+  }
+
+  @override
+  String get ui3Import => 'Impor';
+
+  @override
+  String get ui3InvalidRecoveryKeyFormat =>
+      'Format kunci pemulihan tidak valid';
+
+  @override
+  String ui3RecoveryKeyPartialRestore(
+    Object restored,
+    Object total,
+    Object failed,
+  ) {
+    return '$restored dari $total kunci dipulihkan. $failed kunci gagal. Periksa akun, jaringan, dan cadangan, lalu coba lagi. Sebagian riwayat mungkin tetap tidak dapat dibaca.';
+  }
+
+  @override
+  String ui3RecoveryKeyRestoreSuccess(Object restored, Object total) {
+    return '$restored dari $total kunci berhasil dipulihkan';
+  }
+
+  @override
+  String ui3ImportFailed(Object error) {
+    return 'Impor gagal: $error';
+  }
+
+  @override
+  String ui3PasskeyRegistrationFailed(Object error) {
+    return 'Pendaftaran passkey gagal: $error';
+  }
+
+  @override
+  String get ui3PasskeyDefaultName => 'Passkey saya';
+
+  @override
+  String get ui3PasskeyNameHint => 'mis. iPhone, MacBook';
+
+  @override
+  String get ui3PasskeyDeleteFailed => 'Gagal menghapus passkey';
+
+  @override
+  String get ui3TwoFactorAuth => 'Autentikasi dua faktor';
+
+  @override
+  String get ui3TwoFactorOnSubtitle =>
+      'Aktif — kode aplikasi autentikator diperlukan';
+
+  @override
+  String get ui3TwoFactorOffSubtitle =>
+      'Nonaktif — lindungi dengan aplikasi autentikator (TOTP)';
+
+  @override
+  String get ui3ShowRecoveryKey => 'Tampilkan kunci pemulihan';
+
+  @override
+  String get ui3ShowRecoveryKeyDesc =>
+      'Tampilkan kunci pemulihan untuk dicadangkan';
+
+  @override
+  String get ui3ImportRecoveryKeyHint =>
+      'Pulihkan pesan menggunakan kunci pemulihan';
+
+  @override
+  String get ui3RecoveryKeyCreateFailed => 'Gagal membuat kunci pemulihan';
+
+  @override
+  String get ui3TotpIncorrectCode => 'Kode salah, coba lagi';
+
+  @override
+  String get ui3TwoFactorEnabled => 'Autentikasi dua faktor diaktifkan';
+
+  @override
+  String get ui3TwoFactorDisabled => 'Autentikasi dua faktor dinonaktifkan';
+
+  @override
+  String get ui3TwoFactorTurnOffTitle => 'Nonaktifkan autentikasi dua faktor?';
+
+  @override
+  String get ui3TwoFactorTurnOffMessage =>
+      'Aplikasi autentikator tidak akan diperlukan lagi. Kamu bisa mengaturnya lagi nanti dengan kunci baru.';
+
+  @override
+  String get ui3TurnOff => 'Nonaktifkan';
+
+  @override
+  String get ui3TwoFactorTotpTitle => 'Dua faktor (TOTP)';
+
+  @override
+  String get ui3TwoFactorIsOn => 'Autentikasi dua faktor aktif';
+
+  @override
+  String get ui3TwoFactorCodeRequired =>
+      'Kode dari aplikasi autentikator diperlukan.';
+
+  @override
+  String get ui3TotpStepScan =>
+      '1. Pindai QR ini dengan aplikasi autentikator (Google Authenticator, Authy, 1Password…), atau masukkan kunci secara manual.';
+
+  @override
+  String get ui3TotpKeyCopied => 'Kunci disalin';
+
+  @override
+  String get ui3TotpStepConfirm => '2. Masukkan kode 6 digit untuk konfirmasi.';
+
+  @override
+  String get ui3Enable => 'Aktifkan';
+
+  @override
+  String get ui3BackupSettingsDesc =>
+      'Cadangkan pengaturan chat lokal. Pesan akan dipulihkan dari server setelah masuk kembali.';
+
+  @override
+  String get ui3BackupKeysSeparate => 'Kunci enkripsi dikelola secara terpisah';
+
+  @override
+  String get ui3BackupKeysSeparateHint =>
+      'Gunakan Keamanan > Kunci Pemulihan untuk mencadangkan akses pesan terenkripsi.';
+
+  @override
+  String ui3BackupRoomsSize(Object rooms, Object size) {
+    return '$rooms ruang  $size';
+  }
+
+  @override
+  String get ui3BackupRestoreFromFileDesc =>
+      'Impor file .n42backup dari perangkat lain atau cadangan sebelumnya. Kunci enkripsi dipulihkan terpisah dengan kunci pemulihan.';
+
+  @override
+  String get ui3UsernameSessionRequired =>
+      'Nama pengguna memerlukan sesi aktif';
+
+  @override
+  String get ui3SecuritySessionRequired =>
+      'Pengaturan keamanan memerlukan sesi aktif';
+
+  @override
+  String get ui3ConnectedAccountsSessionRequired =>
+      'Akun terhubung memerlukan sesi aktif';
+
+  @override
+  String get ui3SystemAccounts => 'Sistem & akun';
+
+  @override
+  String get ui3AccountIdentity => 'Akun & identitas';
+
+  @override
+  String get ui3Accounts => 'Akun';
+
+  @override
+  String get ui3DevicesSessions => 'Perangkat & sesi';
+
+  @override
+  String get ui3Integrations => 'Integrasi';
+
+  @override
+  String get ui3ConnectedAccounts => 'Akun terhubung';
+
+  @override
+  String get ui3ConnectedAccountsDesc =>
+      'Integrasi Telegram, WhatsApp, Discord, dan jembatan API';
+
+  @override
+  String get ui3SystemOverview => 'Ringkasan sistem';
+
+  @override
+  String ui3AccountCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count akun',
+      one: '1 akun',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String ui3DeviceCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count perangkat',
+      one: '1 perangkat',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get ui3PrivacySecurityOverview =>
+      'Enkripsi end-to-end, perlindungan tangkapan layar, dan kontrol proxy';
+
+  @override
+  String get ui3ConversationPrivacy => 'Privasi percakapan';
+
+  @override
+  String get ui3NetworkPrivacy => 'Privasi jaringan';
+
+  @override
+  String get ui3IdentityPrivacy => 'Privasi identitas';
+
+  @override
+  String get ui3EncryptionKeyBackup => 'Enkripsi & cadangan kunci';
+
+  @override
+  String get ui3DevicesVerification => 'Perangkat & verifikasi';
+
+  @override
+  String get ui3ChipE2eeDefault => 'E2EE bawaan';
+
+  @override
+  String get ui3ChipManualE2ee => 'E2EE manual';
+
+  @override
+  String get ui3ChipSelfDestruct => 'Hancur otomatis';
+
+  @override
+  String get ui3ChipScreenshotGuard => 'Pelindung tangkapan layar';
+
+  @override
+  String get ui3ChipIpProxy => 'IP / proksi';
+
+  @override
+  String get ui3ChipLinkPreviewsOff => 'Pratinjau tautan nonaktif';
+
+  @override
+  String get ui3ChipPublicHandle => 'Nama pengguna publik';
+
+  @override
+  String get a11yShowPassword => 'Tampilkan kata sandi';
+
+  @override
+  String get a11yHidePassword => 'Sembunyikan kata sandi';
+
+  @override
+  String get a11yCheckServer => 'Periksa server';
+
+  @override
+  String get ui3AuthAnonymousRegistration => 'Pendaftaran Anonim';
+
+  @override
+  String get ui3AuthAnonymousRegistrationDesc =>
+      'Buat akun tanpa menautkan nomor telepon atau email. Nama pengguna akan dibuat secara otomatis.';
+
+  @override
+  String get ui3AuthAnonymousModeOn => 'Mode anonim aktif';
+
+  @override
+  String get ui3AuthAnonymousModeOnDesc =>
+      'Aplikasi akan membuat nama pengguna Matrix acak untuk Anda. Anda tetap dapat masuk nanti dengan akun dan kata sandi yang dibuat.';
+
+  @override
+  String get ui3AuthChooseLoginMethod => 'Pilih metode masuk';
+
+  @override
+  String get ui3AuthSsoOpenFailed => 'Gagal membuka halaman masuk SSO';
+
+  @override
+  String get ui3AuthWalletUnavailable => 'Dompet tidak tersedia';
+
+  @override
+  String get ui3ProfileSubscriptions => 'Langganan';
+
+  @override
+  String get ui3ProfileBuySellCrypto => 'Beli / Jual kripto';
+
+  @override
+  String get ui3ProfileOnDeviceAi => 'AI di perangkat';
+
+  @override
+  String get ui3ProfileSetAUsername => 'Atur nama pengguna';
+
+  @override
+  String get ui3ProfileAvatarStudio => 'Studio Avatar';
+
+  @override
+  String get ui3ProfileAvatarStudioSubtitle => 'Avatar NFT / Dekorasi';
+
+  @override
+  String get ui3ProfileCustomize => 'Sesuaikan';
+
+  @override
+  String get ui3ProfileQrSubtitle =>
+      'Pindai untuk membuka profil ini atau memulai chat';
+
+  @override
+  String get ui3PrivacyHardening => 'Penguatan Privasi';
+
+  @override
+  String get ui3HidePhoneNumber => 'Sembunyikan Nomor Telepon';
+
+  @override
+  String get ui3HidePhoneNumberDesc =>
+      'Samarkan nomor telepon yang ditautkan di halaman profil pada perangkat ini';
+
+  @override
+  String get ui3EncryptNewChatsByDefault => 'Enkripsi Chat Baru Secara Default';
+
+  @override
+  String get ui3EncryptNewChatsByDefaultDesc =>
+      'Mulai chat langsung dan ruang privat baru dengan E2EE aktif';
+
+  @override
+  String get ui3PrivateChatMode => 'Mode Chat Privat';
+
+  @override
+  String get ui3PrivateChatModeDesc =>
+      'Aktifkan pemblokiran tangkapan layar sementara saat melihat chat privat atau terenkripsi';
+
+  @override
+  String get ui3DefaultSelfDestructTimer => 'Timer Hancur Otomatis Default';
+
+  @override
+  String get ui3DefaultSelfDestructTimerDesc =>
+      'Terapkan timer hancur otomatis default ke pesan yang baru dikirim';
+
+  @override
+  String get ui3LinkPreviews => 'Pratinjau Tautan';
+
+  @override
+  String get ui3LinkPreviewsDesc =>
+      'Ambil judul, deskripsi, dan gambar mini saat pesan berisi URL';
+
+  @override
+  String get ui3IpAddressProtection => 'Perlindungan Alamat IP';
+
+  @override
+  String get ui3IpAddressProtectionDesc =>
+      'Arahkan permintaan Matrix dan pratinjau tautan melalui proksi privasi HTTP yang Anda konfigurasi jika tersedia';
+
+  @override
+  String get ui3UseTorProxy => 'Gunakan Proksi HTTP Tor / Privoxy';
+
+  @override
+  String get ui3UseTorProxyDesc =>
+      'Gunakan endpoint proksi HTTP lokal seperti Privoxy di 127.0.0.1:8118. Perutean Tor SOCKS5 native tidak didukung di sini.';
+
+  @override
+  String get ui3CustomProxy => 'Proksi Kustom';
+
+  @override
+  String get ui3CustomProxyDesc =>
+      'Gunakan proksi HTTP atau HTTPS kustom untuk lalu lintas Matrix dan pratinjau tautan';
+
+  @override
+  String get ui3ProxyEndpoint => 'Alamat Proksi';
+
+  @override
+  String get ui3ProxyEndpointDesc =>
+      'Alamat proksi HTTP/HTTPS (SOCKS tidak didukung)';
+
+  @override
+  String get ui3InvalidEndpoint => 'Alamat tidak valid';
+
+  @override
+  String get ui3CustomProxyStaysOff =>
+      'Proksi kustom tetap nonaktif sampai Anda mengatur alamat yang valid';
+
+  @override
+  String get ui3NotificationFilterNote =>
+      'Aturan prioritas selalu memberi notifikasi (mengabaikan senyap, hanya sebutan, dan Jangan Ganggu). Kata kunci yang disenyapkan menahan notifikasi.';
+
+  @override
+  String get ui3PriorityKeywords => 'Kata kunci prioritas';
+
+  @override
+  String get ui3PriorityKeywordHint => 'mis. mendesak';
+
+  @override
+  String get ui3MutedKeywords => 'Kata kunci disenyapkan';
+
+  @override
+  String get ui3MutedKeywordHint => 'mis. spam';
+
+  @override
+  String get ui3PrioritySenders => 'Pengirim prioritas';
+
+  @override
+  String get ui3CaseSensitive => 'Peka huruf besar/kecil';
+
+  @override
+  String get ui3None => 'Tidak ada';
+
+  @override
+  String get ui3SmartReplyTranslation => 'Terjemahan balasan pintar';
+
+  @override
+  String get ui3SmartReplyTranslationDesc =>
+      'Terjemahkan pesan Anda secara otomatis ke bahasa penerima sebelum dikirim.';
+
+  @override
+  String get ui3FromPhotos => 'Dari Foto';
+
+  @override
+  String get ui3ChangePhoto => 'Ganti foto';
+
+  @override
+  String get ui3RoamingUsesMobileData =>
+      'Roaming mengikuti aturan Data Seluler';
+
+  @override
+  String get ui3RoamingUsesMobileDataDesc =>
+      'Deteksi roaming khusus belum tersedia, jadi roaming saat ini mengikuti pengaturan unduh otomatis Data Seluler.';
+
+  @override
+  String ui3DeleteQuickReplyConfirm(String content) {
+    return 'Hapus \"$content\"?';
+  }
+
+  @override
+  String get ui3ResetToDefaults => 'Atur Ulang ke Default';
+
+  @override
+  String get ui3ResetQuickRepliesMessage =>
+      'Ini akan menghapus semua balasan cepat kustom dan memulihkan default. Lanjutkan?';
+
+  @override
+  String get ui3LocalLlmUnavailable => 'Tidak didukung di perangkat ini';
+
+  @override
+  String get ui3LocalLlmNotDownloaded => 'Model belum diunduh';
+
+  @override
+  String get ui3LocalLlmReady => 'Siap (di perangkat)';
+
+  @override
+  String get ui3LocalLlmDescription =>
+      'Saat diaktifkan dan siap, fitur AI (meringkas, menulis ulang, menerjemahkan, membalas) berjalan sepenuhnya di perangkat — data tidak pernah keluar dari ponsel Anda. Jika tidak, fitur tersebut menggunakan penyedia cloud.';
+
+  @override
+  String get ui3UseOnDeviceAi => 'Gunakan AI di perangkat';
+
+  @override
+  String get ui3UseOnDeviceAiDesc => 'Utamakan inferensi lokal saat siap';
+
+  @override
+  String get ui3DownloadModel => 'Unduh model';
+
+  @override
+  String get ui3LocalLlmRuntimeRequired =>
+      'Inferensi di perangkat memerlukan runtime native (Android MediaPipe / iOS Core ML). Fitur ini akan aktif otomatis setelah handler platform tersedia.';
+
+  @override
+  String get ui3PhotoAvatar => 'Avatar Foto';
+
+  @override
+  String get ui3AvatarStyles => 'Gaya Avatar';
+
+  @override
+  String get ui3AvatarStylesDesc =>
+      'Gunakan satu pemilih dekorasi untuk titik masuk profil dan avatar.';
+
+  @override
+  String get ui3ReplaceNftAvatar => 'Ganti Avatar NFT';
+
+  @override
+  String get ui3NftAvatarDesc =>
+      'Gunakan koleksi on-chain sebagai avatar Anda.';
+
+  @override
+  String get ui3UsePhotoAvatar => 'Gunakan Avatar Foto';
+
+  @override
+  String get ui3UsePhotoAvatarDesc =>
+      'Pertahankan avatar yang diunggah dan hapus tautan NFT.';
+
+  @override
+  String ui3AvatarStyleSet(Object name) {
+    return 'Gaya avatar diatur ke: $name';
+  }
+
+  @override
+  String get ui3NftAvatarUpdated => 'Avatar NFT diperbarui';
+
+  @override
+  String get ui3SwitchedToPhotoAvatar => 'Beralih kembali ke avatar foto';
+
+  @override
+  String get ui3SignInToViewRedPacketHistory =>
+      'Masuk untuk melihat riwayat angpao';
+
+  @override
+  String get ui3RedPacketActive => 'Aktif';
+
+  @override
+  String get ui3RedPacketCompleted => 'Selesai';
+
+  @override
+  String get ui3CardsAndPasses => 'Kartu dan tiket';
+
+  @override
+  String get ui3CardsAndPassesDesc =>
+      'Kartu dompet, kupon, dan tiket dikelola oleh aplikasi utama.';
+
+  @override
+  String get ui3CardPackRequiresMainApp =>
+      'Paket Kartu memerlukan aplikasi utama';
+
+  @override
+  String get ui3OpenCardPack => 'Buka Paket Kartu';
+
+  @override
+  String get ui3UnableToOpenChat =>
+      'Tidak dapat membuka chat dengan kontak ini';
+
+  @override
+  String get ui3WalletManagedInMainApp => 'Dompet dikelola di aplikasi utama';
+
+  @override
+  String ui3CreatorPlans(Object name) {
+    return '$name · Paket';
+  }
+
+  @override
+  String get ui3NewPlan => 'Paket baru';
+
+  @override
+  String get ui3MySubscriptions => 'Langganan saya';
+
+  @override
+  String get ui3AvailablePlans => 'Paket tersedia';
+
+  @override
+  String get ui3NoPlansYet =>
+      'Belum ada paket · ketuk \"Paket baru\" untuk membuatnya';
+
+  @override
+  String ui3DaysLeft(Object days) {
+    return 'Sisa $days hr';
+  }
+
+  @override
+  String get ui3SubscriptionCancelled => 'Dibatalkan';
+
+  @override
+  String get ui3AutoRenewOn => 'Perpanjang otomatis: aktif';
+
+  @override
+  String get ui3AutoRenewOff => 'Perpanjang otomatis: nonaktif';
+
+  @override
+  String get ui3CancelSubscriptionTitle => 'Batalkan langganan?';
+
+  @override
+  String ui3CancelSubscriptionConfirm(Object name) {
+    return 'Langganan Anda ke $name tetap aktif hingga berakhir dan tidak akan diperpanjang.';
+  }
+
+  @override
+  String get ui3Subscribe => 'Berlangganan';
+
+  @override
+  String ui3SubscribedTo(Object name) {
+    return 'Berlangganan ke $name';
+  }
+
+  @override
+  String get ui3PlanPriceLabel => 'Harga (mis. 9.9 USDT)';
+
+  @override
+  String get ui3PlanDescriptionLabel => 'Deskripsi (opsional)';
+
+  @override
+  String get ui3PlanBenefitsLabel => 'Manfaat (pisahkan dengan koma)';
+
+  @override
+  String get ui3PlanPeriod => 'Periode:';
+
+  @override
+  String get ui3Monthly => 'Bulanan';
+
+  @override
+  String get ui3Yearly => 'Tahunan';
+
+  @override
+  String get ui3SaveRemarkFailed => 'Gagal menyimpan catatan';
+
+  @override
+  String get ui3CopyLink => 'Salin Tautan';
+
+  @override
+  String get ui3Connect => 'Hubungkan';
+
+  @override
+  String get ui3CommonTokens => 'Token yang sama';
+
+  @override
+  String get ui3SharedNfts => 'NFT yang sama';
+
+  @override
+  String get ui3TransactionHistory => 'Riwayat transaksi';
+
+  @override
+  String get ui3CommonDaos => 'DAO yang sama';
+
+  @override
+  String get ui3SameChains => 'Chain yang sama';
+
+  @override
+  String get ui3ChatInitFailed => 'Gagal menginisialisasi chat';
+
+  @override
+  String get ui3CheckNetworkRetry => 'Periksa jaringan Anda lalu coba lagi';
+
+  @override
+  String get ui3FromContacts => 'Dari Kontak';
+
+  @override
+  String get ui3FindFriendsFromContacts =>
+      'Temukan teman dari kontak ponsel Anda';
+
+  @override
+  String get ui3EnsOrDomain => 'ENS / Nama domain';
+
+  @override
+  String get ui3LoadingContacts => 'Memuat kontak...';
+
+  @override
+  String get ui3ContactsPermissionRequired => 'Izin Kontak Diperlukan';
+
+  @override
+  String get ui3ContactsPermissionMessage =>
+      'Untuk menemukan teman dari kontak, izinkan akses ke kontak Anda.';
+
+  @override
+  String get ui3AllowAccess => 'Izinkan Akses';
+
+  @override
+  String get ui3NoContactMatches => 'Tidak Ada yang Cocok';
+
+  @override
+  String get ui3NoContactMatchesMessage =>
+      'Belum ada kontak Anda yang menggunakan aplikasi ini. Undang mereka untuk bergabung!';
+
+  @override
+  String ui3ScannedContacts(Object count) {
+    return '$count kontak dipindai';
+  }
+
+  @override
+  String ui3FoundContactMatches(Object count) {
+    return 'Ditemukan $count kecocokan dari kontak Anda';
+  }
+
+  @override
+  String ui3InContactsAs(Object name) {
+    return 'Di Kontak: $name';
+  }
+
+  @override
+  String get ui3DeletePhotoConfirm => 'Hapus foto ini?';
+
+  @override
+  String get ui3InviteLink => 'Tautan Undangan';
+
+  @override
+  String get ui3ShareJoinLink => 'Bagikan tautan untuk bergabung ke ruang ini';
+
+  @override
+  String get ui3ShareRoomReference =>
+      'Bagikan referensi ruang dengan anggota yang diundang';
+
+  @override
+  String get ui3ScanToJoinGroup =>
+      'Pindai untuk langsung bergabung ke grup ini';
+
+  @override
+  String get ui3ScanToShareRoomReference =>
+      'Pindai untuk membagikan referensi ruang ini dengan anggota yang diundang';
+
+  @override
+  String get ui3InviteLinkLoadFailed => 'Gagal memuat tautan undangan';
+
+  @override
+  String get ui3InviteLinkCopied => 'Tautan undangan disalin';
+
+  @override
+  String get ui3ChannelCategoryOptional => 'Kategori (opsional)';
+
+  @override
+  String get ui3ChannelCategoryHint => 'Pengumuman / Produk / Dukungan';
+
+  @override
+  String get ui3DescriptionOptional => 'Deskripsi (opsional)';
+
+  @override
+  String get ui3WebhookEnable => 'Aktifkan otomatisasi webhook';
+
+  @override
+  String get ui3WebhookEnableDesc =>
+      'Kirim peristiwa anggota bergabung dan sambutan ke endpoint integrasi Anda.';
+
+  @override
+  String get ui3WebhookUrl => 'URL webhook';
+
+  @override
+  String get ui3WebhookSecretOptional => 'Rahasia Penandatanganan (opsional)';
+
+  @override
+  String get ui3WebhookSecretHint => 'Digunakan untuk X-N42-Signature';
+
+  @override
+  String get ui3WebhookNotifyMemberJoined => 'Beri tahu saat anggota bergabung';
+
+  @override
+  String get ui3WebhookNotifyWelcomeSent => 'Beri tahu saat sambutan dikirim';
+
+  @override
+  String get ui3WebhookTestSend => 'Kirim webhook uji';
+
+  @override
+  String get ui3WebhookTestSending => 'Mengirim webhook uji...';
+
+  @override
+  String get ui3WebhookTestSent => 'Webhook uji berhasil dikirim';
+
+  @override
+  String get ui3WebhookTestFailed => 'Gagal mengirim webhook uji';
+
+  @override
+  String get ui3WebhookUrlInvalid =>
+      'URL webhook harus berupa alamat HTTPS publik';
+
+  @override
+  String get ui3WebhookSelectEvent => 'Pilih setidaknya satu peristiwa webhook';
+
+  @override
+  String get ui3SensitiveDataDetection => 'Deteksi Data Sensitif';
+
+  @override
+  String get ui3Email => 'E-mail';
+
+  @override
+  String get ui3CreditCard => 'Kartu Kredit';
+
+  @override
+  String get ui3DetectEmailDesc => 'Deteksi alamat email dalam pesan teks';
+
+  @override
+  String get ui3DetectPhoneDesc =>
+      'Deteksi nomor telepon dan nomor internasional';
+
+  @override
+  String get ui3DetectCardDesc =>
+      'Deteksi kemungkinan nomor rekening dan kartu';
+
+  @override
+  String get ui3DetectWalletDesc => 'Deteksi alamat dompet bergaya Ethereum';
+
+  @override
+  String get ui3GeneralTopic => 'Umum';
+
+  @override
+  String get a11yPreviousResult => 'Hasil sebelumnya';
+
+  @override
+  String get a11yNextResult => 'Hasil berikutnya';
+
+  @override
+  String get ui3TryDifferentKeywords => 'Coba kata kunci lain';
+
+  @override
+  String ui3FiltersActive(Object count) {
+    return 'Filter aktif: $count';
+  }
+
+  @override
+  String ui3MessageFiltersActive(Object count) {
+    return 'Filter pesan aktif: $count';
+  }
+
+  @override
+  String get ui3LoadMore => 'Muat lebih banyak';
+
+  @override
+  String get ui3MessageFilters => 'Filter Pesan';
+
+  @override
+  String get ui3SenderUserId => 'ID Pengguna Pengirim';
+
+  @override
+  String get ui3FilterType => 'Jenis';
+
+  @override
+  String get ui3FilterAny => 'Semua';
+
+  @override
+  String get ui3FilterImage => 'Gambar';
+
+  @override
+  String get ui3FilterTime => 'Waktu';
+
+  @override
+  String get ui3AnyTime => 'Kapan saja';
+
+  @override
+  String get ui3OnlyMyMessages => 'Hanya pesan saya';
+
+  @override
+  String get ui3MediaOnly => 'Hanya media';
+
+  @override
+  String get ui3Apply => 'Terapkan';
+
+  @override
+  String get ui3QrStyleClassic => 'Klasik';
+
+  @override
+  String get ui3QrStyleOcean => 'Samudra';
+
+  @override
+  String get ui3QrStyleBerry => 'Beri';
+
+  @override
+  String get ui3NfcUnavailable =>
+      'NFC tidak tersedia atau tag tidak didukung. Aktifkan NFC, coba tag lain, atau gunakan QR.';
+
+  @override
+  String get ui3CancelNfc => 'Batalkan NFC';
+
+  @override
+  String get ui3ReadNfcTag => 'Baca tag NFC';
+
+  @override
+  String get ui3HoldNearNfcTag => 'Dekatkan ponsel Anda ke tag layanan.';
+
+  @override
+  String get a11yFlashlightOn => 'Nyalakan senter';
+
+  @override
+  String get a11yFlashlightOff => 'Matikan senter';
+
+  @override
+  String get ui3SocialGraph => 'Grafik Sosial';
+
+  @override
+  String get ui3RecommendedConnections => 'Koneksi yang Disarankan';
+
+  @override
+  String get ui3Portfolio => 'Portofolio';
+
+  @override
+  String get ui3Chains => 'Jaringan';
+
+  @override
+  String get ui3Tokens => 'Token';
+
+  @override
+  String get ui3NoConnectionsFound => 'Tidak ada koneksi';
+
+  @override
+  String get ui3ConnectionsHint =>
+      'Koneksi akan muncul seiring aktivitas on-chain Anda';
+
+  @override
+  String get ui3SocialGraphLoadFailed => 'Gagal memuat grafik sosial';
+
+  @override
+  String get ui3Similarity => 'Kemiripan';
+
+  @override
+  String get ui3Breakdown => 'Rincian';
+
+  @override
+  String get ui3TokenHoldings => 'Kepemilikan token';
+
+  @override
+  String get ui3NftCollections => 'Koleksi NFT';
+
+  @override
+  String get ui3ChainUsage => 'Penggunaan chain';
+
+  @override
+  String get ui3Transactions => 'Transaksi';
+
+  @override
+  String get ui3DaoMembership => 'Keanggotaan DAO';
+
+  @override
+  String get ui3NotWeighted => 'Tidak berbobot';
+
+  @override
+  String ui3PercentWithWeight(Object percent, Object weight) {
+    return '$percent% (bobot: $weight)';
+  }
+
+  @override
+  String get ui3CommonOnChainActivity => 'Aktivitas on-chain bersama';
+
+  @override
+  String get ui3SharedTokens => 'Token bersama';
+
+  @override
+  String get ui3SharedNftCollections => 'Koleksi NFT bersama';
+
+  @override
+  String get ui3SharedChains => 'Chain bersama';
+
+  @override
+  String get ui3NoSharedTokens => 'Tidak ada token bersama';
+
+  @override
+  String get ui3NoSharedNftCollections => 'Tidak ada koleksi NFT bersama';
+
+  @override
+  String get ui3NoSharedChains => 'Tidak ada chain bersama';
+
+  @override
+  String get ui3SimilarityFailed => 'Gagal menghitung kemiripan';
+
+  @override
+  String ui3ItemsAndMore(Object items, Object count) {
+    return '$items +$count lainnya';
+  }
+
+  @override
+  String get a11yGovernance => 'Tata kelola';
+
+  @override
+  String get ui3CommunityLink => 'Tautan komunitas';
+
+  @override
+  String get ui3CommunityQrCode => 'Kode QR komunitas';
+
+  @override
+  String get ui3CommunityQrSubtitle =>
+      'Pindai untuk bergabung dengan komunitas ini dan menjelajahi salurannya';
+
+  @override
+  String get ui3CommunityLinkLoadFailed => 'Gagal memuat tautan komunitas';
+
+  @override
+  String get ui3CommunityLinkCopied => 'Tautan komunitas disalin';
+
+  @override
+  String ui3KickMemberConfirm(Object name) {
+    return '$name akan dikeluarkan dari komunitas ini.';
+  }
+
+  @override
+  String ui3BanMemberConfirm(Object name) {
+    return '$name akan dikeluarkan dan tidak dapat bergabung kembali.';
+  }
+
+  @override
+  String get ui3SignInToDiscoverChannels =>
+      'Masuk untuk menemukan saluran publik';
+
+  @override
+  String ui3UnableToJoinChannel(Object name, Object error) {
+    return 'Tidak dapat bergabung ke $name: $error';
+  }
+
+  @override
+  String get ui3CategoryTech => 'Teknologi';
+
+  @override
+  String get ui3CategorySocial => 'Sosial';
+
+  @override
+  String get ui3NoPublicChannels => 'Tidak ada saluran publik';
+
+  @override
+  String get ui3StoriesAndFun => 'Cerita & Hiburan';
+
+  @override
+  String get ui3SearchMusicHint => 'Cari lagu, artis, atau teman';
+
+  @override
+  String get ui3ForYou => 'Untuk Anda';
+
+  @override
+  String get ui3Liked => 'Disukai';
+
+  @override
+  String get ui3NoLikedMusic => 'Belum ada musik yang disukai';
+
+  @override
+  String get ui3NoMusicStories => 'Belum ada Cerita musik';
+
+  @override
+  String get ui3LikedMusicHint =>
+      'Ketuk ikon hati di samping lagu untuk menyimpannya di sini.';
+
+  @override
+  String get ui3MusicStoriesHint =>
+      'Musik yang dibagikan di Cerita akan muncul di sini.';
+
+  @override
+  String ui3SharedBy(Object artist, Object name) {
+    return '$artist · dibagikan oleh $name';
+  }
+
+  @override
+  String ui3UnableToPlay(Object title, Object error) {
+    return 'Tidak dapat memutar $title: $error';
+  }
+
+  @override
+  String get a11yPreviousTrack => 'Lagu sebelumnya';
+
+  @override
+  String get a11yNextTrack => 'Lagu berikutnya';
+
+  @override
+  String get a11yPlay => 'Putar';
+
+  @override
+  String get a11yPause => 'Jeda';
+
+  @override
+  String get ui3Refresh => 'Muat ulang';
+
+  @override
+  String get ui3NearbyIntroTitle => 'Temukan postingan publik di sekitar';
+
+  @override
+  String get ui3NearbyIntroBody =>
+      'Lokasi Anda digunakan sekali di perangkat ini untuk mengurutkan Momen publik. Lokasi tidak diunggah, disiarkan, atau ditampilkan ke orang lain.';
+
+  @override
+  String get ui3UseMyLocation => 'Gunakan lokasi saya';
+
+  @override
+  String get ui3NearbyUnavailable => 'Fitur Sekitar tidak tersedia';
+
+  @override
+  String get ui3NoNearbyPosts => 'Belum ada postingan di sekitar';
+
+  @override
+  String get ui3NoNearbyPostsHint =>
+      'Momen publik dengan lokasi akan muncul di sini.';
+
+  @override
+  String get ui3NearbyDistanceNote =>
+      'Jarak perkiraan · hanya postingan lokasi publik';
+
+  @override
+  String get ui3PublicLocationPost => 'Postingan lokasi publik';
+
+  @override
+  String get ui3LocationServicesOff => 'Layanan Lokasi dinonaktifkan';
+
+  @override
+  String get ui3LocationPermissionDenied => 'Izin lokasi ditolak';
+
+  @override
+  String get ui3EnableLocationInSettings =>
+      'Aktifkan izin lokasi di pengaturan sistem';
+
+  @override
+  String get ui3CreateStory => 'Buat Cerita';
+
+  @override
+  String get ui3CreateStoryDesc => 'Posting status teks atau foto.';
+
+  @override
+  String get ui3StoryCamera => 'Kamera Cerita';
+
+  @override
+  String get ui3StoryCameraDesc => 'Langsung ke filter dan edit foto.';
+
+  @override
+  String get ui3MomentsDesc => 'Buka feed lengkap dan komentar.';
+
+  @override
+  String get ui3MomentCamera => 'Kamera Momen';
+
+  @override
+  String get ui3MomentCameraDesc => 'Buat postingan dan langsung pilih media.';
+
+  @override
+  String get ui3GamesDesc => 'Buka pusat game kasual bawaan.';
+
+  @override
+  String get ui3AvatarStudio => 'Studio Avatar';
+
+  @override
+  String get ui3AvatarStudioDesc => 'Dekorasi, avatar NFT, dan gaya identitas.';
+
+  @override
+  String get ui3SocialGraphDesc => 'Ikuti, penggemar, dan koneksi on-chain.';
+
+  @override
+  String get ui3SocialHubHeroTitle => 'Cerita, momen, game, dan avatar';
+
+  @override
+  String get ui3SocialHubHeroBody =>
+      'Semua fitur sosial di satu tempat, tidak tersebar di chat, profil, dan jelajah.';
+
+  @override
+  String get ui3SocialGraphNotConfigured =>
+      'Grafik sosial tidak dikonfigurasi di build ini';
+
+  @override
+  String get ui3ConnectWalletForSocialGraph =>
+      'Hubungkan dompet untuk melihat grafik sosial Anda';
+
+  @override
+  String get ui3AvatarStudioSignIn =>
+      'Studio Avatar memerlukan pengguna yang masuk';
+
+  @override
+  String get a11yRemoveImage => 'Hapus gambar';
+
+  @override
+  String get a11yBack => 'Kembali';
+
+  @override
+  String get ui3MiniAppConfirmTransactionTitle => 'Konfirmasi transaksi';
+
+  @override
+  String get ui3MiniAppConfirmTransactionBody =>
+      'Sebuah Mini App meminta untuk mengirim transaksi atas nama Anda.';
+
+  @override
+  String ui3MiniAppOpenTitle(Object name) {
+    return 'Buka $name?';
+  }
+
+  @override
+  String get ui3MiniAppOpenButton => 'Buka';
+
+  @override
+  String get ui3StoryReplySendFailed => 'Gagal mengirim balasan Cerita';
+
+  @override
+  String get ui3RedPacketDemoNotice =>
+      'Angpao demo — hanya catatan di chat, tidak ada aset on-chain nyata yang ditransfer.';
+
+  @override
+  String get ui3RedPacketCoverClassic => 'Merah klasik';
+
+  @override
+  String get ui3RedPacketCoverGolden => 'Emas';
+
+  @override
+  String get ui3RedPacketCoverPurple => 'Ungu';
+
+  @override
+  String get ui3RedPacketCoverOceanBlue => 'Biru laut';
+
+  @override
+  String get ui3RedPacketCoverNatureGreen => 'Hijau alam';
+
+  @override
+  String get ui3RedPacketCoverRosePink => 'Merah muda mawar';
+
+  @override
+  String get ui3RedPacketHistoryEmpty => 'Belum ada angpao';
+
+  @override
+  String get ui3TransferMerchantQrWithAmount => 'QR merchant (dengan jumlah)';
+
+  @override
+  String get ui3TransferMerchantQrTitle => 'QR merchant';
+
+  @override
+  String get ui3TransferOpenAmountHint => 'Kosongkan untuk jumlah bebas';
+
+  @override
+  String get ui3FiatRampTitle => 'Beli / Jual kripto';
+
+  @override
+  String get ui3FiatRampBuy => 'Beli';
+
+  @override
+  String get ui3FiatRampSell => 'Jual';
+
+  @override
+  String get ui3FiatRampNotConfigured => 'On/off-ramp fiat belum dikonfigurasi';
+
+  @override
+  String get a11yPointsAddRule => 'Tambah aturan hadiah';
+
+  @override
+  String get a11yGovernanceRemoveChoice => 'Hapus pilihan';
+
+  @override
+  String get a11yGovernanceCreateProposal => 'Buat proposal';
+
+  @override
+  String get ui3MiniAppUpdateN42 => 'Perbarui N42';
+
+  @override
+  String get ui3MiniAppOfficial => 'Resmi';
+
+  @override
+  String ui3MiniAppUserCount(Object count) {
+    return '$count pengguna';
+  }
+
+  @override
+  String a11yStoryBackgroundColor(Object index) {
+    return 'Warna latar $index';
+  }
+
+  @override
+  String get a11yStoryAdd => 'Tambah cerita';
+
+  @override
+  String get ui3StoryPostFailed => 'Gagal memposting cerita';
+
+  @override
+  String get ui3StoryTapToSelectImage => 'Ketuk untuk memilih gambar';
+
+  @override
+  String get ui3StoryChangeImage => 'Ganti';
+
+  @override
+  String ui3StoryMusicReadFailed(Object error) {
+    return 'Tidak dapat membaca musik yang dipilih: $error';
+  }
+
+  @override
+  String get ui3StoryDeleteConfirm => 'Hapus cerita ini?';
+
+  @override
+  String get ui3StoryDeleteFailed => 'Gagal menghapus cerita';
+
+  @override
+  String get ui3MomentCreateTitle => 'Buat momen';
+
+  @override
+  String get ui3MomentContentHint => 'Apa yang Anda pikirkan?';
+
+  @override
+  String get ui3MomentAddPhotos => 'Tambah foto';
+
+  @override
+  String get ui3MomentAddLocation => 'Tambah lokasi';
+
+  @override
+  String ui3MomentSelectedMedia(Object count) {
+    return 'Media terpilih ($count)';
+  }
+
+  @override
+  String get ui3MomentClearAll => 'Hapus semua';
+
+  @override
+  String get ui3MomentClearMediaConfirm =>
+      'Hapus semua foto/video yang dipilih?';
+
+  @override
+  String get ui3MomentVisibilityPublicDesc => 'Semua teman dapat melihat';
+
+  @override
+  String get ui3MomentVisibilityPrivateDesc => 'Hanya Anda yang dapat melihat';
+
+  @override
+  String get ui3MomentVisibilityPartialDesc => 'Pilih siapa yang dapat melihat';
+
+  @override
+  String get ui3MomentVisibilityExcludedDesc =>
+      'Sembunyikan dari teman tertentu';
+
+  @override
+  String get ui3MomentVideos => 'Video';
+
+  @override
+  String get ui3MomentNoVideos => 'Belum ada video';
+
+  @override
+  String get a11yCallMinimize => 'Perkecil';
+
+  @override
+  String get a11yCallGridView => 'Tampilan petak';
+
+  @override
+  String get a11yCallFocusView => 'Tampilan fokus';
+
+  @override
+  String get ui3CallTools => 'Alat panggilan';
+
+  @override
+  String get ui3CallMeetingTools => 'Alat rapat';
+
+  @override
+  String get ui3CallToolsSubtitle =>
+      'Atur kualitas audio dan video tanpa meninggalkan panggilan.';
+
+  @override
+  String get ui3CallAudioEnhancement => 'Peningkatan audio';
+
+  @override
+  String get ui3CallNoiseSuppression => 'Peredam bising';
+
+  @override
+  String get ui3CallNoiseSuppressionDesc =>
+      'Kurangi bising keyboard dan latar belakang.';
+
+  @override
+  String get ui3CallEchoCancellation => 'Peniadaan gema';
+
+  @override
+  String get ui3CallEchoCancellationDesc =>
+      'Cegah suara speaker masuk kembali ke mikrofon.';
+
+  @override
+  String get ui3CallAutoGainControl => 'Kontrol penguatan otomatis';
+
+  @override
+  String get ui3CallAutoGainControlDesc => 'Jaga volume mikrofon lebih stabil.';
+
+  @override
+  String get ui3CallVoiceIsolation => 'Isolasi suara lanjutan';
+
+  @override
+  String get ui3CallVoiceIsolationDesc =>
+      'Gunakan profil pengurangan bising yang lebih kuat.';
+
+  @override
+  String get ui3CallVideoSection => 'Pengaturan video';
+
+  @override
+  String get ui3CallBackgroundBlur => 'Buramkan latar (beta)';
+
+  @override
+  String get ui3CallBlurDescReady =>
+      'Preferensi sudah aktif. Efek buram masih bergantung pada peluncuran pemroses video.';
+
+  @override
+  String get ui3CallBlurDescSaved =>
+      'Preferensi buram disimpan dan akan diterapkan saat pemrosesan kamera tersedia.';
+
+  @override
+  String get ui3CallBlurDescCameraOff =>
+      'Nyalakan kamera setelah pemrosesan latar tersedia.';
+
+  @override
+  String get ui3CallRecordingSection => 'Perekaman';
+
+  @override
+  String get ui3CallRecordingDesc =>
+      'Memerlukan egress sisi server sebelum rekaman dapat disimpan.';
+
+  @override
+  String ui3CallSettingsUpdateFailed(Object error) {
+    return 'Gagal memperbarui pengaturan panggilan: $error';
+  }
+
+  @override
+  String get ui3CallRecordingStarted => 'Perekaman dimulai';
+
+  @override
+  String get ui3VoiceRoomNotFound => 'Ruang tidak ditemukan';
+
+  @override
+  String get ui3VoiceRoomEndConfirm =>
+      'Yakin ingin mengakhiri ruang suara ini?';
+
+  @override
+  String get a11yGameMoveUp => 'Geser ke atas';
+
+  @override
+  String get a11yGameMoveDown => 'Geser ke bawah';
+
+  @override
+  String get a11yGameMoveLeft => 'Geser ke kiri';
+
+  @override
+  String get a11yGameMoveRight => 'Geser ke kanan';
+
+  @override
+  String get a11yGameRotate => 'Putar';
+
+  @override
+  String get a11yGameDrop => 'Jatuhkan';
+
+  @override
+  String ui3StickerAddedCount(Object count) {
+    return '$count stiker ditambahkan';
+  }
+
+  @override
+  String ui3StickerAddFailed(Object error) {
+    return 'Gagal menambahkan: $error';
+  }
+
+  @override
+  String get ui3StickerRemoveTitle => 'Hapus stiker';
+
+  @override
+  String get ui3StickerRemoveConfirm => 'Hapus stiker ini dari paket?';
+
+  @override
+  String get ui3StickerRemoveFailed => 'Gagal menghapus';
+
+  @override
+  String get ui3StickerRenamePack => 'Ganti nama paket';
+
+  @override
+  String get ui3StickerPackName => 'Nama paket';
+
+  @override
+  String get ui3StickerRenameFailed => 'Gagal mengganti nama';
+
+  @override
+  String get ui3StickerDeletePack => 'Hapus paket';
+
+  @override
+  String get ui3StickerThisPack => 'paket ini';
+
+  @override
+  String ui3StickerDeletePackConfirm(Object name) {
+    return 'Hapus \"$name\" dan semua stikernya? Tindakan ini tidak dapat dibatalkan.';
+  }
+
+  @override
+  String get ui3StickerDeleteFailed => 'Gagal menghapus';
+
+  @override
+  String get ui3StickerPack => 'Paket stiker';
+
+  @override
+  String get ui3StickerAdding => 'Menambahkan…';
+
+  @override
+  String get ui3StickerAddStickers => 'Tambah stiker';
+
+  @override
+  String get ui3StickerPackNotFound => 'Paket tidak ditemukan';
+
+  @override
+  String get ui3StickerEmptyHint =>
+      'Ketuk \"Tambah stiker\" untuk mengunggah gambar';
+
+  @override
+  String get ui3StickerNewPack => 'Paket stiker baru';
+
+  @override
+  String get ui3StickerCreate => 'Buat';
+
+  @override
+  String get ui3StickerCreateFailed => 'Gagal membuat paket';
+
+  @override
+  String ui3StickerInstalled(Object name) {
+    return '\"$name\" terpasang';
+  }
+
+  @override
+  String get ui3StickerRemovePackTitle => 'Hapus paket stiker';
+
+  @override
+  String ui3StickerRemovePackConfirm(Object name) {
+    return 'Hapus \"$name\" dari stiker Anda?';
+  }
+
+  @override
+  String ui3StickerRemoved(Object name) {
+    return '\"$name\" dihapus';
+  }
+
+  @override
+  String get ui3StickerAiSticker => 'Stiker AI';
+
+  @override
+  String get ui3StickerStoreTab => 'Toko';
+
+  @override
+  String get ui3StickerMyStickersTab => 'Stiker saya';
+
+  @override
+  String get ui3StickerNoneFound => 'Tidak ada stiker ditemukan';
+
+  @override
+  String ui3StickerByAuthor(Object author) {
+    return 'oleh $author';
+  }
+
+  @override
+  String get ui3StickerManage => 'Kelola';
+
+  @override
+  String ui3StickerCount(Object count) {
+    return '$count stiker';
+  }
+
+  @override
+  String get ui3StickerNoneInstalled => 'Belum ada stiker terpasang';
+
+  @override
+  String get ui3StickerGetFromStore => 'Dapatkan stiker dari toko';
+
+  @override
+  String get ui3StickerBrowseStore => 'Jelajahi toko';
+
+  @override
+  String get ui3StickerAddedToAi => 'Ditambahkan ke \"Stiker AI\"';
+
+  @override
+  String get ui3StickerAddOneFailed => 'Gagal menambahkan stiker';
+
+  @override
+  String get ui3StickerPromptLabel => 'Jelaskan stiker Anda';
+
+  @override
+  String get ui3StickerPromptHint =>
+      'mis. kucing oranye ceria berkacamata hitam';
+
+  @override
+  String get ui3StickerGenerating => 'Membuat…';
+
+  @override
+  String get ui3StickerGenerate => 'Buat';
+
+  @override
+  String get ui3StickerAddToStickers => 'Tambahkan ke stiker';
+
+  @override
+  String get ui3StickerGeneratingPreview => 'Membuat stiker Anda…';
+
+  @override
+  String get ui3StickerGenerateEmpty => 'Jelaskan stiker lalu ketuk \"Buat\"';
 }

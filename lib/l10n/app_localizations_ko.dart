@@ -6233,4 +6233,1928 @@ class SKo extends S {
   String scheduledSendTomorrowMorningAt(String time) {
     return '내일 아침 ($time)';
   }
+
+  @override
+  String get a11yScrollToBottom => '맨 아래로 스크롤';
+
+  @override
+  String get ui3EnterMessageBeforeScheduling => '예약하기 전에 메시지를 입력하세요';
+
+  @override
+  String get ui3SendCode => '코드 보내기';
+
+  @override
+  String get ui3CodeLanguage => '언어';
+
+  @override
+  String get ui3PasteCodeHere => '여기에 코드 붙여넣기';
+
+  @override
+  String ui3ReminderSetAt(String time) {
+    return '알림 설정됨 · $time';
+  }
+
+  @override
+  String get ui3RedPacketCreateFailed => '홍바오 생성 실패';
+
+  @override
+  String get ui3SendTip => '팁 보내기';
+
+  @override
+  String get ui3TokenLabel => '토큰';
+
+  @override
+  String get ui3NoteOptional => '메모(선택)';
+
+  @override
+  String ui3TipFailed(String error) {
+    return '팁 전송 실패: $error';
+  }
+
+  @override
+  String get ui3GiftNftTitle => 'NFT 선물하기';
+
+  @override
+  String get ui3TokenId => '토큰 ID';
+
+  @override
+  String ui3NftGiftFailed(String error) {
+    return 'NFT 선물 실패: $error';
+  }
+
+  @override
+  String get ui3AiAgentSubtitle => '작업을 설명하면 알맞은 미니 앱을 엽니다';
+
+  @override
+  String get ui3GiftNft => 'NFT 선물';
+
+  @override
+  String get ui3GiftNftSubtitle => '이 연락처에 NFT 보내기';
+
+  @override
+  String get ui3MiniAppUnavailable => '미니 앱을 사용할 수 없습니다';
+
+  @override
+  String ui3MediaItemsNotSent(int count) {
+    return '선택한 미디어 $count개를 보낼 수 없습니다';
+  }
+
+  @override
+  String get ui3PhotosSubtitle => '채팅에 적합한 형식으로 사진 및 동영상 보내기';
+
+  @override
+  String get ui3OriginalImages => '원본 이미지';
+
+  @override
+  String get ui3OriginalImagesSubtitle => '압축하지 않은 사진을 파일로 보내기';
+
+  @override
+  String ui3ScheduledFileFor(String filename, String time) {
+    return '$filename을(를) $time에 예약했습니다';
+  }
+
+  @override
+  String ui3SendingOriginalImage(String filename) {
+    return '원본 이미지 보내는 중: $filename';
+  }
+
+  @override
+  String ui3ScheduledOriginalImage(String filename) {
+    return '원본 이미지 예약됨: $filename';
+  }
+
+  @override
+  String get ui3PaymentAlreadySent => '이미 결제를 보냈습니다';
+
+  @override
+  String get ui3PaymentProcessing => '결제 처리 중';
+
+  @override
+  String ui3ChainStatus(String status) {
+    return '체인 상태: $status';
+  }
+
+  @override
+  String get ui3NotChecked => '확인 안 됨';
+
+  @override
+  String ui3ConfirmationsCount(int confirmations, int required) {
+    return '확인됨: $confirmations / $required 블록';
+  }
+
+  @override
+  String get ui3CopyTxHash => '트랜잭션 해시 복사';
+
+  @override
+  String get ui3VerifyAgain => '다시 확인';
+
+  @override
+  String get ui3VerifyOnChain => '체인에서 확인';
+
+  @override
+  String get ui3TransferMissingChainDetails =>
+      '이 송금에는 정확한 체인 및 자산 정보가 포함되어 있지 않습니다.';
+
+  @override
+  String get ui3ReceiptPending => '체인에서 대기 중';
+
+  @override
+  String get ui3ReceiptConfirmed => '확인됨';
+
+  @override
+  String get ui3ReceiptFailed => '체인에서 실패';
+
+  @override
+  String get ui3ReceiptMismatch => '거래 정보가 일치하지 않습니다';
+
+  @override
+  String get ui3ReceiptUnsupported => '체인 확인이 지원되지 않습니다';
+
+  @override
+  String get ui3ReceiptUnavailable => '확인할 수 없음';
+
+  @override
+  String get ui3OpenOrSave => '열기 / 저장';
+
+  @override
+  String get ui3UnableToOpenFile => '이 파일을 열 수 없습니다.';
+
+  @override
+  String ui3AiRewriteFailed(String error) {
+    return 'AI 다시 쓰기 실패: $error';
+  }
+
+  @override
+  String get ui3AiShareMessagesTitle => 'AI와 메시지를 공유할까요?';
+
+  @override
+  String get ui3AiShareMessagesBody =>
+      '이 답장에 AI가 사용할 수 있는 메시지를 선택하세요. 이 1회성 승인은 2분 후에 만료됩니다. 빠른 답장을 닫으면 대기 중인 결과가 취소됩니다. 결제나 내보내기는 허용되지 않습니다.';
+
+  @override
+  String get ui3OtherParticipant => '상대방';
+
+  @override
+  String get ui3ShareSelected => '선택 항목 공유';
+
+  @override
+  String get ui3BotCommandError => '명령 오류';
+
+  @override
+  String get ui3BotUnknownCommand => '알 수 없는 명령';
+
+  @override
+  String get ui3BotTypeHelp => '사용 가능한 명령을 보려면 /help를 입력하세요.';
+
+  @override
+  String get ui3FilesMediaLinks => '파일, 미디어 및 링크';
+
+  @override
+  String get ui3ChatStorage => '채팅 저장 공간';
+
+  @override
+  String get ui3EncryptionKeysDevices => '암호화 키 및 기기';
+
+  @override
+  String get ui3EncryptionServiceUnavailable => '암호화 서비스를 아직 사용할 수 없습니다';
+
+  @override
+  String get ui3ExportLoadingHistory => '내보내기용 채팅 기록을 더 불러오는 중...';
+
+  @override
+  String get ui3ExportTxtDesc => '메모, 백업 또는 규정 준수 검토용 일반 텍스트 기록';
+
+  @override
+  String get ui3ExportCustomRange => '사용자 지정 기간';
+
+  @override
+  String get ui3ExportStart => '시작';
+
+  @override
+  String get ui3ExportEnd => '종료';
+
+  @override
+  String get ui3ExportSelectDate => '날짜 선택';
+
+  @override
+  String get ui3FolderFilterUnreadOnly => '읽지 않음만';
+
+  @override
+  String get ui3FolderFilterMutedOnly => '음소거만';
+
+  @override
+  String get ui3FolderFilterNoDms => 'DM 제외';
+
+  @override
+  String get ui3FolderFilterNoGroups => '그룹 제외';
+
+  @override
+  String get ui3FolderFilterNoChannels => '채널 제외';
+
+  @override
+  String get ui3FolderFilterAllChats => '모든 채팅';
+
+  @override
+  String get ui3Create => '만들기';
+
+  @override
+  String ui3DeleteFolderConfirm(String name) {
+    return '“$name” 폴더를 삭제할까요?';
+  }
+
+  @override
+  String get a11yDecreaseTextSize => '글자 크기 줄이기';
+
+  @override
+  String get a11yIncreaseTextSize => '글자 크기 키우기';
+
+  @override
+  String ui3MinutesRead(int minutes) {
+    return '$minutes분 분량';
+  }
+
+  @override
+  String get ui3TipOnChain => '온체인 ✓';
+
+  @override
+  String get ui3ViewSource => '소스 보기';
+
+  @override
+  String get a11yPreviousPage => '이전 페이지';
+
+  @override
+  String get a11yNextPage => '다음 페이지';
+
+  @override
+  String get ui3OpenExternalLinkTitle => '외부 링크를 열까요?';
+
+  @override
+  String get ui3Open => '열기';
+
+  @override
+  String get ui3UnableToOpenLink => '이 링크를 열 수 없습니다.';
+
+  @override
+  String get ui3ImageUnavailable => '이미지를 사용할 수 없음';
+
+  @override
+  String ui3LoadImageFrom(Object host) {
+    return '$host에서 이미지 불러오기';
+  }
+
+  @override
+  String ui3RetryImageFrom(Object host) {
+    return '$host에서 이미지 다시 불러오기';
+  }
+
+  @override
+  String get ui3TranslatedByN42 => 'N42 번역';
+
+  @override
+  String ui3TranslatedFromByN42(Object language) {
+    return 'N42가 $language에서 번역함';
+  }
+
+  @override
+  String get ui3ClearWhiteboardTitle => '화이트보드를 지울까요?';
+
+  @override
+  String get ui3ClearWhiteboardMessage =>
+      '모든 사람의 획이 모두 지워집니다. 이 작업은 취소할 수 없습니다.';
+
+  @override
+  String get ui3WhiteboardLive => '화이트보드 · 실시간';
+
+  @override
+  String get a11yPenColor => '펜 색상';
+
+  @override
+  String get ui3AiDescribeOcr => 'AI 설명 / OCR';
+
+  @override
+  String get ui3DocumentPreviewFailed =>
+      '이 문서를 안전하게 미리 볼 수 없습니다. 연결 상태와 파일 크기(최대 2MB)를 확인하세요.';
+
+  @override
+  String get ui3AiConsentMessage =>
+      '이 요약에 AI가 사용할 수 있는 메시지를 선택하세요. 이 1회성 승인은 2분 후에 만료됩니다. 결제나 내보내기는 허용되지 않습니다.';
+
+  @override
+  String get ui3AiSuggestedReplies => '추천 답장';
+
+  @override
+  String get ui3AiGeneratingSuggestions => '제안 생성 중...';
+
+  @override
+  String get ui3StickersEmpty => '아직 스티커가 없습니다';
+
+  @override
+  String get ui3StickersGet => '스티커 받기';
+
+  @override
+  String get a11yFormatBold => '굵게';
+
+  @override
+  String get a11yFormatItalic => '기울임꼴';
+
+  @override
+  String get a11yFormatStrikethrough => '취소선';
+
+  @override
+  String get a11yFormatInlineCode => '인라인 코드';
+
+  @override
+  String get a11yFormatCodeBlock => '코드 블록';
+
+  @override
+  String get a11yFormatChecklistItem => '체크리스트 항목';
+
+  @override
+  String get a11yFormatBulletList => '글머리 기호 목록';
+
+  @override
+  String get a11yFormatNumberedList => '번호 매기기 목록';
+
+  @override
+  String get a11yFormatLink => '링크';
+
+  @override
+  String get a11yFormatTable => '표';
+
+  @override
+  String get a11yFormatMeetingTemplate => '회의 템플릿';
+
+  @override
+  String get a11yEmojiSmileys => '스마일리 및 사람';
+
+  @override
+  String get a11yEmojiHearts => '하트';
+
+  @override
+  String get a11yEmojiAnimals => '동물 및 자연';
+
+  @override
+  String get a11yEmojiFood => '음식 및 음료';
+
+  @override
+  String get a11yEmojiTravel => '여행 및 장소';
+
+  @override
+  String get a11yEmojiActivities => '활동';
+
+  @override
+  String get a11yEmojiObjects => '사물';
+
+  @override
+  String get a11yEmojiSymbols => '기호';
+
+  @override
+  String get ui3FrequentlyUsed => '자주 사용';
+
+  @override
+  String get ui3NoEditHistory => '수정 기록 없음';
+
+  @override
+  String get ui3EventNew => '새 일정';
+
+  @override
+  String get ui3EventTitleLabel => '제목';
+
+  @override
+  String get ui3EventLocationOptional => '장소(선택)';
+
+  @override
+  String get ui3EventDescriptionOptional => '설명(선택)';
+
+  @override
+  String get ui3EventSend => '일정 보내기';
+
+  @override
+  String get ui3EventTitleRequired => '제목을 입력하세요';
+
+  @override
+  String get ui3EventEndAfterStart => '종료 시간은 시작 시간 이후여야 합니다';
+
+  @override
+  String get ui3MiniAppAgentIntro => '하고 싶은 일을 설명해 주세요. 알맞은 미니 앱을 열어 드릴게요.';
+
+  @override
+  String get ui3MiniAppAgentExample => '예: ETH를 USDC로 스왑';
+
+  @override
+  String get ui3MiniAppAgentNoMatch => '일치하는 미니 앱이 없습니다. 다르게 표현해 보세요.';
+
+  @override
+  String ui3MiniAppOpen(Object appName) {
+    return '$appName 열기';
+  }
+
+  @override
+  String get ui3MusicLinkPlatforms =>
+      'NetEase Cloud Music, QQ Music, Kugou, Kuwo 등의 노래 링크 지원';
+
+  @override
+  String get ui3PollMarkCorrectAnswer => '비어 있지 않은 정답을 표시하세요';
+
+  @override
+  String get ui3PollQuizMode => '퀴즈 모드';
+
+  @override
+  String get ui3PollAnswerExplanationHint => '정답 해설(선택)';
+
+  @override
+  String get a11yCorrectAnswer => '정답';
+
+  @override
+  String get ui3AiSuggestions => 'AI 추천';
+
+  @override
+  String get a11yPaste => '붙여넣기';
+
+  @override
+  String get a11yRefresh => '새로고침';
+
+  @override
+  String get ui3RecoveryKeyStoreWarning =>
+      '이 키를 안전하게 보관하세요. 모든 기기에 접근할 수 없게 되었을 때 암호화된 메시지를 복구할 수 있는 유일한 방법입니다.';
+
+  @override
+  String ui3SavedToPath(Object path) {
+    return '저장됨: $path';
+  }
+
+  @override
+  String get ui3UnknownAccount => '알 수 없는 계정';
+
+  @override
+  String get ui3UnknownHomeserver => '알 수 없는 홈서버';
+
+  @override
+  String get ui3ImportRecoveryKey => '복구 키 가져오기';
+
+  @override
+  String get ui3ImportRecoveryKeyDesc =>
+      '복구 키를 입력하거나 붙여넣어 암호화된 메시지 기록의 방 키를 복원하세요.';
+
+  @override
+  String ui3RecoveryKeyAccountInfo(Object account, Object homeserver) {
+    return '계정: $account\\n홈서버: $homeserver';
+  }
+
+  @override
+  String get ui3Import => '가져오기';
+
+  @override
+  String get ui3InvalidRecoveryKeyFormat => '복구 키 형식이 올바르지 않습니다';
+
+  @override
+  String ui3RecoveryKeyPartialRestore(
+    Object restored,
+    Object total,
+    Object failed,
+  ) {
+    return '키 $total개 중 $restored개를 복원했습니다. $failed개는 실패했습니다. 계정, 네트워크, 백업을 확인한 후 다시 시도하세요. 일부 기록은 계속 읽지 못할 수 있습니다.';
+  }
+
+  @override
+  String ui3RecoveryKeyRestoreSuccess(Object restored, Object total) {
+    return '키 $total개 중 $restored개를 복원했습니다';
+  }
+
+  @override
+  String ui3ImportFailed(Object error) {
+    return '가져오기 실패: $error';
+  }
+
+  @override
+  String ui3PasskeyRegistrationFailed(Object error) {
+    return '패스키 등록 실패: $error';
+  }
+
+  @override
+  String get ui3PasskeyDefaultName => '내 패스키';
+
+  @override
+  String get ui3PasskeyNameHint => '예: iPhone, MacBook';
+
+  @override
+  String get ui3PasskeyDeleteFailed => '패스키를 삭제하지 못했습니다';
+
+  @override
+  String get ui3TwoFactorAuth => '2단계 인증';
+
+  @override
+  String get ui3TwoFactorOnSubtitle => '켜짐 — 인증 앱 코드 필요';
+
+  @override
+  String get ui3TwoFactorOffSubtitle => '꺼짐 — 인증 앱(TOTP)으로 보호하세요';
+
+  @override
+  String get ui3ShowRecoveryKey => '복구 키 보기';
+
+  @override
+  String get ui3ShowRecoveryKeyDesc => '백업을 위해 복구 키 표시';
+
+  @override
+  String get ui3ImportRecoveryKeyHint => '복구 키로 메시지 복원';
+
+  @override
+  String get ui3RecoveryKeyCreateFailed => '복구 키를 만들지 못했습니다';
+
+  @override
+  String get ui3TotpIncorrectCode => '코드가 올바르지 않습니다. 다시 시도하세요';
+
+  @override
+  String get ui3TwoFactorEnabled => '2단계 인증이 켜졌습니다';
+
+  @override
+  String get ui3TwoFactorDisabled => '2단계 인증이 꺼졌습니다';
+
+  @override
+  String get ui3TwoFactorTurnOffTitle => '2단계 인증을 끄시겠습니까?';
+
+  @override
+  String get ui3TwoFactorTurnOffMessage =>
+      '더 이상 인증 앱이 필요하지 않습니다. 나중에 새 키로 다시 설정할 수 있습니다.';
+
+  @override
+  String get ui3TurnOff => '끄기';
+
+  @override
+  String get ui3TwoFactorTotpTitle => '2단계 인증(TOTP)';
+
+  @override
+  String get ui3TwoFactorIsOn => '2단계 인증이 켜져 있습니다';
+
+  @override
+  String get ui3TwoFactorCodeRequired => '인증 앱의 코드가 필요합니다.';
+
+  @override
+  String get ui3TotpStepScan =>
+      '1. 인증 앱(Google Authenticator, Authy, 1Password 등)으로 이 QR 코드를 스캔하거나 키를 직접 입력하세요.';
+
+  @override
+  String get ui3TotpKeyCopied => '키 복사됨';
+
+  @override
+  String get ui3TotpStepConfirm => '2. 확인을 위해 6자리 코드를 입력하세요.';
+
+  @override
+  String get ui3Enable => '사용';
+
+  @override
+  String get ui3BackupSettingsDesc =>
+      '로컬 채팅 설정을 백업합니다. 메시지는 다시 로그인하면 서버에서 복원됩니다.';
+
+  @override
+  String get ui3BackupKeysSeparate => '암호화 키는 별도로 관리됩니다';
+
+  @override
+  String get ui3BackupKeysSeparateHint =>
+      '암호화된 메시지 접근 권한을 백업하려면 보안 > 복구 키를 사용하세요.';
+
+  @override
+  String ui3BackupRoomsSize(Object rooms, Object size) {
+    return '방 $rooms개  $size';
+  }
+
+  @override
+  String get ui3BackupRestoreFromFileDesc =>
+      '다른 기기나 이전 백업의 .n42backup 파일을 가져옵니다. 암호화 키는 복구 키로 별도 복원됩니다.';
+
+  @override
+  String get ui3UsernameSessionRequired => '사용자 이름을 설정하려면 활성 세션이 필요합니다';
+
+  @override
+  String get ui3SecuritySessionRequired => '보안 설정을 사용하려면 활성 세션이 필요합니다';
+
+  @override
+  String get ui3ConnectedAccountsSessionRequired =>
+      '연결된 계정을 사용하려면 활성 세션이 필요합니다';
+
+  @override
+  String get ui3SystemAccounts => '시스템 및 계정';
+
+  @override
+  String get ui3AccountIdentity => '계정 및 신원';
+
+  @override
+  String get ui3Accounts => '계정';
+
+  @override
+  String get ui3DevicesSessions => '기기 및 세션';
+
+  @override
+  String get ui3Integrations => '통합';
+
+  @override
+  String get ui3ConnectedAccounts => '연결된 계정';
+
+  @override
+  String get ui3ConnectedAccountsDesc =>
+      'Telegram, WhatsApp, Discord 및 API 브리지 통합';
+
+  @override
+  String get ui3SystemOverview => '시스템 개요';
+
+  @override
+  String ui3AccountCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '계정 $count개',
+      one: '계정 1개',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String ui3DeviceCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '기기 $count대',
+      one: '기기 1대',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get ui3PrivacySecurityOverview => '종단 간 암호화, 스크린샷 보호 및 프록시 제어';
+
+  @override
+  String get ui3ConversationPrivacy => '대화 개인정보 보호';
+
+  @override
+  String get ui3NetworkPrivacy => '네트워크 개인정보 보호';
+
+  @override
+  String get ui3IdentityPrivacy => '신원 개인정보 보호';
+
+  @override
+  String get ui3EncryptionKeyBackup => '암호화 및 키 백업';
+
+  @override
+  String get ui3DevicesVerification => '기기 및 인증';
+
+  @override
+  String get ui3ChipE2eeDefault => '기본 E2EE';
+
+  @override
+  String get ui3ChipManualE2ee => '수동 E2EE';
+
+  @override
+  String get ui3ChipSelfDestruct => '자동 삭제';
+
+  @override
+  String get ui3ChipScreenshotGuard => '스크린샷 보호';
+
+  @override
+  String get ui3ChipIpProxy => 'IP / 프록시';
+
+  @override
+  String get ui3ChipLinkPreviewsOff => '링크 미리보기 꺼짐';
+
+  @override
+  String get ui3ChipPublicHandle => '공개 사용자 이름';
+
+  @override
+  String get a11yShowPassword => '비밀번호 표시';
+
+  @override
+  String get a11yHidePassword => '비밀번호 숨기기';
+
+  @override
+  String get a11yCheckServer => '서버 확인';
+
+  @override
+  String get ui3AuthAnonymousRegistration => '익명 가입';
+
+  @override
+  String get ui3AuthAnonymousRegistrationDesc =>
+      '전화번호나 이메일을 연결하지 않고 계정을 만듭니다. 사용자 이름은 자동으로 생성됩니다.';
+
+  @override
+  String get ui3AuthAnonymousModeOn => '익명 모드가 켜져 있음';
+
+  @override
+  String get ui3AuthAnonymousModeOnDesc =>
+      '앱이 무작위 Matrix 사용자 이름을 만들어 드립니다. 나중에 생성된 계정과 비밀번호로 로그인할 수 있습니다.';
+
+  @override
+  String get ui3AuthChooseLoginMethod => '로그인 방법 선택';
+
+  @override
+  String get ui3AuthSsoOpenFailed => 'SSO 로그인 페이지를 열지 못했습니다';
+
+  @override
+  String get ui3AuthWalletUnavailable => '지갑을 사용할 수 없습니다';
+
+  @override
+  String get ui3ProfileSubscriptions => '구독';
+
+  @override
+  String get ui3ProfileBuySellCrypto => '암호화폐 구매 / 판매';
+
+  @override
+  String get ui3ProfileOnDeviceAi => '온디바이스 AI';
+
+  @override
+  String get ui3ProfileSetAUsername => '사용자 이름 설정';
+
+  @override
+  String get ui3ProfileAvatarStudio => '아바타 스튜디오';
+
+  @override
+  String get ui3ProfileAvatarStudioSubtitle => 'NFT 아바타 / 꾸미기';
+
+  @override
+  String get ui3ProfileCustomize => '맞춤 설정';
+
+  @override
+  String get ui3ProfileQrSubtitle => '스캔하여 이 프로필을 열거나 채팅 시작';
+
+  @override
+  String get ui3PrivacyHardening => '개인정보 보호 강화';
+
+  @override
+  String get ui3HidePhoneNumber => '전화번호 숨기기';
+
+  @override
+  String get ui3HidePhoneNumberDesc => '이 기기의 프로필 관련 화면에서 연결된 전화번호를 가립니다';
+
+  @override
+  String get ui3EncryptNewChatsByDefault => '새 채팅 기본 암호화';
+
+  @override
+  String get ui3EncryptNewChatsByDefaultDesc =>
+      '새 1:1 채팅과 비공개 방을 E2EE가 켜진 상태로 시작합니다';
+
+  @override
+  String get ui3PrivateChatMode => '비공개 채팅 모드';
+
+  @override
+  String get ui3PrivateChatModeDesc => '비공개 또는 암호화된 채팅을 볼 때 일시적으로 스크린샷을 차단합니다';
+
+  @override
+  String get ui3DefaultSelfDestructTimer => '기본 자동 삭제 타이머';
+
+  @override
+  String get ui3DefaultSelfDestructTimerDesc =>
+      '새로 보내는 메시지에 기본 자동 삭제 타이머를 적용합니다';
+
+  @override
+  String get ui3LinkPreviews => '링크 미리보기';
+
+  @override
+  String get ui3LinkPreviewsDesc => '메시지에 URL이 있으면 제목, 설명, 썸네일을 가져옵니다';
+
+  @override
+  String get ui3IpAddressProtection => 'IP 주소 보호';
+
+  @override
+  String get ui3IpAddressProtectionDesc =>
+      '가능한 경우 Matrix 및 링크 미리보기 요청을 설정된 HTTP 개인정보 보호 프록시를 통해 전송합니다';
+
+  @override
+  String get ui3UseTorProxy => 'Tor / Privoxy HTTP 프록시 사용';
+
+  @override
+  String get ui3UseTorProxyDesc =>
+      '127.0.0.1:8118의 Privoxy 같은 로컬 HTTP 프록시 엔드포인트를 사용합니다. 여기서는 네이티브 SOCKS5 Tor 라우팅을 지원하지 않습니다.';
+
+  @override
+  String get ui3CustomProxy => '사용자 지정 프록시';
+
+  @override
+  String get ui3CustomProxyDesc =>
+      'Matrix 트래픽과 링크 미리보기에 사용자 지정 HTTP 또는 HTTPS 프록시를 사용합니다';
+
+  @override
+  String get ui3ProxyEndpoint => '프록시 주소';
+
+  @override
+  String get ui3ProxyEndpointDesc => 'HTTP/HTTPS 프록시 주소(SOCKS 미지원)';
+
+  @override
+  String get ui3InvalidEndpoint => '잘못된 주소';
+
+  @override
+  String get ui3CustomProxyStaysOff =>
+      '유효한 주소를 설정할 때까지 사용자 지정 프록시는 꺼진 상태로 유지됩니다';
+
+  @override
+  String get ui3NotificationFilterNote =>
+      '우선 규칙은 항상 알림을 보냅니다(음소거, 멘션만, 방해 금지 무시). 음소거 키워드는 알림을 차단합니다.';
+
+  @override
+  String get ui3PriorityKeywords => '우선 키워드';
+
+  @override
+  String get ui3PriorityKeywordHint => '예: 긴급';
+
+  @override
+  String get ui3MutedKeywords => '음소거 키워드';
+
+  @override
+  String get ui3MutedKeywordHint => '예: 스팸';
+
+  @override
+  String get ui3PrioritySenders => '우선 발신자';
+
+  @override
+  String get ui3CaseSensitive => '대소문자 구분';
+
+  @override
+  String get ui3None => '없음';
+
+  @override
+  String get ui3SmartReplyTranslation => '스마트 답장 번역';
+
+  @override
+  String get ui3SmartReplyTranslationDesc => '보내기 전에 메시지를 받는 사람의 언어로 자동 번역합니다.';
+
+  @override
+  String get ui3FromPhotos => '사진에서 선택';
+
+  @override
+  String get ui3ChangePhoto => '사진 변경';
+
+  @override
+  String get ui3RoamingUsesMobileData => '로밍 시 모바일 데이터 규칙 적용';
+
+  @override
+  String get ui3RoamingUsesMobileDataDesc =>
+      '로밍 전용 감지는 아직 지원되지 않아 현재 로밍 시에는 모바일 데이터 자동 다운로드 설정을 따릅니다.';
+
+  @override
+  String ui3DeleteQuickReplyConfirm(String content) {
+    return '\"$content\"을(를) 삭제할까요?';
+  }
+
+  @override
+  String get ui3ResetToDefaults => '기본값으로 재설정';
+
+  @override
+  String get ui3ResetQuickRepliesMessage =>
+      '모든 사용자 지정 빠른 답장이 삭제되고 기본값이 복원됩니다. 계속할까요?';
+
+  @override
+  String get ui3LocalLlmUnavailable => '이 기기에서 지원되지 않음';
+
+  @override
+  String get ui3LocalLlmNotDownloaded => '모델이 다운로드되지 않음';
+
+  @override
+  String get ui3LocalLlmReady => '준비됨(온디바이스)';
+
+  @override
+  String get ui3LocalLlmDescription =>
+      '켜져 있고 준비되면 AI 기능(요약, 다시 쓰기, 번역, 답장)이 완전히 기기에서 실행되며 데이터가 휴대폰 밖으로 나가지 않습니다. 그렇지 않으면 클라우드 제공업체를 사용합니다.';
+
+  @override
+  String get ui3UseOnDeviceAi => '온디바이스 AI 사용';
+
+  @override
+  String get ui3UseOnDeviceAiDesc => '준비되면 로컬 추론 우선 사용';
+
+  @override
+  String get ui3DownloadModel => '모델 다운로드';
+
+  @override
+  String get ui3LocalLlmRuntimeRequired =>
+      '온디바이스 추론에는 네이티브 런타임(Android MediaPipe / iOS Core ML)이 필요합니다. 플랫폼 핸들러를 사용할 수 있게 되면 자동으로 활성화됩니다.';
+
+  @override
+  String get ui3PhotoAvatar => '사진 아바타';
+
+  @override
+  String get ui3AvatarStyles => '아바타 스타일';
+
+  @override
+  String get ui3AvatarStylesDesc => '프로필과 아바타 진입점에서 하나의 꾸미기 선택기를 함께 사용합니다.';
+
+  @override
+  String get ui3ReplaceNftAvatar => 'NFT 아바타 변경';
+
+  @override
+  String get ui3NftAvatarDesc => '온체인 수집품을 아바타로 사용합니다.';
+
+  @override
+  String get ui3UsePhotoAvatar => '사진 아바타 사용';
+
+  @override
+  String get ui3UsePhotoAvatarDesc => '업로드한 아바타를 유지하고 NFT 연결을 해제합니다.';
+
+  @override
+  String ui3AvatarStyleSet(Object name) {
+    return '아바타 스타일 설정됨: $name';
+  }
+
+  @override
+  String get ui3NftAvatarUpdated => 'NFT 아바타가 업데이트됨';
+
+  @override
+  String get ui3SwitchedToPhotoAvatar => '사진 아바타로 다시 전환됨';
+
+  @override
+  String get ui3SignInToViewRedPacketHistory => '로그인하여 세뱃돈 봉투 기록 보기';
+
+  @override
+  String get ui3RedPacketActive => '진행 중';
+
+  @override
+  String get ui3RedPacketCompleted => '수령 완료';
+
+  @override
+  String get ui3CardsAndPasses => '카드 및 패스';
+
+  @override
+  String get ui3CardsAndPassesDesc => '지갑 카드, 쿠폰, 패스는 메인 앱에서 관리합니다.';
+
+  @override
+  String get ui3CardPackRequiresMainApp => '카드 팩을 사용하려면 메인 앱이 필요합니다';
+
+  @override
+  String get ui3OpenCardPack => '카드 팩 열기';
+
+  @override
+  String get ui3UnableToOpenChat => '이 연락처와 채팅을 열 수 없습니다';
+
+  @override
+  String get ui3WalletManagedInMainApp => '지갑은 메인 앱에서 관리됩니다';
+
+  @override
+  String ui3CreatorPlans(Object name) {
+    return '$name · 플랜';
+  }
+
+  @override
+  String get ui3NewPlan => '새 플랜';
+
+  @override
+  String get ui3MySubscriptions => '내 구독';
+
+  @override
+  String get ui3AvailablePlans => '이용 가능한 플랜';
+
+  @override
+  String get ui3NoPlansYet => '아직 플랜이 없습니다 · \"새 플랜\"을 탭하여 만드세요';
+
+  @override
+  String ui3DaysLeft(Object days) {
+    return '$days일 남음';
+  }
+
+  @override
+  String get ui3SubscriptionCancelled => '취소됨';
+
+  @override
+  String get ui3AutoRenewOn => '자동 갱신: 켜짐';
+
+  @override
+  String get ui3AutoRenewOff => '자동 갱신: 꺼짐';
+
+  @override
+  String get ui3CancelSubscriptionTitle => '구독을 취소할까요?';
+
+  @override
+  String ui3CancelSubscriptionConfirm(Object name) {
+    return '$name 구독은 만료될 때까지 유지되며 갱신되지 않습니다.';
+  }
+
+  @override
+  String get ui3Subscribe => '구독';
+
+  @override
+  String ui3SubscribedTo(Object name) {
+    return '$name 구독 완료';
+  }
+
+  @override
+  String get ui3PlanPriceLabel => '가격(예: 9.9 USDT)';
+
+  @override
+  String get ui3PlanDescriptionLabel => '설명(선택 사항)';
+
+  @override
+  String get ui3PlanBenefitsLabel => '혜택(쉼표로 구분)';
+
+  @override
+  String get ui3PlanPeriod => '기간:';
+
+  @override
+  String get ui3Monthly => '월간';
+
+  @override
+  String get ui3Yearly => '연간';
+
+  @override
+  String get ui3SaveRemarkFailed => '메모를 저장하지 못했습니다';
+
+  @override
+  String get ui3CopyLink => '링크 복사';
+
+  @override
+  String get ui3Connect => '연결';
+
+  @override
+  String get ui3CommonTokens => '공통 토큰';
+
+  @override
+  String get ui3SharedNfts => '공통 NFT';
+
+  @override
+  String get ui3TransactionHistory => '거래 내역';
+
+  @override
+  String get ui3CommonDaos => '공통 DAO';
+
+  @override
+  String get ui3SameChains => '동일 체인';
+
+  @override
+  String get ui3ChatInitFailed => '채팅을 초기화하지 못했습니다';
+
+  @override
+  String get ui3CheckNetworkRetry => '네트워크를 확인한 후 다시 시도해 주세요';
+
+  @override
+  String get ui3FromContacts => '연락처에서';
+
+  @override
+  String get ui3FindFriendsFromContacts => '휴대폰 연락처에서 친구 찾기';
+
+  @override
+  String get ui3EnsOrDomain => 'ENS / 도메인';
+
+  @override
+  String get ui3LoadingContacts => '연락처 불러오는 중...';
+
+  @override
+  String get ui3ContactsPermissionRequired => '연락처 권한 필요';
+
+  @override
+  String get ui3ContactsPermissionMessage => '연락처에서 친구를 찾으려면 연락처 접근을 허용해 주세요.';
+
+  @override
+  String get ui3AllowAccess => '접근 허용';
+
+  @override
+  String get ui3NoContactMatches => '일치하는 항목 없음';
+
+  @override
+  String get ui3NoContactMatchesMessage => '아직 이 앱을 사용하는 연락처가 없습니다. 초대해 보세요!';
+
+  @override
+  String ui3ScannedContacts(Object count) {
+    return '연락처 $count개 검색함';
+  }
+
+  @override
+  String ui3FoundContactMatches(Object count) {
+    return '연락처에서 $count명을 찾았습니다';
+  }
+
+  @override
+  String ui3InContactsAs(Object name) {
+    return '연락처 이름: $name';
+  }
+
+  @override
+  String get ui3DeletePhotoConfirm => '이 사진을 삭제할까요?';
+
+  @override
+  String get ui3InviteLink => '초대 링크';
+
+  @override
+  String get ui3ShareJoinLink => '이 방의 참여 링크 공유';
+
+  @override
+  String get ui3ShareRoomReference => '초대된 멤버에게 방 참조 공유';
+
+  @override
+  String get ui3ScanToJoinGroup => '스캔하여 이 그룹에 바로 참여';
+
+  @override
+  String get ui3ScanToShareRoomReference => '스캔하여 초대된 멤버에게 이 방 참조 공유';
+
+  @override
+  String get ui3InviteLinkLoadFailed => '초대 링크를 불러오지 못했습니다';
+
+  @override
+  String get ui3InviteLinkCopied => '초대 링크가 복사되었습니다';
+
+  @override
+  String get ui3ChannelCategoryOptional => '카테고리(선택 사항)';
+
+  @override
+  String get ui3ChannelCategoryHint => '공지 / 제품 / 지원';
+
+  @override
+  String get ui3DescriptionOptional => '설명(선택 사항)';
+
+  @override
+  String get ui3WebhookEnable => 'Webhook 자동화 사용';
+
+  @override
+  String get ui3WebhookEnableDesc => '멤버 참여 및 환영 이벤트를 통합 엔드포인트로 전송합니다.';
+
+  @override
+  String get ui3WebhookUrl => 'Webhook 주소';
+
+  @override
+  String get ui3WebhookSecretOptional => '서명 시크릿(선택 사항)';
+
+  @override
+  String get ui3WebhookSecretHint => 'X-N42-Signature에 사용됨';
+
+  @override
+  String get ui3WebhookNotifyMemberJoined => '멤버 참여 시 알림';
+
+  @override
+  String get ui3WebhookNotifyWelcomeSent => '환영 메시지 전송 시 알림';
+
+  @override
+  String get ui3WebhookTestSend => '테스트 Webhook 보내기';
+
+  @override
+  String get ui3WebhookTestSending => '테스트 Webhook 보내는 중...';
+
+  @override
+  String get ui3WebhookTestSent => '테스트 Webhook을 보냈습니다';
+
+  @override
+  String get ui3WebhookTestFailed => '테스트 Webhook을 보내지 못했습니다';
+
+  @override
+  String get ui3WebhookUrlInvalid => 'Webhook 주소는 공개 HTTPS 주소여야 합니다';
+
+  @override
+  String get ui3WebhookSelectEvent => 'Webhook 이벤트를 하나 이상 선택하세요';
+
+  @override
+  String get ui3SensitiveDataDetection => '민감 정보 감지';
+
+  @override
+  String get ui3Email => '이메일';
+
+  @override
+  String get ui3CreditCard => '신용카드';
+
+  @override
+  String get ui3DetectEmailDesc => '텍스트 메시지에서 이메일 주소 감지';
+
+  @override
+  String get ui3DetectPhoneDesc => '전화번호 및 국제 번호 감지';
+
+  @override
+  String get ui3DetectCardDesc => '은행 계좌 및 카드 번호로 보이는 항목 감지';
+
+  @override
+  String get ui3DetectWalletDesc => 'Ethereum 형식의 지갑 주소 감지';
+
+  @override
+  String get ui3GeneralTopic => '일반';
+
+  @override
+  String get a11yPreviousResult => '이전 결과';
+
+  @override
+  String get a11yNextResult => '다음 결과';
+
+  @override
+  String get ui3TryDifferentKeywords => '다른 키워드로 검색해 보세요';
+
+  @override
+  String ui3FiltersActive(Object count) {
+    return '적용된 필터: $count';
+  }
+
+  @override
+  String ui3MessageFiltersActive(Object count) {
+    return '적용된 메시지 필터: $count';
+  }
+
+  @override
+  String get ui3LoadMore => '더 보기';
+
+  @override
+  String get ui3MessageFilters => '메시지 필터';
+
+  @override
+  String get ui3SenderUserId => '보낸 사람 사용자 ID';
+
+  @override
+  String get ui3FilterType => '유형';
+
+  @override
+  String get ui3FilterAny => '전체';
+
+  @override
+  String get ui3FilterImage => '이미지';
+
+  @override
+  String get ui3FilterTime => '시간';
+
+  @override
+  String get ui3AnyTime => '전체 기간';
+
+  @override
+  String get ui3OnlyMyMessages => '내 메시지만';
+
+  @override
+  String get ui3MediaOnly => '미디어만';
+
+  @override
+  String get ui3Apply => '적용';
+
+  @override
+  String get ui3QrStyleClassic => '클래식';
+
+  @override
+  String get ui3QrStyleOcean => '오션';
+
+  @override
+  String get ui3QrStyleBerry => '베리';
+
+  @override
+  String get ui3NfcUnavailable =>
+      'NFC를 사용할 수 없거나 지원되지 않는 태그입니다. NFC를 켜거나 다른 태그를 시도하거나 QR을 사용하세요.';
+
+  @override
+  String get ui3CancelNfc => 'NFC 취소';
+
+  @override
+  String get ui3ReadNfcTag => 'NFC 태그 읽기';
+
+  @override
+  String get ui3HoldNearNfcTag => '휴대폰을 서비스 태그에 가까이 대세요.';
+
+  @override
+  String get a11yFlashlightOn => '손전등 켜기';
+
+  @override
+  String get a11yFlashlightOff => '손전등 끄기';
+
+  @override
+  String get ui3SocialGraph => '소셜 그래프';
+
+  @override
+  String get ui3RecommendedConnections => '추천 연결';
+
+  @override
+  String get ui3Portfolio => '포트폴리오';
+
+  @override
+  String get ui3Chains => '체인';
+
+  @override
+  String get ui3Tokens => '토큰';
+
+  @override
+  String get ui3NoConnectionsFound => '연결이 없습니다';
+
+  @override
+  String get ui3ConnectionsHint => '온체인 활동이 쌓이면 연결이 표시됩니다';
+
+  @override
+  String get ui3SocialGraphLoadFailed => '소셜 그래프를 불러오지 못했습니다';
+
+  @override
+  String get ui3Similarity => '유사도';
+
+  @override
+  String get ui3Breakdown => '세부 항목';
+
+  @override
+  String get ui3TokenHoldings => '보유 토큰';
+
+  @override
+  String get ui3NftCollections => 'NFT 컬렉션';
+
+  @override
+  String get ui3ChainUsage => '체인 사용';
+
+  @override
+  String get ui3Transactions => '거래';
+
+  @override
+  String get ui3DaoMembership => 'DAO 멤버십';
+
+  @override
+  String get ui3NotWeighted => '가중치 없음';
+
+  @override
+  String ui3PercentWithWeight(Object percent, Object weight) {
+    return '$percent% (가중치: $weight)';
+  }
+
+  @override
+  String get ui3CommonOnChainActivity => '공통 온체인 활동';
+
+  @override
+  String get ui3SharedTokens => '공통 토큰';
+
+  @override
+  String get ui3SharedNftCollections => '공통 NFT 컬렉션';
+
+  @override
+  String get ui3SharedChains => '공통 체인';
+
+  @override
+  String get ui3NoSharedTokens => '공통 토큰이 없습니다';
+
+  @override
+  String get ui3NoSharedNftCollections => '공통 NFT 컬렉션이 없습니다';
+
+  @override
+  String get ui3NoSharedChains => '공통 체인이 없습니다';
+
+  @override
+  String get ui3SimilarityFailed => '유사도를 계산하지 못했습니다';
+
+  @override
+  String ui3ItemsAndMore(Object items, Object count) {
+    return '$items 외 $count개';
+  }
+
+  @override
+  String get a11yGovernance => '거버넌스';
+
+  @override
+  String get ui3CommunityLink => '커뮤니티 링크';
+
+  @override
+  String get ui3CommunityQrCode => '커뮤니티 QR 코드';
+
+  @override
+  String get ui3CommunityQrSubtitle => '스캔하여 이 커뮤니티에 가입하고 채널을 둘러보세요';
+
+  @override
+  String get ui3CommunityLinkLoadFailed => '커뮤니티 링크를 불러오지 못했습니다';
+
+  @override
+  String get ui3CommunityLinkCopied => '커뮤니티 링크가 복사되었습니다';
+
+  @override
+  String ui3KickMemberConfirm(Object name) {
+    return '$name님이 이 커뮤니티에서 제거됩니다.';
+  }
+
+  @override
+  String ui3BanMemberConfirm(Object name) {
+    return '$name님이 제거되며 다시 가입할 수 없습니다.';
+  }
+
+  @override
+  String get ui3SignInToDiscoverChannels => '로그인하여 공개 채널을 찾아보세요';
+
+  @override
+  String ui3UnableToJoinChannel(Object name, Object error) {
+    return '$name에 참여할 수 없습니다: $error';
+  }
+
+  @override
+  String get ui3CategoryTech => '기술';
+
+  @override
+  String get ui3CategorySocial => '소셜';
+
+  @override
+  String get ui3NoPublicChannels => '공개 채널이 없습니다';
+
+  @override
+  String get ui3StoriesAndFun => '스토리 & 재미';
+
+  @override
+  String get ui3SearchMusicHint => '노래, 아티스트 또는 친구 검색';
+
+  @override
+  String get ui3ForYou => '추천';
+
+  @override
+  String get ui3Liked => '좋아요';
+
+  @override
+  String get ui3NoLikedMusic => '좋아요한 음악이 아직 없습니다';
+
+  @override
+  String get ui3NoMusicStories => '음악 스토리가 아직 없습니다';
+
+  @override
+  String get ui3LikedMusicHint => '노래 옆 하트를 탭하면 여기에 보관됩니다.';
+
+  @override
+  String get ui3MusicStoriesHint => '스토리에 공유된 음악이 여기에 표시됩니다.';
+
+  @override
+  String ui3SharedBy(Object artist, Object name) {
+    return '$artist · $name님이 공유함';
+  }
+
+  @override
+  String ui3UnableToPlay(Object title, Object error) {
+    return '$title을(를) 재생할 수 없습니다: $error';
+  }
+
+  @override
+  String get a11yPreviousTrack => '이전 트랙';
+
+  @override
+  String get a11yNextTrack => '다음 트랙';
+
+  @override
+  String get a11yPlay => '재생';
+
+  @override
+  String get a11yPause => '일시정지';
+
+  @override
+  String get ui3Refresh => '새로고침';
+
+  @override
+  String get ui3NearbyIntroTitle => '주변 공개 게시물 둘러보기';
+
+  @override
+  String get ui3NearbyIntroBody =>
+      '위치는 공개 모먼트를 정렬하기 위해 이 기기에서 한 번만 사용됩니다. 업로드, 전송되거나 다른 사람에게 표시되지 않습니다.';
+
+  @override
+  String get ui3UseMyLocation => '내 위치 사용';
+
+  @override
+  String get ui3NearbyUnavailable => '주변 기능을 사용할 수 없습니다';
+
+  @override
+  String get ui3NoNearbyPosts => '주변 게시물이 아직 없습니다';
+
+  @override
+  String get ui3NoNearbyPostsHint => '위치가 포함된 공개 모먼트가 여기에 표시됩니다.';
+
+  @override
+  String get ui3NearbyDistanceNote => '대략적인 거리 · 위치가 있는 공개 게시물만';
+
+  @override
+  String get ui3PublicLocationPost => '위치가 있는 공개 게시물';
+
+  @override
+  String get ui3LocationServicesOff => '위치 서비스가 꺼져 있습니다';
+
+  @override
+  String get ui3LocationPermissionDenied => '위치 권한이 거부되었습니다';
+
+  @override
+  String get ui3EnableLocationInSettings => '시스템 설정에서 위치 권한을 허용하세요';
+
+  @override
+  String get ui3CreateStory => '스토리 만들기';
+
+  @override
+  String get ui3CreateStoryDesc => '텍스트 또는 사진 상태를 게시하세요.';
+
+  @override
+  String get ui3StoryCamera => '스토리 카메라';
+
+  @override
+  String get ui3StoryCameraDesc => '필터와 사진 편집으로 바로 이동하세요.';
+
+  @override
+  String get ui3MomentsDesc => '전체 피드와 댓글을 엽니다.';
+
+  @override
+  String get ui3MomentCamera => '모먼트 카메라';
+
+  @override
+  String get ui3MomentCameraDesc => '게시물을 만들고 바로 미디어를 선택하세요.';
+
+  @override
+  String get ui3GamesDesc => '내장 캐주얼 게임 센터를 실행합니다.';
+
+  @override
+  String get ui3AvatarStudio => '아바타 스튜디오';
+
+  @override
+  String get ui3AvatarStudioDesc => '꾸미기, NFT 아바타, 아이덴티티 장식.';
+
+  @override
+  String get ui3SocialGraphDesc => '온체인 팔로우, 팬, 연결.';
+
+  @override
+  String get ui3SocialHubHeroTitle => '스토리, 모먼트, 게임, 아바타';
+
+  @override
+  String get ui3SocialHubHeroBody => '채팅, 프로필, 탐색에 흩어져 있던 소셜 기능을 한곳에 모았습니다.';
+
+  @override
+  String get ui3SocialGraphNotConfigured => '이 빌드에는 소셜 그래프가 구성되지 않았습니다';
+
+  @override
+  String get ui3ConnectWalletForSocialGraph => '지갑을 연결하여 소셜 그래프를 확인하세요';
+
+  @override
+  String get ui3AvatarStudioSignIn => '아바타 스튜디오를 사용하려면 로그인해야 합니다';
+
+  @override
+  String get a11yRemoveImage => '이미지 삭제';
+
+  @override
+  String get a11yBack => '뒤로';
+
+  @override
+  String get ui3MiniAppConfirmTransactionTitle => '거래 확인';
+
+  @override
+  String get ui3MiniAppConfirmTransactionBody =>
+      '미니 앱이 사용자를 대신해 거래 전송을 요청하고 있습니다.';
+
+  @override
+  String ui3MiniAppOpenTitle(Object name) {
+    return '$name을(를) 여시겠습니까?';
+  }
+
+  @override
+  String get ui3MiniAppOpenButton => '열기';
+
+  @override
+  String get ui3StoryReplySendFailed => '스토리 답장을 보내지 못했습니다';
+
+  @override
+  String get ui3RedPacketDemoNotice =>
+      '데모 홍바오 — 채팅 내 기록일 뿐, 실제 온체인 자산은 전송되지 않습니다.';
+
+  @override
+  String get ui3RedPacketCoverClassic => '클래식 레드';
+
+  @override
+  String get ui3RedPacketCoverGolden => '골드';
+
+  @override
+  String get ui3RedPacketCoverPurple => '퍼플';
+
+  @override
+  String get ui3RedPacketCoverOceanBlue => '오션 블루';
+
+  @override
+  String get ui3RedPacketCoverNatureGreen => '네이처 그린';
+
+  @override
+  String get ui3RedPacketCoverRosePink => '로즈 핑크';
+
+  @override
+  String get ui3RedPacketHistoryEmpty => '홍바오가 아직 없습니다';
+
+  @override
+  String get ui3TransferMerchantQrWithAmount => '가맹점 QR(금액 포함)';
+
+  @override
+  String get ui3TransferMerchantQrTitle => '가맹점 QR';
+
+  @override
+  String get ui3TransferOpenAmountHint => '금액을 자유롭게 하려면 비워 두세요';
+
+  @override
+  String get ui3FiatRampTitle => '암호화폐 구매 / 판매';
+
+  @override
+  String get ui3FiatRampBuy => '구매';
+
+  @override
+  String get ui3FiatRampSell => '판매';
+
+  @override
+  String get ui3FiatRampNotConfigured => '법정화폐 온/오프램프가 구성되지 않았습니다';
+
+  @override
+  String get a11yPointsAddRule => '보상 규칙 추가';
+
+  @override
+  String get a11yGovernanceRemoveChoice => '선택지 삭제';
+
+  @override
+  String get a11yGovernanceCreateProposal => '제안 만들기';
+
+  @override
+  String get ui3MiniAppUpdateN42 => 'N42 업데이트';
+
+  @override
+  String get ui3MiniAppOfficial => '공식';
+
+  @override
+  String ui3MiniAppUserCount(Object count) {
+    return '사용자 $count명';
+  }
+
+  @override
+  String a11yStoryBackgroundColor(Object index) {
+    return '배경 색상 $index';
+  }
+
+  @override
+  String get a11yStoryAdd => '스토리 추가';
+
+  @override
+  String get ui3StoryPostFailed => '스토리를 게시하지 못했습니다';
+
+  @override
+  String get ui3StoryTapToSelectImage => '탭하여 이미지 선택';
+
+  @override
+  String get ui3StoryChangeImage => '변경';
+
+  @override
+  String ui3StoryMusicReadFailed(Object error) {
+    return '선택한 음악을 읽을 수 없습니다: $error';
+  }
+
+  @override
+  String get ui3StoryDeleteConfirm => '이 스토리를 삭제할까요?';
+
+  @override
+  String get ui3StoryDeleteFailed => '스토리를 삭제하지 못했습니다';
+
+  @override
+  String get ui3MomentCreateTitle => '모먼트 만들기';
+
+  @override
+  String get ui3MomentContentHint => '무슨 생각을 하고 계신가요?';
+
+  @override
+  String get ui3MomentAddPhotos => '사진 추가';
+
+  @override
+  String get ui3MomentAddLocation => '위치 추가';
+
+  @override
+  String ui3MomentSelectedMedia(Object count) {
+    return '선택한 미디어 ($count)';
+  }
+
+  @override
+  String get ui3MomentClearAll => '모두 지우기';
+
+  @override
+  String get ui3MomentClearMediaConfirm => '선택한 사진/동영상을 모두 삭제할까요?';
+
+  @override
+  String get ui3MomentVisibilityPublicDesc => '모든 친구가 볼 수 있음';
+
+  @override
+  String get ui3MomentVisibilityPrivateDesc => '나만 보기';
+
+  @override
+  String get ui3MomentVisibilityPartialDesc => '볼 수 있는 사람 선택';
+
+  @override
+  String get ui3MomentVisibilityExcludedDesc => '특정 친구에게 숨기기';
+
+  @override
+  String get ui3MomentVideos => '동영상';
+
+  @override
+  String get ui3MomentNoVideos => '아직 동영상이 없습니다';
+
+  @override
+  String get a11yCallMinimize => '최소화';
+
+  @override
+  String get a11yCallGridView => '그리드 보기';
+
+  @override
+  String get a11yCallFocusView => '포커스 보기';
+
+  @override
+  String get ui3CallTools => '통화 도구';
+
+  @override
+  String get ui3CallMeetingTools => '회의 도구';
+
+  @override
+  String get ui3CallToolsSubtitle => '통화를 종료하지 않고 오디오 및 동영상 품질을 조정하세요.';
+
+  @override
+  String get ui3CallAudioEnhancement => '오디오 향상';
+
+  @override
+  String get ui3CallNoiseSuppression => '소음 억제';
+
+  @override
+  String get ui3CallNoiseSuppressionDesc => '키보드 소리와 배경 소음을 줄입니다.';
+
+  @override
+  String get ui3CallEchoCancellation => '에코 제거';
+
+  @override
+  String get ui3CallEchoCancellationDesc => '스피커 소리가 마이크로 다시 들어가는 것을 방지합니다.';
+
+  @override
+  String get ui3CallAutoGainControl => '자동 게인 조절';
+
+  @override
+  String get ui3CallAutoGainControlDesc => '마이크 볼륨을 더 안정적으로 유지합니다.';
+
+  @override
+  String get ui3CallVoiceIsolation => '향상된 음성 분리';
+
+  @override
+  String get ui3CallVoiceIsolationDesc => '더 강력한 소음 감소 프로필을 사용합니다.';
+
+  @override
+  String get ui3CallVideoSection => '동영상';
+
+  @override
+  String get ui3CallBackgroundBlur => '배경 흐림 (베타)';
+
+  @override
+  String get ui3CallBlurDescReady =>
+      '설정이 적용되었습니다. 실제 흐림 효과는 동영상 프로세서 배포 여부에 따라 달라집니다.';
+
+  @override
+  String get ui3CallBlurDescSaved => '흐림 설정이 저장되었으며 카메라 처리가 가능해지면 적용됩니다.';
+
+  @override
+  String get ui3CallBlurDescCameraOff => '배경 처리가 가능해지면 카메라를 켜세요.';
+
+  @override
+  String get ui3CallRecordingSection => '녹화';
+
+  @override
+  String get ui3CallRecordingDesc => '녹화를 저장하려면 서버 측 이그레스가 필요합니다.';
+
+  @override
+  String ui3CallSettingsUpdateFailed(Object error) {
+    return '통화 설정을 업데이트하지 못했습니다: $error';
+  }
+
+  @override
+  String get ui3CallRecordingStarted => '녹화가 시작되었습니다';
+
+  @override
+  String get ui3VoiceRoomNotFound => '방을 찾을 수 없습니다';
+
+  @override
+  String get ui3VoiceRoomEndConfirm => '이 음성 방을 종료하시겠습니까?';
+
+  @override
+  String get a11yGameMoveUp => '위로 이동';
+
+  @override
+  String get a11yGameMoveDown => '아래로 이동';
+
+  @override
+  String get a11yGameMoveLeft => '왼쪽으로 이동';
+
+  @override
+  String get a11yGameMoveRight => '오른쪽으로 이동';
+
+  @override
+  String get a11yGameRotate => '회전';
+
+  @override
+  String get a11yGameDrop => '떨어뜨리기';
+
+  @override
+  String ui3StickerAddedCount(Object count) {
+    return '스티커 $count개를 추가했습니다';
+  }
+
+  @override
+  String ui3StickerAddFailed(Object error) {
+    return '추가하지 못했습니다: $error';
+  }
+
+  @override
+  String get ui3StickerRemoveTitle => '스티커 삭제';
+
+  @override
+  String get ui3StickerRemoveConfirm => '이 스티커를 팩에서 삭제할까요?';
+
+  @override
+  String get ui3StickerRemoveFailed => '삭제하지 못했습니다';
+
+  @override
+  String get ui3StickerRenamePack => '팩 이름 변경';
+
+  @override
+  String get ui3StickerPackName => '팩 이름';
+
+  @override
+  String get ui3StickerRenameFailed => '이름을 변경하지 못했습니다';
+
+  @override
+  String get ui3StickerDeletePack => '팩 삭제';
+
+  @override
+  String get ui3StickerThisPack => '이 팩';
+
+  @override
+  String ui3StickerDeletePackConfirm(Object name) {
+    return '\'$name\' 및 포함된 모든 스티커를 삭제할까요? 이 작업은 되돌릴 수 없습니다.';
+  }
+
+  @override
+  String get ui3StickerDeleteFailed => '삭제하지 못했습니다';
+
+  @override
+  String get ui3StickerPack => '스티커 팩';
+
+  @override
+  String get ui3StickerAdding => '추가 중…';
+
+  @override
+  String get ui3StickerAddStickers => '스티커 추가';
+
+  @override
+  String get ui3StickerPackNotFound => '팩을 찾을 수 없습니다';
+
+  @override
+  String get ui3StickerEmptyHint => '\'스티커 추가\'를 탭하여 이미지를 업로드하세요';
+
+  @override
+  String get ui3StickerNewPack => '새 스티커 팩';
+
+  @override
+  String get ui3StickerCreate => '만들기';
+
+  @override
+  String get ui3StickerCreateFailed => '팩을 만들지 못했습니다';
+
+  @override
+  String ui3StickerInstalled(Object name) {
+    return '\'$name\'을(를) 추가했습니다';
+  }
+
+  @override
+  String get ui3StickerRemovePackTitle => '스티커 팩 삭제';
+
+  @override
+  String ui3StickerRemovePackConfirm(Object name) {
+    return '내 스티커에서 \'$name\'을(를) 삭제할까요?';
+  }
+
+  @override
+  String ui3StickerRemoved(Object name) {
+    return '\'$name\'을(를) 삭제했습니다';
+  }
+
+  @override
+  String get ui3StickerAiSticker => 'AI 스티커';
+
+  @override
+  String get ui3StickerStoreTab => '스토어';
+
+  @override
+  String get ui3StickerMyStickersTab => '내 스티커';
+
+  @override
+  String get ui3StickerNoneFound => '스티커를 찾을 수 없습니다';
+
+  @override
+  String ui3StickerByAuthor(Object author) {
+    return '제작: $author';
+  }
+
+  @override
+  String get ui3StickerManage => '관리';
+
+  @override
+  String ui3StickerCount(Object count) {
+    return '스티커 $count개';
+  }
+
+  @override
+  String get ui3StickerNoneInstalled => '설치된 스티커가 없습니다';
+
+  @override
+  String get ui3StickerGetFromStore => '스토어에서 스티커 받기';
+
+  @override
+  String get ui3StickerBrowseStore => '스토어 둘러보기';
+
+  @override
+  String get ui3StickerAddedToAi => '\'AI 스티커\'에 추가했습니다';
+
+  @override
+  String get ui3StickerAddOneFailed => '스티커를 추가하지 못했습니다';
+
+  @override
+  String get ui3StickerPromptLabel => '스티커를 설명하세요';
+
+  @override
+  String get ui3StickerPromptHint => '예: 선글라스를 쓴 행복한 주황색 고양이';
+
+  @override
+  String get ui3StickerGenerating => '생성 중…';
+
+  @override
+  String get ui3StickerGenerate => '생성';
+
+  @override
+  String get ui3StickerAddToStickers => '스티커에 추가';
+
+  @override
+  String get ui3StickerGeneratingPreview => '스티커를 생성하는 중…';
+
+  @override
+  String get ui3StickerGenerateEmpty => '스티커를 설명하고 \'생성\'을 탭하세요';
 }

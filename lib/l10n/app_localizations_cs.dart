@@ -6382,4 +6382,2013 @@ class SCs extends S {
   String scheduledSendTomorrowMorningAt(String time) {
     return 'Zítra ráno ($time)';
   }
+
+  @override
+  String get a11yScrollToBottom => 'Posunout dolů';
+
+  @override
+  String get ui3EnterMessageBeforeScheduling =>
+      'Před naplánováním zadejte zprávu';
+
+  @override
+  String get ui3SendCode => 'Odeslat kód';
+
+  @override
+  String get ui3CodeLanguage => 'Jazyk';
+
+  @override
+  String get ui3PasteCodeHere => 'Sem vložte kód';
+
+  @override
+  String ui3ReminderSetAt(String time) {
+    return 'Připomínka nastavena · $time';
+  }
+
+  @override
+  String get ui3RedPacketCreateFailed =>
+      'Červenou obálku se nepodařilo vytvořit';
+
+  @override
+  String get ui3SendTip => 'Poslat spropitné';
+
+  @override
+  String get ui3TokenLabel => 'Kryptoměna';
+
+  @override
+  String get ui3NoteOptional => 'Poznámka (nepovinné)';
+
+  @override
+  String ui3TipFailed(String error) {
+    return 'Spropitné se nezdařilo: $error';
+  }
+
+  @override
+  String get ui3GiftNftTitle => 'Darovat NFT';
+
+  @override
+  String get ui3TokenId => 'ID tokenu';
+
+  @override
+  String ui3NftGiftFailed(String error) {
+    return 'Darování NFT se nezdařilo: $error';
+  }
+
+  @override
+  String get ui3AiAgentSubtitle =>
+      'Popište úkol a otevřete správnou miniaplikaci';
+
+  @override
+  String get ui3GiftNft => 'Darovat NFT';
+
+  @override
+  String get ui3GiftNftSubtitle => 'Poslat NFT tomuto kontaktu';
+
+  @override
+  String get ui3MiniAppUnavailable => 'Miniaplikace není k dispozici';
+
+  @override
+  String ui3MediaItemsNotSent(int count) {
+    return 'Nepodařilo se odeslat vybraná média: $count';
+  }
+
+  @override
+  String get ui3PhotosSubtitle =>
+      'Posílejte fotky a videa ve formátu vhodném pro chat';
+
+  @override
+  String get ui3OriginalImages => 'Původní obrázky';
+
+  @override
+  String get ui3OriginalImagesSubtitle =>
+      'Posílat nekomprimované fotky jako soubory';
+
+  @override
+  String ui3ScheduledFileFor(String filename, String time) {
+    return 'Soubor $filename naplánován na $time';
+  }
+
+  @override
+  String ui3SendingOriginalImage(String filename) {
+    return 'Odesílání původního obrázku: $filename';
+  }
+
+  @override
+  String ui3ScheduledOriginalImage(String filename) {
+    return 'Původní obrázek naplánován: $filename';
+  }
+
+  @override
+  String get ui3PaymentAlreadySent => 'Platba již byla odeslána';
+
+  @override
+  String get ui3PaymentProcessing => 'Platba se zpracovává';
+
+  @override
+  String ui3ChainStatus(String status) {
+    return 'Stav v řetězci: $status';
+  }
+
+  @override
+  String get ui3NotChecked => 'Neověřeno';
+
+  @override
+  String ui3ConfirmationsCount(int confirmations, int required) {
+    return 'Potvrzeno: $confirmations / $required bloků';
+  }
+
+  @override
+  String get ui3CopyTxHash => 'Kopírovat hash transakce';
+
+  @override
+  String get ui3VerifyAgain => 'Ověřit znovu';
+
+  @override
+  String get ui3VerifyOnChain => 'Ověřit v řetězci';
+
+  @override
+  String get ui3TransferMissingChainDetails =>
+      'Tento převod neobsahuje přesné údaje o řetězci a aktivu.';
+
+  @override
+  String get ui3ReceiptPending => 'Čeká v řetězci';
+
+  @override
+  String get ui3ReceiptConfirmed => 'Potvrzeno';
+
+  @override
+  String get ui3ReceiptFailed => 'Selhalo v řetězci';
+
+  @override
+  String get ui3ReceiptMismatch => 'Údaje o transakci nesouhlasí';
+
+  @override
+  String get ui3ReceiptUnsupported => 'Ověření v řetězci není podporováno';
+
+  @override
+  String get ui3ReceiptUnavailable => 'Ověření není k dispozici';
+
+  @override
+  String get ui3OpenOrSave => 'Otevřít / Uložit';
+
+  @override
+  String get ui3UnableToOpenFile => 'Tento soubor nelze otevřít.';
+
+  @override
+  String ui3AiRewriteFailed(String error) {
+    return 'Přepis pomocí AI se nezdařil: $error';
+  }
+
+  @override
+  String get ui3AiShareMessagesTitle => 'Sdílet zprávy s AI?';
+
+  @override
+  String get ui3AiShareMessagesBody =>
+      'Vyberte zprávy, které může AI použít pro tuto odpověď. Toto jednorázové schválení vyprší po dvou minutách. Zavřením Rychlé odpovědi zrušíte čekající výsledky. Neumožňuje platby ani exporty.';
+
+  @override
+  String get ui3OtherParticipant => 'Protistrana';
+
+  @override
+  String get ui3ShareSelected => 'Sdílet vybrané';
+
+  @override
+  String get ui3BotCommandError => 'Chyba příkazu';
+
+  @override
+  String get ui3BotUnknownCommand => 'Neznámý příkaz';
+
+  @override
+  String get ui3BotTypeHelp =>
+      'Napište /help pro zobrazení dostupných příkazů.';
+
+  @override
+  String get ui3FilesMediaLinks => 'Soubory, média a odkazy';
+
+  @override
+  String get ui3ChatStorage => 'Úložiště chatu';
+
+  @override
+  String get ui3EncryptionKeysDevices => 'Šifrovací klíče a zařízení';
+
+  @override
+  String get ui3EncryptionServiceUnavailable =>
+      'Šifrovací služba zatím není k dispozici';
+
+  @override
+  String get ui3ExportLoadingHistory =>
+      'Načítání další historie chatu pro export...';
+
+  @override
+  String get ui3ExportTxtDesc =>
+      'Prostý text pro poznámky, zálohu nebo kontrolu souladu';
+
+  @override
+  String get ui3ExportCustomRange => 'Vlastní rozsah';
+
+  @override
+  String get ui3ExportStart => 'Začátek';
+
+  @override
+  String get ui3ExportEnd => 'Konec';
+
+  @override
+  String get ui3ExportSelectDate => 'Vyberte datum';
+
+  @override
+  String get ui3FolderFilterUnreadOnly => 'Pouze nepřečtené';
+
+  @override
+  String get ui3FolderFilterMutedOnly => 'Pouze ztlumené';
+
+  @override
+  String get ui3FolderFilterNoDms => 'Bez soukromých zpráv';
+
+  @override
+  String get ui3FolderFilterNoGroups => 'Bez skupin';
+
+  @override
+  String get ui3FolderFilterNoChannels => 'Bez kanálů';
+
+  @override
+  String get ui3FolderFilterAllChats => 'Všechny chaty';
+
+  @override
+  String get ui3Create => 'Vytvořit';
+
+  @override
+  String ui3DeleteFolderConfirm(String name) {
+    return 'Smazat složku „$name“?';
+  }
+
+  @override
+  String get a11yDecreaseTextSize => 'Zmenšit text';
+
+  @override
+  String get a11yIncreaseTextSize => 'Zvětšit text';
+
+  @override
+  String ui3MinutesRead(int minutes) {
+    return 'Čtení na $minutes min';
+  }
+
+  @override
+  String get ui3TipOnChain => 'V řetězci ✓';
+
+  @override
+  String get ui3ViewSource => 'Zobrazit zdroj';
+
+  @override
+  String get a11yPreviousPage => 'Předchozí stránka';
+
+  @override
+  String get a11yNextPage => 'Další stránka';
+
+  @override
+  String get ui3OpenExternalLinkTitle => 'Otevřít externí odkaz?';
+
+  @override
+  String get ui3Open => 'Otevřít';
+
+  @override
+  String get ui3UnableToOpenLink => 'Tento odkaz nelze otevřít.';
+
+  @override
+  String get ui3ImageUnavailable => 'Obrázek není k dispozici';
+
+  @override
+  String ui3LoadImageFrom(Object host) {
+    return 'Načíst obrázek z $host';
+  }
+
+  @override
+  String ui3RetryImageFrom(Object host) {
+    return 'Znovu načíst obrázek z $host';
+  }
+
+  @override
+  String get ui3TranslatedByN42 => 'Přeloženo pomocí N42';
+
+  @override
+  String ui3TranslatedFromByN42(Object language) {
+    return 'Přeloženo z jazyka $language pomocí N42';
+  }
+
+  @override
+  String get ui3ClearWhiteboardTitle => 'Vymazat tabuli?';
+
+  @override
+  String get ui3ClearWhiteboardMessage =>
+      'Všechny tahy budou odstraněny pro všechny. Tuto akci nelze vrátit.';
+
+  @override
+  String get ui3WhiteboardLive => 'Tabule · živě';
+
+  @override
+  String get a11yPenColor => 'Barva pera';
+
+  @override
+  String get ui3AiDescribeOcr => 'Popis AI / OCR';
+
+  @override
+  String get ui3DocumentPreviewFailed =>
+      'Tento dokument nelze bezpečně zobrazit. Zkontrolujte připojení a velikost souboru (max. 2 MB).';
+
+  @override
+  String get ui3AiConsentMessage =>
+      'Vyberte zprávy, které může AI použít pro toto shrnutí. Toto jednorázové schválení vyprší po dvou minutách. Neumožňuje platby ani exporty.';
+
+  @override
+  String get ui3AiSuggestedReplies => 'Navrhované odpovědi';
+
+  @override
+  String get ui3AiGeneratingSuggestions => 'Generování návrhů...';
+
+  @override
+  String get ui3StickersEmpty => 'Zatím žádné nálepky';
+
+  @override
+  String get ui3StickersGet => 'Získat nálepky';
+
+  @override
+  String get a11yFormatBold => 'Tučné';
+
+  @override
+  String get a11yFormatItalic => 'Kurzíva';
+
+  @override
+  String get a11yFormatStrikethrough => 'Přeškrtnutí';
+
+  @override
+  String get a11yFormatInlineCode => 'Vložený kód';
+
+  @override
+  String get a11yFormatCodeBlock => 'Blok kódu';
+
+  @override
+  String get a11yFormatChecklistItem => 'Položka kontrolního seznamu';
+
+  @override
+  String get a11yFormatBulletList => 'Odrážkový seznam';
+
+  @override
+  String get a11yFormatNumberedList => 'Číslovaný seznam';
+
+  @override
+  String get a11yFormatLink => 'Odkaz';
+
+  @override
+  String get a11yFormatTable => 'Tabulka';
+
+  @override
+  String get a11yFormatMeetingTemplate => 'Šablona schůzky';
+
+  @override
+  String get a11yEmojiSmileys => 'Smajlíci a lidé';
+
+  @override
+  String get a11yEmojiHearts => 'Srdce';
+
+  @override
+  String get a11yEmojiAnimals => 'Zvířata a příroda';
+
+  @override
+  String get a11yEmojiFood => 'Jídlo a pití';
+
+  @override
+  String get a11yEmojiTravel => 'Cestování a místa';
+
+  @override
+  String get a11yEmojiActivities => 'Aktivity';
+
+  @override
+  String get a11yEmojiObjects => 'Předměty';
+
+  @override
+  String get a11yEmojiSymbols => 'Symboly';
+
+  @override
+  String get ui3FrequentlyUsed => 'Často používané';
+
+  @override
+  String get ui3NoEditHistory => 'Žádná historie úprav';
+
+  @override
+  String get ui3EventNew => 'Nová událost';
+
+  @override
+  String get ui3EventTitleLabel => 'Název';
+
+  @override
+  String get ui3EventLocationOptional => 'Místo (volitelné)';
+
+  @override
+  String get ui3EventDescriptionOptional => 'Popis (volitelný)';
+
+  @override
+  String get ui3EventSend => 'Odeslat událost';
+
+  @override
+  String get ui3EventTitleRequired => 'Název je povinný';
+
+  @override
+  String get ui3EventEndAfterStart => 'Konec musí být po začátku';
+
+  @override
+  String get ui3MiniAppAgentIntro =>
+      'Popište, co chcete udělat, a já otevřu správnou miniaplikaci.';
+
+  @override
+  String get ui3MiniAppAgentExample => 'např. vyměnit ETH za USDC';
+
+  @override
+  String get ui3MiniAppAgentNoMatch =>
+      'Nebyla nalezena žádná odpovídající miniaplikace. Zkuste to formulovat jinak.';
+
+  @override
+  String ui3MiniAppOpen(Object appName) {
+    return 'Otevřít $appName';
+  }
+
+  @override
+  String get ui3MusicLinkPlatforms =>
+      'Podporuje odkazy na skladby z NetEase Cloud Music, QQ Music, Kugou, Kuwo a dalších';
+
+  @override
+  String get ui3PollMarkCorrectAnswer => 'Označte neprázdnou správnou odpověď';
+
+  @override
+  String get ui3PollQuizMode => 'Režim kvízu';
+
+  @override
+  String get ui3PollAnswerExplanationHint => 'Vysvětlení odpovědi (volitelné)';
+
+  @override
+  String get a11yCorrectAnswer => 'Správná odpověď';
+
+  @override
+  String get ui3AiSuggestions => 'Návrhy AI';
+
+  @override
+  String get a11yPaste => 'Vložit';
+
+  @override
+  String get a11yRefresh => 'Obnovit';
+
+  @override
+  String get ui3RecoveryKeyStoreWarning =>
+      'Uložte si tento klíč na bezpečné místo. Je to jediný způsob, jak obnovit šifrované zprávy, pokud ztratíte přístup ke všem zařízením.';
+
+  @override
+  String ui3SavedToPath(Object path) {
+    return 'Uloženo: $path';
+  }
+
+  @override
+  String get ui3UnknownAccount => 'Neznámý účet';
+
+  @override
+  String get ui3UnknownHomeserver => 'Neznámý domovský server';
+
+  @override
+  String get ui3ImportRecoveryKey => 'Importovat klíč pro obnovení';
+
+  @override
+  String get ui3ImportRecoveryKeyDesc =>
+      'Zadejte nebo vložte klíč pro obnovení a obnovte klíče místností pro historii šifrovaných zpráv.';
+
+  @override
+  String ui3RecoveryKeyAccountInfo(Object account, Object homeserver) {
+    return 'Účet: $account\\nDomovský server: $homeserver';
+  }
+
+  @override
+  String get ui3Import => 'Importovat';
+
+  @override
+  String get ui3InvalidRecoveryKeyFormat =>
+      'Neplatný formát klíče pro obnovení';
+
+  @override
+  String ui3RecoveryKeyPartialRestore(
+    Object restored,
+    Object total,
+    Object failed,
+  ) {
+    return 'Obnoveno $restored z $total klíčů. Selhalo: $failed. Zkontrolujte účet, síť a zálohu a zkuste to znovu. Část historie může zůstat nečitelná.';
+  }
+
+  @override
+  String ui3RecoveryKeyRestoreSuccess(Object restored, Object total) {
+    return 'Úspěšně obnoveno $restored z $total klíčů';
+  }
+
+  @override
+  String ui3ImportFailed(Object error) {
+    return 'Import se nezdařil: $error';
+  }
+
+  @override
+  String ui3PasskeyRegistrationFailed(Object error) {
+    return 'Registrace přístupového klíče se nezdařila: $error';
+  }
+
+  @override
+  String get ui3PasskeyDefaultName => 'Můj přístupový klíč';
+
+  @override
+  String get ui3PasskeyNameHint => 'např. iPhone, MacBook';
+
+  @override
+  String get ui3PasskeyDeleteFailed => 'Přístupový klíč se nepodařilo smazat';
+
+  @override
+  String get ui3TwoFactorAuth => 'Dvoufázové ověření';
+
+  @override
+  String get ui3TwoFactorOnSubtitle =>
+      'Zapnuto – vyžaduje kód z ověřovací aplikace';
+
+  @override
+  String get ui3TwoFactorOffSubtitle =>
+      'Vypnuto – chraňte účet ověřovací aplikací (TOTP)';
+
+  @override
+  String get ui3ShowRecoveryKey => 'Zobrazit klíč pro obnovení';
+
+  @override
+  String get ui3ShowRecoveryKeyDesc =>
+      'Zobrazte klíč pro obnovení a zazálohujte ho';
+
+  @override
+  String get ui3ImportRecoveryKeyHint =>
+      'Obnovit zprávy pomocí klíče pro obnovení';
+
+  @override
+  String get ui3RecoveryKeyCreateFailed =>
+      'Klíč pro obnovení se nepodařilo vytvořit';
+
+  @override
+  String get ui3TotpIncorrectCode => 'Nesprávný kód, zkuste to znovu';
+
+  @override
+  String get ui3TwoFactorEnabled => 'Dvoufázové ověření zapnuto';
+
+  @override
+  String get ui3TwoFactorDisabled => 'Dvoufázové ověření vypnuto';
+
+  @override
+  String get ui3TwoFactorTurnOffTitle => 'Vypnout dvoufázové ověření?';
+
+  @override
+  String get ui3TwoFactorTurnOffMessage =>
+      'Ověřovací aplikace už nebude vyžadována. Později ji můžete znovu nastavit s novým klíčem.';
+
+  @override
+  String get ui3TurnOff => 'Vypnout';
+
+  @override
+  String get ui3TwoFactorTotpTitle => 'Dvoufázové ověření (TOTP)';
+
+  @override
+  String get ui3TwoFactorIsOn => 'Dvoufázové ověření je zapnuté';
+
+  @override
+  String get ui3TwoFactorCodeRequired =>
+      'Je vyžadován kód z ověřovací aplikace.';
+
+  @override
+  String get ui3TotpStepScan =>
+      '1. Naskenujte tento QR kód ověřovací aplikací (Google Authenticator, Authy, 1Password…) nebo zadejte klíč ručně.';
+
+  @override
+  String get ui3TotpKeyCopied => 'Klíč zkopírován';
+
+  @override
+  String get ui3TotpStepConfirm => '2. Pro potvrzení zadejte šestimístný kód.';
+
+  @override
+  String get ui3Enable => 'Zapnout';
+
+  @override
+  String get ui3BackupSettingsDesc =>
+      'Zálohujte místní nastavení chatu. Zprávy budou po opětovném přihlášení obnoveny ze serveru.';
+
+  @override
+  String get ui3BackupKeysSeparate => 'Šifrovací klíče se spravují zvlášť';
+
+  @override
+  String get ui3BackupKeysSeparateHint =>
+      'K zálohování přístupu k šifrovaným zprávám použijte Zabezpečení > Klíč pro obnovení.';
+
+  @override
+  String ui3BackupRoomsSize(Object rooms, Object size) {
+    return 'Místnosti: $rooms  $size';
+  }
+
+  @override
+  String get ui3BackupRestoreFromFileDesc =>
+      'Importujte soubor .n42backup z jiného zařízení nebo z předchozí zálohy. Šifrovací klíče se obnovují zvlášť pomocí klíče pro obnovení.';
+
+  @override
+  String get ui3UsernameSessionRequired =>
+      'Uživatelské jméno vyžaduje aktivní relaci';
+
+  @override
+  String get ui3SecuritySessionRequired =>
+      'Nastavení zabezpečení vyžaduje aktivní relaci';
+
+  @override
+  String get ui3ConnectedAccountsSessionRequired =>
+      'Propojené účty vyžadují aktivní relaci';
+
+  @override
+  String get ui3SystemAccounts => 'Systém a účty';
+
+  @override
+  String get ui3AccountIdentity => 'Účet a identita';
+
+  @override
+  String get ui3Accounts => 'Účty';
+
+  @override
+  String get ui3DevicesSessions => 'Zařízení a relace';
+
+  @override
+  String get ui3Integrations => 'Integrace';
+
+  @override
+  String get ui3ConnectedAccounts => 'Propojené účty';
+
+  @override
+  String get ui3ConnectedAccountsDesc =>
+      'Integrace Telegramu, WhatsAppu, Discordu a API mostů';
+
+  @override
+  String get ui3SystemOverview => 'Přehled systému';
+
+  @override
+  String ui3AccountCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count účtů',
+      many: '$count účtu',
+      few: '$count účty',
+      one: '1 účet',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String ui3DeviceCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count zařízení',
+      many: '$count zařízení',
+      few: '$count zařízení',
+      one: '1 zařízení',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get ui3PrivacySecurityOverview =>
+      'Koncové šifrování, ochrana proti snímkům obrazovky a nastavení proxy';
+
+  @override
+  String get ui3ConversationPrivacy => 'Soukromí konverzací';
+
+  @override
+  String get ui3NetworkPrivacy => 'Soukromí sítě';
+
+  @override
+  String get ui3IdentityPrivacy => 'Soukromí identity';
+
+  @override
+  String get ui3EncryptionKeyBackup => 'Šifrování a záloha klíčů';
+
+  @override
+  String get ui3DevicesVerification => 'Zařízení a ověření';
+
+  @override
+  String get ui3ChipE2eeDefault => 'E2EE ve výchozím stavu';
+
+  @override
+  String get ui3ChipManualE2ee => 'Ruční E2EE';
+
+  @override
+  String get ui3ChipSelfDestruct => 'Samozničení';
+
+  @override
+  String get ui3ChipScreenshotGuard => 'Ochrana snímků obrazovky';
+
+  @override
+  String get ui3ChipIpProxy => 'IP / proxy server';
+
+  @override
+  String get ui3ChipLinkPreviewsOff => 'Náhledy odkazů vypnuty';
+
+  @override
+  String get ui3ChipPublicHandle => 'Veřejné uživatelské jméno';
+
+  @override
+  String get a11yShowPassword => 'Zobrazit heslo';
+
+  @override
+  String get a11yHidePassword => 'Skrýt heslo';
+
+  @override
+  String get a11yCheckServer => 'Zkontrolovat server';
+
+  @override
+  String get ui3AuthAnonymousRegistration => 'Anonymní registrace';
+
+  @override
+  String get ui3AuthAnonymousRegistrationDesc =>
+      'Vytvořte si účet bez propojení telefonu nebo e-mailu. Uživatelské jméno se vygeneruje automaticky.';
+
+  @override
+  String get ui3AuthAnonymousModeOn => 'Anonymní režim je zapnutý';
+
+  @override
+  String get ui3AuthAnonymousModeOnDesc =>
+      'Aplikace pro vás vytvoří náhodné uživatelské jméno Matrix. Později se můžete přihlásit pomocí vygenerovaného účtu a hesla.';
+
+  @override
+  String get ui3AuthChooseLoginMethod => 'Vyberte způsob přihlášení';
+
+  @override
+  String get ui3AuthSsoOpenFailed =>
+      'Přihlašovací stránku SSO se nepodařilo otevřít';
+
+  @override
+  String get ui3AuthWalletUnavailable => 'Peněženka není k dispozici';
+
+  @override
+  String get ui3ProfileSubscriptions => 'Předplatné';
+
+  @override
+  String get ui3ProfileBuySellCrypto => 'Koupit / prodat kryptoměny';
+
+  @override
+  String get ui3ProfileOnDeviceAi => 'AI v zařízení';
+
+  @override
+  String get ui3ProfileSetAUsername => 'Nastavit uživatelské jméno';
+
+  @override
+  String get ui3ProfileAvatarStudio => 'Studio avatarů';
+
+  @override
+  String get ui3ProfileAvatarStudioSubtitle => 'NFT avatar / dekorace';
+
+  @override
+  String get ui3ProfileCustomize => 'Přizpůsobit';
+
+  @override
+  String get ui3ProfileQrSubtitle =>
+      'Naskenujte pro otevření profilu nebo zahájení chatu';
+
+  @override
+  String get ui3PrivacyHardening => 'Posílení soukromí';
+
+  @override
+  String get ui3HidePhoneNumber => 'Skrýt telefonní číslo';
+
+  @override
+  String get ui3HidePhoneNumberDesc =>
+      'Maskovat propojené telefonní číslo na stránkách profilu v tomto zařízení';
+
+  @override
+  String get ui3EncryptNewChatsByDefault =>
+      'Ve výchozím nastavení šifrovat nové chaty';
+
+  @override
+  String get ui3EncryptNewChatsByDefaultDesc =>
+      'Zakládat nové přímé chaty a soukromé místnosti se zapnutým E2EE';
+
+  @override
+  String get ui3PrivateChatMode => 'Režim soukromého chatu';
+
+  @override
+  String get ui3PrivateChatModeDesc =>
+      'Dočasně blokovat snímky obrazovky při prohlížení soukromých nebo šifrovaných chatů';
+
+  @override
+  String get ui3DefaultSelfDestructTimer => 'Výchozí časovač samozničení';
+
+  @override
+  String get ui3DefaultSelfDestructTimerDesc =>
+      'Použít výchozí časovač samozničení u nově odeslaných zpráv';
+
+  @override
+  String get ui3LinkPreviews => 'Náhledy odkazů';
+
+  @override
+  String get ui3LinkPreviewsDesc =>
+      'Načítat názvy, popisy a miniatury, když zprávy obsahují URL';
+
+  @override
+  String get ui3IpAddressProtection => 'Ochrana IP adresy';
+
+  @override
+  String get ui3IpAddressProtectionDesc =>
+      'Směrovat požadavky Matrix a náhledů odkazů přes nastavený HTTP proxy pro soukromí, pokud je k dispozici';
+
+  @override
+  String get ui3UseTorProxy => 'Použít HTTP proxy Tor / Privoxy';
+
+  @override
+  String get ui3UseTorProxyDesc =>
+      'Použijte místní koncový bod HTTP proxy, například Privoxy na 127.0.0.1:8118. Nativní směrování Tor přes SOCKS5 zde není podporováno.';
+
+  @override
+  String get ui3CustomProxy => 'Vlastní proxy';
+
+  @override
+  String get ui3CustomProxyDesc =>
+      'Použít vlastní HTTP nebo HTTPS proxy pro provoz Matrix a náhledy odkazů';
+
+  @override
+  String get ui3ProxyEndpoint => 'Adresa proxy';
+
+  @override
+  String get ui3ProxyEndpointDesc =>
+      'Adresa HTTP/HTTPS proxy (SOCKS není podporováno)';
+
+  @override
+  String get ui3InvalidEndpoint => 'Neplatná adresa';
+
+  @override
+  String get ui3CustomProxyStaysOff =>
+      'Vlastní proxy zůstane vypnutý, dokud nenastavíte platnou adresu';
+
+  @override
+  String get ui3NotificationFilterNote =>
+      'Prioritní pravidla upozorní vždy (obejdou ztlumení, pouze zmínky i režim Nerušit). Ztlumená klíčová slova upozornění potlačí.';
+
+  @override
+  String get ui3PriorityKeywords => 'Prioritní klíčová slova';
+
+  @override
+  String get ui3PriorityKeywordHint => 'např. naléhavé';
+
+  @override
+  String get ui3MutedKeywords => 'Ztlumená klíčová slova';
+
+  @override
+  String get ui3MutedKeywordHint => 'např. spam';
+
+  @override
+  String get ui3PrioritySenders => 'Prioritní odesílatelé';
+
+  @override
+  String get ui3CaseSensitive => 'Rozlišovat velká a malá písmena';
+
+  @override
+  String get ui3None => 'Žádné';
+
+  @override
+  String get ui3SmartReplyTranslation => 'Překlad chytrých odpovědí';
+
+  @override
+  String get ui3SmartReplyTranslationDesc =>
+      'Před odesláním automaticky přeložit vaše zprávy do jazyka příjemce.';
+
+  @override
+  String get ui3FromPhotos => 'Z fotek';
+
+  @override
+  String get ui3ChangePhoto => 'Změnit fotku';
+
+  @override
+  String get ui3RoamingUsesMobileData =>
+      'Roaming se řídí pravidly mobilních dat';
+
+  @override
+  String get ui3RoamingUsesMobileDataDesc =>
+      'Samostatná detekce roamingu zatím není k dispozici, takže roaming se nyní řídí nastavením automatického stahování pro mobilní data.';
+
+  @override
+  String ui3DeleteQuickReplyConfirm(String content) {
+    return 'Smazat „$content“?';
+  }
+
+  @override
+  String get ui3ResetToDefaults => 'Obnovit výchozí';
+
+  @override
+  String get ui3ResetQuickRepliesMessage =>
+      'Tímto odstraníte všechny vlastní rychlé odpovědi a obnovíte výchozí. Pokračovat?';
+
+  @override
+  String get ui3LocalLlmUnavailable => 'V tomto zařízení není podporováno';
+
+  @override
+  String get ui3LocalLlmNotDownloaded => 'Model není stažen';
+
+  @override
+  String get ui3LocalLlmReady => 'Připraveno (v zařízení)';
+
+  @override
+  String get ui3LocalLlmDescription =>
+      'Když je zapnuto a připraveno, funkce AI (shrnutí, přepis, překlad, odpovědi) běží zcela v zařízení — data nikdy neopustí váš telefon. Jinak se použije cloudový poskytovatel.';
+
+  @override
+  String get ui3UseOnDeviceAi => 'Používat AI v zařízení';
+
+  @override
+  String get ui3UseOnDeviceAiDesc =>
+      'Upřednostnit místní inferenci, když je připravena';
+
+  @override
+  String get ui3DownloadModel => 'Stáhnout model';
+
+  @override
+  String get ui3LocalLlmRuntimeRequired =>
+      'Inference v zařízení vyžaduje nativní runtime (Android MediaPipe / iOS Core ML). Aktivuje se automaticky, jakmile bude k dispozici obslužná rutina platformy.';
+
+  @override
+  String get ui3PhotoAvatar => 'Avatar z fotky';
+
+  @override
+  String get ui3AvatarStyles => 'Styly avatarů';
+
+  @override
+  String get ui3AvatarStylesDesc =>
+      'Používat jeden výběr dekorací pro profil i vstupní body avatara.';
+
+  @override
+  String get ui3ReplaceNftAvatar => 'Nahradit NFT avatar';
+
+  @override
+  String get ui3NftAvatarDesc =>
+      'Použijte jako avatar sběratelský předmět na blockchainu.';
+
+  @override
+  String get ui3UsePhotoAvatar => 'Použít avatar z fotky';
+
+  @override
+  String get ui3UsePhotoAvatarDesc =>
+      'Ponechat nahraný avatar a zrušit propojení s NFT.';
+
+  @override
+  String ui3AvatarStyleSet(Object name) {
+    return 'Styl avatara nastaven na: $name';
+  }
+
+  @override
+  String get ui3NftAvatarUpdated => 'NFT avatar aktualizován';
+
+  @override
+  String get ui3SwitchedToPhotoAvatar => 'Přepnuto zpět na avatar z fotky';
+
+  @override
+  String get ui3SignInToViewRedPacketHistory =>
+      'Přihlaste se pro zobrazení historie červených obálek';
+
+  @override
+  String get ui3RedPacketActive => 'Aktivní';
+
+  @override
+  String get ui3RedPacketCompleted => 'Dokončeno';
+
+  @override
+  String get ui3CardsAndPasses => 'Karty a vstupenky';
+
+  @override
+  String get ui3CardsAndPassesDesc =>
+      'Karty v peněžence, kupony a vstupenky spravuje hlavní aplikace.';
+
+  @override
+  String get ui3CardPackRequiresMainApp =>
+      'Balíček karet vyžaduje hlavní aplikaci';
+
+  @override
+  String get ui3OpenCardPack => 'Otevřít balíček karet';
+
+  @override
+  String get ui3UnableToOpenChat => 'S tímto kontaktem nelze otevřít chat';
+
+  @override
+  String get ui3WalletManagedInMainApp =>
+      'Peněženka se spravuje v hlavní aplikaci';
+
+  @override
+  String ui3CreatorPlans(Object name) {
+    return '$name · Tarify';
+  }
+
+  @override
+  String get ui3NewPlan => 'Nový tarif';
+
+  @override
+  String get ui3MySubscriptions => 'Moje předplatné';
+
+  @override
+  String get ui3AvailablePlans => 'Dostupné tarify';
+
+  @override
+  String get ui3NoPlansYet =>
+      'Zatím žádné tarify · klepnutím na „Nový tarif“ jeden vytvoříte';
+
+  @override
+  String ui3DaysLeft(Object days) {
+    return 'Zbývá $days d';
+  }
+
+  @override
+  String get ui3SubscriptionCancelled => 'Zrušeno';
+
+  @override
+  String get ui3AutoRenewOn => 'Automatické obnovení: zapnuto';
+
+  @override
+  String get ui3AutoRenewOff => 'Automatické obnovení: vypnuto';
+
+  @override
+  String get ui3CancelSubscriptionTitle => 'Zrušit předplatné?';
+
+  @override
+  String ui3CancelSubscriptionConfirm(Object name) {
+    return 'Vaše předplatné $name zůstane aktivní až do vypršení a nebude obnoveno.';
+  }
+
+  @override
+  String get ui3Subscribe => 'Předplatit';
+
+  @override
+  String ui3SubscribedTo(Object name) {
+    return 'Předplaceno: $name';
+  }
+
+  @override
+  String get ui3PlanPriceLabel => 'Cena (např. 9.9 USDT)';
+
+  @override
+  String get ui3PlanDescriptionLabel => 'Popis (volitelné)';
+
+  @override
+  String get ui3PlanBenefitsLabel => 'Výhody (oddělené čárkami)';
+
+  @override
+  String get ui3PlanPeriod => 'Období:';
+
+  @override
+  String get ui3Monthly => 'Měsíčně';
+
+  @override
+  String get ui3Yearly => 'Ročně';
+
+  @override
+  String get ui3SaveRemarkFailed => 'Poznámku se nepodařilo uložit';
+
+  @override
+  String get ui3CopyLink => 'Kopírovat odkaz';
+
+  @override
+  String get ui3Connect => 'Spojit se';
+
+  @override
+  String get ui3CommonTokens => 'Společné tokeny';
+
+  @override
+  String get ui3SharedNfts => 'Společná NFT';
+
+  @override
+  String get ui3TransactionHistory => 'Historie transakcí';
+
+  @override
+  String get ui3CommonDaos => 'Společné DAO';
+
+  @override
+  String get ui3SameChains => 'Stejné řetězce';
+
+  @override
+  String get ui3ChatInitFailed => 'Inicializace chatu selhala';
+
+  @override
+  String get ui3CheckNetworkRetry =>
+      'Zkontrolujte připojení k síti a zkuste to znovu';
+
+  @override
+  String get ui3FromContacts => 'Z kontaktů';
+
+  @override
+  String get ui3FindFriendsFromContacts =>
+      'Najděte přátele ve svých kontaktech';
+
+  @override
+  String get ui3EnsOrDomain => 'ENS / doména';
+
+  @override
+  String get ui3LoadingContacts => 'Načítání kontaktů...';
+
+  @override
+  String get ui3ContactsPermissionRequired =>
+      'Je vyžadován přístup ke kontaktům';
+
+  @override
+  String get ui3ContactsPermissionMessage =>
+      'Chcete-li najít přátele v kontaktech, povolte k nim přístup.';
+
+  @override
+  String get ui3AllowAccess => 'Povolit přístup';
+
+  @override
+  String get ui3NoContactMatches => 'Nenalezeny žádné shody';
+
+  @override
+  String get ui3NoContactMatchesMessage =>
+      'Nikdo z vašich kontaktů zatím tuto aplikaci nepoužívá. Pozvěte je!';
+
+  @override
+  String ui3ScannedContacts(Object count) {
+    return 'Prohledáno kontaktů: $count';
+  }
+
+  @override
+  String ui3FoundContactMatches(Object count) {
+    return 'Nalezené shody v kontaktech: $count';
+  }
+
+  @override
+  String ui3InContactsAs(Object name) {
+    return 'V kontaktech: $name';
+  }
+
+  @override
+  String get ui3DeletePhotoConfirm => 'Smazat tuto fotku?';
+
+  @override
+  String get ui3InviteLink => 'Odkaz s pozvánkou';
+
+  @override
+  String get ui3ShareJoinLink => 'Sdílet odkaz pro připojení k této místnosti';
+
+  @override
+  String get ui3ShareRoomReference =>
+      'Sdílet odkaz na místnost s pozvanými členy';
+
+  @override
+  String get ui3ScanToJoinGroup =>
+      'Naskenujte a připojte se přímo k této skupině';
+
+  @override
+  String get ui3ScanToShareRoomReference =>
+      'Naskenujte pro sdílení odkazu na tuto místnost s pozvanými členy';
+
+  @override
+  String get ui3InviteLinkLoadFailed =>
+      'Odkaz s pozvánkou se nepodařilo načíst';
+
+  @override
+  String get ui3InviteLinkCopied => 'Odkaz s pozvánkou zkopírován';
+
+  @override
+  String get ui3ChannelCategoryOptional => 'Kategorie (volitelné)';
+
+  @override
+  String get ui3ChannelCategoryHint => 'Oznámení / Produkt / Podpora';
+
+  @override
+  String get ui3DescriptionOptional => 'Popis (volitelné)';
+
+  @override
+  String get ui3WebhookEnable => 'Povolit automatizaci webhooku';
+
+  @override
+  String get ui3WebhookEnableDesc =>
+      'Odesílat události připojení členů a uvítání do koncového bodu vaší integrace.';
+
+  @override
+  String get ui3WebhookUrl => 'URL webhooku';
+
+  @override
+  String get ui3WebhookSecretOptional => 'Podpisový klíč (volitelné)';
+
+  @override
+  String get ui3WebhookSecretHint => 'Používá se pro X-N42-Signature';
+
+  @override
+  String get ui3WebhookNotifyMemberJoined => 'Upozornit, když se připojí člen';
+
+  @override
+  String get ui3WebhookNotifyWelcomeSent => 'Upozornit při odeslání uvítání';
+
+  @override
+  String get ui3WebhookTestSend => 'Odeslat testovací webhook';
+
+  @override
+  String get ui3WebhookTestSending => 'Odesílání testovacího webhooku...';
+
+  @override
+  String get ui3WebhookTestSent => 'Testovací webhook byl úspěšně odeslán';
+
+  @override
+  String get ui3WebhookTestFailed => 'Testovací webhook se nepodařilo odeslat';
+
+  @override
+  String get ui3WebhookUrlInvalid =>
+      'URL webhooku musí být veřejná adresa HTTPS';
+
+  @override
+  String get ui3WebhookSelectEvent => 'Vyberte alespoň jednu událost webhooku';
+
+  @override
+  String get ui3SensitiveDataDetection => 'Detekce citlivých údajů';
+
+  @override
+  String get ui3Email => 'E-mail';
+
+  @override
+  String get ui3CreditCard => 'Platební karta';
+
+  @override
+  String get ui3DetectEmailDesc =>
+      'Rozpoznávat e-mailové adresy v textových zprávách';
+
+  @override
+  String get ui3DetectPhoneDesc =>
+      'Rozpoznávat telefonní čísla včetně mezinárodních';
+
+  @override
+  String get ui3DetectCardDesc =>
+      'Rozpoznávat pravděpodobná čísla účtů a karet';
+
+  @override
+  String get ui3DetectWalletDesc =>
+      'Rozpoznávat adresy peněženek ve formátu Ethereum';
+
+  @override
+  String get ui3GeneralTopic => 'Obecné';
+
+  @override
+  String get a11yPreviousResult => 'Předchozí výsledek';
+
+  @override
+  String get a11yNextResult => 'Další výsledek';
+
+  @override
+  String get ui3TryDifferentKeywords => 'Zkuste jiná klíčová slova';
+
+  @override
+  String ui3FiltersActive(Object count) {
+    return 'Aktivní filtry: $count';
+  }
+
+  @override
+  String ui3MessageFiltersActive(Object count) {
+    return 'Aktivní filtry zpráv: $count';
+  }
+
+  @override
+  String get ui3LoadMore => 'Načíst další';
+
+  @override
+  String get ui3MessageFilters => 'Filtry zpráv';
+
+  @override
+  String get ui3SenderUserId => 'ID uživatele odesílatele';
+
+  @override
+  String get ui3FilterType => 'Typ';
+
+  @override
+  String get ui3FilterAny => 'Libovolný';
+
+  @override
+  String get ui3FilterImage => 'Obrázek';
+
+  @override
+  String get ui3FilterTime => 'Čas';
+
+  @override
+  String get ui3AnyTime => 'Kdykoli';
+
+  @override
+  String get ui3OnlyMyMessages => 'Jen moje zprávy';
+
+  @override
+  String get ui3MediaOnly => 'Pouze média';
+
+  @override
+  String get ui3Apply => 'Použít';
+
+  @override
+  String get ui3QrStyleClassic => 'Klasický';
+
+  @override
+  String get ui3QrStyleOcean => 'Oceán';
+
+  @override
+  String get ui3QrStyleBerry => 'Bobule';
+
+  @override
+  String get ui3NfcUnavailable =>
+      'NFC není k dispozici nebo štítek není podporován. Zapněte NFC, zkuste jiný štítek nebo použijte QR.';
+
+  @override
+  String get ui3CancelNfc => 'Zrušit NFC';
+
+  @override
+  String get ui3ReadNfcTag => 'Načíst štítek NFC';
+
+  @override
+  String get ui3HoldNearNfcTag => 'Přiložte telefon ke štítku služby.';
+
+  @override
+  String get a11yFlashlightOn => 'Zapnout svítilnu';
+
+  @override
+  String get a11yFlashlightOff => 'Vypnout svítilnu';
+
+  @override
+  String get ui3SocialGraph => 'Sociální graf';
+
+  @override
+  String get ui3RecommendedConnections => 'Doporučená spojení';
+
+  @override
+  String get ui3Portfolio => 'Majetek';
+
+  @override
+  String get ui3Chains => 'Řetězce';
+
+  @override
+  String get ui3Tokens => 'Tokeny';
+
+  @override
+  String get ui3NoConnectionsFound => 'Nenalezena žádná spojení';
+
+  @override
+  String get ui3ConnectionsHint =>
+      'Spojení se objeví s rostoucí aktivitou na blockchainu';
+
+  @override
+  String get ui3SocialGraphLoadFailed => 'Sociální graf se nepodařilo načíst';
+
+  @override
+  String get ui3Similarity => 'Podobnost';
+
+  @override
+  String get ui3Breakdown => 'Rozpis';
+
+  @override
+  String get ui3TokenHoldings => 'Držené tokeny';
+
+  @override
+  String get ui3NftCollections => 'Kolekce NFT';
+
+  @override
+  String get ui3ChainUsage => 'Využití řetězců';
+
+  @override
+  String get ui3Transactions => 'Transakce';
+
+  @override
+  String get ui3DaoMembership => 'Členství v DAO';
+
+  @override
+  String get ui3NotWeighted => 'Bez váhy';
+
+  @override
+  String ui3PercentWithWeight(Object percent, Object weight) {
+    return '$percent % (váha: $weight)';
+  }
+
+  @override
+  String get ui3CommonOnChainActivity => 'Společná on-chain aktivita';
+
+  @override
+  String get ui3SharedTokens => 'Společné tokeny';
+
+  @override
+  String get ui3SharedNftCollections => 'Společné kolekce NFT';
+
+  @override
+  String get ui3SharedChains => 'Společné řetězce';
+
+  @override
+  String get ui3NoSharedTokens => 'Nebyly nalezeny žádné společné tokeny';
+
+  @override
+  String get ui3NoSharedNftCollections =>
+      'Nebyly nalezeny žádné společné kolekce NFT';
+
+  @override
+  String get ui3NoSharedChains => 'Nebyly nalezeny žádné společné řetězce';
+
+  @override
+  String get ui3SimilarityFailed => 'Podobnost se nepodařilo vypočítat';
+
+  @override
+  String ui3ItemsAndMore(Object items, Object count) {
+    return '$items +$count další';
+  }
+
+  @override
+  String get a11yGovernance => 'Správa';
+
+  @override
+  String get ui3CommunityLink => 'Odkaz na komunitu';
+
+  @override
+  String get ui3CommunityQrCode => 'QR kód komunity';
+
+  @override
+  String get ui3CommunityQrSubtitle =>
+      'Naskenujte, připojte se ke komunitě a procházejte její kanály';
+
+  @override
+  String get ui3CommunityLinkLoadFailed =>
+      'Odkaz na komunitu se nepodařilo načíst';
+
+  @override
+  String get ui3CommunityLinkCopied => 'Odkaz na komunitu zkopírován';
+
+  @override
+  String ui3KickMemberConfirm(Object name) {
+    return '$name bude z této komunity odebrán(a).';
+  }
+
+  @override
+  String ui3BanMemberConfirm(Object name) {
+    return '$name bude odebrán(a) a nebude se moci znovu připojit.';
+  }
+
+  @override
+  String get ui3SignInToDiscoverChannels =>
+      'Přihlaste se a objevujte veřejné kanály';
+
+  @override
+  String ui3UnableToJoinChannel(Object name, Object error) {
+    return 'Nelze se připojit k $name: $error';
+  }
+
+  @override
+  String get ui3CategoryTech => 'Technologie';
+
+  @override
+  String get ui3CategorySocial => 'Sociální';
+
+  @override
+  String get ui3NoPublicChannels => 'Nebyly nalezeny žádné veřejné kanály';
+
+  @override
+  String get ui3StoriesAndFun => 'Příběhy a zábava';
+
+  @override
+  String get ui3SearchMusicHint => 'Hledat skladby, interprety nebo přátele';
+
+  @override
+  String get ui3ForYou => 'Pro vás';
+
+  @override
+  String get ui3Liked => 'Oblíbené';
+
+  @override
+  String get ui3NoLikedMusic => 'Zatím žádná oblíbená hudba';
+
+  @override
+  String get ui3NoMusicStories => 'Zatím žádné hudební příběhy';
+
+  @override
+  String get ui3LikedMusicHint =>
+      'Klepnutím na srdce u skladby ji uložíte sem.';
+
+  @override
+  String get ui3MusicStoriesHint => 'Zde se zobrazí hudba sdílená v příbězích.';
+
+  @override
+  String ui3SharedBy(Object artist, Object name) {
+    return '$artist · sdílí $name';
+  }
+
+  @override
+  String ui3UnableToPlay(Object title, Object error) {
+    return 'Nelze přehrát $title: $error';
+  }
+
+  @override
+  String get a11yPreviousTrack => 'Předchozí skladba';
+
+  @override
+  String get a11yNextTrack => 'Další skladba';
+
+  @override
+  String get a11yPlay => 'Přehrát';
+
+  @override
+  String get a11yPause => 'Pozastavit';
+
+  @override
+  String get ui3Refresh => 'Obnovit';
+
+  @override
+  String get ui3NearbyIntroTitle => 'Objevte veřejné příspěvky v okolí';
+
+  @override
+  String get ui3NearbyIntroBody =>
+      'Vaše poloha se jednou použije v tomto zařízení k seřazení veřejných Momentů. Nenahrává se, nevysílá ani nezobrazuje ostatním.';
+
+  @override
+  String get ui3UseMyLocation => 'Použít mou polohu';
+
+  @override
+  String get ui3NearbyUnavailable => 'Funkce V okolí není k dispozici';
+
+  @override
+  String get ui3NoNearbyPosts => 'V okolí zatím nejsou žádné příspěvky';
+
+  @override
+  String get ui3NoNearbyPostsHint =>
+      'Zde se zobrazí veřejné Momenty s polohou.';
+
+  @override
+  String get ui3NearbyDistanceNote =>
+      'Přibližná vzdálenost · pouze veřejné příspěvky s polohou';
+
+  @override
+  String get ui3PublicLocationPost => 'Veřejný příspěvek s polohou';
+
+  @override
+  String get ui3LocationServicesOff => 'Služby určování polohy jsou vypnuté';
+
+  @override
+  String get ui3LocationPermissionDenied => 'Oprávnění k poloze bylo zamítnuto';
+
+  @override
+  String get ui3EnableLocationInSettings =>
+      'Povolte přístup k poloze v nastavení systému';
+
+  @override
+  String get ui3CreateStory => 'Vytvořit příběh';
+
+  @override
+  String get ui3CreateStoryDesc =>
+      'Zveřejněte textový nebo fotografický status.';
+
+  @override
+  String get ui3StoryCamera => 'Fotoaparát pro příběhy';
+
+  @override
+  String get ui3StoryCameraDesc => 'Přejděte rovnou k filtrům a úpravám fotek.';
+
+  @override
+  String get ui3MomentsDesc => 'Otevřete celý kanál a komentáře.';
+
+  @override
+  String get ui3MomentCamera => 'Fotoaparát pro Momenty';
+
+  @override
+  String get ui3MomentCameraDesc => 'Vytvořte příspěvek a hned vyberte média.';
+
+  @override
+  String get ui3GamesDesc => 'Spusťte vestavěné centrum oddechových her.';
+
+  @override
+  String get ui3AvatarStudio => 'Studio avatarů';
+
+  @override
+  String get ui3AvatarStudioDesc => 'Dekorace, NFT avatar a ozdoby identity.';
+
+  @override
+  String get ui3SocialGraphDesc => 'On-chain sledování, fanoušci a spojení.';
+
+  @override
+  String get ui3SocialHubHeroTitle => 'Příběhy, Momenty, hry a avatary';
+
+  @override
+  String get ui3SocialHubHeroBody =>
+      'Všechny sociální funkce na jednom místě, místo roztroušení po chatu, profilu a objevování.';
+
+  @override
+  String get ui3SocialGraphNotConfigured =>
+      'Sociální graf není v tomto sestavení nakonfigurován';
+
+  @override
+  String get ui3ConnectWalletForSocialGraph =>
+      'Připojte peněženku a zobrazte svůj sociální graf';
+
+  @override
+  String get ui3AvatarStudioSignIn => 'Studio avatarů vyžaduje přihlášení';
+
+  @override
+  String get a11yRemoveImage => 'Odebrat obrázek';
+
+  @override
+  String get a11yBack => 'Zpět';
+
+  @override
+  String get ui3MiniAppConfirmTransactionTitle => 'Potvrdit transakci';
+
+  @override
+  String get ui3MiniAppConfirmTransactionBody =>
+      'Mini aplikace žádá o odeslání transakce vaším jménem.';
+
+  @override
+  String ui3MiniAppOpenTitle(Object name) {
+    return 'Otevřít $name?';
+  }
+
+  @override
+  String get ui3MiniAppOpenButton => 'Otevřít';
+
+  @override
+  String get ui3StoryReplySendFailed =>
+      'Odpověď na příběh se nepodařilo odeslat';
+
+  @override
+  String get ui3RedPacketDemoNotice =>
+      'Ukázková červená obálka — pouze záznam v chatu, nepřevádí se žádné skutečné on-chain aktivum.';
+
+  @override
+  String get ui3RedPacketCoverClassic => 'Klasická červená';
+
+  @override
+  String get ui3RedPacketCoverGolden => 'Zlatá';
+
+  @override
+  String get ui3RedPacketCoverPurple => 'Fialová';
+
+  @override
+  String get ui3RedPacketCoverOceanBlue => 'Oceánská modrá';
+
+  @override
+  String get ui3RedPacketCoverNatureGreen => 'Přírodní zelená';
+
+  @override
+  String get ui3RedPacketCoverRosePink => 'Růžová';
+
+  @override
+  String get ui3RedPacketHistoryEmpty => 'Zatím žádné červené obálky';
+
+  @override
+  String get ui3TransferMerchantQrWithAmount => 'QR obchodníka (s částkou)';
+
+  @override
+  String get ui3TransferMerchantQrTitle => 'QR obchodníka';
+
+  @override
+  String get ui3TransferOpenAmountHint =>
+      'Pro libovolnou částku ponechte prázdné';
+
+  @override
+  String get ui3FiatRampTitle => 'Koupit / prodat kryptoměny';
+
+  @override
+  String get ui3FiatRampBuy => 'Koupit';
+
+  @override
+  String get ui3FiatRampSell => 'Prodat';
+
+  @override
+  String get ui3FiatRampNotConfigured => 'Fiat on/off-ramp není nakonfigurován';
+
+  @override
+  String get a11yPointsAddRule => 'Přidat pravidlo odměny';
+
+  @override
+  String get a11yGovernanceRemoveChoice => 'Odebrat možnost';
+
+  @override
+  String get a11yGovernanceCreateProposal => 'Vytvořit návrh';
+
+  @override
+  String get ui3MiniAppUpdateN42 => 'Aktualizovat N42';
+
+  @override
+  String get ui3MiniAppOfficial => 'Oficiální';
+
+  @override
+  String ui3MiniAppUserCount(Object count) {
+    return '$count uživatelů';
+  }
+
+  @override
+  String a11yStoryBackgroundColor(Object index) {
+    return 'Barva pozadí $index';
+  }
+
+  @override
+  String get a11yStoryAdd => 'Přidat příběh';
+
+  @override
+  String get ui3StoryPostFailed => 'Příběh se nepodařilo zveřejnit';
+
+  @override
+  String get ui3StoryTapToSelectImage => 'Klepnutím vyberte obrázek';
+
+  @override
+  String get ui3StoryChangeImage => 'Změnit';
+
+  @override
+  String ui3StoryMusicReadFailed(Object error) {
+    return 'Vybranou hudbu nelze načíst: $error';
+  }
+
+  @override
+  String get ui3StoryDeleteConfirm => 'Smazat tento příběh?';
+
+  @override
+  String get ui3StoryDeleteFailed => 'Příběh se nepodařilo smazat';
+
+  @override
+  String get ui3MomentCreateTitle => 'Vytvořit okamžik';
+
+  @override
+  String get ui3MomentContentHint => 'Na co myslíte?';
+
+  @override
+  String get ui3MomentAddPhotos => 'Přidat fotky';
+
+  @override
+  String get ui3MomentAddLocation => 'Přidat polohu';
+
+  @override
+  String ui3MomentSelectedMedia(Object count) {
+    return 'Vybraná média ($count)';
+  }
+
+  @override
+  String get ui3MomentClearAll => 'Vymazat vše';
+
+  @override
+  String get ui3MomentClearMediaConfirm =>
+      'Odebrat všechny vybrané fotky/videa?';
+
+  @override
+  String get ui3MomentVisibilityPublicDesc => 'Uvidí všichni přátelé';
+
+  @override
+  String get ui3MomentVisibilityPrivateDesc => 'Uvidíte jen vy';
+
+  @override
+  String get ui3MomentVisibilityPartialDesc => 'Vyberte, kdo uvidí';
+
+  @override
+  String get ui3MomentVisibilityExcludedDesc => 'Skrýt před vybranými přáteli';
+
+  @override
+  String get ui3MomentVideos => 'Videa';
+
+  @override
+  String get ui3MomentNoVideos => 'Zatím žádná videa';
+
+  @override
+  String get a11yCallMinimize => 'Minimalizovat';
+
+  @override
+  String get a11yCallGridView => 'Zobrazení mřížky';
+
+  @override
+  String get a11yCallFocusView => 'Zobrazení s důrazem';
+
+  @override
+  String get ui3CallTools => 'Nástroje hovoru';
+
+  @override
+  String get ui3CallMeetingTools => 'Nástroje schůzky';
+
+  @override
+  String get ui3CallToolsSubtitle =>
+      'Upravte kvalitu zvuku a videa, aniž byste opustili hovor.';
+
+  @override
+  String get ui3CallAudioEnhancement => 'Vylepšení zvuku';
+
+  @override
+  String get ui3CallNoiseSuppression => 'Potlačení šumu';
+
+  @override
+  String get ui3CallNoiseSuppressionDesc => 'Omezí hluk klávesnice a pozadí.';
+
+  @override
+  String get ui3CallEchoCancellation => 'Potlačení ozvěny';
+
+  @override
+  String get ui3CallEchoCancellationDesc =>
+      'Zabrání návratu zvuku z reproduktoru do mikrofonu.';
+
+  @override
+  String get ui3CallAutoGainControl => 'Automatické řízení zisku';
+
+  @override
+  String get ui3CallAutoGainControlDesc =>
+      'Udržuje hlasitost mikrofonu stabilnější.';
+
+  @override
+  String get ui3CallVoiceIsolation => 'Vylepšená izolace hlasu';
+
+  @override
+  String get ui3CallVoiceIsolationDesc =>
+      'Použít silnější profil potlačení šumu.';
+
+  @override
+  String get ui3CallVideoSection => 'Obraz';
+
+  @override
+  String get ui3CallBackgroundBlur => 'Rozmazání pozadí (beta)';
+
+  @override
+  String get ui3CallBlurDescReady =>
+      'Předvolba je aktivní. Samotné rozmazání závisí na zavedení zpracování videa.';
+
+  @override
+  String get ui3CallBlurDescSaved =>
+      'Předvolba rozmazání je uložena a použije se, jakmile bude dostupné zpracování kamery.';
+
+  @override
+  String get ui3CallBlurDescCameraOff =>
+      'Po zpřístupnění zpracování pozadí zapněte kameru.';
+
+  @override
+  String get ui3CallRecordingSection => 'Nahrávání';
+
+  @override
+  String get ui3CallRecordingDesc =>
+      'Před uložením nahrávek je nutný výstup na straně serveru.';
+
+  @override
+  String ui3CallSettingsUpdateFailed(Object error) {
+    return 'Nastavení hovoru se nepodařilo aktualizovat: $error';
+  }
+
+  @override
+  String get ui3CallRecordingStarted => 'Nahrávání zahájeno';
+
+  @override
+  String get ui3VoiceRoomNotFound => 'Místnost nebyla nalezena';
+
+  @override
+  String get ui3VoiceRoomEndConfirm =>
+      'Opravdu chcete ukončit tuto hlasovou místnost?';
+
+  @override
+  String get a11yGameMoveUp => 'Posunout nahoru';
+
+  @override
+  String get a11yGameMoveDown => 'Posunout dolů';
+
+  @override
+  String get a11yGameMoveLeft => 'Posunout doleva';
+
+  @override
+  String get a11yGameMoveRight => 'Posunout doprava';
+
+  @override
+  String get a11yGameRotate => 'Otočit';
+
+  @override
+  String get a11yGameDrop => 'Shodit';
+
+  @override
+  String ui3StickerAddedCount(Object count) {
+    return 'Přidané nálepky: $count';
+  }
+
+  @override
+  String ui3StickerAddFailed(Object error) {
+    return 'Přidání se nezdařilo: $error';
+  }
+
+  @override
+  String get ui3StickerRemoveTitle => 'Odebrat nálepku';
+
+  @override
+  String get ui3StickerRemoveConfirm => 'Odebrat tuto nálepku z balíčku?';
+
+  @override
+  String get ui3StickerRemoveFailed => 'Odebrání se nezdařilo';
+
+  @override
+  String get ui3StickerRenamePack => 'Přejmenovat balíček';
+
+  @override
+  String get ui3StickerPackName => 'Název balíčku';
+
+  @override
+  String get ui3StickerRenameFailed => 'Přejmenování se nezdařilo';
+
+  @override
+  String get ui3StickerDeletePack => 'Smazat balíček';
+
+  @override
+  String get ui3StickerThisPack => 'tento balíček';
+
+  @override
+  String ui3StickerDeletePackConfirm(Object name) {
+    return 'Smazat „$name“ a všechny jeho nálepky? Tuto akci nelze vrátit.';
+  }
+
+  @override
+  String get ui3StickerDeleteFailed => 'Smazání se nezdařilo';
+
+  @override
+  String get ui3StickerPack => 'Balíček nálepek';
+
+  @override
+  String get ui3StickerAdding => 'Přidávání…';
+
+  @override
+  String get ui3StickerAddStickers => 'Přidat nálepky';
+
+  @override
+  String get ui3StickerPackNotFound => 'Balíček nebyl nalezen';
+
+  @override
+  String get ui3StickerEmptyHint =>
+      'Klepnutím na „Přidat nálepky“ nahrajete obrázky';
+
+  @override
+  String get ui3StickerNewPack => 'Nový balíček nálepek';
+
+  @override
+  String get ui3StickerCreate => 'Vytvořit';
+
+  @override
+  String get ui3StickerCreateFailed => 'Balíček se nepodařilo vytvořit';
+
+  @override
+  String ui3StickerInstalled(Object name) {
+    return '„$name“ nainstalováno';
+  }
+
+  @override
+  String get ui3StickerRemovePackTitle => 'Odebrat balíček nálepek';
+
+  @override
+  String ui3StickerRemovePackConfirm(Object name) {
+    return 'Odebrat „$name“ z vašich nálepek?';
+  }
+
+  @override
+  String ui3StickerRemoved(Object name) {
+    return '„$name“ odebráno';
+  }
+
+  @override
+  String get ui3StickerAiSticker => 'AI nálepka';
+
+  @override
+  String get ui3StickerStoreTab => 'Obchod';
+
+  @override
+  String get ui3StickerMyStickersTab => 'Moje nálepky';
+
+  @override
+  String get ui3StickerNoneFound => 'Nebyly nalezeny žádné nálepky';
+
+  @override
+  String ui3StickerByAuthor(Object author) {
+    return 'od $author';
+  }
+
+  @override
+  String get ui3StickerManage => 'Spravovat';
+
+  @override
+  String ui3StickerCount(Object count) {
+    return 'Nálepky: $count';
+  }
+
+  @override
+  String get ui3StickerNoneInstalled => 'Nemáte nainstalované žádné nálepky';
+
+  @override
+  String get ui3StickerGetFromStore => 'Získejte nálepky z obchodu';
+
+  @override
+  String get ui3StickerBrowseStore => 'Procházet obchod';
+
+  @override
+  String get ui3StickerAddedToAi => 'Přidáno do „AI nálepky“';
+
+  @override
+  String get ui3StickerAddOneFailed => 'Nálepku se nepodařilo přidat';
+
+  @override
+  String get ui3StickerPromptLabel => 'Popište svou nálepku';
+
+  @override
+  String get ui3StickerPromptHint =>
+      'např. veselá zrzavá kočka se slunečními brýlemi';
+
+  @override
+  String get ui3StickerGenerating => 'Generování…';
+
+  @override
+  String get ui3StickerGenerate => 'Vygenerovat';
+
+  @override
+  String get ui3StickerAddToStickers => 'Přidat do nálepek';
+
+  @override
+  String get ui3StickerGeneratingPreview => 'Generujeme vaši nálepku…';
+
+  @override
+  String get ui3StickerGenerateEmpty =>
+      'Popište nálepku a klepněte na „Vygenerovat“';
 }

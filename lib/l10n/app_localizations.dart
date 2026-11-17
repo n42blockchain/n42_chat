@@ -11704,6 +11704,3532 @@ abstract class S {
   /// In en, this message translates to:
   /// **'Tomorrow morning ({time})'**
   String scheduledSendTomorrowMorningAt(String time);
+
+  /// No description provided for @a11yScrollToBottom.
+  ///
+  /// In en, this message translates to:
+  /// **'Scroll to bottom'**
+  String get a11yScrollToBottom;
+
+  /// No description provided for @ui3EnterMessageBeforeScheduling.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a message before scheduling'**
+  String get ui3EnterMessageBeforeScheduling;
+
+  /// No description provided for @ui3SendCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Send code'**
+  String get ui3SendCode;
+
+  /// No description provided for @ui3CodeLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get ui3CodeLanguage;
+
+  /// No description provided for @ui3PasteCodeHere.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste code here'**
+  String get ui3PasteCodeHere;
+
+  /// No description provided for @ui3ReminderSetAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder set · {time}'**
+  String ui3ReminderSetAt(String time);
+
+  /// No description provided for @ui3RedPacketCreateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to create red packet'**
+  String get ui3RedPacketCreateFailed;
+
+  /// No description provided for @ui3SendTip.
+  ///
+  /// In en, this message translates to:
+  /// **'Send a tip'**
+  String get ui3SendTip;
+
+  /// No description provided for @ui3TokenLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Token'**
+  String get ui3TokenLabel;
+
+  /// No description provided for @ui3NoteOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Note (optional)'**
+  String get ui3NoteOptional;
+
+  /// No description provided for @ui3TipFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Tip failed: {error}'**
+  String ui3TipFailed(String error);
+
+  /// No description provided for @ui3GiftNftTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Gift an NFT'**
+  String get ui3GiftNftTitle;
+
+  /// No description provided for @ui3TokenId.
+  ///
+  /// In en, this message translates to:
+  /// **'Token ID'**
+  String get ui3TokenId;
+
+  /// No description provided for @ui3NftGiftFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'NFT gift failed: {error}'**
+  String ui3NftGiftFailed(String error);
+
+  /// No description provided for @ui3AiAgentSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Describe a task, open the right mini app'**
+  String get ui3AiAgentSubtitle;
+
+  /// No description provided for @ui3GiftNft.
+  ///
+  /// In en, this message translates to:
+  /// **'Gift NFT'**
+  String get ui3GiftNft;
+
+  /// No description provided for @ui3GiftNftSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Send an NFT to this contact'**
+  String get ui3GiftNftSubtitle;
+
+  /// No description provided for @ui3MiniAppUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Mini app is not available'**
+  String get ui3MiniAppUnavailable;
+
+  /// No description provided for @ui3MediaItemsNotSent.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} selected media item(s) could not be sent'**
+  String ui3MediaItemsNotSent(int count);
+
+  /// No description provided for @ui3PhotosSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Send photos and videos in chat-friendly format'**
+  String get ui3PhotosSubtitle;
+
+  /// No description provided for @ui3OriginalImages.
+  ///
+  /// In en, this message translates to:
+  /// **'Original Images'**
+  String get ui3OriginalImages;
+
+  /// No description provided for @ui3OriginalImagesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Send uncompressed photos as files'**
+  String get ui3OriginalImagesSubtitle;
+
+  /// No description provided for @ui3ScheduledFileFor.
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled {filename} for {time}'**
+  String ui3ScheduledFileFor(String filename, String time);
+
+  /// No description provided for @ui3SendingOriginalImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Sending original image: {filename}'**
+  String ui3SendingOriginalImage(String filename);
+
+  /// No description provided for @ui3ScheduledOriginalImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled original image: {filename}'**
+  String ui3ScheduledOriginalImage(String filename);
+
+  /// No description provided for @ui3PaymentAlreadySent.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment already sent'**
+  String get ui3PaymentAlreadySent;
+
+  /// No description provided for @ui3PaymentProcessing.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment is processing'**
+  String get ui3PaymentProcessing;
+
+  /// No description provided for @ui3ChainStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Chain status: {status}'**
+  String ui3ChainStatus(String status);
+
+  /// No description provided for @ui3NotChecked.
+  ///
+  /// In en, this message translates to:
+  /// **'Not checked'**
+  String get ui3NotChecked;
+
+  /// No description provided for @ui3ConfirmationsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirmed: {confirmations} / {required} blocks'**
+  String ui3ConfirmationsCount(int confirmations, int required);
+
+  /// No description provided for @ui3CopyTxHash.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy transaction hash'**
+  String get ui3CopyTxHash;
+
+  /// No description provided for @ui3VerifyAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify again'**
+  String get ui3VerifyAgain;
+
+  /// No description provided for @ui3VerifyOnChain.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify on chain'**
+  String get ui3VerifyOnChain;
+
+  /// No description provided for @ui3TransferMissingChainDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'This transfer does not include exact chain and asset details.'**
+  String get ui3TransferMissingChainDetails;
+
+  /// No description provided for @ui3ReceiptPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending on chain'**
+  String get ui3ReceiptPending;
+
+  /// No description provided for @ui3ReceiptConfirmed.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirmed'**
+  String get ui3ReceiptConfirmed;
+
+  /// No description provided for @ui3ReceiptFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed on chain'**
+  String get ui3ReceiptFailed;
+
+  /// No description provided for @ui3ReceiptMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction details do not match'**
+  String get ui3ReceiptMismatch;
+
+  /// No description provided for @ui3ReceiptUnsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'Chain verification unsupported'**
+  String get ui3ReceiptUnsupported;
+
+  /// No description provided for @ui3ReceiptUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification unavailable'**
+  String get ui3ReceiptUnavailable;
+
+  /// No description provided for @ui3OpenOrSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Open / Save'**
+  String get ui3OpenOrSave;
+
+  /// No description provided for @ui3UnableToOpenFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to open this file.'**
+  String get ui3UnableToOpenFile;
+
+  /// No description provided for @ui3AiRewriteFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'AI rewrite failed: {error}'**
+  String ui3AiRewriteFailed(String error);
+
+  /// No description provided for @ui3AiShareMessagesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Share messages with AI?'**
+  String get ui3AiShareMessagesTitle;
+
+  /// No description provided for @ui3AiShareMessagesBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Select the messages AI may use for this reply. This one-request approval expires after two minutes. Closing Quick Reply cancels pending results. It does not permit payments or exports.'**
+  String get ui3AiShareMessagesBody;
+
+  /// No description provided for @ui3OtherParticipant.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get ui3OtherParticipant;
+
+  /// No description provided for @ui3ShareSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Share selected'**
+  String get ui3ShareSelected;
+
+  /// No description provided for @ui3BotCommandError.
+  ///
+  /// In en, this message translates to:
+  /// **'Command Error'**
+  String get ui3BotCommandError;
+
+  /// No description provided for @ui3BotUnknownCommand.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown Command'**
+  String get ui3BotUnknownCommand;
+
+  /// No description provided for @ui3BotTypeHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Type /help to see available commands.'**
+  String get ui3BotTypeHelp;
+
+  /// No description provided for @ui3FilesMediaLinks.
+  ///
+  /// In en, this message translates to:
+  /// **'Files, Media & Links'**
+  String get ui3FilesMediaLinks;
+
+  /// No description provided for @ui3ChatStorage.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat Storage'**
+  String get ui3ChatStorage;
+
+  /// No description provided for @ui3EncryptionKeysDevices.
+  ///
+  /// In en, this message translates to:
+  /// **'Encryption Keys & Devices'**
+  String get ui3EncryptionKeysDevices;
+
+  /// No description provided for @ui3EncryptionServiceUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Encryption service is not available yet'**
+  String get ui3EncryptionServiceUnavailable;
+
+  /// No description provided for @ui3ExportLoadingHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading more chat history for export...'**
+  String get ui3ExportLoadingHistory;
+
+  /// No description provided for @ui3ExportTxtDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Plain-text transcript for notes, backup, or compliance review'**
+  String get ui3ExportTxtDesc;
+
+  /// No description provided for @ui3ExportCustomRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Range'**
+  String get ui3ExportCustomRange;
+
+  /// No description provided for @ui3ExportStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get ui3ExportStart;
+
+  /// No description provided for @ui3ExportEnd.
+  ///
+  /// In en, this message translates to:
+  /// **'End'**
+  String get ui3ExportEnd;
+
+  /// No description provided for @ui3ExportSelectDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Select date'**
+  String get ui3ExportSelectDate;
+
+  /// No description provided for @ui3FolderFilterUnreadOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Unread only'**
+  String get ui3FolderFilterUnreadOnly;
+
+  /// No description provided for @ui3FolderFilterMutedOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Muted only'**
+  String get ui3FolderFilterMutedOnly;
+
+  /// No description provided for @ui3FolderFilterNoDms.
+  ///
+  /// In en, this message translates to:
+  /// **'No DMs'**
+  String get ui3FolderFilterNoDms;
+
+  /// No description provided for @ui3FolderFilterNoGroups.
+  ///
+  /// In en, this message translates to:
+  /// **'No groups'**
+  String get ui3FolderFilterNoGroups;
+
+  /// No description provided for @ui3FolderFilterNoChannels.
+  ///
+  /// In en, this message translates to:
+  /// **'No channels'**
+  String get ui3FolderFilterNoChannels;
+
+  /// No description provided for @ui3FolderFilterAllChats.
+  ///
+  /// In en, this message translates to:
+  /// **'All chats'**
+  String get ui3FolderFilterAllChats;
+
+  /// No description provided for @ui3Create.
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get ui3Create;
+
+  /// No description provided for @ui3DeleteFolderConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete folder \"{name}\"?'**
+  String ui3DeleteFolderConfirm(String name);
+
+  /// No description provided for @a11yDecreaseTextSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Decrease text size'**
+  String get a11yDecreaseTextSize;
+
+  /// No description provided for @a11yIncreaseTextSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Increase text size'**
+  String get a11yIncreaseTextSize;
+
+  /// No description provided for @ui3MinutesRead.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min read'**
+  String ui3MinutesRead(int minutes);
+
+  /// No description provided for @ui3TipOnChain.
+  ///
+  /// In en, this message translates to:
+  /// **'On-chain ✓'**
+  String get ui3TipOnChain;
+
+  /// No description provided for @ui3ViewSource.
+  ///
+  /// In en, this message translates to:
+  /// **'View source'**
+  String get ui3ViewSource;
+
+  /// No description provided for @a11yPreviousPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous page'**
+  String get a11yPreviousPage;
+
+  /// No description provided for @a11yNextPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Next page'**
+  String get a11yNextPage;
+
+  /// No description provided for @ui3OpenExternalLinkTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Open external link?'**
+  String get ui3OpenExternalLinkTitle;
+
+  /// No description provided for @ui3Open.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get ui3Open;
+
+  /// No description provided for @ui3UnableToOpenLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to open this link.'**
+  String get ui3UnableToOpenLink;
+
+  /// No description provided for @ui3ImageUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Image unavailable'**
+  String get ui3ImageUnavailable;
+
+  /// No description provided for @ui3LoadImageFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'Load image from {host}'**
+  String ui3LoadImageFrom(Object host);
+
+  /// No description provided for @ui3RetryImageFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry image from {host}'**
+  String ui3RetryImageFrom(Object host);
+
+  /// No description provided for @ui3TranslatedByN42.
+  ///
+  /// In en, this message translates to:
+  /// **'Translated by N42'**
+  String get ui3TranslatedByN42;
+
+  /// No description provided for @ui3TranslatedFromByN42.
+  ///
+  /// In en, this message translates to:
+  /// **'Translated from {language} by N42'**
+  String ui3TranslatedFromByN42(Object language);
+
+  /// No description provided for @ui3ClearWhiteboardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear whiteboard?'**
+  String get ui3ClearWhiteboardTitle;
+
+  /// No description provided for @ui3ClearWhiteboardMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'All strokes will be removed for everyone. This cannot be undone.'**
+  String get ui3ClearWhiteboardMessage;
+
+  /// No description provided for @ui3WhiteboardLive.
+  ///
+  /// In en, this message translates to:
+  /// **'Whiteboard · Live'**
+  String get ui3WhiteboardLive;
+
+  /// No description provided for @a11yPenColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Pen color'**
+  String get a11yPenColor;
+
+  /// No description provided for @ui3AiDescribeOcr.
+  ///
+  /// In en, this message translates to:
+  /// **'AI describe / OCR'**
+  String get ui3AiDescribeOcr;
+
+  /// No description provided for @ui3DocumentPreviewFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to preview this document safely. Check the connection and file size (max 2MB).'**
+  String get ui3DocumentPreviewFailed;
+
+  /// No description provided for @ui3AiConsentMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Select the messages AI may use for this summary. This one-request approval expires after two minutes. It does not permit payments or exports.'**
+  String get ui3AiConsentMessage;
+
+  /// No description provided for @ui3AiSuggestedReplies.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggested replies'**
+  String get ui3AiSuggestedReplies;
+
+  /// No description provided for @ui3AiGeneratingSuggestions.
+  ///
+  /// In en, this message translates to:
+  /// **'Generating suggestions...'**
+  String get ui3AiGeneratingSuggestions;
+
+  /// No description provided for @ui3StickersEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No stickers yet'**
+  String get ui3StickersEmpty;
+
+  /// No description provided for @ui3StickersGet.
+  ///
+  /// In en, this message translates to:
+  /// **'Get Stickers'**
+  String get ui3StickersGet;
+
+  /// No description provided for @a11yFormatBold.
+  ///
+  /// In en, this message translates to:
+  /// **'Bold'**
+  String get a11yFormatBold;
+
+  /// No description provided for @a11yFormatItalic.
+  ///
+  /// In en, this message translates to:
+  /// **'Italic'**
+  String get a11yFormatItalic;
+
+  /// No description provided for @a11yFormatStrikethrough.
+  ///
+  /// In en, this message translates to:
+  /// **'Strikethrough'**
+  String get a11yFormatStrikethrough;
+
+  /// No description provided for @a11yFormatInlineCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Inline code'**
+  String get a11yFormatInlineCode;
+
+  /// No description provided for @a11yFormatCodeBlock.
+  ///
+  /// In en, this message translates to:
+  /// **'Code block'**
+  String get a11yFormatCodeBlock;
+
+  /// No description provided for @a11yFormatChecklistItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Checklist item'**
+  String get a11yFormatChecklistItem;
+
+  /// No description provided for @a11yFormatBulletList.
+  ///
+  /// In en, this message translates to:
+  /// **'Bullet list'**
+  String get a11yFormatBulletList;
+
+  /// No description provided for @a11yFormatNumberedList.
+  ///
+  /// In en, this message translates to:
+  /// **'Numbered list'**
+  String get a11yFormatNumberedList;
+
+  /// No description provided for @a11yFormatLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Link'**
+  String get a11yFormatLink;
+
+  /// No description provided for @a11yFormatTable.
+  ///
+  /// In en, this message translates to:
+  /// **'Table'**
+  String get a11yFormatTable;
+
+  /// No description provided for @a11yFormatMeetingTemplate.
+  ///
+  /// In en, this message translates to:
+  /// **'Meeting template'**
+  String get a11yFormatMeetingTemplate;
+
+  /// No description provided for @a11yEmojiSmileys.
+  ///
+  /// In en, this message translates to:
+  /// **'Smileys & people'**
+  String get a11yEmojiSmileys;
+
+  /// No description provided for @a11yEmojiHearts.
+  ///
+  /// In en, this message translates to:
+  /// **'Hearts'**
+  String get a11yEmojiHearts;
+
+  /// No description provided for @a11yEmojiAnimals.
+  ///
+  /// In en, this message translates to:
+  /// **'Animals & nature'**
+  String get a11yEmojiAnimals;
+
+  /// No description provided for @a11yEmojiFood.
+  ///
+  /// In en, this message translates to:
+  /// **'Food & drink'**
+  String get a11yEmojiFood;
+
+  /// No description provided for @a11yEmojiTravel.
+  ///
+  /// In en, this message translates to:
+  /// **'Travel & places'**
+  String get a11yEmojiTravel;
+
+  /// No description provided for @a11yEmojiActivities.
+  ///
+  /// In en, this message translates to:
+  /// **'Activities'**
+  String get a11yEmojiActivities;
+
+  /// No description provided for @a11yEmojiObjects.
+  ///
+  /// In en, this message translates to:
+  /// **'Objects'**
+  String get a11yEmojiObjects;
+
+  /// No description provided for @a11yEmojiSymbols.
+  ///
+  /// In en, this message translates to:
+  /// **'Symbols'**
+  String get a11yEmojiSymbols;
+
+  /// No description provided for @ui3FrequentlyUsed.
+  ///
+  /// In en, this message translates to:
+  /// **'Frequently Used'**
+  String get ui3FrequentlyUsed;
+
+  /// No description provided for @ui3NoEditHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'No edit history'**
+  String get ui3NoEditHistory;
+
+  /// No description provided for @ui3EventNew.
+  ///
+  /// In en, this message translates to:
+  /// **'New Event'**
+  String get ui3EventNew;
+
+  /// No description provided for @ui3EventTitleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get ui3EventTitleLabel;
+
+  /// No description provided for @ui3EventLocationOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Location (optional)'**
+  String get ui3EventLocationOptional;
+
+  /// No description provided for @ui3EventDescriptionOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Description (optional)'**
+  String get ui3EventDescriptionOptional;
+
+  /// No description provided for @ui3EventSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Event'**
+  String get ui3EventSend;
+
+  /// No description provided for @ui3EventTitleRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Title is required'**
+  String get ui3EventTitleRequired;
+
+  /// No description provided for @ui3EventEndAfterStart.
+  ///
+  /// In en, this message translates to:
+  /// **'End time must be after start'**
+  String get ui3EventEndAfterStart;
+
+  /// No description provided for @ui3MiniAppAgentIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Describe what you want to do — I\'ll open the right mini app.'**
+  String get ui3MiniAppAgentIntro;
+
+  /// No description provided for @ui3MiniAppAgentExample.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. swap ETH to USDC'**
+  String get ui3MiniAppAgentExample;
+
+  /// No description provided for @ui3MiniAppAgentNoMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching mini app found. Try rephrasing.'**
+  String get ui3MiniAppAgentNoMatch;
+
+  /// No description provided for @ui3MiniAppOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Open {appName}'**
+  String ui3MiniAppOpen(Object appName);
+
+  /// No description provided for @ui3MusicLinkPlatforms.
+  ///
+  /// In en, this message translates to:
+  /// **'Supports song links from NetEase Cloud Music, QQ Music, Kugou, Kuwo and more'**
+  String get ui3MusicLinkPlatforms;
+
+  /// No description provided for @ui3PollMarkCorrectAnswer.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark a non-empty correct answer'**
+  String get ui3PollMarkCorrectAnswer;
+
+  /// No description provided for @ui3PollQuizMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Quiz mode'**
+  String get ui3PollQuizMode;
+
+  /// No description provided for @ui3PollAnswerExplanationHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Answer explanation (optional)'**
+  String get ui3PollAnswerExplanationHint;
+
+  /// No description provided for @a11yCorrectAnswer.
+  ///
+  /// In en, this message translates to:
+  /// **'Correct answer'**
+  String get a11yCorrectAnswer;
+
+  /// No description provided for @ui3AiSuggestions.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Suggestions'**
+  String get ui3AiSuggestions;
+
+  /// No description provided for @a11yPaste.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste'**
+  String get a11yPaste;
+
+  /// No description provided for @a11yRefresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh'**
+  String get a11yRefresh;
+
+  /// No description provided for @ui3RecoveryKeyStoreWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Store this key safely. It is the only way to recover your encrypted messages if you lose access to all devices.'**
+  String get ui3RecoveryKeyStoreWarning;
+
+  /// No description provided for @ui3SavedToPath.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved: {path}'**
+  String ui3SavedToPath(Object path);
+
+  /// No description provided for @ui3UnknownAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown account'**
+  String get ui3UnknownAccount;
+
+  /// No description provided for @ui3UnknownHomeserver.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown homeserver'**
+  String get ui3UnknownHomeserver;
+
+  /// No description provided for @ui3ImportRecoveryKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Import Recovery Key'**
+  String get ui3ImportRecoveryKey;
+
+  /// No description provided for @ui3ImportRecoveryKeyDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter or paste your recovery key to restore room keys for encrypted message history.'**
+  String get ui3ImportRecoveryKeyDesc;
+
+  /// No description provided for @ui3RecoveryKeyAccountInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Account: {account}\\nHomeserver: {homeserver}'**
+  String ui3RecoveryKeyAccountInfo(Object account, Object homeserver);
+
+  /// No description provided for @ui3Import.
+  ///
+  /// In en, this message translates to:
+  /// **'Import'**
+  String get ui3Import;
+
+  /// No description provided for @ui3InvalidRecoveryKeyFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid recovery key format'**
+  String get ui3InvalidRecoveryKeyFormat;
+
+  /// No description provided for @ui3RecoveryKeyPartialRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'Restored {restored} of {total} keys. {failed} keys failed. Check the account, network, and backup, then retry. Some history may remain unreadable.'**
+  String ui3RecoveryKeyPartialRestore(
+    Object restored,
+    Object total,
+    Object failed,
+  );
+
+  /// No description provided for @ui3RecoveryKeyRestoreSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Restored {restored} of {total} keys successfully'**
+  String ui3RecoveryKeyRestoreSuccess(Object restored, Object total);
+
+  /// No description provided for @ui3ImportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Import failed: {error}'**
+  String ui3ImportFailed(Object error);
+
+  /// No description provided for @ui3PasskeyRegistrationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Passkey registration failed: {error}'**
+  String ui3PasskeyRegistrationFailed(Object error);
+
+  /// No description provided for @ui3PasskeyDefaultName.
+  ///
+  /// In en, this message translates to:
+  /// **'My Passkey'**
+  String get ui3PasskeyDefaultName;
+
+  /// No description provided for @ui3PasskeyNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., iPhone, MacBook'**
+  String get ui3PasskeyNameHint;
+
+  /// No description provided for @ui3PasskeyDeleteFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete passkey'**
+  String get ui3PasskeyDeleteFailed;
+
+  /// No description provided for @ui3TwoFactorAuth.
+  ///
+  /// In en, this message translates to:
+  /// **'Two-factor authentication'**
+  String get ui3TwoFactorAuth;
+
+  /// No description provided for @ui3TwoFactorOnSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'On — authenticator app code required'**
+  String get ui3TwoFactorOnSubtitle;
+
+  /// No description provided for @ui3TwoFactorOffSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Off — protect with an authenticator app (TOTP)'**
+  String get ui3TwoFactorOffSubtitle;
+
+  /// No description provided for @ui3ShowRecoveryKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Show Recovery Key'**
+  String get ui3ShowRecoveryKey;
+
+  /// No description provided for @ui3ShowRecoveryKeyDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Display your recovery key for backup'**
+  String get ui3ShowRecoveryKeyDesc;
+
+  /// No description provided for @ui3ImportRecoveryKeyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore messages using a recovery key'**
+  String get ui3ImportRecoveryKeyHint;
+
+  /// No description provided for @ui3RecoveryKeyCreateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to create recovery key'**
+  String get ui3RecoveryKeyCreateFailed;
+
+  /// No description provided for @ui3TotpIncorrectCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect code, try again'**
+  String get ui3TotpIncorrectCode;
+
+  /// No description provided for @ui3TwoFactorEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Two-factor authentication enabled'**
+  String get ui3TwoFactorEnabled;
+
+  /// No description provided for @ui3TwoFactorDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Two-factor authentication disabled'**
+  String get ui3TwoFactorDisabled;
+
+  /// No description provided for @ui3TwoFactorTurnOffTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn off two-factor authentication?'**
+  String get ui3TwoFactorTurnOffTitle;
+
+  /// No description provided for @ui3TwoFactorTurnOffMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your authenticator app will no longer be required. You can set it up again later with a new key.'**
+  String get ui3TwoFactorTurnOffMessage;
+
+  /// No description provided for @ui3TurnOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn off'**
+  String get ui3TurnOff;
+
+  /// No description provided for @ui3TwoFactorTotpTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Two-Factor (TOTP)'**
+  String get ui3TwoFactorTotpTitle;
+
+  /// No description provided for @ui3TwoFactorIsOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Two-factor authentication is on'**
+  String get ui3TwoFactorIsOn;
+
+  /// No description provided for @ui3TwoFactorCodeRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'A code from your authenticator app is required.'**
+  String get ui3TwoFactorCodeRequired;
+
+  /// No description provided for @ui3TotpStepScan.
+  ///
+  /// In en, this message translates to:
+  /// **'1. Scan this QR with an authenticator app (Google Authenticator, Authy, 1Password…), or enter the key manually.'**
+  String get ui3TotpStepScan;
+
+  /// No description provided for @ui3TotpKeyCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Key copied'**
+  String get ui3TotpKeyCopied;
+
+  /// No description provided for @ui3TotpStepConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'2. Enter the 6-digit code to confirm.'**
+  String get ui3TotpStepConfirm;
+
+  /// No description provided for @ui3Enable.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable'**
+  String get ui3Enable;
+
+  /// No description provided for @ui3BackupSettingsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup your local chat settings. Messages will be restored from server after re-login.'**
+  String get ui3BackupSettingsDesc;
+
+  /// No description provided for @ui3BackupKeysSeparate.
+  ///
+  /// In en, this message translates to:
+  /// **'Encryption keys are managed separately'**
+  String get ui3BackupKeysSeparate;
+
+  /// No description provided for @ui3BackupKeysSeparateHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Use Security > Recovery Key to back up encrypted message access.'**
+  String get ui3BackupKeysSeparateHint;
+
+  /// No description provided for @ui3BackupRoomsSize.
+  ///
+  /// In en, this message translates to:
+  /// **'{rooms} rooms  {size}'**
+  String ui3BackupRoomsSize(Object rooms, Object size);
+
+  /// No description provided for @ui3BackupRestoreFromFileDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Import a .n42backup file from another device or previous backup. Encryption keys are restored separately with your Recovery Key.'**
+  String get ui3BackupRestoreFromFileDesc;
+
+  /// No description provided for @ui3UsernameSessionRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Username requires an active session'**
+  String get ui3UsernameSessionRequired;
+
+  /// No description provided for @ui3SecuritySessionRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Security settings require an active session'**
+  String get ui3SecuritySessionRequired;
+
+  /// No description provided for @ui3ConnectedAccountsSessionRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected accounts require an active session'**
+  String get ui3ConnectedAccountsSessionRequired;
+
+  /// No description provided for @ui3SystemAccounts.
+  ///
+  /// In en, this message translates to:
+  /// **'System & Accounts'**
+  String get ui3SystemAccounts;
+
+  /// No description provided for @ui3AccountIdentity.
+  ///
+  /// In en, this message translates to:
+  /// **'Account & Identity'**
+  String get ui3AccountIdentity;
+
+  /// No description provided for @ui3Accounts.
+  ///
+  /// In en, this message translates to:
+  /// **'Accounts'**
+  String get ui3Accounts;
+
+  /// No description provided for @ui3DevicesSessions.
+  ///
+  /// In en, this message translates to:
+  /// **'Devices & Sessions'**
+  String get ui3DevicesSessions;
+
+  /// No description provided for @ui3Integrations.
+  ///
+  /// In en, this message translates to:
+  /// **'Integrations'**
+  String get ui3Integrations;
+
+  /// No description provided for @ui3ConnectedAccounts.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected Accounts'**
+  String get ui3ConnectedAccounts;
+
+  /// No description provided for @ui3ConnectedAccountsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Telegram, WhatsApp, Discord, and API bridge integrations'**
+  String get ui3ConnectedAccountsDesc;
+
+  /// No description provided for @ui3SystemOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'System overview'**
+  String get ui3SystemOverview;
+
+  /// No description provided for @ui3AccountCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 account} other{{count} accounts}}'**
+  String ui3AccountCount(num count);
+
+  /// No description provided for @ui3DeviceCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 device} other{{count} devices}}'**
+  String ui3DeviceCount(num count);
+
+  /// No description provided for @ui3PrivacySecurityOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'End-to-end encryption, screenshot protection, and proxy controls'**
+  String get ui3PrivacySecurityOverview;
+
+  /// No description provided for @ui3ConversationPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Conversation Privacy'**
+  String get ui3ConversationPrivacy;
+
+  /// No description provided for @ui3NetworkPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Network Privacy'**
+  String get ui3NetworkPrivacy;
+
+  /// No description provided for @ui3IdentityPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Identity Privacy'**
+  String get ui3IdentityPrivacy;
+
+  /// No description provided for @ui3EncryptionKeyBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Encryption & Key Backup'**
+  String get ui3EncryptionKeyBackup;
+
+  /// No description provided for @ui3DevicesVerification.
+  ///
+  /// In en, this message translates to:
+  /// **'Devices & Verification'**
+  String get ui3DevicesVerification;
+
+  /// No description provided for @ui3ChipE2eeDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'E2EE default'**
+  String get ui3ChipE2eeDefault;
+
+  /// No description provided for @ui3ChipManualE2ee.
+  ///
+  /// In en, this message translates to:
+  /// **'Manual E2EE'**
+  String get ui3ChipManualE2ee;
+
+  /// No description provided for @ui3ChipSelfDestruct.
+  ///
+  /// In en, this message translates to:
+  /// **'Self-destruct'**
+  String get ui3ChipSelfDestruct;
+
+  /// No description provided for @ui3ChipScreenshotGuard.
+  ///
+  /// In en, this message translates to:
+  /// **'Screenshot guard'**
+  String get ui3ChipScreenshotGuard;
+
+  /// No description provided for @ui3ChipIpProxy.
+  ///
+  /// In en, this message translates to:
+  /// **'IP / proxy'**
+  String get ui3ChipIpProxy;
+
+  /// No description provided for @ui3ChipLinkPreviewsOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Link previews off'**
+  String get ui3ChipLinkPreviewsOff;
+
+  /// No description provided for @ui3ChipPublicHandle.
+  ///
+  /// In en, this message translates to:
+  /// **'Public handle'**
+  String get ui3ChipPublicHandle;
+
+  /// No description provided for @a11yShowPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Show password'**
+  String get a11yShowPassword;
+
+  /// No description provided for @a11yHidePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide password'**
+  String get a11yHidePassword;
+
+  /// No description provided for @a11yCheckServer.
+  ///
+  /// In en, this message translates to:
+  /// **'Check server'**
+  String get a11yCheckServer;
+
+  /// No description provided for @ui3AuthAnonymousRegistration.
+  ///
+  /// In en, this message translates to:
+  /// **'Anonymous Registration'**
+  String get ui3AuthAnonymousRegistration;
+
+  /// No description provided for @ui3AuthAnonymousRegistrationDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Create an account without binding phone or email. A username will be generated automatically.'**
+  String get ui3AuthAnonymousRegistrationDesc;
+
+  /// No description provided for @ui3AuthAnonymousModeOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Anonymous mode is on'**
+  String get ui3AuthAnonymousModeOn;
+
+  /// No description provided for @ui3AuthAnonymousModeOnDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'The app will create a random Matrix username for you. You can still sign in later with your generated account and password.'**
+  String get ui3AuthAnonymousModeOnDesc;
+
+  /// No description provided for @ui3AuthChooseLoginMethod.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose login method'**
+  String get ui3AuthChooseLoginMethod;
+
+  /// No description provided for @ui3AuthSsoOpenFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to open SSO login page'**
+  String get ui3AuthSsoOpenFailed;
+
+  /// No description provided for @ui3AuthWalletUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet is not available'**
+  String get ui3AuthWalletUnavailable;
+
+  /// No description provided for @ui3ProfileSubscriptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscriptions'**
+  String get ui3ProfileSubscriptions;
+
+  /// No description provided for @ui3ProfileBuySellCrypto.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy / Sell crypto'**
+  String get ui3ProfileBuySellCrypto;
+
+  /// No description provided for @ui3ProfileOnDeviceAi.
+  ///
+  /// In en, this message translates to:
+  /// **'On-device AI'**
+  String get ui3ProfileOnDeviceAi;
+
+  /// No description provided for @ui3ProfileSetAUsername.
+  ///
+  /// In en, this message translates to:
+  /// **'Set a username'**
+  String get ui3ProfileSetAUsername;
+
+  /// No description provided for @ui3ProfileAvatarStudio.
+  ///
+  /// In en, this message translates to:
+  /// **'Avatar Studio'**
+  String get ui3ProfileAvatarStudio;
+
+  /// No description provided for @ui3ProfileAvatarStudioSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'NFT Avatar / Decorations'**
+  String get ui3ProfileAvatarStudioSubtitle;
+
+  /// No description provided for @ui3ProfileCustomize.
+  ///
+  /// In en, this message translates to:
+  /// **'Customize'**
+  String get ui3ProfileCustomize;
+
+  /// No description provided for @ui3ProfileQrSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan to open this profile or start a chat'**
+  String get ui3ProfileQrSubtitle;
+
+  /// No description provided for @ui3PrivacyHardening.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Hardening'**
+  String get ui3PrivacyHardening;
+
+  /// No description provided for @ui3HidePhoneNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide Phone Number'**
+  String get ui3HidePhoneNumber;
+
+  /// No description provided for @ui3HidePhoneNumberDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Mask any bound phone number in profile-level surfaces on this device'**
+  String get ui3HidePhoneNumberDesc;
+
+  /// No description provided for @ui3EncryptNewChatsByDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Encrypt New Chats By Default'**
+  String get ui3EncryptNewChatsByDefault;
+
+  /// No description provided for @ui3EncryptNewChatsByDefaultDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Start new direct chats and private rooms with E2EE enabled'**
+  String get ui3EncryptNewChatsByDefaultDesc;
+
+  /// No description provided for @ui3PrivateChatMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Private Chat Mode'**
+  String get ui3PrivateChatMode;
+
+  /// No description provided for @ui3PrivateChatModeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Temporarily enable screenshot blocking when viewing private or encrypted chats'**
+  String get ui3PrivateChatModeDesc;
+
+  /// No description provided for @ui3DefaultSelfDestructTimer.
+  ///
+  /// In en, this message translates to:
+  /// **'Default Auto-Destruct Timer'**
+  String get ui3DefaultSelfDestructTimer;
+
+  /// No description provided for @ui3DefaultSelfDestructTimerDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply a default self-destruct timer to newly sent messages'**
+  String get ui3DefaultSelfDestructTimerDesc;
+
+  /// No description provided for @ui3LinkPreviews.
+  ///
+  /// In en, this message translates to:
+  /// **'Link Previews'**
+  String get ui3LinkPreviews;
+
+  /// No description provided for @ui3LinkPreviewsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetch titles, descriptions, and thumbnails when messages contain URLs'**
+  String get ui3LinkPreviewsDesc;
+
+  /// No description provided for @ui3IpAddressProtection.
+  ///
+  /// In en, this message translates to:
+  /// **'IP Address Protection'**
+  String get ui3IpAddressProtection;
+
+  /// No description provided for @ui3IpAddressProtectionDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Route Matrix and link-preview requests through your configured HTTP privacy proxy when available'**
+  String get ui3IpAddressProtectionDesc;
+
+  /// No description provided for @ui3UseTorProxy.
+  ///
+  /// In en, this message translates to:
+  /// **'Use Tor / Privoxy HTTP Proxy'**
+  String get ui3UseTorProxy;
+
+  /// No description provided for @ui3UseTorProxyDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Use a local HTTP proxy endpoint such as Privoxy on 127.0.0.1:8118. Native SOCKS5 Tor routing is not supported here.'**
+  String get ui3UseTorProxyDesc;
+
+  /// No description provided for @ui3CustomProxy.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Proxy'**
+  String get ui3CustomProxy;
+
+  /// No description provided for @ui3CustomProxyDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Use a custom HTTP or HTTPS proxy for Matrix traffic and link previews'**
+  String get ui3CustomProxyDesc;
+
+  /// No description provided for @ui3ProxyEndpoint.
+  ///
+  /// In en, this message translates to:
+  /// **'Proxy Endpoint'**
+  String get ui3ProxyEndpoint;
+
+  /// No description provided for @ui3ProxyEndpointDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'HTTP/HTTPS proxy address (SOCKS not supported)'**
+  String get ui3ProxyEndpointDesc;
+
+  /// No description provided for @ui3InvalidEndpoint.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid endpoint'**
+  String get ui3InvalidEndpoint;
+
+  /// No description provided for @ui3CustomProxyStaysOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom proxy stays off until you set a valid endpoint'**
+  String get ui3CustomProxyStaysOff;
+
+  /// No description provided for @ui3NotificationFilterNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Priority rules always notify (bypassing mute, mentions-only and Do Not Disturb). Muted keywords suppress notifications.'**
+  String get ui3NotificationFilterNote;
+
+  /// No description provided for @ui3PriorityKeywords.
+  ///
+  /// In en, this message translates to:
+  /// **'Priority keywords'**
+  String get ui3PriorityKeywords;
+
+  /// No description provided for @ui3PriorityKeywordHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. urgent'**
+  String get ui3PriorityKeywordHint;
+
+  /// No description provided for @ui3MutedKeywords.
+  ///
+  /// In en, this message translates to:
+  /// **'Muted keywords'**
+  String get ui3MutedKeywords;
+
+  /// No description provided for @ui3MutedKeywordHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. spam'**
+  String get ui3MutedKeywordHint;
+
+  /// No description provided for @ui3PrioritySenders.
+  ///
+  /// In en, this message translates to:
+  /// **'Priority senders'**
+  String get ui3PrioritySenders;
+
+  /// No description provided for @ui3CaseSensitive.
+  ///
+  /// In en, this message translates to:
+  /// **'Case sensitive'**
+  String get ui3CaseSensitive;
+
+  /// No description provided for @ui3None.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get ui3None;
+
+  /// No description provided for @ui3SmartReplyTranslation.
+  ///
+  /// In en, this message translates to:
+  /// **'Smart reply translation'**
+  String get ui3SmartReplyTranslation;
+
+  /// No description provided for @ui3SmartReplyTranslationDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatically translate your messages to match the recipient\'s language before sending.'**
+  String get ui3SmartReplyTranslationDesc;
+
+  /// No description provided for @ui3FromPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'From Photos'**
+  String get ui3FromPhotos;
+
+  /// No description provided for @ui3ChangePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Change photo'**
+  String get ui3ChangePhoto;
+
+  /// No description provided for @ui3RoamingUsesMobileData.
+  ///
+  /// In en, this message translates to:
+  /// **'Roaming uses Mobile Data rules'**
+  String get ui3RoamingUsesMobileData;
+
+  /// No description provided for @ui3RoamingUsesMobileDataDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Dedicated roaming detection is not available yet, so roaming currently follows the Mobile Data auto-download settings.'**
+  String get ui3RoamingUsesMobileDataDesc;
+
+  /// No description provided for @ui3DeleteQuickReplyConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete \"{content}\"?'**
+  String ui3DeleteQuickReplyConfirm(String content);
+
+  /// No description provided for @ui3ResetToDefaults.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset to Defaults'**
+  String get ui3ResetToDefaults;
+
+  /// No description provided for @ui3ResetQuickRepliesMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This will remove all custom quick replies and restore defaults. Continue?'**
+  String get ui3ResetQuickRepliesMessage;
+
+  /// No description provided for @ui3LocalLlmUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Not supported on this device'**
+  String get ui3LocalLlmUnavailable;
+
+  /// No description provided for @ui3LocalLlmNotDownloaded.
+  ///
+  /// In en, this message translates to:
+  /// **'Model not downloaded'**
+  String get ui3LocalLlmNotDownloaded;
+
+  /// No description provided for @ui3LocalLlmReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready (on-device)'**
+  String get ui3LocalLlmReady;
+
+  /// No description provided for @ui3LocalLlmDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'When enabled and ready, AI features (summarize, rewrite, translate, replies) run fully on-device — data never leaves your phone. Otherwise they use the cloud provider.'**
+  String get ui3LocalLlmDescription;
+
+  /// No description provided for @ui3UseOnDeviceAi.
+  ///
+  /// In en, this message translates to:
+  /// **'Use on-device AI'**
+  String get ui3UseOnDeviceAi;
+
+  /// No description provided for @ui3UseOnDeviceAiDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Prefer local inference when ready'**
+  String get ui3UseOnDeviceAiDesc;
+
+  /// No description provided for @ui3DownloadModel.
+  ///
+  /// In en, this message translates to:
+  /// **'Download model'**
+  String get ui3DownloadModel;
+
+  /// No description provided for @ui3LocalLlmRuntimeRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'On-device inference requires the native runtime (Android MediaPipe / iOS Core ML). It will activate automatically once the platform handler is available.'**
+  String get ui3LocalLlmRuntimeRequired;
+
+  /// No description provided for @ui3PhotoAvatar.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo Avatar'**
+  String get ui3PhotoAvatar;
+
+  /// No description provided for @ui3AvatarStyles.
+  ///
+  /// In en, this message translates to:
+  /// **'Avatar Styles'**
+  String get ui3AvatarStyles;
+
+  /// No description provided for @ui3AvatarStylesDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Reuse one decoration selector for profile and avatar entry points.'**
+  String get ui3AvatarStylesDesc;
+
+  /// No description provided for @ui3ReplaceNftAvatar.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace NFT Avatar'**
+  String get ui3ReplaceNftAvatar;
+
+  /// No description provided for @ui3NftAvatarDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Use an on-chain collectible as your avatar.'**
+  String get ui3NftAvatarDesc;
+
+  /// No description provided for @ui3UsePhotoAvatar.
+  ///
+  /// In en, this message translates to:
+  /// **'Use Photo Avatar'**
+  String get ui3UsePhotoAvatar;
+
+  /// No description provided for @ui3UsePhotoAvatarDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep your uploaded avatar and clear the NFT binding.'**
+  String get ui3UsePhotoAvatarDesc;
+
+  /// No description provided for @ui3AvatarStyleSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Avatar style set to: {name}'**
+  String ui3AvatarStyleSet(Object name);
+
+  /// No description provided for @ui3NftAvatarUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'NFT avatar updated'**
+  String get ui3NftAvatarUpdated;
+
+  /// No description provided for @ui3SwitchedToPhotoAvatar.
+  ///
+  /// In en, this message translates to:
+  /// **'Switched back to photo avatar'**
+  String get ui3SwitchedToPhotoAvatar;
+
+  /// No description provided for @ui3SignInToViewRedPacketHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to view red packet history'**
+  String get ui3SignInToViewRedPacketHistory;
+
+  /// No description provided for @ui3RedPacketActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get ui3RedPacketActive;
+
+  /// No description provided for @ui3RedPacketCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get ui3RedPacketCompleted;
+
+  /// No description provided for @ui3CardsAndPasses.
+  ///
+  /// In en, this message translates to:
+  /// **'Cards and passes'**
+  String get ui3CardsAndPasses;
+
+  /// No description provided for @ui3CardsAndPassesDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet cards, coupons, and passes are managed by the main app.'**
+  String get ui3CardsAndPassesDesc;
+
+  /// No description provided for @ui3CardPackRequiresMainApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Card Pack requires the main app'**
+  String get ui3CardPackRequiresMainApp;
+
+  /// No description provided for @ui3OpenCardPack.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Card Pack'**
+  String get ui3OpenCardPack;
+
+  /// No description provided for @ui3UnableToOpenChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to open a chat for this contact'**
+  String get ui3UnableToOpenChat;
+
+  /// No description provided for @ui3WalletManagedInMainApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet is managed in the main app'**
+  String get ui3WalletManagedInMainApp;
+
+  /// No description provided for @ui3CreatorPlans.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} · Plans'**
+  String ui3CreatorPlans(Object name);
+
+  /// No description provided for @ui3NewPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'New plan'**
+  String get ui3NewPlan;
+
+  /// No description provided for @ui3MySubscriptions.
+  ///
+  /// In en, this message translates to:
+  /// **'My subscriptions'**
+  String get ui3MySubscriptions;
+
+  /// No description provided for @ui3AvailablePlans.
+  ///
+  /// In en, this message translates to:
+  /// **'Available plans'**
+  String get ui3AvailablePlans;
+
+  /// No description provided for @ui3NoPlansYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No plans yet · tap “New plan” to create one'**
+  String get ui3NoPlansYet;
+
+  /// No description provided for @ui3DaysLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'{days}d left'**
+  String ui3DaysLeft(Object days);
+
+  /// No description provided for @ui3SubscriptionCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get ui3SubscriptionCancelled;
+
+  /// No description provided for @ui3AutoRenewOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-renew: on'**
+  String get ui3AutoRenewOn;
+
+  /// No description provided for @ui3AutoRenewOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-renew: off'**
+  String get ui3AutoRenewOff;
+
+  /// No description provided for @ui3CancelSubscriptionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel subscription?'**
+  String get ui3CancelSubscriptionTitle;
+
+  /// No description provided for @ui3CancelSubscriptionConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Your subscription to {name} stays active until it expires and will not renew.'**
+  String ui3CancelSubscriptionConfirm(Object name);
+
+  /// No description provided for @ui3Subscribe.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscribe'**
+  String get ui3Subscribe;
+
+  /// No description provided for @ui3SubscribedTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscribed to {name}'**
+  String ui3SubscribedTo(Object name);
+
+  /// No description provided for @ui3PlanPriceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Price (e.g. 9.9 USDT)'**
+  String get ui3PlanPriceLabel;
+
+  /// No description provided for @ui3PlanDescriptionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Description (optional)'**
+  String get ui3PlanDescriptionLabel;
+
+  /// No description provided for @ui3PlanBenefitsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Benefits (comma separated)'**
+  String get ui3PlanBenefitsLabel;
+
+  /// No description provided for @ui3PlanPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'Period:'**
+  String get ui3PlanPeriod;
+
+  /// No description provided for @ui3Monthly.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly'**
+  String get ui3Monthly;
+
+  /// No description provided for @ui3Yearly.
+  ///
+  /// In en, this message translates to:
+  /// **'Yearly'**
+  String get ui3Yearly;
+
+  /// No description provided for @ui3SaveRemarkFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save remark'**
+  String get ui3SaveRemarkFailed;
+
+  /// No description provided for @ui3CopyLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy Link'**
+  String get ui3CopyLink;
+
+  /// No description provided for @ui3Connect.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect'**
+  String get ui3Connect;
+
+  /// No description provided for @ui3CommonTokens.
+  ///
+  /// In en, this message translates to:
+  /// **'Common tokens'**
+  String get ui3CommonTokens;
+
+  /// No description provided for @ui3SharedNfts.
+  ///
+  /// In en, this message translates to:
+  /// **'Shared NFTs'**
+  String get ui3SharedNfts;
+
+  /// No description provided for @ui3TransactionHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction history'**
+  String get ui3TransactionHistory;
+
+  /// No description provided for @ui3CommonDaos.
+  ///
+  /// In en, this message translates to:
+  /// **'Common DAOs'**
+  String get ui3CommonDaos;
+
+  /// No description provided for @ui3SameChains.
+  ///
+  /// In en, this message translates to:
+  /// **'Same chains'**
+  String get ui3SameChains;
+
+  /// No description provided for @ui3ChatInitFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat initialization failed'**
+  String get ui3ChatInitFailed;
+
+  /// No description provided for @ui3CheckNetworkRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Please check your network and try again'**
+  String get ui3CheckNetworkRetry;
+
+  /// No description provided for @ui3FromContacts.
+  ///
+  /// In en, this message translates to:
+  /// **'From Contacts'**
+  String get ui3FromContacts;
+
+  /// No description provided for @ui3FindFriendsFromContacts.
+  ///
+  /// In en, this message translates to:
+  /// **'Find friends from your phone contacts'**
+  String get ui3FindFriendsFromContacts;
+
+  /// No description provided for @ui3EnsOrDomain.
+  ///
+  /// In en, this message translates to:
+  /// **'ENS / Domain'**
+  String get ui3EnsOrDomain;
+
+  /// No description provided for @ui3LoadingContacts.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading contacts...'**
+  String get ui3LoadingContacts;
+
+  /// No description provided for @ui3ContactsPermissionRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Contacts Permission Required'**
+  String get ui3ContactsPermissionRequired;
+
+  /// No description provided for @ui3ContactsPermissionMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'To find friends from your contacts, please allow access to your contacts.'**
+  String get ui3ContactsPermissionMessage;
+
+  /// No description provided for @ui3AllowAccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow Access'**
+  String get ui3AllowAccess;
+
+  /// No description provided for @ui3NoContactMatches.
+  ///
+  /// In en, this message translates to:
+  /// **'No Matches Found'**
+  String get ui3NoContactMatches;
+
+  /// No description provided for @ui3NoContactMatchesMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'None of your contacts are using this app yet. Invite them to join!'**
+  String get ui3NoContactMatchesMessage;
+
+  /// No description provided for @ui3ScannedContacts.
+  ///
+  /// In en, this message translates to:
+  /// **'Scanned {count} contacts'**
+  String ui3ScannedContacts(Object count);
+
+  /// No description provided for @ui3FoundContactMatches.
+  ///
+  /// In en, this message translates to:
+  /// **'Found {count} matches from your contacts'**
+  String ui3FoundContactMatches(Object count);
+
+  /// No description provided for @ui3InContactsAs.
+  ///
+  /// In en, this message translates to:
+  /// **'In Contacts: {name}'**
+  String ui3InContactsAs(Object name);
+
+  /// No description provided for @ui3DeletePhotoConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this photo?'**
+  String get ui3DeletePhotoConfirm;
+
+  /// No description provided for @ui3InviteLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite Link'**
+  String get ui3InviteLink;
+
+  /// No description provided for @ui3ShareJoinLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Share a join link for this room'**
+  String get ui3ShareJoinLink;
+
+  /// No description provided for @ui3ShareRoomReference.
+  ///
+  /// In en, this message translates to:
+  /// **'Share a room reference with invited members'**
+  String get ui3ShareRoomReference;
+
+  /// No description provided for @ui3ScanToJoinGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan to join this group directly'**
+  String get ui3ScanToJoinGroup;
+
+  /// No description provided for @ui3ScanToShareRoomReference.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan to share this room reference with invited members'**
+  String get ui3ScanToShareRoomReference;
+
+  /// No description provided for @ui3InviteLinkLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load invite link'**
+  String get ui3InviteLinkLoadFailed;
+
+  /// No description provided for @ui3InviteLinkCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite link copied'**
+  String get ui3InviteLinkCopied;
+
+  /// No description provided for @ui3ChannelCategoryOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Category (optional)'**
+  String get ui3ChannelCategoryOptional;
+
+  /// No description provided for @ui3ChannelCategoryHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Announcements / Product / Support'**
+  String get ui3ChannelCategoryHint;
+
+  /// No description provided for @ui3DescriptionOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Description (optional)'**
+  String get ui3DescriptionOptional;
+
+  /// No description provided for @ui3WebhookEnable.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable webhook automation'**
+  String get ui3WebhookEnable;
+
+  /// No description provided for @ui3WebhookEnableDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Post member-join and welcome events to your integration endpoint.'**
+  String get ui3WebhookEnableDesc;
+
+  /// No description provided for @ui3WebhookUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Webhook URL'**
+  String get ui3WebhookUrl;
+
+  /// No description provided for @ui3WebhookSecretOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Signing Secret (optional)'**
+  String get ui3WebhookSecretOptional;
+
+  /// No description provided for @ui3WebhookSecretHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Used for X-N42-Signature'**
+  String get ui3WebhookSecretHint;
+
+  /// No description provided for @ui3WebhookNotifyMemberJoined.
+  ///
+  /// In en, this message translates to:
+  /// **'Notify when a member joins'**
+  String get ui3WebhookNotifyMemberJoined;
+
+  /// No description provided for @ui3WebhookNotifyWelcomeSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Notify when welcome is sent'**
+  String get ui3WebhookNotifyWelcomeSent;
+
+  /// No description provided for @ui3WebhookTestSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send test webhook'**
+  String get ui3WebhookTestSend;
+
+  /// No description provided for @ui3WebhookTestSending.
+  ///
+  /// In en, this message translates to:
+  /// **'Sending test webhook...'**
+  String get ui3WebhookTestSending;
+
+  /// No description provided for @ui3WebhookTestSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Test webhook sent successfully'**
+  String get ui3WebhookTestSent;
+
+  /// No description provided for @ui3WebhookTestFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to send test webhook'**
+  String get ui3WebhookTestFailed;
+
+  /// No description provided for @ui3WebhookUrlInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Webhook URL must be a public HTTPS address'**
+  String get ui3WebhookUrlInvalid;
+
+  /// No description provided for @ui3WebhookSelectEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'Select at least one webhook event'**
+  String get ui3WebhookSelectEvent;
+
+  /// No description provided for @ui3SensitiveDataDetection.
+  ///
+  /// In en, this message translates to:
+  /// **'Sensitive Data Detection'**
+  String get ui3SensitiveDataDetection;
+
+  /// No description provided for @ui3Email.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get ui3Email;
+
+  /// No description provided for @ui3CreditCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Credit Card'**
+  String get ui3CreditCard;
+
+  /// No description provided for @ui3DetectEmailDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Detect email addresses in text messages'**
+  String get ui3DetectEmailDesc;
+
+  /// No description provided for @ui3DetectPhoneDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Detect phone numbers and international numbers'**
+  String get ui3DetectPhoneDesc;
+
+  /// No description provided for @ui3DetectCardDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Detect likely bank and card numbers'**
+  String get ui3DetectCardDesc;
+
+  /// No description provided for @ui3DetectWalletDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Detect Ethereum-style wallet addresses'**
+  String get ui3DetectWalletDesc;
+
+  /// No description provided for @ui3GeneralTopic.
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get ui3GeneralTopic;
+
+  /// No description provided for @a11yPreviousResult.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous result'**
+  String get a11yPreviousResult;
+
+  /// No description provided for @a11yNextResult.
+  ///
+  /// In en, this message translates to:
+  /// **'Next result'**
+  String get a11yNextResult;
+
+  /// No description provided for @ui3TryDifferentKeywords.
+  ///
+  /// In en, this message translates to:
+  /// **'Try different keywords'**
+  String get ui3TryDifferentKeywords;
+
+  /// No description provided for @ui3FiltersActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Filters active: {count}'**
+  String ui3FiltersActive(Object count);
+
+  /// No description provided for @ui3MessageFiltersActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Message filters active: {count}'**
+  String ui3MessageFiltersActive(Object count);
+
+  /// No description provided for @ui3LoadMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Load more'**
+  String get ui3LoadMore;
+
+  /// No description provided for @ui3MessageFilters.
+  ///
+  /// In en, this message translates to:
+  /// **'Message Filters'**
+  String get ui3MessageFilters;
+
+  /// No description provided for @ui3SenderUserId.
+  ///
+  /// In en, this message translates to:
+  /// **'Sender User ID'**
+  String get ui3SenderUserId;
+
+  /// No description provided for @ui3FilterType.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get ui3FilterType;
+
+  /// No description provided for @ui3FilterAny.
+  ///
+  /// In en, this message translates to:
+  /// **'Any'**
+  String get ui3FilterAny;
+
+  /// No description provided for @ui3FilterImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Image'**
+  String get ui3FilterImage;
+
+  /// No description provided for @ui3FilterTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Time'**
+  String get ui3FilterTime;
+
+  /// No description provided for @ui3AnyTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Any time'**
+  String get ui3AnyTime;
+
+  /// No description provided for @ui3OnlyMyMessages.
+  ///
+  /// In en, this message translates to:
+  /// **'Only my messages'**
+  String get ui3OnlyMyMessages;
+
+  /// No description provided for @ui3MediaOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Media only'**
+  String get ui3MediaOnly;
+
+  /// No description provided for @ui3Apply.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get ui3Apply;
+
+  /// No description provided for @ui3QrStyleClassic.
+  ///
+  /// In en, this message translates to:
+  /// **'Classic'**
+  String get ui3QrStyleClassic;
+
+  /// No description provided for @ui3QrStyleOcean.
+  ///
+  /// In en, this message translates to:
+  /// **'Ocean'**
+  String get ui3QrStyleOcean;
+
+  /// No description provided for @ui3QrStyleBerry.
+  ///
+  /// In en, this message translates to:
+  /// **'Berry'**
+  String get ui3QrStyleBerry;
+
+  /// No description provided for @ui3NfcUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'NFC unavailable or tag not supported. Enable NFC, try another tag, or use QR.'**
+  String get ui3NfcUnavailable;
+
+  /// No description provided for @ui3CancelNfc.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel NFC'**
+  String get ui3CancelNfc;
+
+  /// No description provided for @ui3ReadNfcTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Read NFC tag'**
+  String get ui3ReadNfcTag;
+
+  /// No description provided for @ui3HoldNearNfcTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold your phone near the service tag.'**
+  String get ui3HoldNearNfcTag;
+
+  /// No description provided for @a11yFlashlightOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on flashlight'**
+  String get a11yFlashlightOn;
+
+  /// No description provided for @a11yFlashlightOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn off flashlight'**
+  String get a11yFlashlightOff;
+
+  /// No description provided for @ui3SocialGraph.
+  ///
+  /// In en, this message translates to:
+  /// **'Social Graph'**
+  String get ui3SocialGraph;
+
+  /// No description provided for @ui3RecommendedConnections.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommended Connections'**
+  String get ui3RecommendedConnections;
+
+  /// No description provided for @ui3Portfolio.
+  ///
+  /// In en, this message translates to:
+  /// **'Portfolio'**
+  String get ui3Portfolio;
+
+  /// No description provided for @ui3Chains.
+  ///
+  /// In en, this message translates to:
+  /// **'Chains'**
+  String get ui3Chains;
+
+  /// No description provided for @ui3Tokens.
+  ///
+  /// In en, this message translates to:
+  /// **'Tokens'**
+  String get ui3Tokens;
+
+  /// No description provided for @ui3NoConnectionsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No connections found'**
+  String get ui3NoConnectionsFound;
+
+  /// No description provided for @ui3ConnectionsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Connections appear as you build on-chain activity'**
+  String get ui3ConnectionsHint;
+
+  /// No description provided for @ui3SocialGraphLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load social graph'**
+  String get ui3SocialGraphLoadFailed;
+
+  /// No description provided for @ui3Similarity.
+  ///
+  /// In en, this message translates to:
+  /// **'Similarity'**
+  String get ui3Similarity;
+
+  /// No description provided for @ui3Breakdown.
+  ///
+  /// In en, this message translates to:
+  /// **'Breakdown'**
+  String get ui3Breakdown;
+
+  /// No description provided for @ui3TokenHoldings.
+  ///
+  /// In en, this message translates to:
+  /// **'Token Holdings'**
+  String get ui3TokenHoldings;
+
+  /// No description provided for @ui3NftCollections.
+  ///
+  /// In en, this message translates to:
+  /// **'NFT Collections'**
+  String get ui3NftCollections;
+
+  /// No description provided for @ui3ChainUsage.
+  ///
+  /// In en, this message translates to:
+  /// **'Chain Usage'**
+  String get ui3ChainUsage;
+
+  /// No description provided for @ui3Transactions.
+  ///
+  /// In en, this message translates to:
+  /// **'Transactions'**
+  String get ui3Transactions;
+
+  /// No description provided for @ui3DaoMembership.
+  ///
+  /// In en, this message translates to:
+  /// **'DAO Membership'**
+  String get ui3DaoMembership;
+
+  /// No description provided for @ui3NotWeighted.
+  ///
+  /// In en, this message translates to:
+  /// **'Not weighted'**
+  String get ui3NotWeighted;
+
+  /// No description provided for @ui3PercentWithWeight.
+  ///
+  /// In en, this message translates to:
+  /// **'{percent}% (weight: {weight})'**
+  String ui3PercentWithWeight(Object percent, Object weight);
+
+  /// No description provided for @ui3CommonOnChainActivity.
+  ///
+  /// In en, this message translates to:
+  /// **'Common On-Chain Activity'**
+  String get ui3CommonOnChainActivity;
+
+  /// No description provided for @ui3SharedTokens.
+  ///
+  /// In en, this message translates to:
+  /// **'Shared Tokens'**
+  String get ui3SharedTokens;
+
+  /// No description provided for @ui3SharedNftCollections.
+  ///
+  /// In en, this message translates to:
+  /// **'Shared NFT Collections'**
+  String get ui3SharedNftCollections;
+
+  /// No description provided for @ui3SharedChains.
+  ///
+  /// In en, this message translates to:
+  /// **'Shared Chains'**
+  String get ui3SharedChains;
+
+  /// No description provided for @ui3NoSharedTokens.
+  ///
+  /// In en, this message translates to:
+  /// **'No shared tokens found'**
+  String get ui3NoSharedTokens;
+
+  /// No description provided for @ui3NoSharedNftCollections.
+  ///
+  /// In en, this message translates to:
+  /// **'No shared NFT collections found'**
+  String get ui3NoSharedNftCollections;
+
+  /// No description provided for @ui3NoSharedChains.
+  ///
+  /// In en, this message translates to:
+  /// **'No shared chains found'**
+  String get ui3NoSharedChains;
+
+  /// No description provided for @ui3SimilarityFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to calculate similarity'**
+  String get ui3SimilarityFailed;
+
+  /// No description provided for @ui3ItemsAndMore.
+  ///
+  /// In en, this message translates to:
+  /// **'{items} +{count} more'**
+  String ui3ItemsAndMore(Object items, Object count);
+
+  /// No description provided for @a11yGovernance.
+  ///
+  /// In en, this message translates to:
+  /// **'Governance'**
+  String get a11yGovernance;
+
+  /// No description provided for @ui3CommunityLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Community Link'**
+  String get ui3CommunityLink;
+
+  /// No description provided for @ui3CommunityQrCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Community QR Code'**
+  String get ui3CommunityQrCode;
+
+  /// No description provided for @ui3CommunityQrSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan to join this community and browse its channels'**
+  String get ui3CommunityQrSubtitle;
+
+  /// No description provided for @ui3CommunityLinkLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load community link'**
+  String get ui3CommunityLinkLoadFailed;
+
+  /// No description provided for @ui3CommunityLinkCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Community link copied'**
+  String get ui3CommunityLinkCopied;
+
+  /// No description provided for @ui3KickMemberConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} will be removed from this community.'**
+  String ui3KickMemberConfirm(Object name);
+
+  /// No description provided for @ui3BanMemberConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} will be removed and cannot rejoin.'**
+  String ui3BanMemberConfirm(Object name);
+
+  /// No description provided for @ui3SignInToDiscoverChannels.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to discover public channels'**
+  String get ui3SignInToDiscoverChannels;
+
+  /// No description provided for @ui3UnableToJoinChannel.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to join {name}: {error}'**
+  String ui3UnableToJoinChannel(Object name, Object error);
+
+  /// No description provided for @ui3CategoryTech.
+  ///
+  /// In en, this message translates to:
+  /// **'Tech'**
+  String get ui3CategoryTech;
+
+  /// No description provided for @ui3CategorySocial.
+  ///
+  /// In en, this message translates to:
+  /// **'Social'**
+  String get ui3CategorySocial;
+
+  /// No description provided for @ui3NoPublicChannels.
+  ///
+  /// In en, this message translates to:
+  /// **'No public channels found'**
+  String get ui3NoPublicChannels;
+
+  /// No description provided for @ui3StoriesAndFun.
+  ///
+  /// In en, this message translates to:
+  /// **'Stories & Fun'**
+  String get ui3StoriesAndFun;
+
+  /// No description provided for @ui3SearchMusicHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search songs, artists, or friends'**
+  String get ui3SearchMusicHint;
+
+  /// No description provided for @ui3ForYou.
+  ///
+  /// In en, this message translates to:
+  /// **'For You'**
+  String get ui3ForYou;
+
+  /// No description provided for @ui3Liked.
+  ///
+  /// In en, this message translates to:
+  /// **'Liked'**
+  String get ui3Liked;
+
+  /// No description provided for @ui3NoLikedMusic.
+  ///
+  /// In en, this message translates to:
+  /// **'No liked music yet'**
+  String get ui3NoLikedMusic;
+
+  /// No description provided for @ui3NoMusicStories.
+  ///
+  /// In en, this message translates to:
+  /// **'No music Stories yet'**
+  String get ui3NoMusicStories;
+
+  /// No description provided for @ui3LikedMusicHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the heart beside a song to keep it here.'**
+  String get ui3LikedMusicHint;
+
+  /// No description provided for @ui3MusicStoriesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Music shared in Stories will appear here.'**
+  String get ui3MusicStoriesHint;
+
+  /// No description provided for @ui3SharedBy.
+  ///
+  /// In en, this message translates to:
+  /// **'{artist} · shared by {name}'**
+  String ui3SharedBy(Object artist, Object name);
+
+  /// No description provided for @ui3UnableToPlay.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to play {title}: {error}'**
+  String ui3UnableToPlay(Object title, Object error);
+
+  /// No description provided for @a11yPreviousTrack.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous track'**
+  String get a11yPreviousTrack;
+
+  /// No description provided for @a11yNextTrack.
+  ///
+  /// In en, this message translates to:
+  /// **'Next track'**
+  String get a11yNextTrack;
+
+  /// No description provided for @a11yPlay.
+  ///
+  /// In en, this message translates to:
+  /// **'Play'**
+  String get a11yPlay;
+
+  /// No description provided for @a11yPause.
+  ///
+  /// In en, this message translates to:
+  /// **'Pause'**
+  String get a11yPause;
+
+  /// No description provided for @ui3Refresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh'**
+  String get ui3Refresh;
+
+  /// No description provided for @ui3NearbyIntroTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Discover nearby public posts'**
+  String get ui3NearbyIntroTitle;
+
+  /// No description provided for @ui3NearbyIntroBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your location is used once on this device to sort public Moments. It is not uploaded, broadcast, or shown to other people.'**
+  String get ui3NearbyIntroBody;
+
+  /// No description provided for @ui3UseMyLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Use my location'**
+  String get ui3UseMyLocation;
+
+  /// No description provided for @ui3NearbyUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Nearby is unavailable'**
+  String get ui3NearbyUnavailable;
+
+  /// No description provided for @ui3NoNearbyPosts.
+  ///
+  /// In en, this message translates to:
+  /// **'No nearby posts yet'**
+  String get ui3NoNearbyPosts;
+
+  /// No description provided for @ui3NoNearbyPostsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Public Moments with a location will appear here.'**
+  String get ui3NoNearbyPostsHint;
+
+  /// No description provided for @ui3NearbyDistanceNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Approximate distance · public location posts only'**
+  String get ui3NearbyDistanceNote;
+
+  /// No description provided for @ui3PublicLocationPost.
+  ///
+  /// In en, this message translates to:
+  /// **'Public location post'**
+  String get ui3PublicLocationPost;
+
+  /// No description provided for @ui3LocationServicesOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Location Services are turned off'**
+  String get ui3LocationServicesOff;
+
+  /// No description provided for @ui3LocationPermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Location permission was denied'**
+  String get ui3LocationPermissionDenied;
+
+  /// No description provided for @ui3EnableLocationInSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable location permission in system settings'**
+  String get ui3EnableLocationInSettings;
+
+  /// No description provided for @ui3CreateStory.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Story'**
+  String get ui3CreateStory;
+
+  /// No description provided for @ui3CreateStoryDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Post a text or photo status.'**
+  String get ui3CreateStoryDesc;
+
+  /// No description provided for @ui3StoryCamera.
+  ///
+  /// In en, this message translates to:
+  /// **'Story Camera'**
+  String get ui3StoryCamera;
+
+  /// No description provided for @ui3StoryCameraDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Jump straight into filters and photo editing.'**
+  String get ui3StoryCameraDesc;
+
+  /// No description provided for @ui3MomentsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Open the full feed and comments.'**
+  String get ui3MomentsDesc;
+
+  /// No description provided for @ui3MomentCamera.
+  ///
+  /// In en, this message translates to:
+  /// **'Moment Camera'**
+  String get ui3MomentCamera;
+
+  /// No description provided for @ui3MomentCameraDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a post and pick media immediately.'**
+  String get ui3MomentCameraDesc;
+
+  /// No description provided for @ui3GamesDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Launch the built-in casual game center.'**
+  String get ui3GamesDesc;
+
+  /// No description provided for @ui3AvatarStudio.
+  ///
+  /// In en, this message translates to:
+  /// **'Avatar Studio'**
+  String get ui3AvatarStudio;
+
+  /// No description provided for @ui3AvatarStudioDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Decorations, NFT avatar and identity flair.'**
+  String get ui3AvatarStudioDesc;
+
+  /// No description provided for @ui3SocialGraphDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'On-chain follows, fans and connections.'**
+  String get ui3SocialGraphDesc;
+
+  /// No description provided for @ui3SocialHubHeroTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Stories, moments, games and avatars'**
+  String get ui3SocialHubHeroTitle;
+
+  /// No description provided for @ui3SocialHubHeroBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Reuse the existing social stack instead of scattering entry points across chat, profile and discover.'**
+  String get ui3SocialHubHeroBody;
+
+  /// No description provided for @ui3SocialGraphNotConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'Social graph is not configured on this build'**
+  String get ui3SocialGraphNotConfigured;
+
+  /// No description provided for @ui3ConnectWalletForSocialGraph.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect a wallet to view your social graph'**
+  String get ui3ConnectWalletForSocialGraph;
+
+  /// No description provided for @ui3AvatarStudioSignIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Avatar Studio requires a signed-in user'**
+  String get ui3AvatarStudioSignIn;
+
+  /// No description provided for @a11yRemoveImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove image'**
+  String get a11yRemoveImage;
+
+  /// No description provided for @a11yBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get a11yBack;
+
+  /// No description provided for @ui3MiniAppConfirmTransactionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Transaction'**
+  String get ui3MiniAppConfirmTransactionTitle;
+
+  /// No description provided for @ui3MiniAppConfirmTransactionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A Mini App is requesting to send a transaction on your behalf.'**
+  String get ui3MiniAppConfirmTransactionBody;
+
+  /// No description provided for @ui3MiniAppOpenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Open {name}?'**
+  String ui3MiniAppOpenTitle(Object name);
+
+  /// No description provided for @ui3MiniAppOpenButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get ui3MiniAppOpenButton;
+
+  /// No description provided for @ui3StoryReplySendFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to send story reply'**
+  String get ui3StoryReplySendFailed;
+
+  /// No description provided for @ui3RedPacketDemoNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo red packet — an in-chat record only, no real on-chain asset is transferred.'**
+  String get ui3RedPacketDemoNotice;
+
+  /// No description provided for @ui3RedPacketCoverClassic.
+  ///
+  /// In en, this message translates to:
+  /// **'Classic Red'**
+  String get ui3RedPacketCoverClassic;
+
+  /// No description provided for @ui3RedPacketCoverGolden.
+  ///
+  /// In en, this message translates to:
+  /// **'Golden'**
+  String get ui3RedPacketCoverGolden;
+
+  /// No description provided for @ui3RedPacketCoverPurple.
+  ///
+  /// In en, this message translates to:
+  /// **'Purple'**
+  String get ui3RedPacketCoverPurple;
+
+  /// No description provided for @ui3RedPacketCoverOceanBlue.
+  ///
+  /// In en, this message translates to:
+  /// **'Ocean Blue'**
+  String get ui3RedPacketCoverOceanBlue;
+
+  /// No description provided for @ui3RedPacketCoverNatureGreen.
+  ///
+  /// In en, this message translates to:
+  /// **'Nature Green'**
+  String get ui3RedPacketCoverNatureGreen;
+
+  /// No description provided for @ui3RedPacketCoverRosePink.
+  ///
+  /// In en, this message translates to:
+  /// **'Rose Pink'**
+  String get ui3RedPacketCoverRosePink;
+
+  /// No description provided for @ui3RedPacketHistoryEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No red packets yet'**
+  String get ui3RedPacketHistoryEmpty;
+
+  /// No description provided for @ui3TransferMerchantQrWithAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Merchant QR (with amount)'**
+  String get ui3TransferMerchantQrWithAmount;
+
+  /// No description provided for @ui3TransferMerchantQrTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Merchant QR'**
+  String get ui3TransferMerchantQrTitle;
+
+  /// No description provided for @ui3TransferOpenAmountHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave empty for open amount'**
+  String get ui3TransferOpenAmountHint;
+
+  /// No description provided for @ui3FiatRampTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy / Sell crypto'**
+  String get ui3FiatRampTitle;
+
+  /// No description provided for @ui3FiatRampBuy.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy'**
+  String get ui3FiatRampBuy;
+
+  /// No description provided for @ui3FiatRampSell.
+  ///
+  /// In en, this message translates to:
+  /// **'Sell'**
+  String get ui3FiatRampSell;
+
+  /// No description provided for @ui3FiatRampNotConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'Fiat on/off-ramp not configured'**
+  String get ui3FiatRampNotConfigured;
+
+  /// No description provided for @a11yPointsAddRule.
+  ///
+  /// In en, this message translates to:
+  /// **'Add reward rule'**
+  String get a11yPointsAddRule;
+
+  /// No description provided for @a11yGovernanceRemoveChoice.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove choice'**
+  String get a11yGovernanceRemoveChoice;
+
+  /// No description provided for @a11yGovernanceCreateProposal.
+  ///
+  /// In en, this message translates to:
+  /// **'Create proposal'**
+  String get a11yGovernanceCreateProposal;
+
+  /// No description provided for @ui3MiniAppUpdateN42.
+  ///
+  /// In en, this message translates to:
+  /// **'Update N42'**
+  String get ui3MiniAppUpdateN42;
+
+  /// No description provided for @ui3MiniAppOfficial.
+  ///
+  /// In en, this message translates to:
+  /// **'Official'**
+  String get ui3MiniAppOfficial;
+
+  /// No description provided for @ui3MiniAppUserCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} users'**
+  String ui3MiniAppUserCount(Object count);
+
+  /// No description provided for @a11yStoryBackgroundColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Background color {index}'**
+  String a11yStoryBackgroundColor(Object index);
+
+  /// No description provided for @a11yStoryAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add story'**
+  String get a11yStoryAdd;
+
+  /// No description provided for @ui3StoryPostFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to post story'**
+  String get ui3StoryPostFailed;
+
+  /// No description provided for @ui3StoryTapToSelectImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to select an image'**
+  String get ui3StoryTapToSelectImage;
+
+  /// No description provided for @ui3StoryChangeImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Change'**
+  String get ui3StoryChangeImage;
+
+  /// No description provided for @ui3StoryMusicReadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to read selected music: {error}'**
+  String ui3StoryMusicReadFailed(Object error);
+
+  /// No description provided for @ui3StoryDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this story?'**
+  String get ui3StoryDeleteConfirm;
+
+  /// No description provided for @ui3StoryDeleteFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete story'**
+  String get ui3StoryDeleteFailed;
+
+  /// No description provided for @ui3MomentCreateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Moment'**
+  String get ui3MomentCreateTitle;
+
+  /// No description provided for @ui3MomentContentHint.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s on your mind?'**
+  String get ui3MomentContentHint;
+
+  /// No description provided for @ui3MomentAddPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Photos'**
+  String get ui3MomentAddPhotos;
+
+  /// No description provided for @ui3MomentAddLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Location'**
+  String get ui3MomentAddLocation;
+
+  /// No description provided for @ui3MomentSelectedMedia.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected Media ({count})'**
+  String ui3MomentSelectedMedia(Object count);
+
+  /// No description provided for @ui3MomentClearAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear All'**
+  String get ui3MomentClearAll;
+
+  /// No description provided for @ui3MomentClearMediaConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove all selected photos/videos?'**
+  String get ui3MomentClearMediaConfirm;
+
+  /// No description provided for @ui3MomentVisibilityPublicDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'All friends can see'**
+  String get ui3MomentVisibilityPublicDesc;
+
+  /// No description provided for @ui3MomentVisibilityPrivateDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Only you can see'**
+  String get ui3MomentVisibilityPrivateDesc;
+
+  /// No description provided for @ui3MomentVisibilityPartialDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose who can see'**
+  String get ui3MomentVisibilityPartialDesc;
+
+  /// No description provided for @ui3MomentVisibilityExcludedDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide from specific friends'**
+  String get ui3MomentVisibilityExcludedDesc;
+
+  /// No description provided for @ui3MomentVideos.
+  ///
+  /// In en, this message translates to:
+  /// **'Videos'**
+  String get ui3MomentVideos;
+
+  /// No description provided for @ui3MomentNoVideos.
+  ///
+  /// In en, this message translates to:
+  /// **'No videos yet'**
+  String get ui3MomentNoVideos;
+
+  /// No description provided for @a11yCallMinimize.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimize'**
+  String get a11yCallMinimize;
+
+  /// No description provided for @a11yCallGridView.
+  ///
+  /// In en, this message translates to:
+  /// **'Grid view'**
+  String get a11yCallGridView;
+
+  /// No description provided for @a11yCallFocusView.
+  ///
+  /// In en, this message translates to:
+  /// **'Focus view'**
+  String get a11yCallFocusView;
+
+  /// No description provided for @ui3CallTools.
+  ///
+  /// In en, this message translates to:
+  /// **'Call tools'**
+  String get ui3CallTools;
+
+  /// No description provided for @ui3CallMeetingTools.
+  ///
+  /// In en, this message translates to:
+  /// **'Meeting tools'**
+  String get ui3CallMeetingTools;
+
+  /// No description provided for @ui3CallToolsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tune audio and video quality without leaving the call.'**
+  String get ui3CallToolsSubtitle;
+
+  /// No description provided for @ui3CallAudioEnhancement.
+  ///
+  /// In en, this message translates to:
+  /// **'Audio enhancement'**
+  String get ui3CallAudioEnhancement;
+
+  /// No description provided for @ui3CallNoiseSuppression.
+  ///
+  /// In en, this message translates to:
+  /// **'Noise suppression'**
+  String get ui3CallNoiseSuppression;
+
+  /// No description provided for @ui3CallNoiseSuppressionDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Reduce keyboard and background noise.'**
+  String get ui3CallNoiseSuppressionDesc;
+
+  /// No description provided for @ui3CallEchoCancellation.
+  ///
+  /// In en, this message translates to:
+  /// **'Echo cancellation'**
+  String get ui3CallEchoCancellation;
+
+  /// No description provided for @ui3CallEchoCancellationDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Prevent speaker feedback from re-entering the mic.'**
+  String get ui3CallEchoCancellationDesc;
+
+  /// No description provided for @ui3CallAutoGainControl.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto gain control'**
+  String get ui3CallAutoGainControl;
+
+  /// No description provided for @ui3CallAutoGainControlDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep microphone volume more stable.'**
+  String get ui3CallAutoGainControlDesc;
+
+  /// No description provided for @ui3CallVoiceIsolation.
+  ///
+  /// In en, this message translates to:
+  /// **'Enhanced voice isolation'**
+  String get ui3CallVoiceIsolation;
+
+  /// No description provided for @ui3CallVoiceIsolationDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Use a stronger noise reduction profile.'**
+  String get ui3CallVoiceIsolationDesc;
+
+  /// No description provided for @ui3CallVideoSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Video'**
+  String get ui3CallVideoSection;
+
+  /// No description provided for @ui3CallBackgroundBlur.
+  ///
+  /// In en, this message translates to:
+  /// **'Background blur (beta)'**
+  String get ui3CallBackgroundBlur;
+
+  /// No description provided for @ui3CallBlurDescReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Preference is wired. Visual blur still depends on the video processor rollout.'**
+  String get ui3CallBlurDescReady;
+
+  /// No description provided for @ui3CallBlurDescSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Blur preference is saved and will apply when camera processing is available.'**
+  String get ui3CallBlurDescSaved;
+
+  /// No description provided for @ui3CallBlurDescCameraOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on your camera after background processing is available.'**
+  String get ui3CallBlurDescCameraOff;
+
+  /// No description provided for @ui3CallRecordingSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording'**
+  String get ui3CallRecordingSection;
+
+  /// No description provided for @ui3CallRecordingDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Requires server-side egress before recordings can be saved.'**
+  String get ui3CallRecordingDesc;
+
+  /// No description provided for @ui3CallSettingsUpdateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update call settings: {error}'**
+  String ui3CallSettingsUpdateFailed(Object error);
+
+  /// No description provided for @ui3CallRecordingStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording started'**
+  String get ui3CallRecordingStarted;
+
+  /// No description provided for @ui3VoiceRoomNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Room not found'**
+  String get ui3VoiceRoomNotFound;
+
+  /// No description provided for @ui3VoiceRoomEndConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to end this voice room?'**
+  String get ui3VoiceRoomEndConfirm;
+
+  /// No description provided for @a11yGameMoveUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Move up'**
+  String get a11yGameMoveUp;
+
+  /// No description provided for @a11yGameMoveDown.
+  ///
+  /// In en, this message translates to:
+  /// **'Move down'**
+  String get a11yGameMoveDown;
+
+  /// No description provided for @a11yGameMoveLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'Move left'**
+  String get a11yGameMoveLeft;
+
+  /// No description provided for @a11yGameMoveRight.
+  ///
+  /// In en, this message translates to:
+  /// **'Move right'**
+  String get a11yGameMoveRight;
+
+  /// No description provided for @a11yGameRotate.
+  ///
+  /// In en, this message translates to:
+  /// **'Rotate'**
+  String get a11yGameRotate;
+
+  /// No description provided for @a11yGameDrop.
+  ///
+  /// In en, this message translates to:
+  /// **'Drop'**
+  String get a11yGameDrop;
+
+  /// No description provided for @ui3StickerAddedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Added {count} sticker(s)'**
+  String ui3StickerAddedCount(Object count);
+
+  /// No description provided for @ui3StickerAddFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to add: {error}'**
+  String ui3StickerAddFailed(Object error);
+
+  /// No description provided for @ui3StickerRemoveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove sticker'**
+  String get ui3StickerRemoveTitle;
+
+  /// No description provided for @ui3StickerRemoveConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove this sticker from the pack?'**
+  String get ui3StickerRemoveConfirm;
+
+  /// No description provided for @ui3StickerRemoveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to remove'**
+  String get ui3StickerRemoveFailed;
+
+  /// No description provided for @ui3StickerRenamePack.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename pack'**
+  String get ui3StickerRenamePack;
+
+  /// No description provided for @ui3StickerPackName.
+  ///
+  /// In en, this message translates to:
+  /// **'Pack name'**
+  String get ui3StickerPackName;
+
+  /// No description provided for @ui3StickerRenameFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to rename'**
+  String get ui3StickerRenameFailed;
+
+  /// No description provided for @ui3StickerDeletePack.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete pack'**
+  String get ui3StickerDeletePack;
+
+  /// No description provided for @ui3StickerThisPack.
+  ///
+  /// In en, this message translates to:
+  /// **'this pack'**
+  String get ui3StickerThisPack;
+
+  /// No description provided for @ui3StickerDeletePackConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete \"{name}\" and all its stickers? This cannot be undone.'**
+  String ui3StickerDeletePackConfirm(Object name);
+
+  /// No description provided for @ui3StickerDeleteFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete'**
+  String get ui3StickerDeleteFailed;
+
+  /// No description provided for @ui3StickerPack.
+  ///
+  /// In en, this message translates to:
+  /// **'Sticker Pack'**
+  String get ui3StickerPack;
+
+  /// No description provided for @ui3StickerAdding.
+  ///
+  /// In en, this message translates to:
+  /// **'Adding…'**
+  String get ui3StickerAdding;
+
+  /// No description provided for @ui3StickerAddStickers.
+  ///
+  /// In en, this message translates to:
+  /// **'Add stickers'**
+  String get ui3StickerAddStickers;
+
+  /// No description provided for @ui3StickerPackNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Pack not found'**
+  String get ui3StickerPackNotFound;
+
+  /// No description provided for @ui3StickerEmptyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap \"Add stickers\" to upload images'**
+  String get ui3StickerEmptyHint;
+
+  /// No description provided for @ui3StickerNewPack.
+  ///
+  /// In en, this message translates to:
+  /// **'New sticker pack'**
+  String get ui3StickerNewPack;
+
+  /// No description provided for @ui3StickerCreate.
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get ui3StickerCreate;
+
+  /// No description provided for @ui3StickerCreateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to create pack'**
+  String get ui3StickerCreateFailed;
+
+  /// No description provided for @ui3StickerInstalled.
+  ///
+  /// In en, this message translates to:
+  /// **'Installed \"{name}\"'**
+  String ui3StickerInstalled(Object name);
+
+  /// No description provided for @ui3StickerRemovePackTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove Sticker Pack'**
+  String get ui3StickerRemovePackTitle;
+
+  /// No description provided for @ui3StickerRemovePackConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove \"{name}\" from your stickers?'**
+  String ui3StickerRemovePackConfirm(Object name);
+
+  /// No description provided for @ui3StickerRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'Removed \"{name}\"'**
+  String ui3StickerRemoved(Object name);
+
+  /// No description provided for @ui3StickerAiSticker.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Sticker'**
+  String get ui3StickerAiSticker;
+
+  /// No description provided for @ui3StickerStoreTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Store'**
+  String get ui3StickerStoreTab;
+
+  /// No description provided for @ui3StickerMyStickersTab.
+  ///
+  /// In en, this message translates to:
+  /// **'My Stickers'**
+  String get ui3StickerMyStickersTab;
+
+  /// No description provided for @ui3StickerNoneFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No stickers found'**
+  String get ui3StickerNoneFound;
+
+  /// No description provided for @ui3StickerByAuthor.
+  ///
+  /// In en, this message translates to:
+  /// **'by {author}'**
+  String ui3StickerByAuthor(Object author);
+
+  /// No description provided for @ui3StickerManage.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage'**
+  String get ui3StickerManage;
+
+  /// No description provided for @ui3StickerCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} stickers'**
+  String ui3StickerCount(Object count);
+
+  /// No description provided for @ui3StickerNoneInstalled.
+  ///
+  /// In en, this message translates to:
+  /// **'No stickers installed'**
+  String get ui3StickerNoneInstalled;
+
+  /// No description provided for @ui3StickerGetFromStore.
+  ///
+  /// In en, this message translates to:
+  /// **'Get stickers from the store'**
+  String get ui3StickerGetFromStore;
+
+  /// No description provided for @ui3StickerBrowseStore.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse Store'**
+  String get ui3StickerBrowseStore;
+
+  /// No description provided for @ui3StickerAddedToAi.
+  ///
+  /// In en, this message translates to:
+  /// **'Added to \"AI Stickers\"'**
+  String get ui3StickerAddedToAi;
+
+  /// No description provided for @ui3StickerAddOneFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to add sticker'**
+  String get ui3StickerAddOneFailed;
+
+  /// No description provided for @ui3StickerPromptLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Describe your sticker'**
+  String get ui3StickerPromptLabel;
+
+  /// No description provided for @ui3StickerPromptHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. a happy orange cat with sunglasses'**
+  String get ui3StickerPromptHint;
+
+  /// No description provided for @ui3StickerGenerating.
+  ///
+  /// In en, this message translates to:
+  /// **'Generating…'**
+  String get ui3StickerGenerating;
+
+  /// No description provided for @ui3StickerGenerate.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate'**
+  String get ui3StickerGenerate;
+
+  /// No description provided for @ui3StickerAddToStickers.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to stickers'**
+  String get ui3StickerAddToStickers;
+
+  /// No description provided for @ui3StickerGeneratingPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Generating your sticker…'**
+  String get ui3StickerGeneratingPreview;
+
+  /// No description provided for @ui3StickerGenerateEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Describe a sticker and tap Generate'**
+  String get ui3StickerGenerateEmpty;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

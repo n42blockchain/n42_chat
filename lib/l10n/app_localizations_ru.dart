@@ -6403,4 +6403,2011 @@ class SRu extends S {
   String scheduledSendTomorrowMorningAt(String time) {
     return 'Завтра утром ($time)';
   }
+
+  @override
+  String get a11yScrollToBottom => 'Прокрутить вниз';
+
+  @override
+  String get ui3EnterMessageBeforeScheduling =>
+      'Введите сообщение перед планированием';
+
+  @override
+  String get ui3SendCode => 'Отправить код';
+
+  @override
+  String get ui3CodeLanguage => 'Язык';
+
+  @override
+  String get ui3PasteCodeHere => 'Вставьте код сюда';
+
+  @override
+  String ui3ReminderSetAt(String time) {
+    return 'Напоминание установлено · $time';
+  }
+
+  @override
+  String get ui3RedPacketCreateFailed => 'Не удалось создать красный конверт';
+
+  @override
+  String get ui3SendTip => 'Отправить чаевые';
+
+  @override
+  String get ui3TokenLabel => 'Токен';
+
+  @override
+  String get ui3NoteOptional => 'Примечание (необязательно)';
+
+  @override
+  String ui3TipFailed(String error) {
+    return 'Не удалось отправить чаевые: $error';
+  }
+
+  @override
+  String get ui3GiftNftTitle => 'Подарить NFT';
+
+  @override
+  String get ui3TokenId => 'ID токена';
+
+  @override
+  String ui3NftGiftFailed(String error) {
+    return 'Не удалось подарить NFT: $error';
+  }
+
+  @override
+  String get ui3AiAgentSubtitle =>
+      'Опишите задачу — откроется нужное мини-приложение';
+
+  @override
+  String get ui3GiftNft => 'Подарить NFT';
+
+  @override
+  String get ui3GiftNftSubtitle => 'Отправить NFT этому контакту';
+
+  @override
+  String get ui3MiniAppUnavailable => 'Мини-приложение недоступно';
+
+  @override
+  String ui3MediaItemsNotSent(int count) {
+    return 'Не удалось отправить выбранные медиафайлы: $count';
+  }
+
+  @override
+  String get ui3PhotosSubtitle => 'Отправка фото и видео в формате для чата';
+
+  @override
+  String get ui3OriginalImages => 'Оригиналы изображений';
+
+  @override
+  String get ui3OriginalImagesSubtitle => 'Отправлять несжатые фото как файлы';
+
+  @override
+  String ui3ScheduledFileFor(String filename, String time) {
+    return '$filename: отправка запланирована на $time';
+  }
+
+  @override
+  String ui3SendingOriginalImage(String filename) {
+    return 'Отправка оригинала изображения: $filename';
+  }
+
+  @override
+  String ui3ScheduledOriginalImage(String filename) {
+    return 'Оригинал изображения запланирован: $filename';
+  }
+
+  @override
+  String get ui3PaymentAlreadySent => 'Платёж уже отправлен';
+
+  @override
+  String get ui3PaymentProcessing => 'Платёж обрабатывается';
+
+  @override
+  String ui3ChainStatus(String status) {
+    return 'Статус в блокчейне: $status';
+  }
+
+  @override
+  String get ui3NotChecked => 'Не проверено';
+
+  @override
+  String ui3ConfirmationsCount(int confirmations, int required) {
+    return 'Подтверждено: $confirmations / $required блоков';
+  }
+
+  @override
+  String get ui3CopyTxHash => 'Копировать хеш транзакции';
+
+  @override
+  String get ui3VerifyAgain => 'Проверить снова';
+
+  @override
+  String get ui3VerifyOnChain => 'Проверить в блокчейне';
+
+  @override
+  String get ui3TransferMissingChainDetails =>
+      'Этот перевод не содержит точных данных о сети и активе.';
+
+  @override
+  String get ui3ReceiptPending => 'Ожидает в блокчейне';
+
+  @override
+  String get ui3ReceiptConfirmed => 'Подтверждено';
+
+  @override
+  String get ui3ReceiptFailed => 'Ошибка в блокчейне';
+
+  @override
+  String get ui3ReceiptMismatch => 'Данные транзакции не совпадают';
+
+  @override
+  String get ui3ReceiptUnsupported => 'Проверка в блокчейне не поддерживается';
+
+  @override
+  String get ui3ReceiptUnavailable => 'Проверка недоступна';
+
+  @override
+  String get ui3OpenOrSave => 'Открыть / Сохранить';
+
+  @override
+  String get ui3UnableToOpenFile => 'Не удалось открыть этот файл.';
+
+  @override
+  String ui3AiRewriteFailed(String error) {
+    return 'Не удалось переписать с помощью ИИ: $error';
+  }
+
+  @override
+  String get ui3AiShareMessagesTitle => 'Поделиться сообщениями с ИИ?';
+
+  @override
+  String get ui3AiShareMessagesBody =>
+      'Выберите сообщения, которые ИИ может использовать для этого ответа. Это одноразовое разрешение истекает через две минуты. Закрытие быстрого ответа отменяет ожидающие результаты. Оно не разрешает платежи и экспорт.';
+
+  @override
+  String get ui3OtherParticipant => 'Собеседник';
+
+  @override
+  String get ui3ShareSelected => 'Поделиться выбранными';
+
+  @override
+  String get ui3BotCommandError => 'Ошибка команды';
+
+  @override
+  String get ui3BotUnknownCommand => 'Неизвестная команда';
+
+  @override
+  String get ui3BotTypeHelp =>
+      'Введите /help, чтобы увидеть доступные команды.';
+
+  @override
+  String get ui3FilesMediaLinks => 'Файлы, медиа и ссылки';
+
+  @override
+  String get ui3ChatStorage => 'Хранилище чата';
+
+  @override
+  String get ui3EncryptionKeysDevices => 'Ключи шифрования и устройства';
+
+  @override
+  String get ui3EncryptionServiceUnavailable =>
+      'Служба шифрования пока недоступна';
+
+  @override
+  String get ui3ExportLoadingHistory => 'Загрузка истории чата для экспорта...';
+
+  @override
+  String get ui3ExportTxtDesc =>
+      'Текстовая расшифровка для заметок, резервной копии или проверки на соответствие';
+
+  @override
+  String get ui3ExportCustomRange => 'Свой период';
+
+  @override
+  String get ui3ExportStart => 'Начало';
+
+  @override
+  String get ui3ExportEnd => 'Конец';
+
+  @override
+  String get ui3ExportSelectDate => 'Выберите дату';
+
+  @override
+  String get ui3FolderFilterUnreadOnly => 'Только непрочитанные';
+
+  @override
+  String get ui3FolderFilterMutedOnly => 'Только без звука';
+
+  @override
+  String get ui3FolderFilterNoDms => 'Без личных сообщений';
+
+  @override
+  String get ui3FolderFilterNoGroups => 'Без групп';
+
+  @override
+  String get ui3FolderFilterNoChannels => 'Без каналов';
+
+  @override
+  String get ui3FolderFilterAllChats => 'Все чаты';
+
+  @override
+  String get ui3Create => 'Создать';
+
+  @override
+  String ui3DeleteFolderConfirm(String name) {
+    return 'Удалить папку «$name»?';
+  }
+
+  @override
+  String get a11yDecreaseTextSize => 'Уменьшить шрифт';
+
+  @override
+  String get a11yIncreaseTextSize => 'Увеличить шрифт';
+
+  @override
+  String ui3MinutesRead(int minutes) {
+    return '$minutes мин чтения';
+  }
+
+  @override
+  String get ui3TipOnChain => 'В блокчейне ✓';
+
+  @override
+  String get ui3ViewSource => 'Показать исходный код';
+
+  @override
+  String get a11yPreviousPage => 'Предыдущая страница';
+
+  @override
+  String get a11yNextPage => 'Следующая страница';
+
+  @override
+  String get ui3OpenExternalLinkTitle => 'Открыть внешнюю ссылку?';
+
+  @override
+  String get ui3Open => 'Открыть';
+
+  @override
+  String get ui3UnableToOpenLink => 'Не удалось открыть эту ссылку.';
+
+  @override
+  String get ui3ImageUnavailable => 'Изображение недоступно';
+
+  @override
+  String ui3LoadImageFrom(Object host) {
+    return 'Загрузить изображение с $host';
+  }
+
+  @override
+  String ui3RetryImageFrom(Object host) {
+    return 'Повторить загрузку изображения с $host';
+  }
+
+  @override
+  String get ui3TranslatedByN42 => 'Переведено N42';
+
+  @override
+  String ui3TranslatedFromByN42(Object language) {
+    return 'Переведено N42 с языка: $language';
+  }
+
+  @override
+  String get ui3ClearWhiteboardTitle => 'Очистить доску?';
+
+  @override
+  String get ui3ClearWhiteboardMessage =>
+      'Все штрихи будут удалены у всех участников. Это действие нельзя отменить.';
+
+  @override
+  String get ui3WhiteboardLive => 'Доска · В реальном времени';
+
+  @override
+  String get a11yPenColor => 'Цвет пера';
+
+  @override
+  String get ui3AiDescribeOcr => 'Описание ИИ / OCR';
+
+  @override
+  String get ui3DocumentPreviewFailed =>
+      'Не удалось безопасно просмотреть документ. Проверьте подключение и размер файла (макс. 2 МБ).';
+
+  @override
+  String get ui3AiConsentMessage =>
+      'Выберите сообщения, которые ИИ может использовать для этой сводки. Это одноразовое разрешение истекает через две минуты. Оно не разрешает платежи и экспорт.';
+
+  @override
+  String get ui3AiSuggestedReplies => 'Предлагаемые ответы';
+
+  @override
+  String get ui3AiGeneratingSuggestions => 'Генерация вариантов...';
+
+  @override
+  String get ui3StickersEmpty => 'Стикеров пока нет';
+
+  @override
+  String get ui3StickersGet => 'Получить стикеры';
+
+  @override
+  String get a11yFormatBold => 'Жирный';
+
+  @override
+  String get a11yFormatItalic => 'Курсив';
+
+  @override
+  String get a11yFormatStrikethrough => 'Зачёркнутый';
+
+  @override
+  String get a11yFormatInlineCode => 'Встроенный код';
+
+  @override
+  String get a11yFormatCodeBlock => 'Блок кода';
+
+  @override
+  String get a11yFormatChecklistItem => 'Пункт чек-листа';
+
+  @override
+  String get a11yFormatBulletList => 'Маркированный список';
+
+  @override
+  String get a11yFormatNumberedList => 'Нумерованный список';
+
+  @override
+  String get a11yFormatLink => 'Ссылка';
+
+  @override
+  String get a11yFormatTable => 'Таблица';
+
+  @override
+  String get a11yFormatMeetingTemplate => 'Шаблон встречи';
+
+  @override
+  String get a11yEmojiSmileys => 'Смайлы и люди';
+
+  @override
+  String get a11yEmojiHearts => 'Сердечки';
+
+  @override
+  String get a11yEmojiAnimals => 'Животные и природа';
+
+  @override
+  String get a11yEmojiFood => 'Еда и напитки';
+
+  @override
+  String get a11yEmojiTravel => 'Путешествия и места';
+
+  @override
+  String get a11yEmojiActivities => 'Активности';
+
+  @override
+  String get a11yEmojiObjects => 'Предметы';
+
+  @override
+  String get a11yEmojiSymbols => 'Символы';
+
+  @override
+  String get ui3FrequentlyUsed => 'Часто используемые';
+
+  @override
+  String get ui3NoEditHistory => 'Нет истории изменений';
+
+  @override
+  String get ui3EventNew => 'Новое событие';
+
+  @override
+  String get ui3EventTitleLabel => 'Название';
+
+  @override
+  String get ui3EventLocationOptional => 'Место (необязательно)';
+
+  @override
+  String get ui3EventDescriptionOptional => 'Описание (необязательно)';
+
+  @override
+  String get ui3EventSend => 'Отправить событие';
+
+  @override
+  String get ui3EventTitleRequired => 'Укажите название';
+
+  @override
+  String get ui3EventEndAfterStart =>
+      'Время окончания должно быть позже начала';
+
+  @override
+  String get ui3MiniAppAgentIntro =>
+      'Опишите, что вы хотите сделать, — я открою подходящее мини-приложение.';
+
+  @override
+  String get ui3MiniAppAgentExample => 'например, обменять ETH на USDC';
+
+  @override
+  String get ui3MiniAppAgentNoMatch =>
+      'Подходящее мини-приложение не найдено. Попробуйте сформулировать иначе.';
+
+  @override
+  String ui3MiniAppOpen(Object appName) {
+    return 'Открыть $appName';
+  }
+
+  @override
+  String get ui3MusicLinkPlatforms =>
+      'Поддерживаются ссылки на песни из NetEase Cloud Music, QQ Music, Kugou, Kuwo и других сервисов';
+
+  @override
+  String get ui3PollMarkCorrectAnswer => 'Отметьте непустой правильный ответ';
+
+  @override
+  String get ui3PollQuizMode => 'Режим викторины';
+
+  @override
+  String get ui3PollAnswerExplanationHint =>
+      'Пояснение к ответу (необязательно)';
+
+  @override
+  String get a11yCorrectAnswer => 'Правильный ответ';
+
+  @override
+  String get ui3AiSuggestions => 'Предложения ИИ';
+
+  @override
+  String get a11yPaste => 'Вставить';
+
+  @override
+  String get a11yRefresh => 'Обновить';
+
+  @override
+  String get ui3RecoveryKeyStoreWarning =>
+      'Храните этот ключ в надёжном месте. Это единственный способ восстановить зашифрованные сообщения, если вы потеряете доступ ко всем устройствам.';
+
+  @override
+  String ui3SavedToPath(Object path) {
+    return 'Сохранено: $path';
+  }
+
+  @override
+  String get ui3UnknownAccount => 'Неизвестный аккаунт';
+
+  @override
+  String get ui3UnknownHomeserver => 'Неизвестный домашний сервер';
+
+  @override
+  String get ui3ImportRecoveryKey => 'Импорт ключа восстановления';
+
+  @override
+  String get ui3ImportRecoveryKeyDesc =>
+      'Введите или вставьте ключ восстановления, чтобы восстановить ключи комнат для истории зашифрованных сообщений.';
+
+  @override
+  String ui3RecoveryKeyAccountInfo(Object account, Object homeserver) {
+    return 'Аккаунт: $account\\nДомашний сервер: $homeserver';
+  }
+
+  @override
+  String get ui3Import => 'Импортировать';
+
+  @override
+  String get ui3InvalidRecoveryKeyFormat =>
+      'Неверный формат ключа восстановления';
+
+  @override
+  String ui3RecoveryKeyPartialRestore(
+    Object restored,
+    Object total,
+    Object failed,
+  ) {
+    return 'Восстановлено ключей: $restored из $total. Не удалось: $failed. Проверьте аккаунт, сеть и резервную копию, затем повторите попытку. Часть истории может остаться нечитаемой.';
+  }
+
+  @override
+  String ui3RecoveryKeyRestoreSuccess(Object restored, Object total) {
+    return 'Успешно восстановлено ключей: $restored из $total';
+  }
+
+  @override
+  String ui3ImportFailed(Object error) {
+    return 'Ошибка импорта: $error';
+  }
+
+  @override
+  String ui3PasskeyRegistrationFailed(Object error) {
+    return 'Не удалось зарегистрировать ключ доступа: $error';
+  }
+
+  @override
+  String get ui3PasskeyDefaultName => 'Мой ключ доступа';
+
+  @override
+  String get ui3PasskeyNameHint => 'например, iPhone, MacBook';
+
+  @override
+  String get ui3PasskeyDeleteFailed => 'Не удалось удалить ключ доступа';
+
+  @override
+  String get ui3TwoFactorAuth => 'Двухфакторная аутентификация';
+
+  @override
+  String get ui3TwoFactorOnSubtitle =>
+      'Включена — требуется код из приложения-аутентификатора';
+
+  @override
+  String get ui3TwoFactorOffSubtitle =>
+      'Выключена — защитите аккаунт приложением-аутентификатором (TOTP)';
+
+  @override
+  String get ui3ShowRecoveryKey => 'Показать ключ восстановления';
+
+  @override
+  String get ui3ShowRecoveryKeyDesc =>
+      'Показать ключ восстановления для резервного копирования';
+
+  @override
+  String get ui3ImportRecoveryKeyHint =>
+      'Восстановление сообщений с помощью ключа восстановления';
+
+  @override
+  String get ui3RecoveryKeyCreateFailed =>
+      'Не удалось создать ключ восстановления';
+
+  @override
+  String get ui3TotpIncorrectCode => 'Неверный код, попробуйте ещё раз';
+
+  @override
+  String get ui3TwoFactorEnabled => 'Двухфакторная аутентификация включена';
+
+  @override
+  String get ui3TwoFactorDisabled => 'Двухфакторная аутентификация выключена';
+
+  @override
+  String get ui3TwoFactorTurnOffTitle =>
+      'Отключить двухфакторную аутентификацию?';
+
+  @override
+  String get ui3TwoFactorTurnOffMessage =>
+      'Приложение-аутентификатор больше не потребуется. Позже его можно настроить снова с новым ключом.';
+
+  @override
+  String get ui3TurnOff => 'Отключить';
+
+  @override
+  String get ui3TwoFactorTotpTitle => 'Двухфакторная (TOTP)';
+
+  @override
+  String get ui3TwoFactorIsOn => 'Двухфакторная аутентификация включена';
+
+  @override
+  String get ui3TwoFactorCodeRequired =>
+      'Требуется код из приложения-аутентификатора.';
+
+  @override
+  String get ui3TotpStepScan =>
+      '1. Отсканируйте этот QR-код приложением-аутентификатором (Google Authenticator, Authy, 1Password…) или введите ключ вручную.';
+
+  @override
+  String get ui3TotpKeyCopied => 'Ключ скопирован';
+
+  @override
+  String get ui3TotpStepConfirm =>
+      '2. Введите 6-значный код для подтверждения.';
+
+  @override
+  String get ui3Enable => 'Включить';
+
+  @override
+  String get ui3BackupSettingsDesc =>
+      'Создайте резервную копию локальных настроек чата. Сообщения будут восстановлены с сервера после повторного входа.';
+
+  @override
+  String get ui3BackupKeysSeparate => 'Ключи шифрования управляются отдельно';
+
+  @override
+  String get ui3BackupKeysSeparateHint =>
+      'Используйте «Безопасность > Ключ восстановления», чтобы сохранить доступ к зашифрованным сообщениям.';
+
+  @override
+  String ui3BackupRoomsSize(Object rooms, Object size) {
+    return 'Комнат: $rooms  $size';
+  }
+
+  @override
+  String get ui3BackupRestoreFromFileDesc =>
+      'Импортируйте файл .n42backup с другого устройства или из предыдущей резервной копии. Ключи шифрования восстанавливаются отдельно с помощью ключа восстановления.';
+
+  @override
+  String get ui3UsernameSessionRequired =>
+      'Для имени пользователя нужен активный сеанс';
+
+  @override
+  String get ui3SecuritySessionRequired =>
+      'Для настроек безопасности нужен активный сеанс';
+
+  @override
+  String get ui3ConnectedAccountsSessionRequired =>
+      'Для связанных аккаунтов нужен активный сеанс';
+
+  @override
+  String get ui3SystemAccounts => 'Система и аккаунты';
+
+  @override
+  String get ui3AccountIdentity => 'Аккаунт и личность';
+
+  @override
+  String get ui3Accounts => 'Аккаунты';
+
+  @override
+  String get ui3DevicesSessions => 'Устройства и сеансы';
+
+  @override
+  String get ui3Integrations => 'Интеграции';
+
+  @override
+  String get ui3ConnectedAccounts => 'Связанные аккаунты';
+
+  @override
+  String get ui3ConnectedAccountsDesc =>
+      'Интеграции с Telegram, WhatsApp, Discord и API-мостами';
+
+  @override
+  String get ui3SystemOverview => 'Обзор системы';
+
+  @override
+  String ui3AccountCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count аккаунта',
+      many: '$count аккаунтов',
+      few: '$count аккаунта',
+      one: '$count аккаунт',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String ui3DeviceCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count устройства',
+      many: '$count устройств',
+      few: '$count устройства',
+      one: '$count устройство',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get ui3PrivacySecurityOverview =>
+      'Сквозное шифрование, защита от скриншотов и настройки прокси';
+
+  @override
+  String get ui3ConversationPrivacy => 'Конфиденциальность переписки';
+
+  @override
+  String get ui3NetworkPrivacy => 'Конфиденциальность сети';
+
+  @override
+  String get ui3IdentityPrivacy => 'Конфиденциальность личности';
+
+  @override
+  String get ui3EncryptionKeyBackup => 'Шифрование и резервная копия ключей';
+
+  @override
+  String get ui3DevicesVerification => 'Устройства и проверка';
+
+  @override
+  String get ui3ChipE2eeDefault => 'E2EE по умолчанию';
+
+  @override
+  String get ui3ChipManualE2ee => 'E2EE вручную';
+
+  @override
+  String get ui3ChipSelfDestruct => 'Самоуничтожение';
+
+  @override
+  String get ui3ChipScreenshotGuard => 'Защита от скриншотов';
+
+  @override
+  String get ui3ChipIpProxy => 'IP / прокси';
+
+  @override
+  String get ui3ChipLinkPreviewsOff => 'Превью ссылок выкл.';
+
+  @override
+  String get ui3ChipPublicHandle => 'Публичное имя';
+
+  @override
+  String get a11yShowPassword => 'Показать пароль';
+
+  @override
+  String get a11yHidePassword => 'Скрыть пароль';
+
+  @override
+  String get a11yCheckServer => 'Проверить сервер';
+
+  @override
+  String get ui3AuthAnonymousRegistration => 'Анонимная регистрация';
+
+  @override
+  String get ui3AuthAnonymousRegistrationDesc =>
+      'Создайте аккаунт без привязки телефона или эл. почты. Имя пользователя будет создано автоматически.';
+
+  @override
+  String get ui3AuthAnonymousModeOn => 'Анонимный режим включён';
+
+  @override
+  String get ui3AuthAnonymousModeOnDesc =>
+      'Приложение создаст для вас случайное имя пользователя Matrix. Позже вы сможете войти с созданным аккаунтом и паролем.';
+
+  @override
+  String get ui3AuthChooseLoginMethod => 'Выберите способ входа';
+
+  @override
+  String get ui3AuthSsoOpenFailed => 'Не удалось открыть страницу входа SSO';
+
+  @override
+  String get ui3AuthWalletUnavailable => 'Кошелёк недоступен';
+
+  @override
+  String get ui3ProfileSubscriptions => 'Подписки';
+
+  @override
+  String get ui3ProfileBuySellCrypto => 'Купить / продать криптовалюту';
+
+  @override
+  String get ui3ProfileOnDeviceAi => 'ИИ на устройстве';
+
+  @override
+  String get ui3ProfileSetAUsername => 'Задать имя пользователя';
+
+  @override
+  String get ui3ProfileAvatarStudio => 'Студия аватаров';
+
+  @override
+  String get ui3ProfileAvatarStudioSubtitle => 'NFT-аватар / украшения';
+
+  @override
+  String get ui3ProfileCustomize => 'Настроить';
+
+  @override
+  String get ui3ProfileQrSubtitle =>
+      'Отсканируйте, чтобы открыть профиль или начать чат';
+
+  @override
+  String get ui3PrivacyHardening => 'Усиленная приватность';
+
+  @override
+  String get ui3HidePhoneNumber => 'Скрыть номер телефона';
+
+  @override
+  String get ui3HidePhoneNumberDesc =>
+      'Маскировать привязанный номер телефона на экранах профиля на этом устройстве';
+
+  @override
+  String get ui3EncryptNewChatsByDefault => 'Шифровать новые чаты по умолчанию';
+
+  @override
+  String get ui3EncryptNewChatsByDefaultDesc =>
+      'Создавать новые личные чаты и приватные комнаты с включённым E2EE';
+
+  @override
+  String get ui3PrivateChatMode => 'Режим приватного чата';
+
+  @override
+  String get ui3PrivateChatModeDesc =>
+      'Временно блокировать скриншоты при просмотре приватных или зашифрованных чатов';
+
+  @override
+  String get ui3DefaultSelfDestructTimer =>
+      'Таймер самоуничтожения по умолчанию';
+
+  @override
+  String get ui3DefaultSelfDestructTimerDesc =>
+      'Применять таймер самоуничтожения по умолчанию к новым сообщениям';
+
+  @override
+  String get ui3LinkPreviews => 'Превью ссылок';
+
+  @override
+  String get ui3LinkPreviewsDesc =>
+      'Загружать заголовки, описания и миниатюры, если в сообщениях есть URL';
+
+  @override
+  String get ui3IpAddressProtection => 'Защита IP-адреса';
+
+  @override
+  String get ui3IpAddressProtectionDesc =>
+      'Направлять запросы Matrix и превью ссылок через настроенный HTTP-прокси для приватности, если он доступен';
+
+  @override
+  String get ui3UseTorProxy => 'Использовать HTTP-прокси Tor / Privoxy';
+
+  @override
+  String get ui3UseTorProxyDesc =>
+      'Используйте локальный HTTP-прокси, например Privoxy на 127.0.0.1:8118. Нативная маршрутизация Tor через SOCKS5 здесь не поддерживается.';
+
+  @override
+  String get ui3CustomProxy => 'Свой прокси';
+
+  @override
+  String get ui3CustomProxyDesc =>
+      'Использовать свой HTTP- или HTTPS-прокси для трафика Matrix и превью ссылок';
+
+  @override
+  String get ui3ProxyEndpoint => 'Адрес прокси';
+
+  @override
+  String get ui3ProxyEndpointDesc =>
+      'Адрес HTTP/HTTPS-прокси (SOCKS не поддерживается)';
+
+  @override
+  String get ui3InvalidEndpoint => 'Неверный адрес';
+
+  @override
+  String get ui3CustomProxyStaysOff =>
+      'Свой прокси останется выключенным, пока вы не укажете верный адрес';
+
+  @override
+  String get ui3NotificationFilterNote =>
+      'Приоритетные правила уведомляют всегда (в обход беззвучного режима, режима «только упоминания» и «Не беспокоить»). Заглушённые ключевые слова подавляют уведомления.';
+
+  @override
+  String get ui3PriorityKeywords => 'Приоритетные ключевые слова';
+
+  @override
+  String get ui3PriorityKeywordHint => 'например, срочно';
+
+  @override
+  String get ui3MutedKeywords => 'Заглушённые ключевые слова';
+
+  @override
+  String get ui3MutedKeywordHint => 'например, спам';
+
+  @override
+  String get ui3PrioritySenders => 'Приоритетные отправители';
+
+  @override
+  String get ui3CaseSensitive => 'С учётом регистра';
+
+  @override
+  String get ui3None => 'Нет';
+
+  @override
+  String get ui3SmartReplyTranslation => 'Перевод умных ответов';
+
+  @override
+  String get ui3SmartReplyTranslationDesc =>
+      'Автоматически переводить ваши сообщения на язык получателя перед отправкой.';
+
+  @override
+  String get ui3FromPhotos => 'Из фото';
+
+  @override
+  String get ui3ChangePhoto => 'Сменить фото';
+
+  @override
+  String get ui3RoamingUsesMobileData =>
+      'В роуминге действуют правила мобильных данных';
+
+  @override
+  String get ui3RoamingUsesMobileDataDesc =>
+      'Отдельное определение роуминга пока недоступно, поэтому в роуминге сейчас действуют настройки автозагрузки для мобильных данных.';
+
+  @override
+  String ui3DeleteQuickReplyConfirm(String content) {
+    return 'Удалить «$content»?';
+  }
+
+  @override
+  String get ui3ResetToDefaults => 'Сбросить по умолчанию';
+
+  @override
+  String get ui3ResetQuickRepliesMessage =>
+      'Все свои быстрые ответы будут удалены, а стандартные — восстановлены. Продолжить?';
+
+  @override
+  String get ui3LocalLlmUnavailable => 'Не поддерживается на этом устройстве';
+
+  @override
+  String get ui3LocalLlmNotDownloaded => 'Модель не загружена';
+
+  @override
+  String get ui3LocalLlmReady => 'Готово (на устройстве)';
+
+  @override
+  String get ui3LocalLlmDescription =>
+      'Когда функция включена и готова, функции ИИ (сводка, переписывание, перевод, ответы) работают полностью на устройстве — данные не покидают ваш телефон. Иначе используется облачный провайдер.';
+
+  @override
+  String get ui3UseOnDeviceAi => 'Использовать ИИ на устройстве';
+
+  @override
+  String get ui3UseOnDeviceAiDesc =>
+      'Предпочитать локальный инференс, когда он готов';
+
+  @override
+  String get ui3DownloadModel => 'Скачать модель';
+
+  @override
+  String get ui3LocalLlmRuntimeRequired =>
+      'Для инференса на устройстве нужна нативная среда выполнения (Android MediaPipe / iOS Core ML). Она включится автоматически, как только станет доступен обработчик платформы.';
+
+  @override
+  String get ui3PhotoAvatar => 'Фото-аватар';
+
+  @override
+  String get ui3AvatarStyles => 'Стили аватара';
+
+  @override
+  String get ui3AvatarStylesDesc =>
+      'Один выбор украшений для профиля и всех точек входа аватара.';
+
+  @override
+  String get ui3ReplaceNftAvatar => 'Заменить NFT-аватар';
+
+  @override
+  String get ui3NftAvatarDesc =>
+      'Используйте ончейн-коллекционный предмет как аватар.';
+
+  @override
+  String get ui3UsePhotoAvatar => 'Использовать фото-аватар';
+
+  @override
+  String get ui3UsePhotoAvatarDesc =>
+      'Оставить загруженный аватар и отвязать NFT.';
+
+  @override
+  String ui3AvatarStyleSet(Object name) {
+    return 'Стиль аватара: $name';
+  }
+
+  @override
+  String get ui3NftAvatarUpdated => 'NFT-аватар обновлён';
+
+  @override
+  String get ui3SwitchedToPhotoAvatar => 'Возвращён фото-аватар';
+
+  @override
+  String get ui3SignInToViewRedPacketHistory =>
+      'Войдите, чтобы увидеть историю красных конвертов';
+
+  @override
+  String get ui3RedPacketActive => 'Активные';
+
+  @override
+  String get ui3RedPacketCompleted => 'Завершённые';
+
+  @override
+  String get ui3CardsAndPasses => 'Карты и пропуска';
+
+  @override
+  String get ui3CardsAndPassesDesc =>
+      'Карты кошелька, купоны и пропуска управляются в основном приложении.';
+
+  @override
+  String get ui3CardPackRequiresMainApp =>
+      'Для набора карт нужно основное приложение';
+
+  @override
+  String get ui3OpenCardPack => 'Открыть набор карт';
+
+  @override
+  String get ui3UnableToOpenChat => 'Не удалось открыть чат с этим контактом';
+
+  @override
+  String get ui3WalletManagedInMainApp =>
+      'Кошелёк управляется в основном приложении';
+
+  @override
+  String ui3CreatorPlans(Object name) {
+    return '$name · Тарифы';
+  }
+
+  @override
+  String get ui3NewPlan => 'Новый тариф';
+
+  @override
+  String get ui3MySubscriptions => 'Мои подписки';
+
+  @override
+  String get ui3AvailablePlans => 'Доступные тарифы';
+
+  @override
+  String get ui3NoPlansYet =>
+      'Тарифов пока нет · нажмите «Новый тариф», чтобы создать';
+
+  @override
+  String ui3DaysLeft(Object days) {
+    return 'Осталось $days дн.';
+  }
+
+  @override
+  String get ui3SubscriptionCancelled => 'Отменена';
+
+  @override
+  String get ui3AutoRenewOn => 'Автопродление: вкл.';
+
+  @override
+  String get ui3AutoRenewOff => 'Автопродление: выкл.';
+
+  @override
+  String get ui3CancelSubscriptionTitle => 'Отменить подписку?';
+
+  @override
+  String ui3CancelSubscriptionConfirm(Object name) {
+    return 'Ваша подписка на $name будет действовать до окончания срока и не продлится.';
+  }
+
+  @override
+  String get ui3Subscribe => 'Подписаться';
+
+  @override
+  String ui3SubscribedTo(Object name) {
+    return 'Вы подписались на $name';
+  }
+
+  @override
+  String get ui3PlanPriceLabel => 'Цена (например, 9.9 USDT)';
+
+  @override
+  String get ui3PlanDescriptionLabel => 'Описание (необязательно)';
+
+  @override
+  String get ui3PlanBenefitsLabel => 'Преимущества (через запятую)';
+
+  @override
+  String get ui3PlanPeriod => 'Период:';
+
+  @override
+  String get ui3Monthly => 'Ежемесячно';
+
+  @override
+  String get ui3Yearly => 'Ежегодно';
+
+  @override
+  String get ui3SaveRemarkFailed => 'Не удалось сохранить заметку';
+
+  @override
+  String get ui3CopyLink => 'Копировать ссылку';
+
+  @override
+  String get ui3Connect => 'Связаться';
+
+  @override
+  String get ui3CommonTokens => 'Общие токены';
+
+  @override
+  String get ui3SharedNfts => 'Общие NFT';
+
+  @override
+  String get ui3TransactionHistory => 'История транзакций';
+
+  @override
+  String get ui3CommonDaos => 'Общие DAO';
+
+  @override
+  String get ui3SameChains => 'Общие сети';
+
+  @override
+  String get ui3ChatInitFailed => 'Не удалось инициализировать чат';
+
+  @override
+  String get ui3CheckNetworkRetry =>
+      'Проверьте подключение к сети и повторите попытку';
+
+  @override
+  String get ui3FromContacts => 'Из контактов';
+
+  @override
+  String get ui3FindFriendsFromContacts =>
+      'Найдите друзей среди контактов телефона';
+
+  @override
+  String get ui3EnsOrDomain => 'ENS / домен';
+
+  @override
+  String get ui3LoadingContacts => 'Загрузка контактов...';
+
+  @override
+  String get ui3ContactsPermissionRequired => 'Нужен доступ к контактам';
+
+  @override
+  String get ui3ContactsPermissionMessage =>
+      'Чтобы найти друзей среди контактов, разрешите доступ к ним.';
+
+  @override
+  String get ui3AllowAccess => 'Разрешить доступ';
+
+  @override
+  String get ui3NoContactMatches => 'Совпадений не найдено';
+
+  @override
+  String get ui3NoContactMatchesMessage =>
+      'Никто из ваших контактов ещё не пользуется приложением. Пригласите их!';
+
+  @override
+  String ui3ScannedContacts(Object count) {
+    return 'Просканировано контактов: $count';
+  }
+
+  @override
+  String ui3FoundContactMatches(Object count) {
+    return 'Найдено совпадений в контактах: $count';
+  }
+
+  @override
+  String ui3InContactsAs(Object name) {
+    return 'В контактах: $name';
+  }
+
+  @override
+  String get ui3DeletePhotoConfirm => 'Удалить это фото?';
+
+  @override
+  String get ui3InviteLink => 'Ссылка-приглашение';
+
+  @override
+  String get ui3ShareJoinLink => 'Поделиться ссылкой для входа в эту комнату';
+
+  @override
+  String get ui3ShareRoomReference =>
+      'Поделиться ссылкой на комнату с приглашёнными участниками';
+
+  @override
+  String get ui3ScanToJoinGroup =>
+      'Отсканируйте, чтобы сразу вступить в группу';
+
+  @override
+  String get ui3ScanToShareRoomReference =>
+      'Отсканируйте, чтобы поделиться ссылкой на комнату с приглашёнными';
+
+  @override
+  String get ui3InviteLinkLoadFailed =>
+      'Не удалось загрузить ссылку-приглашение';
+
+  @override
+  String get ui3InviteLinkCopied => 'Ссылка-приглашение скопирована';
+
+  @override
+  String get ui3ChannelCategoryOptional => 'Категория (необязательно)';
+
+  @override
+  String get ui3ChannelCategoryHint => 'Объявления / Продукт / Поддержка';
+
+  @override
+  String get ui3DescriptionOptional => 'Описание (необязательно)';
+
+  @override
+  String get ui3WebhookEnable => 'Включить автоматизацию webhook';
+
+  @override
+  String get ui3WebhookEnableDesc =>
+      'Отправлять события входа участников и приветствия на ваш эндпоинт интеграции.';
+
+  @override
+  String get ui3WebhookUrl => 'URL webhook';
+
+  @override
+  String get ui3WebhookSecretOptional => 'Секрет подписи (необязательно)';
+
+  @override
+  String get ui3WebhookSecretHint => 'Используется для X-N42-Signature';
+
+  @override
+  String get ui3WebhookNotifyMemberJoined =>
+      'Уведомлять о вступлении участника';
+
+  @override
+  String get ui3WebhookNotifyWelcomeSent =>
+      'Уведомлять об отправке приветствия';
+
+  @override
+  String get ui3WebhookTestSend => 'Отправить тестовый webhook';
+
+  @override
+  String get ui3WebhookTestSending => 'Отправка тестового webhook...';
+
+  @override
+  String get ui3WebhookTestSent => 'Тестовый webhook успешно отправлен';
+
+  @override
+  String get ui3WebhookTestFailed => 'Не удалось отправить тестовый webhook';
+
+  @override
+  String get ui3WebhookUrlInvalid =>
+      'URL webhook должен быть публичным адресом HTTPS';
+
+  @override
+  String get ui3WebhookSelectEvent => 'Выберите хотя бы одно событие webhook';
+
+  @override
+  String get ui3SensitiveDataDetection => 'Обнаружение конфиденциальных данных';
+
+  @override
+  String get ui3Email => 'Эл. почта';
+
+  @override
+  String get ui3CreditCard => 'Банковская карта';
+
+  @override
+  String get ui3DetectEmailDesc =>
+      'Обнаруживать адреса эл. почты в текстовых сообщениях';
+
+  @override
+  String get ui3DetectPhoneDesc =>
+      'Обнаруживать номера телефонов, включая международные';
+
+  @override
+  String get ui3DetectCardDesc => 'Обнаруживать вероятные номера счетов и карт';
+
+  @override
+  String get ui3DetectWalletDesc =>
+      'Обнаруживать адреса кошельков в формате Ethereum';
+
+  @override
+  String get ui3GeneralTopic => 'Общее';
+
+  @override
+  String get a11yPreviousResult => 'Предыдущий результат';
+
+  @override
+  String get a11yNextResult => 'Следующий результат';
+
+  @override
+  String get ui3TryDifferentKeywords => 'Попробуйте другие ключевые слова';
+
+  @override
+  String ui3FiltersActive(Object count) {
+    return 'Активные фильтры: $count';
+  }
+
+  @override
+  String ui3MessageFiltersActive(Object count) {
+    return 'Активные фильтры сообщений: $count';
+  }
+
+  @override
+  String get ui3LoadMore => 'Загрузить ещё';
+
+  @override
+  String get ui3MessageFilters => 'Фильтры сообщений';
+
+  @override
+  String get ui3SenderUserId => 'ID пользователя-отправителя';
+
+  @override
+  String get ui3FilterType => 'Тип';
+
+  @override
+  String get ui3FilterAny => 'Любой';
+
+  @override
+  String get ui3FilterImage => 'Изображение';
+
+  @override
+  String get ui3FilterTime => 'Время';
+
+  @override
+  String get ui3AnyTime => 'За всё время';
+
+  @override
+  String get ui3OnlyMyMessages => 'Только мои сообщения';
+
+  @override
+  String get ui3MediaOnly => 'Только медиа';
+
+  @override
+  String get ui3Apply => 'Применить';
+
+  @override
+  String get ui3QrStyleClassic => 'Классический';
+
+  @override
+  String get ui3QrStyleOcean => 'Океан';
+
+  @override
+  String get ui3QrStyleBerry => 'Ягода';
+
+  @override
+  String get ui3NfcUnavailable =>
+      'NFC недоступен или метка не поддерживается. Включите NFC, попробуйте другую метку или используйте QR.';
+
+  @override
+  String get ui3CancelNfc => 'Отменить NFC';
+
+  @override
+  String get ui3ReadNfcTag => 'Считать NFC-метку';
+
+  @override
+  String get ui3HoldNearNfcTag => 'Поднесите телефон к метке сервиса.';
+
+  @override
+  String get a11yFlashlightOn => 'Включить фонарик';
+
+  @override
+  String get a11yFlashlightOff => 'Выключить фонарик';
+
+  @override
+  String get ui3SocialGraph => 'Социальный граф';
+
+  @override
+  String get ui3RecommendedConnections => 'Рекомендуемые связи';
+
+  @override
+  String get ui3Portfolio => 'Портфель';
+
+  @override
+  String get ui3Chains => 'Сети';
+
+  @override
+  String get ui3Tokens => 'Токены';
+
+  @override
+  String get ui3NoConnectionsFound => 'Связи не найдены';
+
+  @override
+  String get ui3ConnectionsHint =>
+      'Связи появятся по мере вашей ончейн-активности';
+
+  @override
+  String get ui3SocialGraphLoadFailed => 'Не удалось загрузить социальный граф';
+
+  @override
+  String get ui3Similarity => 'Сходство';
+
+  @override
+  String get ui3Breakdown => 'Детализация';
+
+  @override
+  String get ui3TokenHoldings => 'Токены в собственности';
+
+  @override
+  String get ui3NftCollections => 'Коллекции NFT';
+
+  @override
+  String get ui3ChainUsage => 'Использование сетей';
+
+  @override
+  String get ui3Transactions => 'Транзакции';
+
+  @override
+  String get ui3DaoMembership => 'Членство в DAO';
+
+  @override
+  String get ui3NotWeighted => 'Без веса';
+
+  @override
+  String ui3PercentWithWeight(Object percent, Object weight) {
+    return '$percent% (вес: $weight)';
+  }
+
+  @override
+  String get ui3CommonOnChainActivity => 'Общая ончейн-активность';
+
+  @override
+  String get ui3SharedTokens => 'Общие токены';
+
+  @override
+  String get ui3SharedNftCollections => 'Общие коллекции NFT';
+
+  @override
+  String get ui3SharedChains => 'Общие сети';
+
+  @override
+  String get ui3NoSharedTokens => 'Общих токенов не найдено';
+
+  @override
+  String get ui3NoSharedNftCollections => 'Общих коллекций NFT не найдено';
+
+  @override
+  String get ui3NoSharedChains => 'Общих сетей не найдено';
+
+  @override
+  String get ui3SimilarityFailed => 'Не удалось рассчитать сходство';
+
+  @override
+  String ui3ItemsAndMore(Object items, Object count) {
+    return '$items и ещё $count';
+  }
+
+  @override
+  String get a11yGovernance => 'Управление';
+
+  @override
+  String get ui3CommunityLink => 'Ссылка на сообщество';
+
+  @override
+  String get ui3CommunityQrCode => 'QR-код сообщества';
+
+  @override
+  String get ui3CommunityQrSubtitle =>
+      'Отсканируйте, чтобы вступить в сообщество и просматривать его каналы';
+
+  @override
+  String get ui3CommunityLinkLoadFailed =>
+      'Не удалось загрузить ссылку на сообщество';
+
+  @override
+  String get ui3CommunityLinkCopied => 'Ссылка на сообщество скопирована';
+
+  @override
+  String ui3KickMemberConfirm(Object name) {
+    return '$name будет удалён(а) из сообщества.';
+  }
+
+  @override
+  String ui3BanMemberConfirm(Object name) {
+    return '$name будет удалён(а) без возможности вернуться.';
+  }
+
+  @override
+  String get ui3SignInToDiscoverChannels =>
+      'Войдите, чтобы находить публичные каналы';
+
+  @override
+  String ui3UnableToJoinChannel(Object name, Object error) {
+    return 'Не удалось вступить в $name: $error';
+  }
+
+  @override
+  String get ui3CategoryTech => 'Технологии';
+
+  @override
+  String get ui3CategorySocial => 'Общение';
+
+  @override
+  String get ui3NoPublicChannels => 'Публичные каналы не найдены';
+
+  @override
+  String get ui3StoriesAndFun => 'Истории и развлечения';
+
+  @override
+  String get ui3SearchMusicHint => 'Поиск песен, исполнителей или друзей';
+
+  @override
+  String get ui3ForYou => 'Для вас';
+
+  @override
+  String get ui3Liked => 'Понравившиеся';
+
+  @override
+  String get ui3NoLikedMusic => 'Пока нет понравившейся музыки';
+
+  @override
+  String get ui3NoMusicStories => 'Пока нет музыкальных историй';
+
+  @override
+  String get ui3LikedMusicHint =>
+      'Нажмите на сердечко рядом с песней, чтобы сохранить её здесь.';
+
+  @override
+  String get ui3MusicStoriesHint => 'Здесь появится музыка из историй.';
+
+  @override
+  String ui3SharedBy(Object artist, Object name) {
+    return '$artist · поделился(-ась) $name';
+  }
+
+  @override
+  String ui3UnableToPlay(Object title, Object error) {
+    return 'Не удалось воспроизвести $title: $error';
+  }
+
+  @override
+  String get a11yPreviousTrack => 'Предыдущий трек';
+
+  @override
+  String get a11yNextTrack => 'Следующий трек';
+
+  @override
+  String get a11yPlay => 'Воспроизвести';
+
+  @override
+  String get a11yPause => 'Пауза';
+
+  @override
+  String get ui3Refresh => 'Обновить';
+
+  @override
+  String get ui3NearbyIntroTitle => 'Публичные посты поблизости';
+
+  @override
+  String get ui3NearbyIntroBody =>
+      'Ваше местоположение используется один раз на этом устройстве для сортировки публичных моментов. Оно не загружается, не транслируется и не показывается другим.';
+
+  @override
+  String get ui3UseMyLocation => 'Использовать моё местоположение';
+
+  @override
+  String get ui3NearbyUnavailable => 'Функция «Рядом» недоступна';
+
+  @override
+  String get ui3NoNearbyPosts => 'Поблизости пока нет постов';
+
+  @override
+  String get ui3NoNearbyPostsHint =>
+      'Здесь появятся публичные моменты с местоположением.';
+
+  @override
+  String get ui3NearbyDistanceNote =>
+      'Приблизительное расстояние · только публичные посты с местоположением';
+
+  @override
+  String get ui3PublicLocationPost => 'Публичный пост с местоположением';
+
+  @override
+  String get ui3LocationServicesOff => 'Службы геолокации отключены';
+
+  @override
+  String get ui3LocationPermissionDenied => 'Доступ к геолокации запрещён';
+
+  @override
+  String get ui3EnableLocationInSettings =>
+      'Разрешите доступ к геолокации в настройках системы';
+
+  @override
+  String get ui3CreateStory => 'Создать историю';
+
+  @override
+  String get ui3CreateStoryDesc => 'Опубликуйте текстовый или фотостатус.';
+
+  @override
+  String get ui3StoryCamera => 'Камера историй';
+
+  @override
+  String get ui3StoryCameraDesc => 'Сразу к фильтрам и редактированию фото.';
+
+  @override
+  String get ui3MomentsDesc => 'Откройте всю ленту и комментарии.';
+
+  @override
+  String get ui3MomentCamera => 'Камера моментов';
+
+  @override
+  String get ui3MomentCameraDesc =>
+      'Создайте пост и сразу выберите медиафайлы.';
+
+  @override
+  String get ui3GamesDesc => 'Откройте встроенный центр казуальных игр.';
+
+  @override
+  String get ui3AvatarStudio => 'Студия аватаров';
+
+  @override
+  String get ui3AvatarStudioDesc => 'Украшения, NFT-аватар и стиль профиля.';
+
+  @override
+  String get ui3SocialGraphDesc => 'Подписки, фанаты и связи в блокчейне.';
+
+  @override
+  String get ui3SocialHubHeroTitle => 'Истории, моменты, игры и аватары';
+
+  @override
+  String get ui3SocialHubHeroBody =>
+      'Все социальные функции в одном месте, а не разбросаны по чату, профилю и обзору.';
+
+  @override
+  String get ui3SocialGraphNotConfigured =>
+      'Социальный граф не настроен в этой сборке';
+
+  @override
+  String get ui3ConnectWalletForSocialGraph =>
+      'Подключите кошелёк, чтобы увидеть социальный граф';
+
+  @override
+  String get ui3AvatarStudioSignIn =>
+      'Для студии аватаров нужно войти в аккаунт';
+
+  @override
+  String get a11yRemoveImage => 'Удалить изображение';
+
+  @override
+  String get a11yBack => 'Назад';
+
+  @override
+  String get ui3MiniAppConfirmTransactionTitle => 'Подтвердите транзакцию';
+
+  @override
+  String get ui3MiniAppConfirmTransactionBody =>
+      'Мини-приложение запрашивает отправку транзакции от вашего имени.';
+
+  @override
+  String ui3MiniAppOpenTitle(Object name) {
+    return 'Открыть $name?';
+  }
+
+  @override
+  String get ui3MiniAppOpenButton => 'Открыть';
+
+  @override
+  String get ui3StoryReplySendFailed => 'Не удалось отправить ответ на историю';
+
+  @override
+  String get ui3RedPacketDemoNotice =>
+      'Демо-красный конверт — только запись в чате, реальные ончейн-активы не переводятся.';
+
+  @override
+  String get ui3RedPacketCoverClassic => 'Классический красный';
+
+  @override
+  String get ui3RedPacketCoverGolden => 'Золотой';
+
+  @override
+  String get ui3RedPacketCoverPurple => 'Фиолетовый';
+
+  @override
+  String get ui3RedPacketCoverOceanBlue => 'Синий океан';
+
+  @override
+  String get ui3RedPacketCoverNatureGreen => 'Природный зелёный';
+
+  @override
+  String get ui3RedPacketCoverRosePink => 'Розовый';
+
+  @override
+  String get ui3RedPacketHistoryEmpty => 'Красных конвертов пока нет';
+
+  @override
+  String get ui3TransferMerchantQrWithAmount => 'QR продавца (с суммой)';
+
+  @override
+  String get ui3TransferMerchantQrTitle => 'QR продавца';
+
+  @override
+  String get ui3TransferOpenAmountHint =>
+      'Оставьте пустым для произвольной суммы';
+
+  @override
+  String get ui3FiatRampTitle => 'Купить / продать криптовалюту';
+
+  @override
+  String get ui3FiatRampBuy => 'Купить';
+
+  @override
+  String get ui3FiatRampSell => 'Продать';
+
+  @override
+  String get ui3FiatRampNotConfigured => 'Фиатный ввод/вывод не настроен';
+
+  @override
+  String get a11yPointsAddRule => 'Добавить правило награды';
+
+  @override
+  String get a11yGovernanceRemoveChoice => 'Удалить вариант';
+
+  @override
+  String get a11yGovernanceCreateProposal => 'Создать предложение';
+
+  @override
+  String get ui3MiniAppUpdateN42 => 'Обновить N42';
+
+  @override
+  String get ui3MiniAppOfficial => 'Официальное';
+
+  @override
+  String ui3MiniAppUserCount(Object count) {
+    return '$count пользователей';
+  }
+
+  @override
+  String a11yStoryBackgroundColor(Object index) {
+    return 'Цвет фона $index';
+  }
+
+  @override
+  String get a11yStoryAdd => 'Добавить историю';
+
+  @override
+  String get ui3StoryPostFailed => 'Не удалось опубликовать историю';
+
+  @override
+  String get ui3StoryTapToSelectImage => 'Нажмите, чтобы выбрать изображение';
+
+  @override
+  String get ui3StoryChangeImage => 'Изменить';
+
+  @override
+  String ui3StoryMusicReadFailed(Object error) {
+    return 'Не удалось прочитать выбранную музыку: $error';
+  }
+
+  @override
+  String get ui3StoryDeleteConfirm => 'Удалить эту историю?';
+
+  @override
+  String get ui3StoryDeleteFailed => 'Не удалось удалить историю';
+
+  @override
+  String get ui3MomentCreateTitle => 'Создать момент';
+
+  @override
+  String get ui3MomentContentHint => 'Что у вас нового?';
+
+  @override
+  String get ui3MomentAddPhotos => 'Добавить фото';
+
+  @override
+  String get ui3MomentAddLocation => 'Добавить местоположение';
+
+  @override
+  String ui3MomentSelectedMedia(Object count) {
+    return 'Выбранные медиафайлы ($count)';
+  }
+
+  @override
+  String get ui3MomentClearAll => 'Очистить всё';
+
+  @override
+  String get ui3MomentClearMediaConfirm =>
+      'Удалить все выбранные фото и видео?';
+
+  @override
+  String get ui3MomentVisibilityPublicDesc => 'Видно всем друзьям';
+
+  @override
+  String get ui3MomentVisibilityPrivateDesc => 'Видно только вам';
+
+  @override
+  String get ui3MomentVisibilityPartialDesc => 'Выберите, кому видно';
+
+  @override
+  String get ui3MomentVisibilityExcludedDesc => 'Скрыть от определённых друзей';
+
+  @override
+  String get ui3MomentVideos => 'Видео';
+
+  @override
+  String get ui3MomentNoVideos => 'Видео пока нет';
+
+  @override
+  String get a11yCallMinimize => 'Свернуть';
+
+  @override
+  String get a11yCallGridView => 'Сетка';
+
+  @override
+  String get a11yCallFocusView => 'Режим фокуса';
+
+  @override
+  String get ui3CallTools => 'Инструменты звонка';
+
+  @override
+  String get ui3CallMeetingTools => 'Инструменты встречи';
+
+  @override
+  String get ui3CallToolsSubtitle =>
+      'Настройте качество звука и видео, не выходя из звонка.';
+
+  @override
+  String get ui3CallAudioEnhancement => 'Улучшение звука';
+
+  @override
+  String get ui3CallNoiseSuppression => 'Шумоподавление';
+
+  @override
+  String get ui3CallNoiseSuppressionDesc =>
+      'Снижает шум клавиатуры и фоновые звуки.';
+
+  @override
+  String get ui3CallEchoCancellation => 'Эхоподавление';
+
+  @override
+  String get ui3CallEchoCancellationDesc =>
+      'Не даёт звуку из динамика попадать обратно в микрофон.';
+
+  @override
+  String get ui3CallAutoGainControl => 'Автоматическая регулировка усиления';
+
+  @override
+  String get ui3CallAutoGainControlDesc =>
+      'Делает громкость микрофона стабильнее.';
+
+  @override
+  String get ui3CallVoiceIsolation => 'Улучшенная изоляция голоса';
+
+  @override
+  String get ui3CallVoiceIsolationDesc =>
+      'Использовать более сильный профиль шумоподавления.';
+
+  @override
+  String get ui3CallVideoSection => 'Видео';
+
+  @override
+  String get ui3CallBackgroundBlur => 'Размытие фона (бета)';
+
+  @override
+  String get ui3CallBlurDescReady =>
+      'Настройка применена. Фактическое размытие зависит от внедрения обработки видео.';
+
+  @override
+  String get ui3CallBlurDescSaved =>
+      'Настройка размытия сохранена и будет применена, когда появится обработка камеры.';
+
+  @override
+  String get ui3CallBlurDescCameraOff =>
+      'Включите камеру, когда станет доступна обработка фона.';
+
+  @override
+  String get ui3CallRecordingSection => 'Запись';
+
+  @override
+  String get ui3CallRecordingDesc =>
+      'Для сохранения записей требуется серверный egress.';
+
+  @override
+  String ui3CallSettingsUpdateFailed(Object error) {
+    return 'Не удалось обновить настройки звонка: $error';
+  }
+
+  @override
+  String get ui3CallRecordingStarted => 'Запись начата';
+
+  @override
+  String get ui3VoiceRoomNotFound => 'Комната не найдена';
+
+  @override
+  String get ui3VoiceRoomEndConfirm =>
+      'Вы уверены, что хотите завершить эту голосовую комнату?';
+
+  @override
+  String get a11yGameMoveUp => 'Сдвинуть вверх';
+
+  @override
+  String get a11yGameMoveDown => 'Сдвинуть вниз';
+
+  @override
+  String get a11yGameMoveLeft => 'Сдвинуть влево';
+
+  @override
+  String get a11yGameMoveRight => 'Сдвинуть вправо';
+
+  @override
+  String get a11yGameRotate => 'Повернуть';
+
+  @override
+  String get a11yGameDrop => 'Сбросить';
+
+  @override
+  String ui3StickerAddedCount(Object count) {
+    return 'Добавлено стикеров: $count';
+  }
+
+  @override
+  String ui3StickerAddFailed(Object error) {
+    return 'Не удалось добавить: $error';
+  }
+
+  @override
+  String get ui3StickerRemoveTitle => 'Удалить стикер';
+
+  @override
+  String get ui3StickerRemoveConfirm => 'Удалить этот стикер из набора?';
+
+  @override
+  String get ui3StickerRemoveFailed => 'Не удалось удалить';
+
+  @override
+  String get ui3StickerRenamePack => 'Переименовать набор';
+
+  @override
+  String get ui3StickerPackName => 'Название набора';
+
+  @override
+  String get ui3StickerRenameFailed => 'Не удалось переименовать';
+
+  @override
+  String get ui3StickerDeletePack => 'Удалить набор';
+
+  @override
+  String get ui3StickerThisPack => 'этот набор';
+
+  @override
+  String ui3StickerDeletePackConfirm(Object name) {
+    return 'Удалить «$name» и все его стикеры? Это действие нельзя отменить.';
+  }
+
+  @override
+  String get ui3StickerDeleteFailed => 'Не удалось удалить';
+
+  @override
+  String get ui3StickerPack => 'Набор стикеров';
+
+  @override
+  String get ui3StickerAdding => 'Добавление…';
+
+  @override
+  String get ui3StickerAddStickers => 'Добавить стикеры';
+
+  @override
+  String get ui3StickerPackNotFound => 'Набор не найден';
+
+  @override
+  String get ui3StickerEmptyHint =>
+      'Нажмите «Добавить стикеры», чтобы загрузить изображения';
+
+  @override
+  String get ui3StickerNewPack => 'Новый набор стикеров';
+
+  @override
+  String get ui3StickerCreate => 'Создать';
+
+  @override
+  String get ui3StickerCreateFailed => 'Не удалось создать набор';
+
+  @override
+  String ui3StickerInstalled(Object name) {
+    return '«$name» установлен';
+  }
+
+  @override
+  String get ui3StickerRemovePackTitle => 'Удалить набор стикеров';
+
+  @override
+  String ui3StickerRemovePackConfirm(Object name) {
+    return 'Удалить «$name» из ваших стикеров?';
+  }
+
+  @override
+  String ui3StickerRemoved(Object name) {
+    return '«$name» удалён';
+  }
+
+  @override
+  String get ui3StickerAiSticker => 'ИИ-стикер';
+
+  @override
+  String get ui3StickerStoreTab => 'Магазин';
+
+  @override
+  String get ui3StickerMyStickersTab => 'Мои стикеры';
+
+  @override
+  String get ui3StickerNoneFound => 'Стикеры не найдены';
+
+  @override
+  String ui3StickerByAuthor(Object author) {
+    return 'от $author';
+  }
+
+  @override
+  String get ui3StickerManage => 'Управление';
+
+  @override
+  String ui3StickerCount(Object count) {
+    return 'Стикеров: $count';
+  }
+
+  @override
+  String get ui3StickerNoneInstalled => 'Нет установленных стикеров';
+
+  @override
+  String get ui3StickerGetFromStore => 'Получите стикеры в магазине';
+
+  @override
+  String get ui3StickerBrowseStore => 'Открыть магазин';
+
+  @override
+  String get ui3StickerAddedToAi => 'Добавлено в «ИИ-стикеры»';
+
+  @override
+  String get ui3StickerAddOneFailed => 'Не удалось добавить стикер';
+
+  @override
+  String get ui3StickerPromptLabel => 'Опишите стикер';
+
+  @override
+  String get ui3StickerPromptHint =>
+      'например, весёлый рыжий кот в солнечных очках';
+
+  @override
+  String get ui3StickerGenerating => 'Создание…';
+
+  @override
+  String get ui3StickerGenerate => 'Создать';
+
+  @override
+  String get ui3StickerAddToStickers => 'Добавить в стикеры';
+
+  @override
+  String get ui3StickerGeneratingPreview => 'Создаём ваш стикер…';
+
+  @override
+  String get ui3StickerGenerateEmpty => 'Опишите стикер и нажмите «Создать»';
 }
