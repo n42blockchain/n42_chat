@@ -292,6 +292,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
         backgroundColor: context.surfaceColor,
         elevation: 0,
         leading: IconButton(
+          tooltip: S.of(context)?.commonClose ?? 'Close',
           icon: Icon(Icons.close, color: context.textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
@@ -348,7 +349,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
                   const SizedBox(height: 16),
                   Text(
                     _errorMessage!,
-                    style: TextStyle(color: context.textTertiary),
+                    style: TextStyle(color: context.textSupporting),
                   ),
                   const SizedBox(height: 24),
                   ElevatedButton(
@@ -405,6 +406,8 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
                         bottom: 16,
                         child: FloatingActionButton.small(
                           heroTag: 'relocate',
+                          tooltip:
+                              S.of(context)?.chatMyLocation ?? 'My location',
                           onPressed: _moveToCurrentLocation,
                           backgroundColor: Colors.white,
                           child: Icon(
@@ -478,7 +481,7 @@ class _ChatLocationPickerPageState extends State<ChatLocationPickerPage> {
                           place.address,
                           style: TextStyle(
                             fontSize: 12,
-                            color: context.textSecondary,
+                            color: context.textSupporting,
                           ),
                         ),
                         trailing: isSelected
@@ -633,6 +636,9 @@ class _ChatLocationDetailPageState extends State<ChatLocationDetailPage> {
               child: Row(
                 children: [
                   IconButton(
+                    tooltip: MaterialLocalizations.of(
+                      context,
+                    ).backButtonTooltip,
                     onPressed: () => Navigator.pop(context),
                     icon: Container(
                       padding: const EdgeInsets.all(8),
@@ -721,7 +727,7 @@ class _ChatLocationDetailPageState extends State<ChatLocationDetailPage> {
                                   '${widget.latitude.toStringAsFixed(6)}, ${widget.longitude.toStringAsFixed(6)}',
                                   style: TextStyle(
                                     fontSize: 14,
-                                    color: context.textSecondary,
+                                    color: context.textSupporting,
                                   ),
                                 ),
                               ],
@@ -783,7 +789,9 @@ class _ChatLocationDetailPageState extends State<ChatLocationDetailPage> {
                                 S.of(context)?.chatMapPreview ?? 'Open in Maps',
                               ),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.primaryOf(context),
+                                backgroundColor: AppColors.primaryFillOf(
+                                  context,
+                                ),
                                 foregroundColor: Colors.white,
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 14,
@@ -840,7 +848,7 @@ class _LocationActionButton extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 label,
-                style: TextStyle(fontSize: 12, color: context.textSecondary),
+                style: TextStyle(fontSize: 12, color: context.textSupporting),
               ),
             ],
           ),

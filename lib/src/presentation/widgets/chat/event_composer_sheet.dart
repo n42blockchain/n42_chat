@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/event_message_data.dart';
@@ -63,11 +64,18 @@ class _EventComposerSheetState extends State<_EventComposerSheet> {
   void _submit() {
     final title = _titleC.text.trim();
     if (title.isEmpty) {
-      setState(() => _error = 'Title is required');
+      setState(
+        () => _error =
+            S.of(context)?.ui3EventTitleRequired ?? 'Title is required',
+      );
       return;
     }
     if (_end != null && !_end!.isAfter(_start)) {
-      setState(() => _error = 'End time must be after start');
+      setState(
+        () => _error =
+            S.of(context)?.ui3EventEndAfterStart ??
+            'End time must be after start',
+      );
       return;
     }
     Navigator.pop(
@@ -84,6 +92,7 @@ class _EventComposerSheetState extends State<_EventComposerSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final s = S.of(context);
     final bottom = MediaQuery.of(context).viewInsets.bottom;
     return Container(
       padding: EdgeInsets.fromLTRB(20, 16, 20, 16 + bottom),
@@ -101,7 +110,7 @@ class _EventComposerSheetState extends State<_EventComposerSheet> {
                 Icon(Icons.event, color: AppColors.primaryOf(context)),
                 const SizedBox(width: AppDimensions.spacingS),
                 Text(
-                  'New Event',
+                  s?.ui3EventNew ?? 'New Event',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
@@ -115,14 +124,14 @@ class _EventComposerSheetState extends State<_EventComposerSheet> {
               controller: _titleC,
               autofocus: true,
               style: TextStyle(color: context.textPrimary),
-              decoration: const InputDecoration(
-                labelText: 'Title',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: s?.ui3EventTitleLabel ?? 'Title',
+                border: const OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: AppDimensions.spacingM),
             _dateTile(
-              label: 'Starts',
+              label: s?.settingsStartTime ?? 'Start Time',
               value: EventMessageData.formatLocal(_start),
               onTap: () async {
                 final picked = await _pickDateTime(_start);
@@ -135,10 +144,10 @@ class _EventComposerSheetState extends State<_EventComposerSheet> {
               },
             ),
             _dateTile(
-              label: 'Ends',
+              label: s?.settingsEndTime ?? 'End Time',
               value: _end != null
                   ? EventMessageData.formatLocal(_end!)
-                  : 'Optional',
+                  : (s?.authOptional ?? 'Optional'),
               onTap: () async {
                 final picked = await _pickDateTime(
                   _end ?? _start.add(const Duration(hours: 1)),
@@ -151,9 +160,10 @@ class _EventComposerSheetState extends State<_EventComposerSheet> {
             TextField(
               controller: _locationC,
               style: TextStyle(color: context.textPrimary),
-              decoration: const InputDecoration(
-                labelText: 'Location (optional)',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText:
+                    s?.ui3EventLocationOptional ?? 'Location (optional)',
+                border: const OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: AppDimensions.spacingM),
@@ -161,16 +171,23 @@ class _EventComposerSheetState extends State<_EventComposerSheet> {
               controller: _descC,
               maxLines: 3,
               style: TextStyle(color: context.textPrimary),
-              decoration: const InputDecoration(
-                labelText: 'Description (optional)',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText:
+                    s?.ui3EventDescriptionOptional ?? 'Description (optional)',
+                border: const OutlineInputBorder(),
               ),
             ),
             if (_error != null) ...[
               const SizedBox(height: AppDimensions.spacingS),
               Text(
                 _error!,
-                style: const TextStyle(color: AppColors.error, fontSize: 13),
+                // errorFill keeps the message at 4.5:1 on the light sheet.
+                style: TextStyle(
+                  color: context.isDarkMode
+                      ? AppColors.error
+                      : AppColors.errorFill,
+                  fontSize: 13,
+                ),
               ),
             ],
             const SizedBox(height: AppDimensions.spacing),
@@ -178,7 +195,7 @@ class _EventComposerSheetState extends State<_EventComposerSheet> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: _submit,
-                child: const Text('Send Event'),
+                child: Text(s?.ui3EventSend ?? 'Send Event'),
               ),
             ),
           ],
@@ -197,25 +214,35 @@ class _EventComposerSheetState extends State<_EventComposerSheet> {
       onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10),
-        child: Row(
-          children: [
-            Icon(Icons.schedule, size: 18, color: context.textSecondary),
-            const SizedBox(width: 10),
-            Text(
-              label,
-              style: TextStyle(fontSize: 15, color: context.textPrimary),
-            ),
-            const Spacer(),
-            Text(
-              value,
-              style: TextStyle(fontSize: 14, color: context.textSecondary),
-            ),
-            if (onClear != null)
-              IconButton(
-                icon: Icon(Icons.close, size: 16, color: context.textTertiary),
-                onPressed: onClear,
+        // 24 + 20 padding keeps the row at the 44pt minimum when no clear
+        // button is shown.
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 24),
+          child: Row(
+            children: [
+              Icon(Icons.schedule, size: 18, color: context.textSecondary),
+              const SizedBox(width: 10),
+              Text(
+                label,
+                style: TextStyle(fontSize: 15, color: context.textPrimary),
               ),
-          ],
+              const Spacer(),
+              Text(
+                value,
+                style: TextStyle(fontSize: 14, color: context.textSupporting),
+              ),
+              if (onClear != null)
+                IconButton(
+                  icon: Icon(
+                    Icons.close,
+                    size: 16,
+                    color: context.textSecondary,
+                  ),
+                  tooltip: S.of(context)?.commonClear ?? 'Clear',
+                  onPressed: onClear,
+                ),
+            ],
+          ),
         ),
       ),
     );

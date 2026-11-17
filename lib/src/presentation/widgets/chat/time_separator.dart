@@ -56,15 +56,18 @@ class SystemMessageWidget extends StatelessWidget {
         vertical: AppDimensions.spacingM,
         horizontal: 40,
       ),
-      child: Center(child: _buildText()),
+      child: Center(child: _buildText(context)),
     );
   }
 
-  Widget _buildText() {
+  Widget _buildText(BuildContext context) {
+    // Same chat-background meta-text token as [TimeSeparator];
+    // textTertiary measured 1.6:1 on the chat background.
+    final textColor = ChatColors.of(context).timeSeparatorText;
     if (clickableTexts == null || clickableTexts!.isEmpty) {
       return Text(
         message,
-        style: const TextStyle(fontSize: 12, color: AppColors.textTertiary),
+        style: TextStyle(fontSize: 12, color: textColor),
         textAlign: TextAlign.center,
       );
     }
@@ -101,7 +104,7 @@ class SystemMessageWidget extends StatelessWidget {
 
     return Text.rich(
       TextSpan(
-        style: const TextStyle(fontSize: 12, color: AppColors.textTertiary),
+        style: TextStyle(fontSize: 12, color: textColor),
         children: spans,
       ),
       textAlign: TextAlign.center,
@@ -290,7 +293,10 @@ class _TypingIndicatorState extends State<TypingIndicator>
                 ? (S.of(context)?.commonUserTyping(widget.userName!) ??
                       '${widget.userName} is typing...')
                 : (S.of(context)?.commonTyping ?? 'Typing...'),
-            style: const TextStyle(fontSize: 12, color: AppColors.textTertiary),
+            style: TextStyle(
+              fontSize: 12,
+              color: ChatColors.of(context).timeSeparatorText,
+            ),
           ),
         ],
       ),

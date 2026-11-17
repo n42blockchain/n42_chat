@@ -95,89 +95,98 @@ class _ExpressionPanelState extends State<ExpressionPanel> {
   Widget build(BuildContext context) {
     final tabBarHeight = 40 + MediaQuery.textScalerOf(context).scale(12) * 1.2;
     final bodyHeight = (widget.height - tabBarHeight).clamp(0.0, widget.height);
-    return Container(
+    return SizedBox(
       height: widget.height + MediaQuery.paddingOf(context).bottom,
-      color: context.inputBarColor,
-      child: SafeArea(
-        top: false,
-        child: Column(
-          children: [
-            Expanded(
-              child: IndexedStack(
-                index: _tab.index,
-                sizing: StackFit.expand,
-                children: [
-                  if (_visited.contains(ExpressionTab.recent))
-                    _RecentTab(
-                      reloadToken: _recentReloadToken,
-                      recentEmojiStore: _recentEmoji,
-                      onEmojiSelected: _handleEmoji,
-                      onStickerSelected: widget.onStickerSelected,
-                      onGoToStickers: () => _switchTab(ExpressionTab.sticker),
-                      onGoToEmojis: () => _switchTab(ExpressionTab.emoji),
-                    )
-                  else
-                    const SizedBox.shrink(),
-                  if (_visited.contains(ExpressionTab.emoji))
-                    EmojiPicker(
-                      height: bodyHeight,
-                      onEmojiSelected: _handleEmoji,
-                      onBackspace: widget.onBackspace,
-                      onSend: widget.onSend,
-                    )
-                  else
-                    const SizedBox.shrink(),
-                  if (_visited.contains(ExpressionTab.sticker))
-                    StickerPicker(
-                      height: bodyHeight,
-                      onStickerSelected: widget.onStickerSelected,
-                      onStickerLongPressed: widget.onStickerLongPressed,
-                      onOpenStore: widget.onOpenStickerStore,
-                    )
-                  else
-                    const SizedBox.shrink(),
-                  if (_visited.contains(ExpressionTab.gif))
-                    GifPicker(
-                      height: bodyHeight,
-                      onGifSelected: widget.onGifSelected,
-                      onGifLongPressed: widget.onGifLongPressed,
-                    )
-                  else
-                    const SizedBox.shrink(),
-                ],
+      // Material (not a colored Container) so the ink of the recent tab is
+      // painted visibly on the panel background.
+      child: Material(
+        color: context.inputBarColor,
+        child: SafeArea(
+          top: false,
+          child: Column(
+            children: [
+              Expanded(
+                child: IndexedStack(
+                  index: _tab.index,
+                  sizing: StackFit.expand,
+                  children: [
+                    if (_visited.contains(ExpressionTab.recent))
+                      _RecentTab(
+                        reloadToken: _recentReloadToken,
+                        recentEmojiStore: _recentEmoji,
+                        onEmojiSelected: _handleEmoji,
+                        onStickerSelected: widget.onStickerSelected,
+                        onGoToStickers: () => _switchTab(ExpressionTab.sticker),
+                        onGoToEmojis: () => _switchTab(ExpressionTab.emoji),
+                      )
+                    else
+                      const SizedBox.shrink(),
+                    if (_visited.contains(ExpressionTab.emoji))
+                      EmojiPicker(
+                        height: bodyHeight,
+                        onEmojiSelected: _handleEmoji,
+                        onBackspace: widget.onBackspace,
+                        onSend: widget.onSend,
+                      )
+                    else
+                      const SizedBox.shrink(),
+                    if (_visited.contains(ExpressionTab.sticker))
+                      StickerPicker(
+                        height: bodyHeight,
+                        onStickerSelected: widget.onStickerSelected,
+                        onStickerLongPressed: widget.onStickerLongPressed,
+                        onOpenStore: widget.onOpenStickerStore,
+                      )
+                    else
+                      const SizedBox.shrink(),
+                    if (_visited.contains(ExpressionTab.gif))
+                      GifPicker(
+                        height: bodyHeight,
+                        onGifSelected: widget.onGifSelected,
+                        onGifLongPressed: widget.onGifLongPressed,
+                      )
+                    else
+                      const SizedBox.shrink(),
+                  ],
+                ),
               ),
-            ),
-            _buildTabBar(context, tabBarHeight),
-          ],
+              _buildTabBar(context, tabBarHeight),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildTabBar(BuildContext context, double height) {
-    return Container(
+    // Material so the tab ink is visible on the bar background.
+    return SizedBox(
       height: height,
-      decoration: BoxDecoration(
+      child: Material(
         color: context.surfaceColor,
-        border: Border(
+        shape: Border(
           top: BorderSide(color: context.dividerColor, width: 0.5),
         ),
-      ),
-      child: Row(
-        children: [
-          _tabButton(context, ExpressionTab.recent, Icons.access_time_rounded),
-          _tabButton(
-            context,
-            ExpressionTab.emoji,
-            Icons.emoji_emotions_outlined,
-          ),
-          _tabButton(
-            context,
-            ExpressionTab.sticker,
-            Icons.auto_awesome_outlined,
-          ),
-          _tabButton(context, ExpressionTab.gif, Icons.gif_box_outlined),
-        ],
+        child: Row(
+          children: [
+            _tabButton(
+              context,
+              ExpressionTab.recent,
+              Icons.access_time_rounded,
+            ),
+            _tabButton(
+              context,
+              ExpressionTab.emoji,
+              Icons.emoji_emotions_outlined,
+            ),
+            _tabButton(
+              context,
+              ExpressionTab.sticker,
+              Icons.auto_awesome_outlined,
+            ),
+            _tabButton(context, ExpressionTab.gif, Icons.gif_box_outlined),
+          ],
+        ),
       ),
     );
   }
@@ -189,6 +198,8 @@ class _ExpressionPanelState extends State<ExpressionPanel> {
         button: true,
         selected: selected,
         label: _tabLabel(context, tab),
+        // Keeps the tap action that excludeSemantics drops.
+        onTap: () => _switchTab(tab),
         excludeSemantics: true,
         child: InkWell(
           key: ValueKey('expression-tab-${tab.name}'),
@@ -329,9 +340,10 @@ class _RecentTabState extends State<_RecentTab> {
                 .map(
                   (e) => InkWell(
                     onTap: () => widget.onEmojiSelected(e),
+                    // 44pt emoji cells (was 40pt).
                     child: Container(
-                      width: 40,
-                      height: 40,
+                      width: 44,
+                      height: 44,
                       alignment: Alignment.center,
                       child: Text(e, style: const TextStyle(fontSize: 26)),
                     ),
@@ -351,7 +363,7 @@ class _RecentTabState extends State<_RecentTab> {
             crossAxisSpacing: 8,
             children: _stickers
                 .map(
-                  (r) => GestureDetector(
+                  (r) => InkWell(
                     onTap: () => widget.onStickerSelected(r.sticker, r.packId),
                     child: _StickerThumb(sticker: r.sticker),
                   ),
@@ -366,7 +378,7 @@ class _RecentTabState extends State<_RecentTab> {
   Widget _sectionIcon(BuildContext context, IconData icon) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 6, left: 2),
-      child: Icon(icon, size: 16, color: context.textTertiary),
+      child: Icon(icon, size: 16, color: context.textSecondary),
     );
   }
 

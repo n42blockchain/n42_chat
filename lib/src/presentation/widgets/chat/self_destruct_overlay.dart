@@ -2,10 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
+
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/self_destruct_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/chat_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../domain/entities/message_entity.dart';
 import '../../../core/theme/app_dimensions.dart';
 
@@ -106,9 +109,11 @@ class _SelfDestructOverlayState extends State<SelfDestructOverlay> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
+        // Solid fills that carry the white label at >= 4.5:1; the
+        // translucent red/orange measured about 2.2-3.4:1.
         color: isUrgent
-            ? AppColors.error.withValues(alpha: 0.9)
-            : AppColors.warning.withValues(alpha: 0.85),
+            ? AppColors.errorFill
+            : ChatContrast.fillForWhiteText(AppColors.warning),
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
@@ -158,15 +163,15 @@ class _SelfDestructOverlayState extends State<SelfDestructOverlay> {
           Icon(
             Icons.auto_delete_outlined,
             size: 14,
-            color: context.textTertiary,
+            color: context.textSupporting,
           ),
           const SizedBox(width: 6),
           Text(
-            'Message destroyed',
+            S.of(context)?.messageDestroyed ?? 'Message destroyed',
             style: TextStyle(
               fontSize: 12,
               fontStyle: FontStyle.italic,
-              color: context.textTertiary,
+              color: context.textSupporting,
             ),
           ),
         ],
@@ -183,15 +188,19 @@ class SelfDestructPendingIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final time = SelfDestructService.formatDuration(durationSeconds);
     return Tooltip(
       message:
-          'Self-destruct: ${SelfDestructService.formatDuration(durationSeconds)}',
+          S.of(context)?.selfDestructCountdown(time) ?? 'Self-destruct: $time',
       child: Padding(
         padding: const EdgeInsets.only(top: 2),
         child: Icon(
           Icons.timer_outlined,
           size: 12,
-          color: AppColors.warning.withValues(alpha: 0.7),
+          // >= 3:1 on light surfaces; plain warning at 70% measured ~1.7:1.
+          color: context.isDarkMode
+              ? AppColors.warning
+              : ChatContrast.fillForWhiteText(AppColors.warning),
         ),
       ),
     );

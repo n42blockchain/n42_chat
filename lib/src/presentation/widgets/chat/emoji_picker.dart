@@ -829,9 +829,23 @@ class _EmojiPickerState extends State<EmojiPicker>
     super.dispose();
   }
 
+  /// Screen-reader labels of the icon-only category tabs, in
+  /// [_categories] order.
+  List<String> _categoryLabels(S? l10n) => [
+    l10n?.a11yEmojiSmileys ?? 'Smileys & people',
+    l10n?.a11yEmojiHearts ?? 'Hearts',
+    l10n?.a11yEmojiAnimals ?? 'Animals & nature',
+    l10n?.a11yEmojiFood ?? 'Food & drink',
+    l10n?.a11yEmojiTravel ?? 'Travel & places',
+    l10n?.a11yEmojiActivities ?? 'Activities',
+    l10n?.a11yEmojiObjects ?? 'Objects',
+    l10n?.a11yEmojiSymbols ?? 'Symbols',
+  ];
+
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
+    final categoryLabels = _categoryLabels(S.of(context));
 
     return Container(
       height: widget.height,
@@ -875,9 +889,16 @@ class _EmojiPickerState extends State<EmojiPicker>
                       unselectedLabelColor: context.textSecondary,
                       indicatorColor: AppColors.primaryOf(context),
                       indicatorSize: TabBarIndicatorSize.label,
-                      tabs: _categories.map((category) {
-                        return Tab(icon: Icon(category.icon, size: 20));
-                      }).toList(),
+                      tabs: [
+                        for (var i = 0; i < _categories.length; i++)
+                          Tab(
+                            icon: Icon(
+                              _categories[i].icon,
+                              size: 20,
+                              semanticLabel: categoryLabels[i],
+                            ),
+                          ),
+                      ],
                     ),
                   ),
 
@@ -886,28 +907,35 @@ class _EmojiPickerState extends State<EmojiPicker>
                     Semantics(
                       button: true,
                       label: A11yL10n.of(context).backspace,
+                      // Keeps the tap action that excludeSemantics drops.
+                      onTap: widget.onBackspace,
                       excludeSemantics: true,
-                      child: GestureDetector(
-                        onTap: widget.onBackspace,
-                        onLongPress: () {
-                          // 长按连续删除
-                          widget.onBackspace?.call();
-                        },
-                        child: Container(
-                          width: 44,
-                          height: 44,
-                          decoration: BoxDecoration(
-                            border: Border(
-                              left: BorderSide(
-                                color: context.dividerColor,
-                                width: 0.5,
+                      // InkWell on a transparent Material: visible pressed
+                      // state on the toolbar background.
+                      child: Material(
+                        type: MaterialType.transparency,
+                        child: InkWell(
+                          onTap: widget.onBackspace,
+                          onLongPress: () {
+                            // 长按连续删除
+                            widget.onBackspace?.call();
+                          },
+                          child: Container(
+                            width: 44,
+                            height: 44,
+                            decoration: BoxDecoration(
+                              border: Border(
+                                left: BorderSide(
+                                  color: context.dividerColor,
+                                  width: 0.5,
+                                ),
                               ),
                             ),
-                          ),
-                          child: Icon(
-                            Icons.backspace_outlined,
-                            size: 20,
-                            color: context.textSecondary,
+                            child: Icon(
+                              Icons.backspace_outlined,
+                              size: 20,
+                              color: context.textSecondary,
+                            ),
                           ),
                         ),
                       ),
@@ -918,20 +946,25 @@ class _EmojiPickerState extends State<EmojiPicker>
                     Semantics(
                       button: true,
                       label: S.of(context)?.chatSendButton ?? 'Send',
+                      onTap: widget.onSend,
                       excludeSemantics: true,
-                      child: GestureDetector(
-                        onTap: widget.onSend,
-                        child: Container(
-                          width: 60,
-                          height: 44,
-                          color: AppColors.primaryOf(context),
-                          child: Center(
-                            child: Text(
-                              S.of(context)?.chatSendButton ?? 'Send',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
+                      // Brand fill that carries white text at >= 4.5:1, as a
+                      // Material so the InkWell ripple is visible.
+                      child: Material(
+                        color: AppColors.primaryFillOf(context),
+                        child: InkWell(
+                          onTap: widget.onSend,
+                          child: SizedBox(
+                            width: 60,
+                            height: 44,
+                            child: Center(
+                              child: Text(
+                                S.of(context)?.chatSendButton ?? 'Send',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
                           ),
@@ -950,8 +983,10 @@ class _EmojiPickerState extends State<EmojiPicker>
   Widget _buildEmojiGrid(List<String> emojis, bool isDark) {
     return GridView.builder(
       padding: const EdgeInsets.all(AppDimensions.spacingS),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 8,
+      // Cells of about 47pt (>= 44pt) at 320-375pt widths; was 8 fixed
+      // columns (34.5pt cells at 320pt, 41.4pt at 375pt).
+      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+        maxCrossAxisExtent: 48,
         mainAxisSpacing: 4,
         crossAxisSpacing: 4,
       ),

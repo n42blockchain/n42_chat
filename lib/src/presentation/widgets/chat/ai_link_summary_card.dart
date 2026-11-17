@@ -6,6 +6,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/chat_colors.dart';
 import '../../../core/utils/a11y_l10n.dart';
 import '../../../core/theme/app_dimensions.dart';
+import '../common/n42_tap_area.dart';
 
 /// AI 链接摘要卡片
 ///
@@ -71,30 +72,36 @@ class _AiLinkSummaryCardState extends State<AiLinkSummaryCard> {
                 : A11yL10n.of(context).expand,
             child: InkWell(
               onTap: () => setState(() => _isExpanded = !_isExpanded),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.auto_awesome,
-                    size: 14,
-                    color: AppColors.primaryOf(context),
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      l10n?.aiLinkSummary ?? 'AI Summary',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.primaryOf(context),
+              // Header row grows to the 44pt minimum hit height.
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(
+                  minHeight: N42TapArea.minTarget,
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.auto_awesome,
+                      size: 14,
+                      color: AppColors.primaryOf(context),
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        l10n?.aiLinkSummary ?? 'AI Summary',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primaryOnTintOf(context),
+                        ),
                       ),
                     ),
-                  ),
-                  Icon(
-                    _isExpanded ? Icons.expand_less : Icons.expand_more,
-                    size: 16,
-                    color: AppColors.textTertiaryOf(isDark),
-                  ),
-                ],
+                    Icon(
+                      _isExpanded ? Icons.expand_less : Icons.expand_more,
+                      size: 16,
+                      color: AppColors.textSecondaryOf(isDark),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -117,7 +124,7 @@ class _AiLinkSummaryCardState extends State<AiLinkSummaryCard> {
                     l10n?.aiLinkSummaryAnalyzing ?? 'Analyzing...',
                     style: TextStyle(
                       fontSize: 12,
-                      color: AppColors.primaryOf(context),
+                      color: AppColors.primaryOnTintOf(context),
                     ),
                   ),
                 ],
@@ -141,9 +148,13 @@ class _AiLinkSummaryCardState extends State<AiLinkSummaryCard> {
     return Semantics(
       button: true,
       label: l10n?.aiLinkSummary ?? 'AI Summary',
+      // Keeps the tap action that excludeSemantics drops.
+      onTap: widget.onGenerate,
       excludeSemantics: true,
-      child: GestureDetector(
+      // 44pt hit area around the unchanged pill.
+      child: N42TapArea(
         onTap: widget.onGenerate,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
         child: Container(
           margin: const EdgeInsets.only(top: 6),
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -168,7 +179,7 @@ class _AiLinkSummaryCardState extends State<AiLinkSummaryCard> {
                 l10n?.aiLinkSummary ?? 'AI Summary',
                 style: TextStyle(
                   fontSize: 11,
-                  color: AppColors.primaryOf(context),
+                  color: AppColors.primaryOnTintOf(context),
                   fontWeight: FontWeight.w500,
                 ),
               ),

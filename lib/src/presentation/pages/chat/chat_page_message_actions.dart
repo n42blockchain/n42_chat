@@ -100,7 +100,7 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
                   'Forward failed: $e',
             ),
             duration: const Duration(seconds: 2),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.errorFill,
           ),
         );
       }
@@ -449,7 +449,7 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
               S.of(context)?.chatMessageForwarded ?? 'Message forwarded',
             ),
             duration: const Duration(seconds: 1),
-            backgroundColor: AppColors.success,
+            backgroundColor: ChatContrast.fillForWhiteText(AppColors.success),
           ),
         );
       }
@@ -713,7 +713,11 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
             onPressed: () => Navigator.pop(ctx, true),
             child: Text(
               S.of(context)?.commonDelete ?? 'Delete',
-              style: const TextStyle(color: AppColors.error),
+              style: TextStyle(
+                color: context.isDarkMode
+                    ? AppColors.error
+                    : AppColors.errorFill,
+              ),
             ),
           ),
         ],
@@ -762,7 +766,7 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
         SnackBar(
           content: Text(message),
           duration: const Duration(seconds: 2),
-          backgroundColor: AppColors.success,
+          backgroundColor: ChatContrast.fillForWhiteText(AppColors.success),
         ),
       );
     }
@@ -793,8 +797,11 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(S.of(context)?.chatRecall ?? '撤回消息'),
-        content: Text('确定撤回 ${myMessages.length} 条消息？撤回后所有人将无法看到这些消息。'),
+        title: Text(S.of(context)?.chatRecall ?? 'Recall'),
+        content: Text(
+          S.of(context)?.chatMyMessagesWillBeRecalled(myMessages.length) ??
+              '${myMessages.length} messages from you will be recalled for everyone.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
@@ -804,7 +811,11 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
             onPressed: () => Navigator.pop(ctx, true),
             child: Text(
               S.of(context)?.chatRecall ?? 'Recall',
-              style: const TextStyle(color: AppColors.error),
+              style: TextStyle(
+                color: context.isDarkMode
+                    ? AppColors.error
+                    : AppColors.errorFill,
+              ),
             ),
           ),
         ],
@@ -824,10 +835,10 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
         SnackBar(
           content: Text(
             S.of(context)?.chatRecalledMessages(myMessages.length) ??
-                '已撤回 ${myMessages.length} 条消息',
+                'Recalled ${myMessages.length} messages',
           ),
           duration: const Duration(seconds: 2),
-          backgroundColor: AppColors.success,
+          backgroundColor: ChatContrast.fillForWhiteText(AppColors.success),
         ),
       );
     }
@@ -862,7 +873,7 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
             S.of(context)?.chatRedPacketTransferCannotForward ??
                 'Red envelopes, transfers and payment requests cannot be forwarded',
           ),
-          backgroundColor: AppColors.warning,
+          backgroundColor: ChatContrast.fillForWhiteText(AppColors.warning),
         ),
       );
       return;
@@ -913,9 +924,9 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
         SnackBar(
           content: Text(resultMsg),
           duration: const Duration(seconds: 2),
-          backgroundColor: failCount == 0
-              ? AppColors.success
-              : AppColors.warning,
+          backgroundColor: ChatContrast.fillForWhiteText(
+            failCount == 0 ? AppColors.success : AppColors.warning,
+          ),
         ),
       );
     }
@@ -1003,7 +1014,9 @@ extension _ChatPageMessageActionsMethods on _ChatPageState {
         '${dueAt.year}-${two(dueAt.month)}-${two(dueAt.day)} ${two(dueAt.hour)}:${two(dueAt.minute)}';
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Reminder set · $label'),
+        content: Text(
+          S.of(context)?.ui3ReminderSetAt(label) ?? 'Reminder set · $label',
+        ),
         duration: const Duration(seconds: 2),
       ),
     );

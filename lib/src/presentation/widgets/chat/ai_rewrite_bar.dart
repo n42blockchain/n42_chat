@@ -6,6 +6,7 @@ import '../../../core/services/ai_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/chat_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
+import '../common/n42_tap_area.dart';
 
 /// AI 消息改写建议栏
 ///
@@ -78,21 +79,19 @@ class AiRewriteBar extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.primaryOf(context),
+                      color: AppColors.primaryOnTintOf(context),
                     ),
                   ),
                 ),
-                Semantics(
-                  button: true,
-                  label: MaterialLocalizations.of(context).closeButtonTooltip,
-                  excludeSemantics: true,
-                  child: GestureDetector(
-                    onTap: onDismiss,
-                    child: Icon(
-                      Icons.close,
-                      size: 18,
-                      color: AppColors.textTertiaryOf(isDark),
-                    ),
+                // 44pt hit area around the unchanged 18pt icon.
+                N42TapArea(
+                  onTap: onDismiss,
+                  tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+                  customBorder: const CircleBorder(),
+                  child: Icon(
+                    Icons.close,
+                    size: 18,
+                    color: AppColors.textSecondaryOf(isDark),
                   ),
                 ),
               ],
@@ -140,7 +139,7 @@ class AiRewriteBar extends StatelessWidget {
                     l10n?.aiRewriteLoading ?? 'Rewriting...',
                     style: TextStyle(
                       fontSize: 13,
-                      color: AppColors.textTertiaryOf(isDark),
+                      color: AppColors.textSecondaryOf(isDark),
                     ),
                   ),
                 ],
@@ -178,14 +177,16 @@ class AiRewriteBar extends StatelessWidget {
                     onPressed: onDismiss,
                     child: Text(
                       l10n?.aiRewriteCancel ?? 'Cancel',
-                      style: TextStyle(color: AppColors.textTertiaryOf(isDark)),
+                      style: TextStyle(
+                        color: AppColors.textSecondaryOf(isDark),
+                      ),
                     ),
                   ),
                   const SizedBox(width: AppDimensions.spacingS),
                   ElevatedButton(
                     onPressed: () => onAccept?.call(rewrittenText!),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryOf(context),
+                      backgroundColor: AppColors.primaryFillOf(context),
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppDimensions.spacingL,
@@ -230,8 +231,10 @@ class _ToneChip extends StatelessWidget {
     final isDark = context.isDarkMode;
     final l10n = S.of(context);
 
-    return GestureDetector(
+    // 44pt hit area around the unchanged chip.
+    return N42TapArea(
       onTap: onTap,
+      borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
       child: Container(
         padding: const EdgeInsets.symmetric(
           horizontal: AppDimensions.spacingM,
@@ -239,7 +242,7 @@ class _ToneChip extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: isSelected
-              ? AppColors.primaryOf(context)
+              ? AppColors.primaryFillOf(context)
               : AppColors.inputBgOf(isDark),
           borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
           border: isSelected

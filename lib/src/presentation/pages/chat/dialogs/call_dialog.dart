@@ -13,6 +13,7 @@ import '../../../../core/utils/debug_log.dart';
 import '../../../../services/voip/call_manager.dart';
 import '../../../../services/voip/webrtc_service.dart';
 import '../../../../core/theme/app_dimensions.dart';
+import '../../../widgets/common/n42_tap_area.dart';
 
 /// 通话对话框（轻量浮层）
 ///
@@ -264,20 +265,25 @@ class _CallDialogState extends State<CallDialog> {
             const SizedBox(height: 40),
 
             // 挂断按钮
-            GestureDetector(
-              // ignore: avoid_void_async
+            // Red circle as the Material so the ripple shows on it; the
+            // label is announced because the caption below is separate.
+            Semantics(
+              button: true,
+              label: S.of(context)?.chatHangUp ?? 'Hang Up',
               onTap: () => _endCall(),
-              child: Container(
-                width: 72,
-                height: 72,
-                decoration: const BoxDecoration(
-                  color: AppColors.error,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.call_end,
-                  color: Colors.white,
-                  size: 36,
+              excludeSemantics: true,
+              child: Material(
+                color: AppColors.error,
+                shape: const CircleBorder(),
+                clipBehavior: Clip.antiAlias,
+                child: InkWell(
+                  // ignore: avoid_void_async
+                  onTap: () => _endCall(),
+                  child: const SizedBox(
+                    width: 72,
+                    height: 72,
+                    child: Icon(Icons.call_end, color: Colors.white, size: 36),
+                  ),
                 ),
               ),
             ),
@@ -317,8 +323,9 @@ class _CallDialogState extends State<CallDialog> {
     required bool isActive,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
+    return N42TapArea(
       onTap: onTap,
+      borderRadius: BorderRadius.circular(AppDimensions.radiusL),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

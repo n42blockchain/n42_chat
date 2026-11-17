@@ -96,6 +96,7 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
 
   /// 选择本地音频文件
   Future<void> _pickLocalAudio() async {
+    final unknownArtist = S.of(context)?.chatUnknownArtist ?? 'Unknown Artist';
     try {
       final file = await FilePicker.pickFile(type: FileType.audio);
 
@@ -103,7 +104,7 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
         final fileName = file.name;
         // 从文件名中提取歌曲名和歌手（假设格式为 "歌手 - 歌曲名.mp3"）
         String songName = fileName;
-        String artist = '未知歌手';
+        String artist = unknownArtist;
 
         // 去掉扩展名
         if (fileName.contains('.')) {
@@ -183,6 +184,13 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
     });
   }
 
+  /// Secondary label: 72% primary text over the sheet, >= 4.5:1 in both
+  /// modes (textSecondary is about 3.4:1 on white).
+  Color get _secondaryText => Color.alphaBlend(
+    AppColors.textPrimaryOf(widget.isDark).withValues(alpha: .72),
+    AppColors.surfaceOf(widget.isDark),
+  );
+
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -219,6 +227,8 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
                       Icons.close,
                       color: AppColors.textPrimaryOf(widget.isDark),
                     ),
+                    tooltip:
+                        MaterialLocalizations.of(context).closeButtonTooltip,
                     onPressed: () => Navigator.pop(context),
                   ),
                 ],
@@ -262,44 +272,50 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
 
   Widget _buildTab(int index, String label, IconData icon) {
     final isSelected = _selectedTab == index;
-    return GestureDetector(
-      onTap: () => setState(() => _selectedTab = index),
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppDimensions.spacing,
-          vertical: AppDimensions.spacingM,
-        ),
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              color: isSelected
-                  ? AppColors.primaryOf(context)
-                  : Colors.transparent,
-              width: 2,
+    return Semantics(
+      selected: isSelected,
+      child: InkWell(
+        onTap: () => setState(() => _selectedTab = index),
+        child: Container(
+          // 44pt minimum tab height (was about 42pt).
+          constraints: const BoxConstraints(minHeight: 44),
+          alignment: Alignment.center,
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.spacing,
+            vertical: AppDimensions.spacingM,
+          ),
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(
+                color: isSelected
+                    ? AppColors.primaryOf(context)
+                    : Colors.transparent,
+                width: 2,
+              ),
             ),
           ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: 18,
-              color: isSelected
-                  ? AppColors.primaryOf(context)
-                  : (AppColors.textSecondaryOf(widget.isDark)),
-            ),
-            const SizedBox(width: 6),
-            Text(
-              label,
-              style: TextStyle(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                size: 18,
                 color: isSelected
                     ? AppColors.primaryOf(context)
                     : (AppColors.textSecondaryOf(widget.isDark)),
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
-            ),
-          ],
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: TextStyle(
+                  color: isSelected
+                      ? AppColors.primaryOf(context)
+                      : _secondaryText,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -351,9 +367,7 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
               ? Center(
                   child: Text(
                     S.of(context)?.chatNoSongsFound ?? 'No songs found',
-                    style: TextStyle(
-                      color: AppColors.textSecondaryOf(widget.isDark),
-                    ),
+                    style: TextStyle(color: _secondaryText),
                   ),
                 )
               : ListView.builder(
@@ -386,7 +400,7 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
                         song['artist'] as String,
                         style: TextStyle(
                           fontSize: 12,
-                          color: AppColors.textSecondaryOf(widget.isDark),
+                          color: _secondaryText,
                         ),
                       ),
                       trailing: Icon(
@@ -404,7 +418,7 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
 
   Widget _buildNetworkLinkInput() {
     final textColor = AppColors.textPrimaryOf(widget.isDark);
-    final hintColor = AppColors.textSecondaryOf(widget.isDark);
+    final hintColor = _secondaryText;
     final fillColor = AppColors.inputBgOf(widget.isDark);
 
     return SingleChildScrollView(
@@ -429,7 +443,9 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
                 const SizedBox(width: AppDimensions.spacingS),
                 Expanded(
                   child: Text(
-                    '支持网易云、QQ音乐、酷狗、酷我等平台的歌曲链接',
+                    S.of(context)?.ui3MusicLinkPlatforms ??
+                        'Supports song links from NetEase Cloud Music, QQ '
+                            'Music, Kugou, Kuwo and more',
                     style: TextStyle(fontSize: 13, color: textColor),
                   ),
                 ),
@@ -510,7 +526,7 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
             child: ElevatedButton(
               onPressed: _shareNetworkLink,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryOf(context),
+                backgroundColor: AppColors.primaryFillOf(context),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
@@ -530,7 +546,7 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
 
   Widget _buildLocalFilePicker() {
     final textColor = AppColors.textPrimaryOf(widget.isDark);
-    final subtextColor = AppColors.textSecondaryOf(widget.isDark);
+    final subtextColor = _secondaryText;
 
     return Center(
       child: Padding(
@@ -572,7 +588,7 @@ class _MusicSelectSheetState extends State<MusicSelectSheet> {
               icon: const Icon(Icons.folder_open),
               label: Text(S.of(context)?.chatSelectFileButton ?? 'Select File'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryOf(context),
+                backgroundColor: AppColors.primaryFillOf(context),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppDimensions.spacingXXL,

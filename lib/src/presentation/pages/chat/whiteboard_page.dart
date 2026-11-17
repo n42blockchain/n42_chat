@@ -7,10 +7,13 @@ import 'package:flutter/rendering.dart';
 import 'package:get_it/get_it.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
+import '../../../../l10n/app_localizations.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/utils/debug_log.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../widgets/chat/whiteboard/whiteboard_controller.dart';
 import '../../../core/theme/app_dimensions.dart';
+import '../../widgets/common/n42_tap_area.dart';
 
 /// 白板 / 涂鸦页（仿微信「涂鸦」、对标 iMessage Digital Touch / Apple Freeform）。
 ///
@@ -124,6 +127,25 @@ class _WhiteboardPageState extends State<WhiteboardPage> {
     );
   }
 
+  /// Clearing is irreversible and is broadcast to every peer, so it is
+  /// confirmed first (HIG feedback: destructive actions).
+  Future<void> _confirmClearBoard() async {
+    if (_controller.isEmpty) {
+      _clearBoard();
+      return;
+    }
+    final s = S.of(context);
+    final confirmed = await context.showConfirmDialog(
+      title: s?.ui3ClearWhiteboardTitle ?? 'Clear whiteboard?',
+      content:
+          s?.ui3ClearWhiteboardMessage ??
+          'All strokes will be removed for everyone. This cannot be undone.',
+      confirmText: s?.commonClear ?? 'Clear',
+      isDanger: true,
+    );
+    if (confirmed && mounted) _clearBoard();
+  }
+
   void _clearBoard() {
     _controller.clear();
     final room = _room;
@@ -182,6 +204,8 @@ class _WhiteboardPageState extends State<WhiteboardPage> {
 
   @override
   Widget build(BuildContext context) {
+    final s = S.of(context);
+    final sendLabel = s?.chatSendButton ?? 'Send';
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -189,21 +213,21 @@ class _WhiteboardPageState extends State<WhiteboardPage> {
         foregroundColor: Colors.white,
         title: Text(
           _room != null
-              ? 'Whiteboard · Live${_peerStrokeCount > 0 ? ' ✏️' : ''}'
-              : 'Whiteboard',
+              ? '${s?.ui3WhiteboardLive ?? 'Whiteboard · Live'}${_peerStrokeCount > 0 ? ' ✏️' : ''}'
+              : (s?.chatAttachmentWhiteboard ?? 'Whiteboard'),
         ),
         actions: [
           AnimatedBuilder(
             animation: _controller,
             builder: (context, _) => Semantics(
               button: true,
-              label: 'Send',
+              label: sendLabel,
               child: TextButton(
                 onPressed: _controller.isNotEmpty && !_exporting
                     ? _export
                     : null,
                 child: Text(
-                  'Send',
+                  sendLabel,
                   style: TextStyle(
                     color: _controller.isNotEmpty
                         ? Colors.lightBlueAccent
@@ -241,13 +265,13 @@ class _WhiteboardPageState extends State<WhiteboardPage> {
               ),
             ),
           ),
-          _buildToolbar(),
+          _buildToolbar(s),
         ],
       ),
     );
   }
 
-  Widget _buildToolbar() {
+  Widget _buildToolbar(S? s) {
     return Container(
       color: Colors.black,
       padding: const EdgeInsets.symmetric(
@@ -258,31 +282,31 @@ class _WhiteboardPageState extends State<WhiteboardPage> {
         top: false,
         child: Row(
           children: [
-            Semantics(
-              button: true,
-              label: 'Undo',
-              child: IconButton(
-                icon: const Icon(Icons.undo, color: Colors.white),
-                onPressed: _controller.undo,
-              ),
+            IconButton(
+              tooltip: s?.mediaEditorUndo ?? 'Undo',
+              icon: const Icon(Icons.undo, color: Colors.white),
+              onPressed: _controller.undo,
             ),
-            Semantics(
-              button: true,
-              label: 'Clear',
-              child: IconButton(
-                icon: const Icon(Icons.delete_outline, color: Colors.white),
-                onPressed: _clearBoard,
-              ),
+            IconButton(
+              tooltip: s?.commonClear ?? 'Clear',
+              icon: const Icon(Icons.delete_outline, color: Colors.white),
+              onPressed: _confirmClearBoard,
             ),
             const SizedBox(width: AppDimensions.spacingXS),
             Expanded(
               child: AnimatedBuilder(
                 animation: _controller,
-                builder: (context, _) => Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    for (final color in _palette) _buildColorDot(color),
-                  ],
+                // 44pt swatches no longer fit one row on a phone: scroll
+                // horizontally, right-aligned while they fit.
+                builder: (context, _) => SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  reverse: true,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      for (final color in _palette) _buildColorDot(color, s),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -292,18 +316,19 @@ class _WhiteboardPageState extends State<WhiteboardPage> {
     );
   }
 
-  Widget _buildColorDot(Color color) {
+  Widget _buildColorDot(Color color, S? s) {
     final selected = _controller.color == color;
     return Semantics(
       button: true,
       selected: selected,
-      label: 'Color',
-      child: GestureDetector(
+      label: s?.a11yPenColor ?? 'Pen color',
+      // 26pt swatch inside a 44x44pt hit area (HIG accessibility).
+      child: N42TapArea(
         onTap: () => _controller.color = color,
+        customBorder: const CircleBorder(),
         child: Container(
           width: 26,
           height: 26,
-          margin: const EdgeInsets.symmetric(horizontal: 3),
           decoration: BoxDecoration(
             color: color,
             shape: BoxShape.circle,

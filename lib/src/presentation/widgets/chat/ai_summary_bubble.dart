@@ -4,6 +4,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/chat_colors.dart';
+import '../common/n42_tap_area.dart';
 
 /// AI 摘要气泡组件
 ///
@@ -66,44 +67,55 @@ class _AiSummaryBubbleState extends State<AiSummaryBubble> {
             onTap: () => setState(() => _isExpanded = !_isExpanded),
             borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.auto_awesome,
-                    size: 18,
-                    color: AppColors.primaryOf(context),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      widget.messageCount > 0
-                          ? (l10n?.aiSummarizeMessages(widget.messageCount) ??
-                                'AI Summary (${widget.messageCount} messages)')
-                          : (l10n?.aiSummarize ?? 'AI Summary'),
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.primaryOf(context),
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              // Header row is at least 44pt tall (was 38pt with 10pt padding).
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(
+                  minHeight: N42TapArea.minTarget,
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.auto_awesome,
+                      size: 18,
+                      color: AppColors.primaryOf(context),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        widget.messageCount > 0
+                            ? (l10n?.aiSummarizeMessages(widget.messageCount) ??
+                                  'AI Summary (${widget.messageCount} messages)')
+                            : (l10n?.aiSummarize ?? 'AI Summary'),
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primaryOnTintOf(context),
+                        ),
                       ),
                     ),
-                  ),
-                  if (widget.onDismiss != null)
-                    GestureDetector(
-                      onTap: widget.onDismiss,
-                      child: Icon(
-                        Icons.close,
-                        size: 16,
-                        color: AppColors.textTertiaryOf(isDark),
+                    if (widget.onDismiss != null)
+                      // 44pt hit area around the unchanged 16pt icon.
+                      N42TapArea(
+                        onTap: widget.onDismiss,
+                        tooltip: MaterialLocalizations.of(
+                          context,
+                        ).closeButtonTooltip,
+                        customBorder: const CircleBorder(),
+                        child: Icon(
+                          Icons.close,
+                          size: 16,
+                          color: AppColors.textSecondaryOf(isDark),
+                        ),
                       ),
+                    const SizedBox(width: 4),
+                    Icon(
+                      _isExpanded ? Icons.expand_less : Icons.expand_more,
+                      size: 18,
+                      color: AppColors.textSecondaryOf(isDark),
                     ),
-                  const SizedBox(width: 4),
-                  Icon(
-                    _isExpanded ? Icons.expand_less : Icons.expand_more,
-                    size: 18,
-                    color: AppColors.textTertiaryOf(isDark),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -143,7 +155,10 @@ class _AiSummaryBubbleState extends State<AiSummaryBubble> {
         const SizedBox(width: 8),
         Text(
           l10n?.aiSummarizeLoading ?? 'Generating summary...',
-          style: TextStyle(fontSize: 13, color: AppColors.primaryOf(context)),
+          style: TextStyle(
+            fontSize: 13,
+            color: AppColors.primaryOnTintOf(context),
+          ),
         ),
       ],
     );
@@ -174,50 +189,57 @@ class AiSummarizeButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = S.of(context);
 
-    return GestureDetector(
-      onTap: isLoading ? null : onTap,
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 40, vertical: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: ChatColors.of(context).brandTint(AppColors.primaryOf(context)),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: AppColors.primaryOf(context).withValues(alpha: 0.3),
+    // 44pt hit area around the unchanged pill; the outer vertical margin
+    // shrinks from 8 to 2 so the overall row height stays about the same.
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 2),
+      child: N42TapArea(
+        onTap: isLoading ? null : onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: ChatColors.of(
+              context,
+            ).brandTint(AppColors.primaryOf(context)),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: AppColors.primaryOf(context).withValues(alpha: 0.3),
+            ),
           ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (isLoading)
-              SizedBox(
-                width: 14,
-                height: 14,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (isLoading)
+                SizedBox(
+                  width: 14,
+                  height: 14,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: AppColors.primaryOf(context),
+                  ),
+                )
+              else
+                Icon(
+                  Icons.auto_awesome,
+                  size: 14,
                   color: AppColors.primaryOf(context),
                 ),
-              )
-            else
-              Icon(
-                Icons.auto_awesome,
-                size: 14,
-                color: AppColors.primaryOf(context),
+              const SizedBox(width: 6),
+              Text(
+                isLoading
+                    ? (l10n?.aiSummarizeLoading ?? 'Summarizing...')
+                    : (l10n?.aiSummarizeMessages(unreadCount) ??
+                          'AI Summarize $unreadCount messages'),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppColors.primaryOnTintOf(context),
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-            const SizedBox(width: 6),
-            Text(
-              isLoading
-                  ? (l10n?.aiSummarizeLoading ?? 'Summarizing...')
-                  : (l10n?.aiSummarizeMessages(unreadCount) ??
-                        'AI Summarize $unreadCount messages'),
-              style: TextStyle(
-                fontSize: 12,
-                color: AppColors.primaryOf(context),
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

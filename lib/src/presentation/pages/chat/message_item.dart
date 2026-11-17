@@ -19,6 +19,7 @@ import '../../../core/services/remark_service.dart';
 import '../../../core/services/url_preview_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/chat_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../core/theme/app_dimensions.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/payment_request_status_utils.dart';
@@ -150,6 +151,16 @@ class MessageItem extends StatelessWidget {
       : AppColors.primaryOnTintOf(
           context,
           over: ChatColors.of(context).bubbleOther,
+        );
+
+  /// Quiz explanation label on its 10% info tint inside the bubble (4.5:1).
+  Color _quizExplanationColor(BuildContext context) => message.isFromMe
+      ? AppColors.messageTextSent
+      : ChatContrast.onTint(
+          AppColors.info,
+          [ChatColors.of(context).bubbleOther],
+          dark: context.isDarkMode,
+          alpha: 0.1,
         );
 
   @override
@@ -626,6 +637,7 @@ class MessageItem extends StatelessWidget {
             UrlPreviewWidget(
               url: urlMatch.group(0)!,
               previewService: getIt<UrlPreviewService>(),
+              onBrandFill: message.isFromMe,
             ),
           if (urlMatch != null && showLinkPreview && aiServiceAvailable())
             AiLinkSummaryWrapper(url: urlMatch.group(0)!),
@@ -643,6 +655,7 @@ class MessageItem extends StatelessWidget {
           UrlPreviewWidget(
             url: urlMatch.group(0)!,
             previewService: getIt<UrlPreviewService>(),
+            onBrandFill: message.isFromMe,
           ),
           if (aiServiceAvailable())
             AiLinkSummaryWrapper(url: urlMatch.group(0)!),
@@ -1065,11 +1078,12 @@ class MessageItem extends StatelessWidget {
   }
 
   /// 圆形视频留言渲染（缩略图圆形裁切 + 播放叠层）。
-  Widget _buildVideoNote(String? thumbnailUrl) {
+  Widget _buildVideoNote(BuildContext context, String? thumbnailUrl) {
     const double size = 160;
     return Semantics(
       button: true,
-      label: 'Video note',
+      label: S.of(context)?.chatAttachmentVideoNote ?? 'Video note',
+      onTap: onTap,
       excludeSemantics: true,
       child: GestureDetector(
         onTap: onTap,
@@ -1147,9 +1161,10 @@ class MessageItem extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  // 60% label on the fixed light placeholder (about 5:1).
                   Icon(
                     message.isExpired ? Icons.timer_off : Icons.visibility,
-                    color: AppColors.textTertiary,
+                    color: AppColors.textPrimary.withValues(alpha: 0.6),
                     size: 28,
                   ),
                   const SizedBox(height: 6),
@@ -1159,8 +1174,8 @@ class MessageItem extends StatelessWidget {
                         : (s?.chatViewOnceViewed ?? 'Viewed'),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: AppColors.textTertiary,
+                    style: TextStyle(
+                      color: AppColors.textPrimary.withValues(alpha: 0.6),
                       fontSize: AppFontSize.caption1,
                       height: 1.3,
                     ),
@@ -1236,7 +1251,7 @@ class MessageItem extends StatelessWidget {
 
     // 圆形视频留言（Video Note）：据文件名前缀识别，圆形渲染。
     if (VideoNoteUtils.isVideoNote(metadata?.fileName)) {
-      return _buildVideoNote(thumbnailUrl);
+      return _buildVideoNote(context, thumbnailUrl);
     }
 
     return GestureDetector(
@@ -1641,7 +1656,7 @@ class MessageItem extends StatelessWidget {
                 const Text('💝', style: TextStyle(fontSize: AppFontSize.title3)),
                 const SizedBox(width: 8),
                 Text(
-                  'Tip · $amount $token',
+                  '${A11yL10n.of(context).tip} · $amount $token',
                   style: const TextStyle(
                     color: AppColors.onMedia,
                     fontWeight: FontWeight.w700,
@@ -1661,7 +1676,9 @@ class MessageItem extends StatelessWidget {
             ],
             const SizedBox(height: 4),
             Text(
-              confirmed ? 'On-chain ✓' : 'Sent',
+              confirmed
+                  ? (S.of(context)?.ui3TipOnChain ?? 'On-chain ✓')
+                  : (S.of(context)?.chatMessageSent ?? 'Sent'),
               style: TextStyle(
                 color: AppColors.onMedia.withValues(alpha: 0.85),
                 fontSize: AppFontSize.caption2,
@@ -1774,6 +1791,7 @@ class MessageItem extends StatelessWidget {
     return Semantics(
       button: true,
       label: A11yL10n.of(context).music(title, artist),
+      onTap: url != null && url.isNotEmpty ? onTap : null,
       excludeSemantics: true,
       child: GestureDetector(
         onTap: () {
@@ -1945,6 +1963,7 @@ class MessageItem extends StatelessWidget {
           Semantics(
             button: true,
             label: A11yL10n.of(context).addToCalendar,
+            onTap: () => _addCalendarEvent(context, data),
             excludeSemantics: true,
             child: _BubbleTap(
               minTarget: true,
@@ -2071,7 +2090,9 @@ class MessageItem extends StatelessWidget {
                     style: TextStyle(
                       fontSize: AppFontSize.caption2,
                       height: 1.3,
-                      color: context.textTertiary,
+                      color: message.isFromMe
+                          ? AppColors.messageTextSent
+                          : context.textSupporting,
                     ),
                   ),
                 ),
@@ -2132,6 +2153,14 @@ class MessageItem extends StatelessWidget {
               button: canChangeVote,
               selected: isSelected,
               label: A11yL10n.of(context).pollOption(optionText, voteCount),
+              onTap: canChangeVote
+                  ? () => onPollVote?.call(
+                      message.id,
+                      optionId,
+                      myVotes,
+                      maxSelections,
+                    )
+                  : null,
               excludeSemantics: true,
               child: Padding(
                 padding: const EdgeInsets.only(bottom: AppDimensions.spacingS),
@@ -2266,19 +2295,19 @@ class MessageItem extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.lightbulb_outline,
                     size: 14,
-                    color: AppColors.info,
+                    color: _quizExplanationColor(context),
                   ),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
                       metadata.quizExplanation!,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: AppFontSize.caption1,
                         height: 1.35,
-                        color: AppColors.info,
+                        color: _quizExplanationColor(context),
                       ),
                     ),
                   ),
@@ -2310,6 +2339,7 @@ class MessageItem extends StatelessWidget {
                 Semantics(
                   button: true,
                   label: S.of(context)?.chatEndPollButton ?? 'End Poll',
+                  onTap: () => onEndPoll?.call(message.id),
                   excludeSemantics: true,
                   child: _BubbleTap(
                     minTarget: true,
@@ -2428,7 +2458,8 @@ class MessageItem extends StatelessWidget {
             const SizedBox(width: 8),
             Semantics(
               button: true,
-              label: S.of(context)?.chatCallBack ?? '回拨',
+              label: S.of(context)?.chatCallBack ?? 'Call back',
+              onTap: () => onCallBack?.call(message),
               excludeSemantics: true,
               child: _BubbleTap(
                 minTarget: true,

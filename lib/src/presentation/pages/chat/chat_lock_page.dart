@@ -28,6 +28,7 @@ class _ChatLockPageState extends State<ChatLockPage> {
   bool _showPinInput = false;
   bool _isBiometricAvailable = false;
   String? _errorMessage;
+  bool _verifyingPin = false;
 
   @override
   void initState() {
@@ -76,13 +77,16 @@ class _ChatLockPageState extends State<ChatLockPage> {
 
   Future<void> _verifyPin() async {
     final pin = _pinController.text;
-    if (pin.isEmpty) return;
+    // One verify at a time: a second success would pop the route below.
+    if (pin.isEmpty || _verifyingPin) return;
+    setState(() => _verifyingPin = true);
 
     final success = await _lockService.verifyPin(widget.roomId, pin);
     if (success && mounted) {
       Navigator.pop(context, true);
     } else if (mounted) {
       setState(() {
+        _verifyingPin = false;
         _errorMessage =
             S.of(context)?.chatLockVerifyFailed ?? 'Verification failed';
         _pinController.clear();
@@ -101,16 +105,20 @@ class _ChatLockPageState extends State<ChatLockPage> {
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.close, color: context.textPrimary),
+          tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
           onPressed: () => Navigator.pop(context, false),
         ),
       ),
       body: SafeArea(
         child: Center(
-          child: Padding(
+          // Scrolls so the PIN field and Confirm stay reachable with the
+          // keyboard open.
+          child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(
               horizontal: AppDimensions.spacingXXL,
             ),
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
@@ -200,9 +208,9 @@ class _ChatLockPageState extends State<ChatLockPage> {
                   SizedBox(
                     width: 200,
                     child: ElevatedButton(
-                      onPressed: _verifyPin,
+                      onPressed: _verifyingPin ? null : _verifyPin,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primaryOf(context),
+                        backgroundColor: AppColors.primaryFillOf(context),
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(
                           vertical: AppDimensions.spacingM,
@@ -231,7 +239,7 @@ class _ChatLockPageState extends State<ChatLockPage> {
                     icon: const Icon(Icons.fingerprint),
                     label: Text(l10n?.chatLockUseBiometric ?? 'Use biometric'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryOf(context),
+                      backgroundColor: AppColors.primaryFillOf(context),
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppDimensions.spacingXL,

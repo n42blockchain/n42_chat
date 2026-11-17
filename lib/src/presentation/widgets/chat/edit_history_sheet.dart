@@ -116,7 +116,7 @@ class _EditHistorySheetState extends State<EditHistorySheet> {
       return Center(
         child: Text(
           _error!,
-          style: const TextStyle(color: AppColors.textSecondary),
+          style: TextStyle(color: context.textSupporting),
         ),
       );
     }
@@ -125,8 +125,8 @@ class _EditHistorySheetState extends State<EditHistorySheet> {
     if (entries == null || entries.isEmpty) {
       return Center(
         child: Text(
-          s?.chatEditHistory ?? 'No edit history',
-          style: const TextStyle(color: AppColors.textSecondary),
+          s?.ui3NoEditHistory ?? 'No edit history',
+          style: TextStyle(color: context.textSupporting),
         ),
       );
     }
@@ -186,12 +186,12 @@ class _EditHistorySheetState extends State<EditHistorySheet> {
                   ),
                 )
               else
-                Icon(Icons.edit, size: 12, color: context.textTertiary),
+                Icon(Icons.edit, size: 12, color: context.textSecondary),
               if (!entry.isOriginal)
                 const SizedBox(width: AppDimensions.spacingXS),
               Text(
                 timeStr,
-                style: TextStyle(fontSize: 12, color: context.textTertiary),
+                style: TextStyle(fontSize: 12, color: context.textSupporting),
               ),
             ],
           ),
@@ -220,7 +220,8 @@ class _EditHistorySheetState extends State<EditHistorySheet> {
     if (messageDay == today) {
       return '$hour:$minute';
     } else if (messageDay == today.subtract(const Duration(days: 1))) {
-      return 'Yesterday $hour:$minute';
+      final yesterday = S.of(context)?.favoriteYesterday ?? 'Yesterday';
+      return '$yesterday $hour:$minute';
     } else {
       return '${time.month}/${time.day} $hour:$minute';
     }

@@ -359,18 +359,18 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
+              Icon(
                 Icons.download_for_offline_outlined,
-                color: AppColors.textSecondary,
+                color: _onPlaceholder,
                 size: 28,
               ),
               const SizedBox(height: 8),
               Text(
                 S.of(context)?.chatDownload ?? 'Download',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
-                  color: AppColors.textSecondary,
+                  color: _onPlaceholder,
                 ),
               ),
             ],
@@ -400,7 +400,7 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
                 children: [
                   Icon(
                     widget.isExpired ? Icons.timer_off : Icons.visibility,
-                    color: AppColors.textTertiary,
+                    color: _onPlaceholder,
                     size: 28,
                   ),
                   const SizedBox(height: 6),
@@ -408,10 +408,7 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
                     widget.isExpired
                         ? (s?.chatViewOnceExpired ?? 'Expired')
                         : (s?.chatViewOnceViewed ?? 'Viewed'),
-                    style: const TextStyle(
-                      color: AppColors.textTertiary,
-                      fontSize: 12,
-                    ),
+                    style: TextStyle(color: _onPlaceholder, fontSize: 12),
                   ),
                 ],
               ),
@@ -434,7 +431,8 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Colors.grey[400]!, Colors.grey[600]!],
+              // Dark enough for the white labels (>= 4.5:1, HIG color).
+              colors: [Colors.grey[700]!, Colors.grey[800]!],
             ),
           ),
           child: Center(
@@ -463,7 +461,7 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
                 Text(
                   s?.chatViewOnceTap ?? 'Tap to view',
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.7),
+                    color: Colors.white.withValues(alpha: 0.85),
                     fontSize: 11,
                   ),
                 ),
@@ -474,6 +472,11 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
       ),
     );
   }
+
+  /// Label/icon color on the light [AppColors.placeholder] fill (5.3:1).
+  static final Color _onPlaceholder = AppColors.textPrimary.withValues(
+    alpha: 0.6,
+  );
 
   Size _calculateSize() {
     if (widget.width == null ||
@@ -540,19 +543,12 @@ class _ImageMessageWidgetState extends State<ImageMessageWidget> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(
-                Icons.broken_image,
-                color: AppColors.textTertiary,
-                size: 32,
-              ),
+              Icon(Icons.broken_image, color: _onPlaceholder, size: 32),
               if (canRetry) ...[
                 const SizedBox(height: 8),
                 Text(
                   S.of(context)?.commonTapToRetry ?? 'Tap to retry',
-                  style: const TextStyle(
-                    color: AppColors.textTertiary,
-                    fontSize: 12,
-                  ),
+                  style: TextStyle(color: _onPlaceholder, fontSize: 12),
                 ),
               ],
             ],

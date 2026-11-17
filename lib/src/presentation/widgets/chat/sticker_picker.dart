@@ -17,6 +17,7 @@ import '../../../domain/entities/sticker_pack_entity.dart';
 import '../../../domain/repositories/sticker_repository.dart';
 import '../../../domain/repositories/auth_repository.dart';
 import '../../../core/theme/app_dimensions.dart';
+import '../common/n42_tap_area.dart';
 
 /// 贴纸选择回调
 typedef StickerSelectedCallback = void Function(Sticker sticker, String packId);
@@ -300,10 +301,12 @@ class _StickerPickerState extends State<StickerPicker> {
   }
 
   Widget _buildSearchField(bool isDark) {
+    // 44pt field (was 36pt) so the clear button gets a 44pt target; top
+    // padding 8 -> 4 and bottom 4 -> 0 keep the bar height unchanged.
     return Padding(
-      padding: const EdgeInsets.fromLTRB(8, 8, 8, 4),
+      padding: const EdgeInsets.fromLTRB(8, 4, 8, 0),
       child: Container(
-        height: 36,
+        height: 44,
         decoration: BoxDecoration(
           color: context.surfaceColor,
           borderRadius: BorderRadius.circular(18),
@@ -325,7 +328,7 @@ class _StickerPickerState extends State<StickerPicker> {
                   hintText: S.of(context)?.commonSearch ?? 'Search stickers',
                   hintStyle: TextStyle(
                     fontSize: 14,
-                    color: context.textTertiary,
+                    color: context.textSecondary,
                   ),
                   contentPadding: const EdgeInsets.symmetric(
                     vertical: AppDimensions.spacingS,
@@ -334,22 +337,15 @@ class _StickerPickerState extends State<StickerPicker> {
               ),
             ),
             if (_searchQuery.isNotEmpty)
-              Semantics(
-                button: true,
-                label: A11yL10n.of(context).clearSearch,
-                excludeSemantics: true,
-                child: GestureDetector(
-                  onTap: _clearSearch,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppDimensions.spacingS,
-                    ),
-                    child: Icon(
-                      Icons.close,
-                      size: 18,
-                      color: context.textTertiary,
-                    ),
-                  ),
+              // 44x44pt hit area around the unchanged 18pt icon (was 18pt).
+              N42TapArea(
+                onTap: _clearSearch,
+                tooltip: A11yL10n.of(context).clearSearch,
+                customBorder: const CircleBorder(),
+                child: Icon(
+                  Icons.close,
+                  size: 18,
+                  color: context.textSecondary,
                 ),
               ),
           ],
@@ -368,7 +364,7 @@ class _StickerPickerState extends State<StickerPicker> {
             const SizedBox(height: AppDimensions.spacingS),
             Text(
               S.of(context)?.searchNoResults ?? 'No stickers found',
-              style: TextStyle(color: context.textTertiary),
+              style: TextStyle(color: context.textSecondary),
             ),
           ],
         ),
@@ -456,6 +452,8 @@ class _StickerPickerState extends State<StickerPicker> {
       label: icon != null
           ? A11yL10n.of(context).stickerStore
           : (label ?? A11yL10n.of(context).stickerPack),
+      // Keeps the tap action that excludeSemantics drops.
+      onTap: onTap,
       excludeSemantics: true,
       child: GestureDetector(
         onTap: onTap,
@@ -487,7 +485,7 @@ class _StickerPickerState extends State<StickerPicker> {
                     style: TextStyle(
                       fontSize: emoji != null ? 22 : 14,
                       color: isSelected
-                          ? AppColors.primaryOf(context)
+                          ? AppColors.primaryOnTintOf(context)
                           : context.textSecondary,
                     ),
                   ),
@@ -554,21 +552,31 @@ class _StickerPickerState extends State<StickerPicker> {
   }
 
   Widget _buildStickerItem(Sticker sticker, String packId, bool isDark) {
-    return GestureDetector(
+    final a11y = A11yL10n.of(context);
+    // Screen-reader label for the image-only sticker tile.
+    return Semantics(
+      button: true,
+      label: sticker.emoji?.isNotEmpty == true
+          ? a11y.stickerNamed(sticker.emoji!)
+          : a11y.tabSticker,
+      excludeSemantics: true,
       onTap: () => _onStickerTap(sticker, packId),
-      onLongPress: widget.onStickerLongPressed == null
-          ? null
-          : () {
-              if (_canUseSticker(sticker, packId)) {
-                widget.onStickerLongPressed!(sticker, packId);
-              }
-            },
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.placeholderOf(isDark),
-          borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+      child: GestureDetector(
+        onTap: () => _onStickerTap(sticker, packId),
+        onLongPress: widget.onStickerLongPressed == null
+            ? null
+            : () {
+                if (_canUseSticker(sticker, packId)) {
+                  widget.onStickerLongPressed!(sticker, packId);
+                }
+              },
+        child: Container(
+          decoration: BoxDecoration(
+            color: AppColors.placeholderOf(isDark),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+          ),
+          child: Center(child: _buildStickerContent(sticker)),
         ),
-        child: Center(child: _buildStickerContent(sticker)),
       ),
     );
   }
@@ -646,15 +654,15 @@ class _StickerPickerState extends State<StickerPicker> {
           ),
           const SizedBox(height: AppDimensions.spacingS),
           Text(
-            'No stickers yet',
-            style: TextStyle(color: context.textTertiary),
+            S.of(context)?.ui3StickersEmpty ?? 'No stickers yet',
+            style: TextStyle(color: context.textSecondary),
           ),
           if (widget.onOpenStore != null) ...[
             const SizedBox(height: AppDimensions.spacing),
             TextButton.icon(
               onPressed: widget.onOpenStore,
               icon: const Icon(Icons.add),
-              label: const Text('Get Stickers'),
+              label: Text(S.of(context)?.ui3StickersGet ?? 'Get Stickers'),
             ),
           ],
         ],

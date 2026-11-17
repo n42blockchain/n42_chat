@@ -273,7 +273,7 @@ class _ConversationListPageState extends State<ConversationListPage> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(state.error!),
-                    backgroundColor: AppColors.error,
+                    backgroundColor: AppColors.errorFill,
                   ),
                 );
               }
@@ -547,8 +547,8 @@ class _ConversationListPageState extends State<ConversationListPage> {
                             minWidth: 16,
                             minHeight: 16,
                           ),
-                          decoration: const BoxDecoration(
-                            color: AppColors.error,
+                          decoration: BoxDecoration(
+                            color: AppColors.errorFill,
                             shape: BoxShape.circle,
                           ),
                           child: Text(
@@ -992,7 +992,9 @@ class _ConversationListPageState extends State<ConversationListPage> {
                 DeleteConversation(conversation.id),
               );
             },
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            style: TextButton.styleFrom(
+              foregroundColor: AppColors.errorTextOf(context),
+            ),
             child: Text(S.of(context)?.commonDelete ?? 'Delete'),
           ),
         ],

@@ -3,6 +3,7 @@ import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/article_reader_utils.dart';
@@ -64,23 +65,24 @@ class _ArticleReaderPageState extends State<ArticleReaderPage> {
         : ArticleReaderUtils.extractTitle(widget.content);
     final minutes = ArticleReaderUtils.estimateReadingMinutes(widget.content);
     final display = sanitizeMarkdownDisplayText(widget.content);
+    final l10n = S.of(context);
 
     return Scaffold(
       backgroundColor: context.pageBackground,
       appBar: N42AppBar(
-        title: 'Reading',
+        title: l10n?.chatReadingMode ?? 'Reading mode',
         showBackButton: true,
         onBackPressed: () => Navigator.pop(context),
         actions: [
           IconButton(
-            tooltip: 'A-',
+            tooltip: l10n?.a11yDecreaseTextSize ?? 'Decrease text size',
             onPressed: _fontScale <= _minScale
                 ? null
                 : () => _setScale(_fontScale - 0.1),
             icon: const Text('A', style: TextStyle(fontSize: 14)),
           ),
           IconButton(
-            tooltip: 'A+',
+            tooltip: l10n?.a11yIncreaseTextSize ?? 'Increase text size',
             onPressed: _fontScale >= _maxScale
                 ? null
                 : () => _setScale(_fontScale + 0.1),
@@ -111,14 +113,14 @@ class _ArticleReaderPageState extends State<ArticleReaderPage> {
                         Icon(
                           Icons.schedule,
                           size: 14,
-                          color: context.textTertiary,
+                          color: context.textSecondary,
                         ),
                         const SizedBox(width: AppDimensions.spacingXS),
                         Text(
-                          '$minutes min read',
+                          l10n?.ui3MinutesRead(minutes) ?? '$minutes min read',
                           style: TextStyle(
                             fontSize: 13,
-                            color: context.textTertiary,
+                            color: context.textSecondary,
                           ),
                         ),
                       ],

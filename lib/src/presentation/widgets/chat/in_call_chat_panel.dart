@@ -116,7 +116,7 @@ class _InCallChatPanelState extends State<InCallChatPanel> {
                 Text(
                   S.of(context)?.callMessagesCount(messages.length) ??
                       '${messages.length} messages',
-                  style: const TextStyle(color: Colors.white38, fontSize: 12),
+                  style: const TextStyle(color: Colors.white60, fontSize: 12),
                 ),
               ],
             ),
@@ -133,7 +133,7 @@ class _InCallChatPanelState extends State<InCallChatPanel> {
                           'No messages yet.\nSend a message to get started.',
                       textAlign: TextAlign.center,
                       style: const TextStyle(
-                        color: Colors.white38,
+                        color: Colors.white60,
                         fontSize: 14,
                       ),
                     ),
@@ -173,7 +173,7 @@ class _InCallChatPanelState extends State<InCallChatPanel> {
                     decoration: InputDecoration(
                       hintText:
                           S.of(context)?.callTypeMessage ?? 'Type a message...',
-                      hintStyle: const TextStyle(color: Colors.white38),
+                      hintStyle: const TextStyle(color: Colors.white60),
                       filled: true,
                       fillColor: Colors.white.withValues(alpha: 0.1),
                       border: OutlineInputBorder(
@@ -191,6 +191,7 @@ class _InCallChatPanelState extends State<InCallChatPanel> {
                 const SizedBox(width: AppDimensions.spacingS),
                 IconButton(
                   onPressed: _sendMessage,
+                  tooltip: S.of(context)?.commonSend ?? 'Send',
                   icon: const Icon(Icons.send, color: Colors.greenAccent),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(
@@ -263,7 +264,7 @@ class _InCallChatPanelState extends State<InCallChatPanel> {
                       timeStr,
                       style: const TextStyle(
                         fontSize: 11,
-                        color: Colors.white38,
+                        color: Colors.white60,
                       ),
                     ),
                   ],

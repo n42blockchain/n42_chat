@@ -60,8 +60,14 @@ extension _ChatPageAiFeaturesMethods on _ChatPageState {
         .catchError((Object e) {
           if (mounted) {
             setState(() => _isRewriting = false);
-            ScaffoldMessenger.of(context)
-                .showSnackBar(SnackBar(content: Text('AI rewrite failed: $e')));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  S.of(context)?.ui3AiRewriteFailed('$e') ??
+                      'AI rewrite failed: $e',
+                ),
+              ),
+            );
           }
         });
   }
@@ -118,7 +124,9 @@ extension _ChatPageAiFeaturesMethods on _ChatPageState {
               (message) => AiMessageConsentItem(
                 id: message.id,
                 sender: message.senderName.isEmpty
-                    ? (message.isFromMe ? 'Me' : 'Other')
+                    ? (message.isFromMe
+                          ? (S.of(context)?.commonMe ?? 'Me')
+                          : (S.of(context)?.ui3OtherParticipant ?? 'Other'))
                     : message.senderName,
                 content: message.content,
               ),
@@ -297,17 +305,20 @@ extension _ChatPageAiFeaturesMethods on _ChatPageState {
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          title: const Text('Share messages with AI?'),
+          title: Text(
+            S.of(context)?.ui3AiShareMessagesTitle ?? 'Share messages with AI?',
+          ),
           content: SizedBox(
             width: double.maxFinite,
             child: ListView(
               shrinkWrap: true,
               children: [
-                const Text(
-                  'Select the messages AI may use for this reply. '
-                  'This one-request approval expires after two minutes. '
-                  'Closing Quick Reply cancels pending results. '
-                  'It does not permit payments or exports.',
+                Text(
+                  S.of(context)?.ui3AiShareMessagesBody ??
+                      'Select the messages AI may use for this reply. '
+                          'This one-request approval expires after two minutes. '
+                          'Closing Quick Reply cancels pending results. '
+                          'It does not permit payments or exports.',
                 ),
                 for (final message in candidates)
                   CheckboxListTile(
@@ -315,7 +326,10 @@ extension _ChatPageAiFeaturesMethods on _ChatPageState {
                     controlAffinity: ListTileControlAffinity.leading,
                     title: Text(
                       message.senderName.isEmpty
-                          ? (message.isFromMe ? 'Me' : 'Other')
+                          ? (message.isFromMe
+                                ? (S.of(context)?.commonMe ?? 'Me')
+                                : (S.of(context)?.ui3OtherParticipant ??
+                                      'Other'))
                           : message.senderName,
                     ),
                     subtitle: Text(
@@ -337,13 +351,13 @@ extension _ChatPageAiFeaturesMethods on _ChatPageState {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext, false),
-              child: const Text('Cancel'),
+              child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
             ),
             FilledButton(
               onPressed: selectedIds.contains(candidates.last.id)
                   ? () => Navigator.pop(dialogContext, true)
                   : null,
-              child: const Text('Share selected'),
+              child: Text(S.of(context)?.ui3ShareSelected ?? 'Share selected'),
             ),
           ],
         ),

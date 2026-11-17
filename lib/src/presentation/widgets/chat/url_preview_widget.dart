@@ -16,10 +16,15 @@ class UrlPreviewWidget extends StatefulWidget {
   final String url;
   final UrlPreviewService previewService;
 
+  /// True when the card sits inside the sender's brand-filled bubble: labels
+  /// switch to white so they stay readable on the brand fill.
+  final bool onBrandFill;
+
   const UrlPreviewWidget({
     super.key,
     required this.url,
     required this.previewService,
+    this.onBrandFill = false,
   });
 
   @override
@@ -135,6 +140,15 @@ class _UrlPreviewWidgetState extends State<UrlPreviewWidget> {
 
   Widget _buildPreview(BuildContext context, UrlPreviewData data) {
     final isDark = context.isDarkMode;
+    final onBrand = widget.onBrandFill;
+    // >= 4.5:1 on the subtle fill (HIG color); plain brand / textSecondary
+    // measured about 3.1-3.6:1 there.
+    final accent = onBrand
+        ? Colors.white
+        : AppColors.primaryOnTintOf(
+            context,
+            over: ChatColors.of(context).bubbleOther,
+          );
 
     return Semantics(
       button: true,
@@ -146,11 +160,16 @@ class _UrlPreviewWidgetState extends State<UrlPreviewWidget> {
         onTap: () => _openUrl(data.url),
         child: Container(
           margin: const EdgeInsets.only(top: AppDimensions.spacingS),
+          // 44pt minimum hit height for a title-only card (HIG accessibility).
+          constraints: const BoxConstraints(minHeight: 44),
           decoration: BoxDecoration(
             color: ChatColors.of(context).subtleFill,
             borderRadius: BorderRadius.circular(AppDimensions.radiusM),
             border: Border(
-              left: BorderSide(color: AppColors.primaryOf(context), width: 3),
+              left: BorderSide(
+                color: onBrand ? Colors.white : AppColors.primaryOf(context),
+                width: 3,
+              ),
             ),
           ),
           child: Row(
@@ -173,7 +192,7 @@ class _UrlPreviewWidgetState extends State<UrlPreviewWidget> {
                             data.siteName!,
                             style: TextStyle(
                               fontSize: 11,
-                              color: AppColors.primaryOf(context),
+                              color: accent,
                               fontWeight: FontWeight.w500,
                             ),
                             maxLines: 1,
@@ -187,7 +206,9 @@ class _UrlPreviewWidgetState extends State<UrlPreviewWidget> {
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimaryOf(isDark),
+                            color: onBrand
+                                ? Colors.white
+                                : AppColors.textPrimaryOf(isDark),
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -202,7 +223,9 @@ class _UrlPreviewWidgetState extends State<UrlPreviewWidget> {
                             data.description!,
                             style: TextStyle(
                               fontSize: 12,
-                              color: AppColors.textSecondaryOf(isDark),
+                              color: onBrand
+                                  ? Colors.white
+                                  : context.textSupporting,
                             ),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,

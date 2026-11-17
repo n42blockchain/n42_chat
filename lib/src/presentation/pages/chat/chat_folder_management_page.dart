@@ -28,6 +28,7 @@ class ChatFolderManagementPage extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.add, size: 22),
+            tooltip: l10n?.chatFolderCreate ?? 'Create Folder',
             onPressed: () => _showCreateDialog(context, l10n),
           ),
         ],
@@ -66,7 +67,7 @@ class ChatFolderManagementPage extends StatelessWidget {
                         const SizedBox(height: AppDimensions.spacingS),
                         Text(
                           l10n?.chatFolderEmpty ?? 'No custom folders yet',
-                          style: TextStyle(color: context.textTertiary),
+                          style: TextStyle(color: context.textSecondary),
                         ),
                       ],
                     ),
@@ -129,13 +130,13 @@ class ChatFolderManagementPage extends StatelessWidget {
         ),
         subtitle: isSystem
             ? Text(
-                _getFilterDescription(folder.filter),
+                _getFilterDescription(folder.filter, S.of(context)),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 12,
                   height: 1.3,
-                  color: context.textTertiary,
+                  color: context.textSecondary,
                 ),
               )
             : null,
@@ -148,8 +149,9 @@ class ChatFolderManagementPage extends StatelessWidget {
                     icon: Icon(
                       Icons.edit_outlined,
                       size: 18,
-                      color: context.textTertiary,
+                      color: context.textSecondary,
                     ),
+                    tooltip: S.of(context)?.chatFolderEdit ?? 'Edit Folder',
                     onPressed: () => _showEditDialog(context, folder),
                   ),
                   IconButton(
@@ -158,6 +160,7 @@ class ChatFolderManagementPage extends StatelessWidget {
                       size: 18,
                       color: AppColors.error,
                     ),
+                    tooltip: S.of(context)?.commonDelete ?? 'Delete',
                     onPressed: () => _confirmDelete(context, folder),
                   ),
                 ],
@@ -166,14 +169,26 @@ class ChatFolderManagementPage extends StatelessWidget {
     );
   }
 
-  String _getFilterDescription(ChatFolderFilter filter) {
+  String _getFilterDescription(ChatFolderFilter filter, S? l10n) {
     final parts = <String>[];
-    if (filter.unreadOnly) parts.add('Unread only');
-    if (filter.mutedOnly) parts.add('Muted only');
-    if (!filter.includeDirectMessages) parts.add('No DMs');
-    if (!filter.includeGroups) parts.add('No groups');
-    if (!filter.includeChannels) parts.add('No channels');
-    return parts.isEmpty ? 'All chats' : parts.join(', ');
+    if (filter.unreadOnly) {
+      parts.add(l10n?.ui3FolderFilterUnreadOnly ?? 'Unread only');
+    }
+    if (filter.mutedOnly) {
+      parts.add(l10n?.ui3FolderFilterMutedOnly ?? 'Muted only');
+    }
+    if (!filter.includeDirectMessages) {
+      parts.add(l10n?.ui3FolderFilterNoDms ?? 'No DMs');
+    }
+    if (!filter.includeGroups) {
+      parts.add(l10n?.ui3FolderFilterNoGroups ?? 'No groups');
+    }
+    if (!filter.includeChannels) {
+      parts.add(l10n?.ui3FolderFilterNoChannels ?? 'No channels');
+    }
+    return parts.isEmpty
+        ? (l10n?.ui3FolderFilterAllChats ?? 'All chats')
+        : parts.join(', ');
   }
 
   void _showCreateDialog(BuildContext context, S? l10n) {
@@ -184,6 +199,9 @@ class ChatFolderManagementPage extends StatelessWidget {
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
+          // Keeps the name field and the icon row reachable with the
+          // keyboard open.
+          scrollable: true,
           title: Text(l10n?.chatFolderCreate ?? 'Create Folder'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -202,8 +220,11 @@ class ChatFolderManagementPage extends StatelessWidget {
                 spacing: 8,
                 children: ['📁', '⭐', '💼', '🏠', '🎮', '📚', '🎵', '💬']
                     .map(
-                      (icon) => GestureDetector(
+                      (icon) => N42TapArea(
                         onTap: () => setState(() => selectedIcon = icon),
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusM,
+                        ),
                         child: Container(
                           width: 40,
                           height: 40,
@@ -249,7 +270,7 @@ class ChatFolderManagementPage extends StatelessWidget {
                   Navigator.pop(dialogContext);
                 }
               },
-              child: Text(l10n?.commonSend ?? 'Create'),
+              child: Text(l10n?.ui3Create ?? 'Create'),
             ),
           ],
         ),
@@ -288,7 +309,7 @@ class ChatFolderManagementPage extends StatelessWidget {
                 Navigator.pop(dialogContext);
               }
             },
-            child: const Text('Save'),
+            child: Text(l10n?.commonSave ?? 'Save'),
           ),
         ],
       ),
@@ -301,7 +322,10 @@ class ChatFolderManagementPage extends StatelessWidget {
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(l10n?.commonDelete ?? 'Delete'),
-        content: Text('Delete folder "${folder.name}"?'),
+        content: Text(
+          l10n?.ui3DeleteFolderConfirm(folder.name) ??
+              'Delete folder "${folder.name}"?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),

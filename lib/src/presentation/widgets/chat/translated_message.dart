@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/chat_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
 
@@ -36,11 +35,10 @@ class TranslatedMessageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDarkMode;
     final l10n = S.of(context);
 
     if (isTranslating) {
-      return _buildTranslatingIndicator(isDark, l10n);
+      return _buildTranslatingIndicator(context, l10n);
     }
 
     // 微信风格：翻译块紧贴消息气泡下方，与气泡内容区域对齐
@@ -81,18 +79,16 @@ class TranslatedMessageWidget extends StatelessWidget {
                 isOriginalDisplay ? Icons.edit : Icons.check_circle,
                 size: 12,
                 color: isOriginalDisplay
-                    ? AppColors.textTertiaryOf(isDark)
+                    ? context.textSupporting
                     : ChatColors.of(context).translatedAccent,
               ),
               const SizedBox(width: AppDimensions.spacingXS),
               Text(
                 isOriginalDisplay
-                    ? 'Original text'
+                    ? (l10n?.chatOriginalMessage ?? 'Original text')
                     : _getTranslationLabel(l10n),
-                style: TextStyle(
-                  fontSize: 11,
-                  color: AppColors.textTertiaryOf(isDark),
-                ),
+                // textTertiary measured 1.6-1.9:1 (HIG color).
+                style: TextStyle(fontSize: 11, color: context.textSupporting),
               ),
             ],
           ),
@@ -101,7 +97,7 @@ class TranslatedMessageWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildTranslatingIndicator(bool isDark, S? l10n) {
+  Widget _buildTranslatingIndicator(BuildContext context, S? l10n) {
     return Padding(
       padding: EdgeInsets.only(
         top: AppDimensions.spacingXS,
@@ -116,18 +112,13 @@ class TranslatedMessageWidget extends StatelessWidget {
             height: 12,
             child: CircularProgressIndicator(
               strokeWidth: 1.5,
-              valueColor: AlwaysStoppedAnimation<Color>(
-                AppColors.textTertiaryOf(isDark),
-              ),
+              valueColor: AlwaysStoppedAnimation<Color>(context.textSupporting),
             ),
           ),
           const SizedBox(width: 6),
           Text(
             l10n?.commonTranslating ?? 'Translating...',
-            style: TextStyle(
-              fontSize: 12,
-              color: AppColors.textTertiaryOf(isDark),
-            ),
+            style: TextStyle(fontSize: 12, color: context.textSupporting),
           ),
         ],
       ),
@@ -137,9 +128,10 @@ class TranslatedMessageWidget extends StatelessWidget {
   String _getTranslationLabel(S? l10n) {
     if (detectedSourceLanguage != null) {
       final langName = _getLanguageName(detectedSourceLanguage!);
-      return 'Translated from $langName by N42';
+      return l10n?.ui3TranslatedFromByN42(langName) ??
+          'Translated from $langName by N42';
     }
-    return 'Translated by N42';
+    return l10n?.ui3TranslatedByN42 ?? 'Translated by N42';
   }
 
   static String _getLanguageName(String code) {

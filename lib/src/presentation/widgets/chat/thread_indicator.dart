@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_colors.dart';
 import '../../../domain/entities/message_entity.dart';
 import '../../../core/theme/app_dimensions.dart';
+import '../common/n42_tap_area.dart';
 
 /// 线程指示器
 ///
@@ -29,13 +31,29 @@ class ThreadIndicator extends StatelessWidget {
 
     final hasUnread = (message.threadUnreadCount ?? 0) > 0;
 
-    return GestureDetector(
+    // Inside the sender's own (brand-filled) bubble a brand label on a brand
+    // tint is unreadable: use white on the darker inset there (4.8:1).
+    final isFromMe = message.isFromMe;
+    final accent = isFromMe
+        ? Colors.white
+        : AppColors.primaryOnTintOf(
+            context,
+            over: ChatColors.of(context).bubbleOther,
+          );
+    final secondaryText = isFromMe
+        ? Colors.white
+        : theme.colorScheme.onSurface.withValues(alpha: 0.6);
+
+    // 44pt hit area around the pill (HIG accessibility).
+    return N42TapArea(
       onTap: onTap,
+      borderRadius: BorderRadius.circular(AppDimensions.radiusM),
       child: Container(
-        margin: const EdgeInsets.only(top: AppDimensions.spacingXS),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: theme.colorScheme.primary.withValues(alpha: 0.08),
+          color: isFromMe
+              ? AppColors.selfBubbleInset
+              : AppColors.primaryOf(context).withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(AppDimensions.radiusM),
         ),
         child: Row(
@@ -44,14 +62,14 @@ class ThreadIndicator extends StatelessWidget {
             Icon(
               Icons.forum_outlined,
               size: 14,
-              color: theme.colorScheme.primary,
+              color: accent,
             ),
             const SizedBox(width: 6),
             Text(
               replyText,
               style: TextStyle(
                 fontSize: 12,
-                color: theme.colorScheme.primary,
+                color: accent,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -74,7 +92,7 @@ class ThreadIndicator extends StatelessWidget {
                   message.threadLatestReply!,
                   style: TextStyle(
                     fontSize: 12,
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                    color: secondaryText,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -85,7 +103,7 @@ class ThreadIndicator extends StatelessWidget {
             Icon(
               Icons.chevron_right,
               size: 14,
-              color: theme.colorScheme.primary,
+              color: accent,
             ),
           ],
         ),

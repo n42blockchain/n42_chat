@@ -211,14 +211,14 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
                     )
                   : const Icon(Icons.download, color: Colors.white),
               onPressed: _isSaving ? null : _saveImage,
-              tooltip: 'Save',
+              tooltip: S.of(context)?.commonSave ?? 'Save',
             ),
           // 分享按钮
           if (!protected)
             IconButton(
               icon: const Icon(Icons.share, color: Colors.white),
               onPressed: _shareImage,
-              tooltip: 'Share',
+              tooltip: S.of(context)?.commonShare ?? 'Share',
             ),
           // 更多选项
           if (!protected)
@@ -282,15 +282,20 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
                     ),
                   ),
                 if (!protected && getIt<AiProviderRouter>().supportsVision)
-                  const PopupMenuItem(
+                  PopupMenuItem(
                     value: 'ai_describe',
                     child: Row(
                       children: [
-                        Icon(Icons.auto_awesome, color: Colors.white, size: 20),
-                        SizedBox(width: 12),
+                        const Icon(
+                          Icons.auto_awesome,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 12),
                         Text(
-                          'AI describe / OCR',
-                          style: TextStyle(color: Colors.white),
+                          S.of(context)?.ui3AiDescribeOcr ??
+                              'AI describe / OCR',
+                          style: const TextStyle(color: Colors.white),
                         ),
                       ],
                     ),
@@ -415,13 +420,13 @@ class _AiDescribeSheetState extends State<_AiDescribeSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Row(
+            Row(
               children: [
-                Icon(Icons.auto_awesome, color: Colors.white, size: 20),
-                SizedBox(width: 8),
+                const Icon(Icons.auto_awesome, color: Colors.white, size: 20),
+                const SizedBox(width: 8),
                 Text(
-                  'AI describe / OCR',
-                  style: TextStyle(
+                  S.of(context)?.ui3AiDescribeOcr ?? 'AI describe / OCR',
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -460,12 +465,16 @@ class _AiDescribeSheetState extends State<_AiDescribeSheet> {
                     Clipboard.setData(ClipboardData(text: _result!));
                     ScaffoldMessenger.of(
                       context,
-                    ).showSnackBar(const SnackBar(content: Text('Copied')));
+                    ).showSnackBar(
+                      SnackBar(
+                        content: Text(S.of(context)?.chatCopied ?? 'Copied'),
+                      ),
+                    );
                   },
                   icon: const Icon(Icons.copy, color: Colors.white, size: 18),
-                  label: const Text(
-                    'Copy',
-                    style: TextStyle(color: Colors.white),
+                  label: Text(
+                    S.of(context)?.chatCopy ?? 'Copy',
+                    style: const TextStyle(color: Colors.white),
                   ),
                 ),
               ),

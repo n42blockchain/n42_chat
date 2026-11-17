@@ -82,6 +82,7 @@ class _ThreadDetailViewState extends State<_ThreadDetailView> {
         title: Text(s?.threadTitle ?? 'Thread'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -270,7 +271,7 @@ class _ThreadDetailViewState extends State<_ThreadDetailView> {
                         fontSize: 12,
                         height: 1.3,
                         color: theme.colorScheme.onSurface.withValues(
-                          alpha: 0.5,
+                          alpha: 0.6,
                         ),
                       ),
                     ),
@@ -332,7 +333,7 @@ class _ThreadDetailViewState extends State<_ThreadDetailView> {
                       style: TextStyle(
                         fontSize: 11,
                         color: theme.colorScheme.onSurface.withValues(
-                          alpha: 0.5,
+                          alpha: 0.6,
                         ),
                       ),
                     ),
@@ -400,6 +401,7 @@ class _ThreadDetailViewState extends State<_ThreadDetailView> {
                   ? theme.colorScheme.onSurface.withValues(alpha: 0.3)
                   : theme.colorScheme.primary,
             ),
+            tooltip: s?.commonSend ?? 'Send',
             onPressed: state.isSending ? null : _sendMessage,
           ),
         ],

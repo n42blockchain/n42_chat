@@ -166,7 +166,7 @@ class _QuickReplySheetState extends State<QuickReplySheet> {
                     child: Text(
                       l10n?.settingsManageQuickReplies ?? 'Manage',
                       style: TextStyle(
-                        color: AppColors.primaryOf(context),
+                        color: AppColors.primaryOnTintOf(context),
                         fontSize: 14,
                       ),
                     ),
@@ -212,10 +212,7 @@ class _QuickReplySheetState extends State<QuickReplySheet> {
           const SizedBox(height: AppDimensions.spacing),
           Text(
             l10n?.settingsNoQuickReplies ?? 'No quick replies',
-            style: TextStyle(
-              fontSize: 15,
-              color: AppColors.textTertiaryOf(isDark),
-            ),
+            style: TextStyle(fontSize: 15, color: context.textSupporting),
           ),
         ],
       ),
@@ -230,7 +227,7 @@ class _QuickReplySheetState extends State<QuickReplySheet> {
         if (_isLoadingSmartReplies)
           _buildSectionHeader(
             isDark,
-            title: 'AI Suggestions',
+            title: l10n?.ui3AiSuggestions ?? 'AI Suggestions',
             trailing: const SizedBox(
               width: AppDimensions.spacing,
               height: 16,
@@ -238,7 +235,10 @@ class _QuickReplySheetState extends State<QuickReplySheet> {
             ),
           )
         else if (_smartReplies.isNotEmpty) ...[
-          _buildSectionHeader(isDark, title: 'AI Suggestions'),
+          _buildSectionHeader(
+            isDark,
+            title: l10n?.ui3AiSuggestions ?? 'AI Suggestions',
+          ),
           ..._smartReplies.map((reply) => _buildSmartReplyItem(reply, isDark)),
         ],
         if (_smartReplies.isNotEmpty && _replies.isNotEmpty)
@@ -275,7 +275,7 @@ class _QuickReplySheetState extends State<QuickReplySheet> {
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: AppColors.textTertiaryOf(isDark),
+              color: context.textSupporting,
             ),
           ),
           const Spacer(),
@@ -296,33 +296,40 @@ class _QuickReplySheetState extends State<QuickReplySheet> {
           horizontal: AppDimensions.spacing,
           vertical: AppDimensions.spacingM,
         ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(
-                reply.content,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: AppColors.textPrimaryOf(isDark),
-                ),
-              ),
-            ),
-            if (reply.isSystem)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: ChatColors.of(context).chipFill,
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusS),
-                ),
+        // 20 + 24 padding: 44pt minimum row height.
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 20),
+          child: Row(
+            children: [
+              Expanded(
                 child: Text(
-                  'Default',
+                  reply.content,
                   style: TextStyle(
-                    fontSize: 10,
-                    color: AppColors.textTertiaryOf(isDark),
+                    fontSize: 16,
+                    color: AppColors.textPrimaryOf(isDark),
                   ),
                 ),
               ),
-          ],
+              if (reply.isSystem)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: ChatColors.of(context).chipFill,
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusS),
+                  ),
+                  child: Text(
+                    S.of(context)?.profileDefaultLabel ?? 'Default',
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: context.textSupporting,
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );
@@ -336,24 +343,28 @@ class _QuickReplySheetState extends State<QuickReplySheet> {
           horizontal: AppDimensions.spacing,
           vertical: AppDimensions.spacingM,
         ),
-        child: Row(
-          children: [
-            Icon(
-              Icons.auto_awesome,
-              size: 18,
-              color: AppColors.primaryOf(context),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                reply,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: AppColors.textPrimaryOf(isDark),
+        // 20 + 24 padding: 44pt minimum row height.
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 20),
+          child: Row(
+            children: [
+              Icon(
+                Icons.auto_awesome,
+                size: 18,
+                color: AppColors.primaryOf(context),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  reply,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: AppColors.textPrimaryOf(isDark),
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

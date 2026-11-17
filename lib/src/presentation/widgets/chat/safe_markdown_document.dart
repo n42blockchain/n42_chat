@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/services/markdown_resource_loader.dart';
 
 import 'package:flutter/material.dart';
@@ -39,13 +40,18 @@ class _SafeMarkdownDocumentState extends State<SafeMarkdownDocument> {
       widget.data.length,
       start + SafeMarkdownDocument.pageCharacters,
     );
+    final s = S.of(context);
     return Column(
       children: [
         Align(
           alignment: Alignment.centerRight,
           child: TextButton.icon(
             icon: Icon(_source ? Icons.preview : Icons.code),
-            label: Text(_source ? 'Preview' : 'View source'),
+            label: Text(
+              _source
+                  ? (s?.stickerImportPreview ?? 'Preview')
+                  : (s?.ui3ViewSource ?? 'View source'),
+            ),
             onPressed: () => setState(() => _source = !_source),
           ),
         ),
@@ -54,13 +60,13 @@ class _SafeMarkdownDocumentState extends State<SafeMarkdownDocument> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               IconButton(
-                tooltip: 'Previous page',
+                tooltip: s?.a11yPreviousPage ?? 'Previous page',
                 onPressed: _page > 0 ? () => setState(() => _page--) : null,
                 icon: const Icon(Icons.chevron_left),
               ),
               Text('${_page + 1} / $pages'),
               IconButton(
-                tooltip: 'Next page',
+                tooltip: s?.a11yNextPage ?? 'Next page',
                 onPressed: _page + 1 < pages
                     ? () => setState(() => _page++)
                     : null,
@@ -90,17 +96,19 @@ class _SafeMarkdownDocumentState extends State<SafeMarkdownDocument> {
                     final accepted = await showDialog<bool>(
                       context: context,
                       builder: (dialogContext) => AlertDialog(
-                        title: const Text('Open external link?'),
+                        title: Text(
+                          s?.ui3OpenExternalLinkTitle ?? 'Open external link?',
+                        ),
                         content: SelectableText(uri.toString()),
                         actions: [
                           TextButton(
                             onPressed: () =>
                                 Navigator.pop(dialogContext, false),
-                            child: const Text('Cancel'),
+                            child: Text(s?.commonCancel ?? 'Cancel'),
                           ),
                           FilledButton(
                             onPressed: () => Navigator.pop(dialogContext, true),
-                            child: const Text('Open'),
+                            child: Text(s?.ui3Open ?? 'Open'),
                           ),
                         ],
                       ),
@@ -117,8 +125,11 @@ class _SafeMarkdownDocumentState extends State<SafeMarkdownDocument> {
                       } catch (_) {
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Unable to open this link.'),
+                            SnackBar(
+                              content: Text(
+                                s?.ui3UnableToOpenLink ??
+                                    'Unable to open this link.',
+                              ),
                             ),
                           );
                         }
@@ -207,16 +218,22 @@ class _ConsentedMarkdownImageState extends State<ConsentedMarkdownImage> {
         cacheHeight: 1024,
         fit: BoxFit.contain,
         semanticLabel: widget.alt,
-        errorBuilder: (_, _, _) => const Text('Image unavailable'),
+        errorBuilder: (context, _, _) => Text(
+          S.of(context)?.ui3ImageUnavailable ?? 'Image unavailable',
+        ),
       );
     }
+    final s = S.of(context);
+    final host = widget.uri.host;
     return TextButton.icon(
       onPressed: _loading ? null : _load,
       icon: const Icon(Icons.image_outlined),
       label: Text(
         _loading
-            ? 'Loading image…'
-            : '${_failed ? 'Retry image' : 'Load image'} from ${widget.uri.host}',
+            ? (s?.commonLoading ?? 'Loading image…')
+            : _failed
+            ? (s?.ui3RetryImageFrom(host) ?? 'Retry image from $host')
+            : (s?.ui3LoadImageFrom(host) ?? 'Load image from $host'),
       ),
     );
   }

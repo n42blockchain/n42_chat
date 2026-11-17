@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../core/utils/a11y_l10n.dart';
 import '../../../domain/entities/message_reaction_entity.dart';
 import '../../../core/theme/app_dimensions.dart';
+import '../common/n42_tap_area.dart';
 
 /// 消息反应栏（显示在消息下方）
 class MessageReactionBar extends StatelessWidget {
@@ -60,9 +63,12 @@ class _ReactionChip extends StatelessWidget {
       button: true,
       selected: hasReacted,
       label: A11yL10n.of(context).reaction(reaction.emoji, reaction.count),
+      onTap: onTap,
       excludeSemantics: true,
-      child: GestureDetector(
+      // 44pt hit area around the unchanged chip (HIG minimum target).
+      child: N42TapArea(
         onTap: onTap,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         child: Container(
           padding: const EdgeInsets.symmetric(
             horizontal: AppDimensions.spacingS,
@@ -70,7 +76,9 @@ class _ReactionChip extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             color: hasReacted
-                ? AppColors.primaryOf(context).withValues(alpha: 0.2)
+                ? AppColors.primaryOf(
+                    context,
+                  ).withValues(alpha: ChatContrast.maxTintAlpha)
                 : context.surfaceColor,
             borderRadius: BorderRadius.circular(AppDimensions.radiusL),
             border: Border.all(
@@ -91,8 +99,8 @@ class _ReactionChip extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12,
                     color: hasReacted
-                        ? AppColors.primaryOf(context)
-                        : context.textSecondary,
+                        ? AppColors.primaryOnTintOf(context)
+                        : context.textSupporting,
                   ),
                 ),
               ],
@@ -115,9 +123,11 @@ class _AddReactionButton extends StatelessWidget {
     return Semantics(
       button: true,
       label: A11yL10n.of(context).addReaction,
+      onTap: onTap,
       excludeSemantics: true,
-      child: GestureDetector(
+      child: N42TapArea(
         onTap: onTap,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
         child: Container(
           padding: const EdgeInsets.symmetric(
             horizontal: AppDimensions.spacingS,
@@ -206,7 +216,7 @@ class FullReactionPicker extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Select Emoji',
+                  S.of(context)?.chatSelectEmoji ?? 'Select Emoji',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -224,34 +234,44 @@ class FullReactionPicker extends StatelessWidget {
 
             // 常用表情
             Text(
-              'Frequently Used',
-              style: TextStyle(fontSize: 13, color: context.textSecondary),
+              S.of(context)?.ui3FrequentlyUsed ?? 'Frequently Used',
+              style: TextStyle(fontSize: 13, color: context.textSupporting),
             ),
             const SizedBox(height: AppDimensions.spacingS),
             Wrap(
-              spacing: 8,
-              runSpacing: 8,
+              spacing: 4,
+              runSpacing: 4,
               children: CommonEmojis.extendedReactions.map((emoji) {
+                void select() {
+                  onReactionSelected?.call(emoji);
+                  Navigator.of(context).pop();
+                }
+
                 return Semantics(
                   button: true,
                   label: emoji,
+                  onTap: select,
                   excludeSemantics: true,
-                  child: GestureDetector(
-                    onTap: () {
-                      onReactionSelected?.call(emoji);
-                      Navigator.of(context).pop();
-                    },
-                    child: Container(
+                  // 44pt hit area around the unchanged 40pt tile.
+                  child: N42TapArea(
+                    onTap: select,
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+                    // Ink keeps the pressed ripple visible over the tile.
+                    child: Ink(
                       width: 40,
                       height: 40,
-                      alignment: Alignment.center,
                       decoration: BoxDecoration(
                         color: context.pageBackground,
                         borderRadius: BorderRadius.circular(
                           AppDimensions.radiusM,
                         ),
                       ),
-                      child: Text(emoji, style: const TextStyle(fontSize: 24)),
+                      child: Center(
+                        child: Text(
+                          emoji,
+                          style: const TextStyle(fontSize: 24),
+                        ),
+                      ),
                     ),
                   ),
                 );

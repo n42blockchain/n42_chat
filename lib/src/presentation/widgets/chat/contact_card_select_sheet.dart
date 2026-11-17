@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/di/injection.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/contact_entity.dart';
 import '../../../domain/entities/conversation_entity.dart';
@@ -122,6 +123,7 @@ class _ContactCardSelectSheetState extends State<ContactCardSelectSheet> {
                     Icons.close,
                     color: AppColors.textPrimaryOf(widget.isDark),
                   ),
+                  tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
                   onPressed: () => Navigator.pop(context),
                 ),
               ],
@@ -156,9 +158,7 @@ class _ContactCardSelectSheetState extends State<ContactCardSelectSheet> {
                 ? Center(
                     child: Text(
                       widget.noContactsFoundText,
-                      style: TextStyle(
-                        color: AppColors.textTertiaryOf(widget.isDark),
-                      ),
+                      style: TextStyle(color: context.textSupporting),
                     ),
                   )
                 : ListView.builder(
@@ -175,7 +175,9 @@ class _ContactCardSelectSheetState extends State<ContactCardSelectSheet> {
                                   ),
                                 )
                               : CircleAvatar(
-                                  backgroundColor: AppColors.primaryOf(context),
+                                  backgroundColor: AppColors.primaryFillOf(
+                                    context,
+                                  ),
                                   child: Text(
                                     contact.effectiveDisplayName.isNotEmpty
                                         ? contact.effectiveDisplayName[0]
@@ -194,7 +196,7 @@ class _ContactCardSelectSheetState extends State<ContactCardSelectSheet> {
                             contact.userId,
                             style: TextStyle(
                               fontSize: 12,
-                              color: AppColors.textTertiaryOf(widget.isDark),
+                              color: context.textSupporting,
                             ),
                           ),
                           onTap: () => Navigator.pop(context, {

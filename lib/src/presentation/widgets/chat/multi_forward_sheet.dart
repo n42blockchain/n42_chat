@@ -76,7 +76,13 @@ class _MultiForwardSheetState extends State<MultiForwardSheet> {
   Widget build(BuildContext context) {
     final bgColor = AppColors.surfaceOf(widget.isDark);
     final textColor = AppColors.textPrimaryOf(widget.isDark);
-    final subtextColor = AppColors.textSecondaryOf(widget.isDark);
+    // 72% label over the sheet: >= 4.5:1 in both modes (textSecondary is
+    // about 3.4:1 on white).
+    final subtextColor = Color.alphaBlend(
+      textColor.withValues(alpha: .72),
+      bgColor,
+    );
+    final s = S.of(context);
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.7,
@@ -108,13 +114,15 @@ class _MultiForwardSheetState extends State<MultiForwardSheet> {
               children: [
                 IconButton(
                   onPressed: () => Navigator.pop(context),
+                  tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
                   icon: Icon(Icons.close, color: textColor),
                 ),
                 Expanded(
                   child: Column(
                     children: [
                       Text(
-                        '选择转发对象',
+                        S.of(context)?.chatSelectForwardTargetTitle ??
+                            'Select Forward Target',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -122,7 +130,8 @@ class _MultiForwardSheetState extends State<MultiForwardSheet> {
                         ),
                       ),
                       Text(
-                        '已选择 ${widget.selectedCount} 条消息',
+                        s?.chatSelectedMessagesCount(widget.selectedCount) ??
+                            'Selected ${widget.selectedCount} messages',
                         style: TextStyle(fontSize: 12, color: subtextColor),
                       ),
                     ],
@@ -168,7 +177,11 @@ class _MultiForwardSheetState extends State<MultiForwardSheet> {
                 : _filteredConversations.isEmpty
                 ? Center(
                     child: Text(
-                      _conversations.isEmpty ? '没有可转发的会话' : '未找到匹配的会话',
+                      _conversations.isEmpty
+                          ? (S.of(context)?.chatNoForwardableChat ??
+                                'No chats available for forwarding')
+                          : (S.of(context)?.chatNoMatchingChat ??
+                                'No matching chats found'),
                       style: TextStyle(color: subtextColor),
                     ),
                   )

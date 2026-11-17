@@ -6,6 +6,7 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/chat_export_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../domain/entities/message_entity.dart';
 import '../../../domain/repositories/message_repository.dart';
 import '../../widgets/common/common_widgets.dart';
@@ -192,6 +193,13 @@ class _ChatExportPageState extends State<ChatExportPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
+    // Info text and icon on the 8% info tint (4.5:1 in light and dark).
+    final infoText = ChatContrast.onTint(
+      AppColors.info,
+      [context.pageBackground],
+      dark: isDark,
+      alpha: 0.08,
+    );
 
     return Scaffold(
       backgroundColor: context.pageBackground,
@@ -224,8 +232,9 @@ class _ChatExportPageState extends State<ChatExportPage> {
                   const SizedBox(width: AppDimensions.spacingM),
                   Expanded(
                     child: Text(
-                      'Loading more chat history for export...',
-                      style: TextStyle(fontSize: 13, color: Colors.blue[700]),
+                      S.of(context)?.ui3ExportLoadingHistory ??
+                          'Loading more chat history for export...',
+                      style: TextStyle(fontSize: 13, color: infoText),
                     ),
                   ),
                 ],
@@ -264,6 +273,7 @@ class _ChatExportPageState extends State<ChatExportPage> {
                   _buildRadioTile(
                     title: 'TXT',
                     subtitle:
+                        S.of(context)?.ui3ExportTxtDesc ??
                         'Plain-text transcript for notes, backup, or compliance review',
                     value: ExportFormat.txt,
                     isDark: isDark,
@@ -301,7 +311,10 @@ class _ChatExportPageState extends State<ChatExportPage> {
                       ExportDateRange.last3Months,
                       S.of(context)?.chatExportLast3Months ?? 'Last 3 Months',
                     ),
-                    (ExportDateRange.custom, 'Custom Range'),
+                    (
+                      ExportDateRange.custom,
+                      S.of(context)?.ui3ExportCustomRange ?? 'Custom Range',
+                    ),
                   ]) ...[
                     _buildRadioTile(
                       title: range.$2,
@@ -327,14 +340,14 @@ class _ChatExportPageState extends State<ChatExportPage> {
               child: Column(
                 children: [
                   _buildDateTile(
-                    label: 'Start',
+                    label: S.of(context)?.ui3ExportStart ?? 'Start',
                     value: _customStart,
                     isDark: isDark,
                     onTap: () => _pickCustomDate(isStart: true),
                   ),
                   const SizedBox(height: AppDimensions.spacingS),
                   _buildDateTile(
-                    label: 'End',
+                    label: S.of(context)?.ui3ExportEnd ?? 'End',
                     value: _customEnd,
                     isDark: isDark,
                     onTap: () => _pickCustomDate(isStart: false),
@@ -357,12 +370,12 @@ class _ChatExportPageState extends State<ChatExportPage> {
             ),
             child: Row(
               children: [
-                Icon(Icons.info_outline, size: 20, color: Colors.blue[700]),
+                Icon(Icons.info_outline, size: 20, color: infoText),
                 const SizedBox(width: AppDimensions.spacingM),
                 Expanded(
                   child: Text(
                     '${S.of(context)?.chatExportMessageCount ?? "Messages to export"}: $_filteredCount / ${_messages.length}',
-                    style: TextStyle(fontSize: 14, color: Colors.blue[700]),
+                    style: TextStyle(fontSize: 14, color: infoText),
                   ),
                 ),
               ],
@@ -382,7 +395,7 @@ class _ChatExportPageState extends State<ChatExportPage> {
                   ? null
                   : _export,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryOf(context),
+                backgroundColor: AppColors.primaryFillOf(context),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
@@ -459,34 +472,38 @@ class _ChatExportPageState extends State<ChatExportPage> {
     required bool isDark,
     required VoidCallback onTap,
   }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppDimensions.spacingM,
-          vertical: 14,
-        ),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-          border: Border.all(color: context.dividerColor),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              Icons.calendar_today_outlined,
-              size: 18,
-              color: AppColors.primaryOf(context),
-            ),
-            const SizedBox(width: AppDimensions.spacingM),
-            Expanded(
-              child: Text(
-                '$label: ${value != null ? _formatDate(value) : "Select date"}',
-                style: TextStyle(color: context.textPrimary),
+    // Transparent Material so the ink shows above the opaque surface.
+    return Material(
+      type: MaterialType.transparency,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+        child: Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.spacingM,
+            vertical: 14,
+          ),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+            border: Border.all(color: context.dividerColor),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.calendar_today_outlined,
+                size: 18,
+                color: AppColors.primaryOf(context),
               ),
-            ),
-            const Icon(AppIcons.chevron),
-          ],
+              const SizedBox(width: AppDimensions.spacingM),
+              Expanded(
+                child: Text(
+                  '$label: ${value != null ? _formatDate(value) : (S.of(context)?.ui3ExportSelectDate ?? 'Select date')}',
+                  style: TextStyle(color: context.textPrimary),
+                ),
+              ),
+              const Icon(AppIcons.chevron),
+            ],
+          ),
         ),
       ),
     );

@@ -61,6 +61,7 @@ import '../media/media_editor_page.dart';
 import '../../../core/services/remark_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/chat_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../domain/entities/contact_entity.dart';
@@ -831,13 +832,15 @@ class _ChatPageState extends State<_ChatPageContent> with WidgetsBindingObserver
         context.read<ChatBloc>().add(SendTextMessage(result.messageText!));
       case BotCommandResultType.error:
         _showBotResultPanel(
-          '⚠️ Command Error',
-          result.errorMessage ?? 'Unknown error',
+          '⚠️ ${S.of(context)?.ui3BotCommandError ?? 'Command Error'}',
+          result.errorMessage ??
+              (S.of(context)?.qrcodeUnknownError ?? 'Unknown error'),
         );
       case BotCommandResultType.unknown:
         _showBotResultPanel(
-          '❓ Unknown Command',
-          'Type /help to see available commands.',
+          '❓ ${S.of(context)?.ui3BotUnknownCommand ?? 'Unknown Command'}',
+          S.of(context)?.ui3BotTypeHelp ??
+              'Type /help to see available commands.',
         );
       case BotCommandResultType.dismiss:
         break;
@@ -1300,7 +1303,7 @@ class _ChatPageState extends State<_ChatPageContent> with WidgetsBindingObserver
                   S.of(context)?.chatLocationPermissionRequired ??
                       'Location permission is required for this feature',
                 ),
-                backgroundColor: AppColors.error,
+                backgroundColor: AppColors.errorFill,
               ),
             );
           }
@@ -1315,7 +1318,7 @@ class _ChatPageState extends State<_ChatPageContent> with WidgetsBindingObserver
               content: Text(
                 S.of(context)?.chatLocationPermissionDeniedPermanent ?? 'Location permission has been permanently denied. Please enable it in settings.',
               ),
-              backgroundColor: AppColors.error,
+              backgroundColor: AppColors.errorFill,
             ),
           );
         }
@@ -1375,11 +1378,9 @@ class _ChatPageState extends State<_ChatPageContent> with WidgetsBindingObserver
   Widget _buildScrollToBottomButton() {
     return FloatingActionButton.small(
       onPressed: _scrollToBottom,
-      backgroundColor: AppColors.surface,
-      child: const Icon(
-        Icons.keyboard_arrow_down,
-        color: AppColors.textSecondary,
-      ),
+      tooltip: S.of(context)?.a11yScrollToBottom ?? 'Scroll to bottom',
+      backgroundColor: context.surfaceColor,
+      child: Icon(Icons.keyboard_arrow_down, color: context.textSecondary),
     );
   }
 

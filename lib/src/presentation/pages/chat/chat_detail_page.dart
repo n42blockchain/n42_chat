@@ -19,6 +19,7 @@ import '../../../core/services/storage_manager_service.dart';
 import '../../../core/services/storage_monitor_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../data/datasources/local/preferences_datasource.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/conversation_entity.dart';
@@ -30,6 +31,7 @@ import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/contact/contact_state.dart';
 import '../../blocs/storage/storage_management_bloc.dart';
 import '../../widgets/common/n42_avatar.dart';
+import '../../widgets/common/n42_tap_area.dart';
 import '../contact/contact_detail_page.dart';
 import '../group/group_media_hub_page.dart';
 import '../group/group_settings_page.dart';
@@ -384,6 +386,8 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
         context: context,
         builder: (ctx) {
           String? error;
+          // Blocks a second verify (and a second pop) while one is running.
+          var verifying = false;
           return StatefulBuilder(
             builder: (ctx, setDialogState) => AlertDialog(
               title: Text(l10n?.chatLockPinTitle ?? 'Enter PIN'),
@@ -398,14 +402,17 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                   errorText: error,
                 ),
                 onSubmitted: (_) async {
+                  if (verifying) return;
+                  setDialogState(() => verifying = true);
                   final verified = await _chatLockService.verifyPin(
                     widget.conversation.id,
                     pinController.text,
                   );
                   if (verified) {
                     if (ctx.mounted) Navigator.pop(ctx, true);
-                  } else {
+                  } else if (ctx.mounted) {
                     setDialogState(() {
+                      verifying = false;
                       error =
                           l10n?.chatLockVerifyFailed ?? 'Verification failed';
                       pinController.clear();
@@ -419,21 +426,26 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                   child: Text(l10n?.commonCancel ?? 'Cancel'),
                 ),
                 TextButton(
-                  onPressed: () async {
-                    final verified = await _chatLockService.verifyPin(
-                      widget.conversation.id,
-                      pinController.text,
-                    );
-                    if (verified) {
-                      if (ctx.mounted) Navigator.pop(ctx, true);
-                    } else {
-                      setDialogState(() {
-                        error =
-                            l10n?.chatLockVerifyFailed ?? 'Verification failed';
-                        pinController.clear();
-                      });
-                    }
-                  },
+                  onPressed: verifying
+                      ? null
+                      : () async {
+                          setDialogState(() => verifying = true);
+                          final verified = await _chatLockService.verifyPin(
+                            widget.conversation.id,
+                            pinController.text,
+                          );
+                          if (verified) {
+                            if (ctx.mounted) Navigator.pop(ctx, true);
+                          } else if (ctx.mounted) {
+                            setDialogState(() {
+                              verifying = false;
+                              error =
+                                  l10n?.chatLockVerifyFailed ??
+                                  'Verification failed';
+                              pinController.clear();
+                            });
+                          }
+                        },
                   child: Text(l10n?.commonConfirm ?? 'Confirm'),
                 ),
               ],
@@ -752,6 +764,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
         elevation: 0,
         leading: IconButton(
           icon: Icon(AppIcons.back, color: textColor, size: 20),
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
@@ -794,19 +807,24 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                       // 添加成员按钮
                       _buildAddButton(
                         icon: Icons.add,
+                        label: S.of(context)?.chatAddMembers ?? 'Add Members',
                         onTap: () => _addMemberToGroup(),
                       ),
                       // 移除成员按钮（仅群主/管理员显示）
                       if (isGroup && widget.canKickMembers)
                         _buildAddButton(
                           icon: Icons.remove,
+                          label:
+                              S.of(context)?.groupRemoveMember ??
+                              'Remove from Group',
                           onTap: () => _removeMemberFromGroup(),
                         ),
                     ],
                   ),
                   if (isGroup) ...[
-                    const SizedBox(height: 16),
-                    GestureDetector(
+                    // 16pt gap minus the extra hit-area padding (44pt target).
+                    const SizedBox(height: 3),
+                    N42TapArea(
                       onTap: () => _openGroupMemberList(),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -887,7 +905,9 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                 ),
                 _buildDivider(dividerColor),
                 _buildMenuItem(
-                  title: 'Files, Media & Links',
+                  title:
+                      S.of(context)?.ui3FilesMediaLinks ??
+                      'Files, Media & Links',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
                   onTap: _openFilesAndLinks,
@@ -901,7 +921,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                 ),
                 _buildDivider(dividerColor),
                 _buildMenuItem(
-                  title: 'Chat Storage',
+                  title: S.of(context)?.ui3ChatStorage ?? 'Chat Storage',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
                   onTap: _openChatStorage,
@@ -923,14 +943,16 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                 ),
                 _buildDivider(dividerColor),
                 _buildMenuItem(
-                  title: 'Backup & Restore',
+                  title: S.of(context)?.backupRestore ?? 'Backup & Restore',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
                   onTap: _openBackupRestore,
                 ),
                 _buildDivider(dividerColor),
                 _buildMenuItem(
-                  title: 'Encryption Keys & Devices',
+                  title:
+                      S.of(context)?.ui3EncryptionKeysDevices ??
+                      'Encryption Keys & Devices',
                   textColor: textColor,
                   secondaryTextColor: secondaryTextColor,
                   onTap: _openSecuritySettings,
@@ -1080,8 +1102,9 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     required String name,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
+    return N42TapArea(
       onTap: onTap,
+      borderRadius: BorderRadius.circular(6),
       child: SizedBox(
         width: 60,
         child: Column(
@@ -1221,11 +1244,14 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
 
   Widget _buildAddButton({
     required IconData icon,
+    required String label,
     required VoidCallback onTap,
   }) {
     final isDark = context.isDarkMode;
-    return GestureDetector(
+    return N42TapArea(
       onTap: onTap,
+      semanticLabel: label,
+      borderRadius: BorderRadius.circular(6),
       child: SizedBox(
         width: 60,
         child: Column(
@@ -1242,7 +1268,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               ),
               child: Icon(
                 icon,
-                color: AppColors.textTertiaryOf(isDark),
+                color: AppColors.textSecondaryOf(isDark),
                 size: 24,
               ),
             ),
@@ -1278,32 +1304,36 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     required Color secondaryTextColor,
     required VoidCallback onTap,
   }) {
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        child: Row(
-          children: [
-            Expanded(
-              flex: 2,
-              child: Text(
-                title,
-                style: TextStyle(fontSize: 16, color: textColor),
-              ),
-            ),
-            if (value != null)
+    // Transparent Material so the ink shows above the opaque section card.
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          child: Row(
+            children: [
               Expanded(
-                flex: 3,
+                flex: 2,
                 child: Text(
-                  value,
-                  style: TextStyle(fontSize: 15, color: secondaryTextColor),
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.right,
+                  title,
+                  style: TextStyle(fontSize: 16, color: textColor),
                 ),
               ),
-            const SizedBox(width: 4),
-            Icon(AppIcons.chevron, color: secondaryTextColor, size: 20),
-          ],
+              if (value != null)
+                Expanded(
+                  flex: 3,
+                  child: Text(
+                    value,
+                    style: TextStyle(fontSize: 15, color: secondaryTextColor),
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.right,
+                  ),
+                ),
+              const SizedBox(width: 4),
+              Icon(AppIcons.chevron, color: secondaryTextColor, size: 20),
+            ],
+          ),
         ),
       ),
     );
@@ -1557,6 +1587,9 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
+          // Keeps the reason list and the text field reachable with the
+          // keyboard open.
+          scrollable: true,
           backgroundColor: context.surfaceColor,
           title: Text(
             S.of(context)?.reportTitle ?? 'Report',
@@ -1775,8 +1808,11 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     final client = MatrixClientManager.instance.client;
     if (client == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Encryption service is not available yet'),
+        SnackBar(
+          content: Text(
+            S.of(context)?.ui3EncryptionServiceUnavailable ??
+                'Encryption service is not available yet',
+          ),
         ),
       );
       return;
@@ -1934,6 +1970,19 @@ class _GroupMemberListPageState extends State<_GroupMemberListPage> {
     final cardColor = context.surfaceColor;
     final textColor = context.textPrimary;
     final secondaryTextColor = context.textSecondary;
+    // Role labels on their 20% tints over the page (4.5:1).
+    final ownerBadgeText = ChatContrast.onTint(
+      AppColors.warning,
+      [bgColor],
+      dark: isDark,
+      alpha: 0.2,
+    );
+    final adminBadgeText = ChatContrast.onTint(
+      AppColors.info,
+      [bgColor],
+      dark: isDark,
+      alpha: 0.2,
+    );
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -1942,6 +1991,7 @@ class _GroupMemberListPageState extends State<_GroupMemberListPage> {
         elevation: 0,
         leading: IconButton(
           icon: Icon(AppIcons.back, color: textColor, size: 20),
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
@@ -2042,9 +2092,9 @@ class _GroupMemberListPageState extends State<_GroupMemberListPage> {
                                 ),
                                 child: Text(
                                   S.of(context)?.commonGroupOwner ?? 'Owner',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 10,
-                                    color: AppColors.warning,
+                                    color: ownerBadgeText,
                                   ),
                                 ),
                               ),
@@ -2061,9 +2111,9 @@ class _GroupMemberListPageState extends State<_GroupMemberListPage> {
                                 ),
                                 child: Text(
                                   S.of(context)?.commonGroupAdmin ?? 'Admin',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 10,
-                                    color: AppColors.info,
+                                    color: adminBadgeText,
                                   ),
                                 ),
                               ),

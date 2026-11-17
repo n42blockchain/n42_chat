@@ -24,7 +24,7 @@ extension _ChatPageInputMethods on _ChatPageState {
               Icon(
                 Icons.campaign_outlined,
                 size: 16,
-                color: context.textTertiary,
+                color: context.textSecondary,
               ),
               const SizedBox(width: AppDimensions.spacingS),
               Flexible(
@@ -37,7 +37,7 @@ extension _ChatPageInputMethods on _ChatPageState {
                   style: TextStyle(
                     fontSize: 13,
                     height: 1.3,
-                    color: context.textTertiary,
+                    color: context.textSecondary,
                   ),
                 ),
               ),
@@ -211,36 +211,41 @@ extension _ChatPageInputMethods on _ChatPageState {
   Widget _buildSelfDestructTimerBar() {
     final seconds = _selfDestructAfter!;
     final label = SelfDestructService.formatDuration(seconds);
+    // Orange on its 10% tint is about 2:1; shift it to 4.5:1.
+    final warningText = ChatContrast.onTint(
+      AppColors.warning,
+      [context.pageBackground],
+      dark: context.isDarkMode,
+    );
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppDimensions.spacing,
-        vertical: AppDimensions.spacingS,
+      // The trailing close button supplies the 44pt row height.
+      padding: const EdgeInsets.only(
+        left: AppDimensions.spacing,
+        right: AppDimensions.spacingXS,
       ),
       color: AppColors.warning.withValues(alpha: 0.1),
       child: Row(
         children: [
-          const Icon(Icons.timer_outlined, size: 16, color: AppColors.warning),
+          Icon(Icons.timer_outlined, size: 16, color: warningText),
           const SizedBox(width: AppDimensions.spacingS),
           Expanded(
             child: Text(
               '${S.of(context)?.chatSelfDestructTimer ?? 'Self-destruct'}: $label',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 height: 1.3,
-                color: AppColors.warning,
+                color: warningText,
                 fontWeight: FontWeight.w500,
               ),
             ),
           ),
-          GestureDetector(
+          N42TapArea(
             onTap: () => setState(() => _selfDestructAfter = null),
-            child: const Icon(
-              Icons.close,
-              size: 18,
-              color: AppColors.textTertiary,
-            ),
+            tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+            customBorder: const CircleBorder(),
+            child: Icon(Icons.close, size: 18, color: warningText),
           ),
         ],
       ),
@@ -250,6 +255,12 @@ extension _ChatPageInputMethods on _ChatPageState {
   /// 显示阅后即焚定时器选择器
   Future<void> _showSelfDestructTimerPicker() async {
     final l10n = S.of(context);
+    // Plain orange is about 2.2:1 on the light sheet surface.
+    final warningOnSurface = ChatContrast.onTint(
+      AppColors.warning,
+      [context.surfaceColor],
+      dark: context.isDarkMode,
+    );
 
     final result = await showModalBottomSheet<int?>(
       context: context,
@@ -258,8 +269,10 @@ extension _ChatPageInputMethods on _ChatPageState {
         borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
         clipBehavior: Clip.antiAlias,
         child: SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+          // Nine 56pt rows exceed the default sheet height (9/16 of the
+          // screen); scroll instead of clipping the longer presets.
+          child: ListView(
+            shrinkWrap: true,
             children: [
               Padding(
                 padding: const EdgeInsets.all(AppDimensions.spacing),
@@ -295,12 +308,12 @@ extension _ChatPageInputMethods on _ChatPageState {
                   leading: Icon(
                     Icons.timer_outlined,
                     color: _selfDestructAfter == preset.seconds
-                        ? AppColors.warning
+                        ? warningOnSurface
                         : null,
                   ),
                   title: Text(preset.name),
                   trailing: _selfDestructAfter == preset.seconds
-                      ? const Icon(Icons.check, color: AppColors.warning)
+                      ? Icon(Icons.check, color: warningOnSurface)
                       : null,
                   onTap: () => Navigator.pop(ctx, preset.seconds),
                 ),
@@ -324,9 +337,10 @@ extension _ChatPageInputMethods on _ChatPageState {
   Widget _buildViewOnceIndicator() {
     final s = S.of(context);
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppDimensions.spacing,
-        vertical: AppDimensions.spacingS,
+      // The trailing close button supplies the 44pt row height.
+      padding: const EdgeInsets.only(
+        left: AppDimensions.spacing,
+        right: AppDimensions.spacingXS,
       ),
       color: AppColors.primaryOf(context).withValues(alpha: 0.1),
       child: Row(
@@ -346,16 +360,18 @@ extension _ChatPageInputMethods on _ChatPageState {
               ),
             ),
           ),
-          GestureDetector(
+          N42TapArea(
             onTap: () {
               setState(() {
                 _isViewOnce = false;
               });
             },
-            child: const Icon(
+            tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+            customBorder: const CircleBorder(),
+            child: Icon(
               Icons.close,
               size: 18,
-              color: AppColors.textTertiary,
+              color: AppColors.primaryOnTintOf(context),
             ),
           ),
         ],
@@ -564,9 +580,12 @@ extension _ChatPageInputMethods on _ChatPageState {
     final text = _inputController.text.trim();
     if (text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Enter a message before scheduling'),
-          duration: Duration(seconds: 1),
+        SnackBar(
+          content: Text(
+            S.of(context)?.ui3EnterMessageBeforeScheduling ??
+                'Enter a message before scheduling',
+          ),
+          duration: const Duration(seconds: 1),
         ),
       );
       return;
@@ -641,7 +660,9 @@ extension _ChatPageInputMethods on _ChatPageState {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: context.surfaceColor,
-        title: const Text('Send code'),
+        // Keeps both fields and the actions reachable above the keyboard.
+        scrollable: true,
+        title: Text(S.of(context)?.ui3SendCode ?? 'Send code'),
         content: SizedBox(
           width: double.maxFinite,
           child: Column(
@@ -649,8 +670,8 @@ extension _ChatPageInputMethods on _ChatPageState {
             children: [
               TextField(
                 controller: langController,
-                decoration: const InputDecoration(
-                  labelText: 'Language',
+                decoration: InputDecoration(
+                  labelText: S.of(context)?.ui3CodeLanguage ?? 'Language',
                   hintText: 'dart / js / python …',
                   isDense: true,
                 ),
@@ -662,9 +683,10 @@ extension _ChatPageInputMethods on _ChatPageState {
                 maxLines: 12,
                 autofocus: true,
                 style: const TextStyle(fontFamily: 'monospace', fontSize: 13),
-                decoration: const InputDecoration(
-                  hintText: 'Paste code here',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  hintText:
+                      S.of(context)?.ui3PasteCodeHere ?? 'Paste code here',
+                  border: const OutlineInputBorder(),
                 ),
               ),
             ],
@@ -823,94 +845,100 @@ extension _ChatPageInputMethods on _ChatPageState {
             );
           }
 
-          return ListView.builder(
-            shrinkWrap: true,
-            padding: EdgeInsets.zero,
-            itemCount: suggestions.length,
-            itemBuilder: (context, index) {
-              final suggestion = suggestions[index];
-              final name = suggestion.displayName;
-              final avatarUrl = suggestion.avatarUrl;
-              final isRoomMention = suggestion.mentionsRoom;
+          return Material(
+            type: MaterialType.transparency,
+            child: ListView.builder(
+              shrinkWrap: true,
+              padding: EdgeInsets.zero,
+              itemCount: suggestions.length,
+              itemBuilder: (context, index) {
+                final suggestion = suggestions[index];
+                final name = suggestion.displayName;
+                final avatarUrl = suggestion.avatarUrl;
+                final isRoomMention = suggestion.mentionsRoom;
 
-              return InkWell(
-                onTap: () => _onMentionSuggestionSelected(suggestion),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppDimensions.spacing,
-                    vertical: 10,
-                  ),
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(color: borderColor, width: 0.5),
+                return InkWell(
+                  onTap: () => _onMentionSuggestionSelected(suggestion),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppDimensions.spacing,
+                      vertical: 10,
                     ),
-                  ),
-                  child: Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 18,
-                        backgroundColor: isRoomMention
-                            ? AppColors.primaryOf(context).withValues(alpha: 0.12)
-                            : AppColors.placeholderOf(isDark),
-                        backgroundImage: !isRoomMention && avatarUrl.isNotEmpty
-                            ? NetworkImage(avatarUrl)
-                            : null,
-                        child: isRoomMention
-                            ? Icon(
-                                Icons.alternate_email,
-                                size: 18,
-                                color: AppColors.primaryOf(context),
-                              )
-                            : (avatarUrl.isEmpty
-                                  ? Text(
-                                      name.isNotEmpty
-                                          ? name[0].toUpperCase()
-                                          : '?',
-                                      style: TextStyle(
-                                        color: textColor,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    )
-                                  : null),
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(color: borderColor, width: 0.5),
                       ),
-                      const SizedBox(width: AppDimensions.spacingM),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              name,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: textColor,
-                                fontSize: 15,
-                                height: 1.3,
-                              ),
-                            ),
-                            if (suggestion.subtitle != null)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 2),
-                                child: Text(
-                                  suggestion.subtitle!,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    color: subtextColor,
-                                    fontSize: 12,
-                                    height: 1.3,
-                                  ),
+                    ),
+                    child: Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 18,
+                          backgroundColor: isRoomMention
+                              ? AppColors.primaryOf(
+                                  context,
+                                ).withValues(alpha: 0.12)
+                              : AppColors.placeholderOf(isDark),
+                          backgroundImage:
+                              !isRoomMention && avatarUrl.isNotEmpty
+                              ? NetworkImage(avatarUrl)
+                              : null,
+                          child: isRoomMention
+                              ? Icon(
+                                  Icons.alternate_email,
+                                  size: 18,
+                                  color: AppColors.primaryOf(context),
+                                )
+                              : (avatarUrl.isEmpty
+                                    ? Text(
+                                        name.isNotEmpty
+                                            ? name[0].toUpperCase()
+                                            : '?',
+                                        style: TextStyle(
+                                          color: textColor,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      )
+                                    : null),
+                        ),
+                        const SizedBox(width: AppDimensions.spacingM),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                name,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: textColor,
+                                  fontSize: 15,
+                                  height: 1.3,
                                 ),
                               ),
-                          ],
+                              if (suggestion.subtitle != null)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 2),
+                                  child: Text(
+                                    suggestion.subtitle!,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: subtextColor,
+                                      fontSize: 12,
+                                      height: 1.3,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           );
         },
       ),

@@ -9,6 +9,7 @@ import '../../../core/di/injection.dart';
 import '../../../core/services/voice_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/chat_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../core/theme/app_dimensions.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/a11y_l10n.dart';
@@ -710,9 +711,30 @@ class ChatInputBarState extends State<ChatInputBar> {
     );
   }
 
+  /// Localized tooltip (also the screen-reader label) for [action].
+  String _formatTooltip(_MarkdownFormatAction action) {
+    final l10n = S.of(context);
+    final localized = switch (action.tooltip) {
+      'Bold' => l10n?.a11yFormatBold,
+      'Italic' => l10n?.a11yFormatItalic,
+      'Strikethrough' => l10n?.a11yFormatStrikethrough,
+      'Inline code' => l10n?.a11yFormatInlineCode,
+      'Code block' => l10n?.a11yFormatCodeBlock,
+      'Quote' => l10n?.commonQuote,
+      'Checklist item' => l10n?.a11yFormatChecklistItem,
+      'Bullet list' => l10n?.a11yFormatBulletList,
+      'Numbered list' => l10n?.a11yFormatNumberedList,
+      'Link' => l10n?.a11yFormatLink,
+      'Table' => l10n?.a11yFormatTable,
+      'Meeting template' => l10n?.a11yFormatMeetingTemplate,
+      _ => null,
+    };
+    return localized ?? action.tooltip;
+  }
+
   Widget _buildFormatButton(_MarkdownFormatAction action) {
     return Tooltip(
-      message: action.tooltip,
+      message: _formatTooltip(action),
       child: InkWell(
         borderRadius: BorderRadius.circular(8),
         onTap: () => _applyMarkdownFormat(action.prefix, action.suffix),
@@ -785,6 +807,8 @@ class ChatInputBarState extends State<ChatInputBar> {
       button: true,
       enabled: effectiveCallback != null,
       label: semanticLabel,
+      // Keeps the tap action that excludeSemantics drops.
+      onTap: effectiveCallback,
       excludeSemantics: true,
       child: InkWell(
         onTap: effectiveCallback,
@@ -830,7 +854,7 @@ class ChatInputBarState extends State<ChatInputBar> {
               S.of(context)?.commonSendMessage ??
               'Send message',
           hintStyle: AppTextStyles.bodyLarge.copyWith(
-            color: context.textTertiary,
+            color: context.textSecondary,
           ),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(
@@ -882,7 +906,8 @@ class ChatInputBarState extends State<ChatInputBar> {
       },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 4),
-        height: 40,
+        // 44pt hold-to-talk target (was 40pt); the input row is already 44pt.
+        height: AppDimensions.buttonHeight,
         decoration: BoxDecoration(
           color: _isRecording
               ? (_cancelRecording
@@ -909,8 +934,19 @@ class ChatInputBarState extends State<ChatInputBar> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
+              // Label shades that keep 4.5:1 on the 10% red / brand tints.
               color: _isRecording
-                  ? (_cancelRecording ? AppColors.error : AppColors.primaryOf(context))
+                  ? (_cancelRecording
+                        ? ChatContrast.onTint(
+                            AppColors.error,
+                            [context.inputBarColor, context.surfaceColor],
+                            dark: context.isDarkMode,
+                            alpha: 0.1,
+                          )
+                        : AppColors.primaryOnTintOf(
+                            context,
+                            over: context.inputBarColor,
+                          ))
                   : context.textPrimary,
             ),
           ),
@@ -924,6 +960,7 @@ class ChatInputBarState extends State<ChatInputBar> {
       button: true,
       enabled: widget.enabled,
       label: A11yL10n.of(context).send,
+      onTap: widget.enabled ? _sendMessage : null,
       excludeSemantics: true,
       child: GestureDetector(
         onLongPress: widget.enabled && widget.onScheduledSend != null

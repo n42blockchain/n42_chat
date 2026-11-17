@@ -31,40 +31,45 @@ class CustomEmojiSuggestionBar extends StatelessWidget {
           top: BorderSide(color: context.dividerColor, width: 0.5),
         ),
       ),
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppDimensions.spacingS,
-          vertical: 6,
-        ),
-        itemCount: suggestions.length,
-        separatorBuilder: (_, _) =>
-            const SizedBox(width: AppDimensions.spacingXS),
-        itemBuilder: (context, index) {
-          final emoji = suggestions[index];
-          return InkWell(
-            borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-            onTap: () => onSelected(emoji),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppDimensions.spacingS,
-              ),
-              child: Row(
-                children: [
-                  CustomEmojiInline(emoji: emoji, size: 24),
-                  const SizedBox(width: 6),
-                  Text(
-                    ':${emoji.shortcode}:',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: context.textSecondary,
+      // Transparent Material above the bar color keeps the ink visible.
+      child: Material(
+        type: MaterialType.transparency,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          // No vertical padding (was 6): items fill the unchanged 48pt bar
+          // (47.5pt below the border; was 35.5pt).
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.spacingS,
+          ),
+          itemCount: suggestions.length,
+          separatorBuilder: (_, _) =>
+              const SizedBox(width: AppDimensions.spacingXS),
+          itemBuilder: (context, index) {
+            final emoji = suggestions[index];
+            return InkWell(
+              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+              onTap: () => onSelected(emoji),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppDimensions.spacingS,
+                ),
+                child: Row(
+                  children: [
+                    CustomEmojiInline(emoji: emoji, size: 24),
+                    const SizedBox(width: 6),
+                    Text(
+                      ':${emoji.shortcode}:',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: context.textSecondary,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

@@ -138,7 +138,11 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
         onBackPressed: () => Navigator.pop(context),
         actions: [
           if (widget.filePath != null)
-            IconButton(icon: const Icon(Icons.share), onPressed: _sharePdf),
+            IconButton(
+              tooltip: S.of(context)?.commonShare ?? 'Share',
+              icon: const Icon(Icons.share),
+              onPressed: _sharePdf,
+            ),
         ],
       ),
       body: _buildBody(),
@@ -175,7 +179,7 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
               ),
               child: Text(
                 _error!,
-                style: TextStyle(fontSize: 13, color: context.textSecondary),
+                style: TextStyle(fontSize: 13, color: context.textSupporting),
                 textAlign: TextAlign.center,
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
@@ -205,7 +209,7 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
       child: Center(
         child: Text(
           '$_currentPage / $_totalPages',
-          style: TextStyle(fontSize: 14, color: context.textSecondary),
+          style: TextStyle(fontSize: 14, color: context.textSupporting),
         ),
       ),
     );

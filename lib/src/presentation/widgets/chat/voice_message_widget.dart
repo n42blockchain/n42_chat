@@ -242,7 +242,7 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
             content: Text(
               S.of(context)?.commonVoiceToTextFailed ?? 'Voice to text failed',
             ),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.errorFill,
           ),
         );
       }
@@ -273,9 +273,13 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
         : widget.transcriptionFailed
         ? (S.of(context)?.commonRetry ?? 'Retry')
         : (S.of(context)?.commonConvertToText ?? 'To text');
-    final convertColor = widget.transcriptionFailed
-        ? AppColors.error
-        : AppColors.textSecondary;
+    // Own bubbles are brand-filled: grey/red labels measured ~1.2-1.5:1
+    // there, so they use the sent-text color; others use textSupporting.
+    final convertColor = widget.isSelf
+        ? AppColors.sentText(isDark)
+        : widget.transcriptionFailed
+        ? (isDark ? AppColors.error : AppColors.errorFill)
+        : context.textSupporting;
 
     return Column(
       crossAxisAlignment: widget.isSelf
@@ -409,14 +413,12 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (isConverting)
-                    const SizedBox(
+                    SizedBox(
                       width: AppDimensions.spacingM,
                       height: 12,
                       child: CircularProgressIndicator(
                         strokeWidth: 1.5,
-                        valueColor: AlwaysStoppedAnimation(
-                          AppColors.textSecondary,
-                        ),
+                        valueColor: AlwaysStoppedAnimation(convertColor),
                       ),
                     )
                   else
@@ -454,9 +456,10 @@ class _VoiceMessageWidgetState extends State<VoiceMessageWidget>
       context: context,
       backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        // Theme surface: a fixed white sheet left dark-mode tiles unreadable.
+        decoration: BoxDecoration(
+          color: ctx.surfaceColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
         ),
         child: SafeArea(
           child: Column(

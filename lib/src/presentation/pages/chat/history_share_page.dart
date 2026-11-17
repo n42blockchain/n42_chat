@@ -72,6 +72,9 @@ class _HistorySharePageState extends State<HistorySharePage> {
     final yes = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
+        // Keeps both number fields and the actions reachable with the
+        // keyboard open.
+        scrollable: true,
         title: Text(l.chatHistoryPolicy),
         content: Column(
           mainAxisSize: MainAxisSize.min,

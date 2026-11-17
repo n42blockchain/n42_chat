@@ -109,7 +109,7 @@ class PaymentCommerceSheet extends StatelessWidget {
                       action.subtitle!,
                       style: TextStyle(
                         fontSize: 12,
-                        color: context.textSecondary,
+                        color: context.textSupporting,
                       ),
                     ),
                   ],

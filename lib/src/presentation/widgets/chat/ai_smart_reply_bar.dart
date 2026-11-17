@@ -59,7 +59,7 @@ class AiSmartReplyBar extends StatelessWidget {
               const SizedBox(width: AppDimensions.spacingS),
               Expanded(
                 child: Text(
-                  'Suggested replies',
+                  S.of(context)?.ui3AiSuggestedReplies ?? 'Suggested replies',
                   style: TextStyle(fontSize: 12, color: subtitleColor),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -91,7 +91,8 @@ class AiSmartReplyBar extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 6),
               child: Text(
-                'Generating suggestions...',
+                S.of(context)?.ui3AiGeneratingSuggestions ??
+                    'Generating suggestions...',
                 style: TextStyle(fontSize: 12, color: subtitleColor),
               ),
             )

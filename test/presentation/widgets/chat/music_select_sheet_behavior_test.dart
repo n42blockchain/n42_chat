@@ -265,7 +265,7 @@ void main() {
     expect(result.isCompleted, isTrue);
     expect(await result.future, {
       'name': 'Recording',
-      'artist': '未知歌手',
+      'artist': 'Unknown Artist',
       'url': _musicPath('recording'),
       'isLocal': true,
     });

@@ -39,7 +39,7 @@ class ChatDeleteConfirmSheet extends StatelessWidget {
                           'Delete this message?',
                       style: TextStyle(
                         fontSize: 13,
-                        color: context.textTertiary,
+                        color: context.textSupporting,
                       ),
                     ),
                   ),
@@ -174,8 +174,7 @@ class ChatMessageMenuSheet extends StatelessWidget {
               _buildMenuItem(
                 context,
                 icon: Icons.chrome_reader_mode_outlined,
-                // 与微信风格主菜单同款硬编码文案（该项尚无 l10n key）
-                title: 'Reading',
+                title: S.of(context)?.chatReadingMode ?? 'Reading mode',
                 onTap: onReadingMode,
               ),
             _buildMenuItem(
@@ -196,7 +195,10 @@ class ChatMessageMenuSheet extends StatelessWidget {
                 context,
                 icon: Icons.delete_outline,
                 title: S.of(context)?.chatRecall ?? 'Recall',
-                color: AppColors.error,
+                // errorFill keeps the red label at 4.5:1 on the light sheet.
+                color: context.isDarkMode
+                    ? AppColors.error
+                    : AppColors.errorFill,
                 onTap: onDelete,
               ),
             const SizedBox(height: AppDimensions.spacingS),

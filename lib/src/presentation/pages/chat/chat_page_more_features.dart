@@ -267,7 +267,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
                 content: Text(
                   l10n?.redPacketInsufficientBalance ?? 'Insufficient balance',
                 ),
-                backgroundColor: AppColors.error,
+                backgroundColor: AppColors.errorFill,
               ),
             );
           }
@@ -299,9 +299,12 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
       debugLog('Red packet creation failed: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to create red packet'),
-            backgroundColor: AppColors.error,
+          SnackBar(
+            content: Text(
+              S.of(context)?.ui3RedPacketCreateFailed ??
+                  'Failed to create red packet',
+            ),
+            backgroundColor: AppColors.errorFill,
           ),
         );
       }
@@ -332,7 +335,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
           l10n?.chatRedPacketSent(amount, token) ??
               'Sent $amount $token red packet',
         ),
-        backgroundColor: AppColors.success,
+        backgroundColor: ChatContrast.fillForWhiteText(AppColors.success),
       ),
     );
     return true;
@@ -378,7 +381,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
           S.of(context)?.chatTransferSent(transfer.amount, transfer.token) ??
               'Sent ${transfer.amount} ${transfer.token} transfer',
         ),
-        backgroundColor: AppColors.primaryOf(context),
+        backgroundColor: AppColors.primaryFillOf(context),
       ),
     );
   }
@@ -455,22 +458,30 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: context.surfaceColor,
-        title: const Text('Send a tip'),
+        // Keeps all three fields and the actions reachable above the keyboard.
+        scrollable: true,
+        title: Text(S.of(context)?.ui3SendTip ?? 'Send a tip'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: amountC,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: 'Amount'),
+              decoration: InputDecoration(
+                labelText: S.of(context)?.transferAmount ?? 'Amount',
+              ),
             ),
             TextField(
               controller: tokenC,
-              decoration: const InputDecoration(labelText: 'Token'),
+              decoration: InputDecoration(
+                labelText: S.of(context)?.ui3TokenLabel ?? 'Token',
+              ),
             ),
             TextField(
               controller: noteC,
-              decoration: const InputDecoration(labelText: 'Note (optional)'),
+              decoration: InputDecoration(
+                labelText: S.of(context)?.ui3NoteOptional ?? 'Note (optional)',
+              ),
             ),
           ],
         ),
@@ -481,7 +492,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Tip'),
+            child: Text(S.of(context)?.chatAttachmentTip ?? 'Tip'),
           ),
         ],
       ),
@@ -506,15 +517,25 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
       );
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Tip failed: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              S.of(context)?.ui3TipFailed('$e') ?? 'Tip failed: $e',
+            ),
+          ),
+        );
       }
       return;
     }
     if (!mounted) return;
     if (!result.success) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Tip failed: ${result.errorMessage ?? ''}')),
+        SnackBar(
+          content: Text(
+            S.of(context)?.ui3TipFailed(result.errorMessage ?? '') ??
+                'Tip failed: ${result.errorMessage ?? ''}',
+          ),
+        ),
       );
       return;
     }
@@ -557,23 +578,33 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: context.surfaceColor,
-        title: const Text('Gift an NFT'),
+        // Keeps all three fields and the actions reachable above the keyboard.
+        scrollable: true,
+        title: Text(S.of(context)?.ui3GiftNftTitle ?? 'Gift an NFT'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: contractC,
-              decoration: const InputDecoration(labelText: 'Contract address'),
+              decoration: InputDecoration(
+                labelText:
+                    S.of(context)?.tokenGateContractAddress ??
+                    'Contract address',
+              ),
             ),
             TextField(
               controller: tokenIdC,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: 'Token ID'),
+              decoration: InputDecoration(
+                labelText: S.of(context)?.ui3TokenId ?? 'Token ID',
+              ),
             ),
             TextField(
               controller: chainC,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: 'Chain ID'),
+              decoration: InputDecoration(
+                labelText: S.of(context)?.tokenGateChainId ?? 'Chain ID',
+              ),
             ),
           ],
         ),
@@ -584,7 +615,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Gift'),
+            child: Text(S.of(context)?.commonGift ?? 'Gift'),
           ),
         ],
       ),
@@ -599,7 +630,12 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
     if (ok != true || !mounted) return;
     if (contract.isEmpty || tokenId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Contract and token ID are required')),
+        SnackBar(
+          content: Text(
+            S.of(context)?.nftPickerEnterBoth ??
+                'Contract and token ID are required',
+          ),
+        ),
       );
       return;
     }
@@ -620,8 +656,13 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
       );
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('NFT gift failed: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              S.of(context)?.ui3NftGiftFailed('$e') ?? 'NFT gift failed: $e',
+            ),
+          ),
+        );
       }
       return;
     }
@@ -629,7 +670,10 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
     if (!result.success) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('NFT gift failed: ${result.errorMessage ?? ''}'),
+          content: Text(
+            S.of(context)?.ui3NftGiftFailed(result.errorMessage ?? '') ??
+                'NFT gift failed: ${result.errorMessage ?? ''}',
+          ),
         ),
       );
       return;
@@ -655,16 +699,19 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
       PaymentCommerceAction(
         icon: Icons.auto_awesome,
         color: AppColors.primaryOf(context),
-        title: 'AI Assistant',
-        subtitle: 'Describe a task, open the right mini app',
+        title: S.of(context)?.aiAssistant ?? 'AI Assistant',
+        subtitle:
+            S.of(context)?.ui3AiAgentSubtitle ??
+            'Describe a task, open the right mini app',
         onTap: () =>
             MiniAppAgentSheet.show(context, roomId: widget.conversation.id),
       ),
       PaymentCommerceAction(
         icon: Icons.card_giftcard_outlined,
         color: Colors.pinkAccent,
-        title: 'Gift NFT',
-        subtitle: 'Send an NFT to this contact',
+        title: S.of(context)?.ui3GiftNft ?? 'Gift NFT',
+        subtitle:
+            S.of(context)?.ui3GiftNftSubtitle ?? 'Send an NFT to this contact',
         onTap: _sendNftGift,
       ),
       for (final app in quickLaunchApps)
@@ -695,9 +742,13 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
 
     if (!mounted || opened) return;
 
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Mini app is not available')));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          S.of(context)?.ui3MiniAppUnavailable ?? 'Mini app is not available',
+        ),
+      ),
+    );
   }
 
   IconData _commerceMiniAppIcon(String appId) {
@@ -768,7 +819,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
             S.of(context)?.chatContactCardSent(contactName) ??
                 'Sent $contactName\'s contact card',
           ),
-          backgroundColor: AppColors.success,
+          backgroundColor: ChatContrast.fillForWhiteText(AppColors.success),
           duration: const Duration(seconds: 1),
         ),
       );
@@ -918,7 +969,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
                 content: Text(
                   S.of(context)?.chatFileNotExist ?? 'File does not exist',
                 ),
-                backgroundColor: AppColors.error,
+                backgroundColor: AppColors.errorFill,
               ),
             );
           }
@@ -931,7 +982,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
                 S.of(context)?.chatSendFailed(e.toString()) ??
                     'Send failed: $e',
               ),
-              backgroundColor: AppColors.error,
+              backgroundColor: AppColors.errorFill,
             ),
           );
         }
@@ -1294,7 +1345,11 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
             onPressed: () => Navigator.pop(ctx, true),
             child: Text(
               S.of(context)?.commonConfirm ?? 'Confirm',
-              style: const TextStyle(color: Colors.red),
+              style: TextStyle(
+                color: context.isDarkMode
+                    ? AppColors.error
+                    : AppColors.errorFill,
+              ),
             ),
           ),
         ],
@@ -1309,7 +1364,7 @@ extension _ChatPageMoreFeaturesMethods on _ChatPageState {
           content: Text(S.of(context)?.chatPollEndedMessage ?? 'Poll ended'),
           duration: const Duration(seconds: 1),
           behavior: SnackBarBehavior.floating,
-          backgroundColor: AppColors.success,
+          backgroundColor: ChatContrast.fillForWhiteText(AppColors.success),
         ),
       );
     }

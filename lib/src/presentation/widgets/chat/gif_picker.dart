@@ -240,10 +240,12 @@ class _GifPickerState extends State<GifPicker> {
   }
 
   Widget _buildSearchBar() {
+    // 44pt field (was 36pt) so the clear button is not clipped to 36pt;
+    // vertical padding 8 -> 4 keeps the bar at about the same height.
     return Padding(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       child: Container(
-        height: 36,
+        height: 44,
         decoration: BoxDecoration(
           color: context.surfaceColor,
           borderRadius: BorderRadius.circular(8),
@@ -254,7 +256,7 @@ class _GifPickerState extends State<GifPicker> {
           style: TextStyle(fontSize: 14, color: context.textPrimary),
           decoration: InputDecoration(
             hintText: '${S.of(context)?.commonSearch ?? 'Search'} GIF',
-            hintStyle: TextStyle(fontSize: 14, color: context.textTertiary),
+            hintStyle: TextStyle(fontSize: 14, color: context.textSecondary),
             prefixIcon: Icon(
               Icons.search,
               size: 20,
@@ -321,7 +323,7 @@ class _GifPickerState extends State<GifPicker> {
             const SizedBox(height: 8),
             Text(
               S.of(context)?.searchNoResults ?? 'No Results',
-              style: const TextStyle(color: AppColors.textTertiary),
+              style: TextStyle(color: context.textSecondary),
             ),
           ],
         ),
@@ -361,32 +363,37 @@ class _GifPickerState extends State<GifPicker> {
   }
 
   Widget _buildGifItem(GiphyGif gif, bool isDark) {
-    return GestureDetector(
-      onTap: () => widget.onGifSelected(gif),
-      onLongPress: widget.onGifLongPressed == null
-          ? null
-          : () => widget.onGifLongPressed!(gif),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
-        child: Container(
-          color: AppColors.placeholderOf(isDark),
-          child: Image.network(
-            gif.previewUrl,
-            fit: BoxFit.cover,
-            loadingBuilder: (context, child, loadingProgress) {
-              if (loadingProgress == null) return child;
-              return Center(
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  value: loadingProgress.expectedTotalBytes != null
-                      ? loadingProgress.cumulativeBytesLoaded /
-                            loadingProgress.expectedTotalBytes!
-                      : null,
-                ),
-              );
-            },
-            errorBuilder: (_, _, _) =>
-                const Icon(Icons.broken_image_outlined, size: 32),
+    // Screen-reader label for the image-only tile.
+    return Semantics(
+      button: true,
+      label: gif.title.isNotEmpty ? gif.title : 'GIF',
+      child: GestureDetector(
+        onTap: () => widget.onGifSelected(gif),
+        onLongPress: widget.onGifLongPressed == null
+            ? null
+            : () => widget.onGifLongPressed!(gif),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: Container(
+            color: AppColors.placeholderOf(isDark),
+            child: Image.network(
+              gif.previewUrl,
+              fit: BoxFit.cover,
+              loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) return child;
+                return Center(
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    value: loadingProgress.expectedTotalBytes != null
+                        ? loadingProgress.cumulativeBytesLoaded /
+                              loadingProgress.expectedTotalBytes!
+                        : null,
+                  ),
+                );
+              },
+              errorBuilder: (_, _, _) =>
+                  const Icon(Icons.broken_image_outlined, size: 32),
+            ),
           ),
         ),
       ),
@@ -416,69 +423,73 @@ Future<GifPickerResult?> showGifPicker(
         color: context.inputBarColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
       ),
-      child: Column(
-        children: [
-          // 拖动条
-          Container(
-            margin: const EdgeInsets.only(top: 8),
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: AppColors.textTertiary,
-              borderRadius: BorderRadius.circular(2),
+      // Transparent Material above the sheet color: visible ink.
+      child: Material(
+        type: MaterialType.transparency,
+        child: Column(
+          children: [
+            // 拖动条
+            Container(
+              margin: const EdgeInsets.only(top: 8),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.textTertiary,
+                borderRadius: BorderRadius.circular(2),
+              ),
             ),
-          ),
-          // 标题栏
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              children: [
-                const Text(
-                  'GIF',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                ),
-                const Spacer(),
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  tooltip: S.of(context)?.commonClose ?? 'Close',
-                  onPressed: () => Navigator.pop(context),
-                ),
-              ],
+            // 标题栏
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                children: [
+                  const Text(
+                    'GIF',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    tooltip: S.of(context)?.commonClose ?? 'Close',
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
             ),
-          ),
-          // GIF 选择器
-          Expanded(
-            child: GifPicker(
-              height: double.infinity,
-              onGifSelected: (gif) {
-                if (scheduling) return;
-                selectedGif = GifPickerResult(gif: gif);
-                Navigator.pop(context);
-              },
-              onGifLongPressed: (gif) async {
-                if (scheduling) return;
-                scheduling = true;
-                try {
-                  final scheduledAt = await showScheduledSendPicker(context);
-                  if (!context.mounted || scheduledAt == null) return;
-                  final selection = GifPickerResult(
-                    gif: gif,
-                    scheduledAt: scheduledAt,
-                  );
-                  if (onSchedule != null) {
-                    final saved = await onSchedule(selection);
-                    if (context.mounted && saved) Navigator.pop(context);
-                  } else {
-                    selectedGif = selection;
-                    Navigator.pop(context);
+            // GIF 选择器
+            Expanded(
+              child: GifPicker(
+                height: double.infinity,
+                onGifSelected: (gif) {
+                  if (scheduling) return;
+                  selectedGif = GifPickerResult(gif: gif);
+                  Navigator.pop(context);
+                },
+                onGifLongPressed: (gif) async {
+                  if (scheduling) return;
+                  scheduling = true;
+                  try {
+                    final scheduledAt = await showScheduledSendPicker(context);
+                    if (!context.mounted || scheduledAt == null) return;
+                    final selection = GifPickerResult(
+                      gif: gif,
+                      scheduledAt: scheduledAt,
+                    );
+                    if (onSchedule != null) {
+                      final saved = await onSchedule(selection);
+                      if (context.mounted && saved) Navigator.pop(context);
+                    } else {
+                      selectedGif = selection;
+                      Navigator.pop(context);
+                    }
+                  } finally {
+                    scheduling = false;
                   }
-                } finally {
-                  scheduling = false;
-                }
-              },
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     ),
   );

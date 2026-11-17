@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../../l10n/app_localizations.dart';
 
 import '../../../../core/services/text_document_loader.dart';
 import '../../../../core/services/media_telemetry.dart';
@@ -77,7 +78,9 @@ class _TextDocumentPreviewPageState extends State<TextDocumentPreviewPage> {
     } catch (_) {
       if (!mounted) return;
       setState(() {
-        _error = 'Unable to preview this document safely. Check the connection and file size (max 2MB).';
+        _error =
+            S.of(context)?.ui3DocumentPreviewFailed ??
+            'Unable to preview this document safely. Check the connection and file size (max 2MB).';
         _isLoading = false;
       });
     }
@@ -128,7 +131,7 @@ class _TextDocumentPreviewPageState extends State<TextDocumentPreviewPage> {
               ),
               const SizedBox(height: AppDimensions.spacing),
               Text(
-                'Preview',
+                S.of(context)?.stickerImportPreview ?? 'Preview',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -139,7 +142,7 @@ class _TextDocumentPreviewPageState extends State<TextDocumentPreviewPage> {
               Text(
                 _error!,
                 textAlign: TextAlign.center,
-                style: TextStyle(color: context.textSecondary),
+                style: TextStyle(color: context.textSupporting),
               ),
             ],
           ),

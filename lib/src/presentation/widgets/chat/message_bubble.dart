@@ -112,7 +112,8 @@ class MessageBubble extends StatelessWidget {
             children: [
               // 左侧头像（对方消息）
               if (!isSelf && showAvatar) _buildAvatar(isDark),
-              if (!isSelf && showAvatar) const SizedBox(width: 8),
+              // 4pt of the 8pt gap is the avatar's hit-area padding.
+              if (!isSelf && showAvatar) const SizedBox(width: 4),
 
               // 消息内容
               Flexible(
@@ -127,9 +128,9 @@ class MessageBubble extends StatelessWidget {
                         padding: const EdgeInsets.only(bottom: 4),
                         child: Text(
                           _formatTime(timestamp!),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
-                            color: AppColors.textTertiary,
+                            color: context.textSupporting,
                           ),
                         ),
                       ),
@@ -167,7 +168,7 @@ class MessageBubble extends StatelessWidget {
               ),
 
               // 右侧头像（自己的消息）
-              if (isSelf && showAvatar) const SizedBox(width: 8),
+              if (isSelf && showAvatar) const SizedBox(width: 4),
               if (isSelf && showAvatar) _buildAvatar(isDark),
             ],
           ),
@@ -192,37 +193,47 @@ class MessageBubble extends StatelessWidget {
       child: GestureDetector(
         onTap: onAvatarTap,
         onDoubleTap: onAvatarDoubleTap,
-        child: Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: AppColors.placeholder,
-            borderRadius: BorderRadius.circular(4),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.08),
-                blurRadius: 4,
-                offset: const Offset(0, 1),
-              ),
-            ],
+        behavior: HitTestBehavior.opaque,
+        // 40pt avatar inside a 44x44pt hit area (HIG accessibility); the
+        // padding faces the bubble gap and the row bottom.
+        child: Padding(
+          padding: EdgeInsets.only(
+            left: isSelf ? 4 : 0,
+            right: isSelf ? 0 : 4,
+            bottom: 4,
           ),
-          clipBehavior: Clip.antiAlias,
-          child: avatarUrl != null && avatarUrl!.isNotEmpty
-              ? CachedNetworkImage(
-                  imageUrl: avatarUrl!,
-                  fit: BoxFit.cover,
-                  memCacheWidth: 80,
-                  memCacheHeight: 80,
-                  httpHeaders: headers,
-                  placeholder: (context, url) => _buildDefaultAvatar(),
-                  errorWidget: (context, url, error) {
-                    debugLog(
-                      'MessageBubble: Failed to load avatar: $url, error: $error',
-                    );
-                    return _buildDefaultAvatar();
-                  },
-                )
-              : _buildDefaultAvatar(),
+          child: Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: AppColors.placeholder,
+              borderRadius: BorderRadius.circular(4),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.08),
+                  blurRadius: 4,
+                  offset: const Offset(0, 1),
+                ),
+              ],
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: avatarUrl != null && avatarUrl!.isNotEmpty
+                ? CachedNetworkImage(
+                    imageUrl: avatarUrl!,
+                    fit: BoxFit.cover,
+                    memCacheWidth: 80,
+                    memCacheHeight: 80,
+                    httpHeaders: headers,
+                    placeholder: (context, url) => _buildDefaultAvatar(),
+                    errorWidget: (context, url, error) {
+                      debugLog(
+                        'MessageBubble: Failed to load avatar: $url, error: $error',
+                      );
+                      return _buildDefaultAvatar();
+                    },
+                  )
+                : _buildDefaultAvatar(),
+          ),
         ),
       ),
     );

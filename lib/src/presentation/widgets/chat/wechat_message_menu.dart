@@ -9,6 +9,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/chat_colors.dart';
 import '../../../core/utils/a11y_l10n.dart';
 import '../../../domain/entities/message_entity.dart';
+import '../common/n42_tap_area.dart';
 import 'message_reaction_bar.dart';
 
 /// 快速表情列表（类似微信/WhatsApp/Element）
@@ -445,18 +446,22 @@ class WeChatMessageMenu extends StatelessWidget {
                 ),
               );
             },
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(24),
             splashColor: Colors.white.withValues(alpha: 0.2),
             highlightColor: Colors.white.withValues(alpha: 0.1),
-            child: Container(
-              width: 40,
-              height: 40,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(20),
+            // 48pt hit height (same as the emoji items) around the 40pt pill.
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Container(
+                width: 40,
+                height: 40,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Icon(Icons.add, color: Colors.white70, size: 22),
               ),
-              child: const Icon(Icons.add, color: Colors.white70, size: 22),
             ),
           ),
         ),
@@ -608,7 +613,7 @@ class _RecallConfirmSheet extends StatelessWidget {
                           'Recall this message?',
                       style: TextStyle(
                         fontSize: 13,
-                        color: context.textTertiary,
+                        color: context.textSupporting,
                       ),
                     ),
                   ),
@@ -689,7 +694,7 @@ class RecalledMessageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textColor = context.textTertiary;
+    final textColor = context.textSupporting;
     final s = S.of(context);
 
     return Center(
@@ -706,14 +711,17 @@ class RecalledMessageWidget extends StatelessWidget {
               style: TextStyle(fontSize: 12, color: textColor),
             ),
             if (isFromMe && onReEdit != null) ...[
-              const SizedBox(width: 4),
-              GestureDetector(
+              N42TapArea(
                 onTap: onReEdit,
-                child: Text(
-                  s?.commonReEdit ?? 'Re-edit',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: ChatColors.of(context).menuLinkText,
+                borderRadius: BorderRadius.circular(8),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: Text(
+                    s?.commonReEdit ?? 'Re-edit',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: ChatColors.of(context).menuLinkText,
+                    ),
                   ),
                 ),
               ),

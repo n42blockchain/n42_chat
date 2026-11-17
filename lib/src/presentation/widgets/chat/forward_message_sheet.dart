@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
+import '../../../core/extensions/context_extension.dart';
 import '../../../domain/entities/conversation_entity.dart';
 import '../../../domain/entities/message_entity.dart';
 import '../../../domain/repositories/conversation_repository.dart';
@@ -113,6 +114,8 @@ class _ForwardMessageSheetState extends State<ForwardMessageSheet> {
                   const Spacer(),
                   IconButton(
                     icon: const Icon(Icons.close),
+                    tooltip:
+                        MaterialLocalizations.of(context).closeButtonTooltip,
                     onPressed: _isForwarding
                         ? null
                         : () => Navigator.pop(context),
@@ -169,7 +172,7 @@ class _ForwardMessageSheetState extends State<ForwardMessageSheet> {
                       _getMessagePreview(widget.message),
                       style: TextStyle(
                         fontSize: 14,
-                        color: AppColors.textSecondaryOf(widget.isDark),
+                        color: context.textSupporting,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -259,7 +262,7 @@ class _ForwardMessageSheetState extends State<ForwardMessageSheet> {
                     'No chats available for forwarding')
               : (S.of(context)?.chatNoMatchingChat ??
                     'No matching chats found'),
-          style: TextStyle(color: AppColors.textTertiaryOf(widget.isDark)),
+          style: TextStyle(color: context.textSupporting),
         ),
       );
     }
@@ -297,7 +300,7 @@ class _ForwardMessageSheetState extends State<ForwardMessageSheet> {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 12,
-                      color: AppColors.textTertiaryOf(widget.isDark),
+                      color: context.textSupporting,
                     ),
                   )
                 : null,
@@ -346,7 +349,7 @@ class _ForwardMessageSheetState extends State<ForwardMessageSheet> {
       case MessageType.location:
         return '${S.of(context)?.chatLocation ?? '[Location]'} ${message.content}';
       case MessageType.music:
-        return '[Music] ${message.metadata?.musicTitle ?? ''}';
+        return '${S.of(context)?.commonMusic ?? '[Music]'} ${message.metadata?.musicTitle ?? ''}';
       default:
         return S.of(context)?.chatUnknownMessage ?? '[Message]';
     }

@@ -242,15 +242,20 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
             S.of(context)?.transferPaymentRequestUnavailable ??
                 'Payment request is unavailable',
           ),
-          backgroundColor: AppColors.warning,
+          backgroundColor: ChatContrast.fillForWhiteText(AppColors.warning),
         ),
       );
       return;
     }
 
     if (paymentStatus == PaymentRequestLifecycleStatus.paid) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Payment already sent')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            S.of(context)?.ui3PaymentAlreadySent ?? 'Payment already sent',
+          ),
+        ),
+      );
       return;
     }
 
@@ -258,7 +263,7 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(S.of(context)?.commonExpired ?? 'Expired'),
-          backgroundColor: AppColors.warning,
+          backgroundColor: ChatContrast.fillForWhiteText(AppColors.warning),
         ),
       );
       return;
@@ -295,7 +300,11 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            hasCompleted ? 'Payment already sent' : 'Payment is processing',
+            hasCompleted
+                ? (S.of(context)?.ui3PaymentAlreadySent ??
+                      'Payment already sent')
+                : (S.of(context)?.ui3PaymentProcessing ??
+                      'Payment is processing'),
           ),
         ),
       );
@@ -359,7 +368,9 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setModalState) => SafeArea(
-          child: Padding(
+          // Scrolls when the receipt details outgrow the default sheet height
+          // (9/16 of the screen) on small phones or with large text.
+          child: SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -379,14 +390,25 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
                 Text('$amount $token'),
                 const SizedBox(height: AppDimensions.spacingS),
                 Text(
-                  'Chain status: ${receiptResult == null ? "Not checked" : _receiptStatusLabel(receiptResult!)}',
+                  S
+                          .of(context)
+                          ?.ui3ChainStatus(
+                            _receiptStatusLabel(receiptResult),
+                          ) ??
+                      'Chain status: ${_receiptStatusLabel(receiptResult)}',
                 ),
                 if (receiptResult != null &&
                     receiptResult!.state ==
                         WalletTransferReceiptState.confirmed)
                   Text(
-                    'Confirmed: ${receiptResult!.confirmations} / '
-                    '${receiptResult!.requiredConfirmations} blocks',
+                    S
+                            .of(context)
+                            ?.ui3ConfirmationsCount(
+                              receiptResult!.confirmations,
+                              receiptResult!.requiredConfirmations,
+                            ) ??
+                        'Confirmed: ${receiptResult!.confirmations} / '
+                            '${receiptResult!.requiredConfirmations} blocks',
                   ),
                 if (txHash?.isNotEmpty == true) ...[
                   const SizedBox(height: AppDimensions.spacingS),
@@ -404,7 +426,9 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
                       );
                     },
                     icon: const Icon(Icons.copy, size: 18),
-                    label: Text(S.of(context)?.chatCopied ?? 'Copy tx hash'),
+                    label: Text(
+                      S.of(context)?.ui3CopyTxHash ?? 'Copy transaction hash',
+                    ),
                   ),
                 ],
                 if (canVerify) ...[
@@ -432,13 +456,15 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
                     label: Text(
                       receiptResult?.state ==
                               WalletTransferReceiptState.confirmed
-                          ? 'Verify again'
-                          : 'Verify on chain',
+                          ? (S.of(context)?.ui3VerifyAgain ?? 'Verify again')
+                          : (S.of(context)?.ui3VerifyOnChain ??
+                                'Verify on chain'),
                     ),
                   ),
                 ] else ...[
-                  const Text(
-                    'This transfer does not include exact chain and asset details.',
+                  Text(
+                    S.of(context)?.ui3TransferMissingChainDetails ??
+                        'This transfer does not include exact chain and asset details.',
                   ),
                 ],
                 if (receiptResult != null) ...[
@@ -487,14 +513,21 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
   }
 
   String _receiptStatusLabel(
-    WalletTransferReceiptResult result,
-  ) => switch (result.state) {
-    WalletTransferReceiptState.pending => 'Pending on chain',
-    WalletTransferReceiptState.confirmed => 'Confirmed',
-    WalletTransferReceiptState.failed => 'Failed on chain',
-    WalletTransferReceiptState.mismatch => 'Transaction details do not match',
-    WalletTransferReceiptState.unsupported => 'Chain verification unsupported',
-    WalletTransferReceiptState.unavailable => 'Verification unavailable',
+    WalletTransferReceiptResult? result,
+  ) => switch (result?.state) {
+    null => S.of(context)?.ui3NotChecked ?? 'Not checked',
+    WalletTransferReceiptState.pending =>
+      S.of(context)?.ui3ReceiptPending ?? 'Pending on chain',
+    WalletTransferReceiptState.confirmed =>
+      S.of(context)?.ui3ReceiptConfirmed ?? 'Confirmed',
+    WalletTransferReceiptState.failed =>
+      S.of(context)?.ui3ReceiptFailed ?? 'Failed on chain',
+    WalletTransferReceiptState.mismatch =>
+      S.of(context)?.ui3ReceiptMismatch ?? 'Transaction details do not match',
+    WalletTransferReceiptState.unsupported =>
+      S.of(context)?.ui3ReceiptUnsupported ?? 'Chain verification unsupported',
+    WalletTransferReceiptState.unavailable =>
+      S.of(context)?.ui3ReceiptUnavailable ?? 'Verification unavailable',
   };
 
   /// 名片消息点击 - 跳转到用户资料页添加好友
@@ -601,7 +634,7 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
           content: Text(
             S.of(context)?.chatInvalidVideoUrl ?? 'Invalid video URL',
           ),
-          backgroundColor: AppColors.warning,
+          backgroundColor: ChatContrast.fillForWhiteText(AppColors.warning),
         ),
       );
       return;
@@ -731,7 +764,7 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
                       S.of(context)?.downloadComplete ?? 'Download complete',
                     ),
                     action: SnackBarAction(
-                      label: 'Open / Save',
+                      label: S.of(context)?.ui3OpenOrSave ?? 'Open / Save',
                       onPressed: () async {
                         try {
                           final box = context.findRenderObject() as RenderBox?;
@@ -746,8 +779,11 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
                         } catch (_) {
                           if (mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Unable to open this file.'),
+                              SnackBar(
+                                content: Text(
+                                  S.of(context)?.ui3UnableToOpenFile ??
+                                      'Unable to open this file.',
+                                ),
                               ),
                             );
                           }
@@ -765,7 +801,7 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
                     content: Text(
                       '${S.of(context)?.downloadFailed ?? 'Download failed'}: $e',
                     ),
-                    backgroundColor: AppColors.error,
+                    backgroundColor: AppColors.errorFill,
                   ),
                 );
               }
@@ -835,7 +871,7 @@ extension _ChatPageEventHandlersMethods on _ChatPageState {
           content: Text(
             S.of(context)?.chatInvalidLocation ?? 'Invalid location',
           ),
-          backgroundColor: AppColors.warning,
+          backgroundColor: ChatContrast.fillForWhiteText(AppColors.warning),
         ),
       );
       return;

@@ -5,6 +5,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
+import '../../../core/utils/a11y_l10n.dart';
 
 enum ChatRecentMediaAccess { available, limited, denied, unsupported }
 
@@ -337,89 +338,107 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
         widget.recentMediaLoader != null &&
         _recentMedia?.access != ChatRecentMediaAccess.unsupported;
     final contentHeight = recentMediaSupported
+        // Min 380 (was 360) leaves room for the 44pt handle and the 44pt
+        // recent-media actions on small screens.
         ? (_expanded ? screenHeight * 0.68 : screenHeight * 0.48).clamp(
-            360.0,
+            380.0,
             _expanded ? 620.0 : 430.0,
           )
         : 225.0;
 
     final pages = _paginate(_buildAllItems(context));
 
-    return Container(
+    return SizedBox(
       key: const ValueKey<String>('chat_more_panel'),
       // 固定高度 = 内容高度 + 底部安全区域
       height: contentHeight + bottomPadding,
-      decoration: BoxDecoration(
+      // A Material (not a decorated Container) so the ink of the tiles and
+      // buttons below is painted visibly on the panel background.
+      child: Material(
         color: context.inputBarColor,
-        border: Border(
+        shape: Border(
           top: BorderSide(color: context.dividerColor, width: 0.5),
         ),
-      ),
-      child: SafeArea(
-        top: false,
-        child: Column(
-          children: [
-            GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onVerticalDragEnd: (details) {
-                final velocity = details.primaryVelocity ?? 0;
-                if (velocity < -120 && !_expanded) {
-                  setState(() => _expanded = true);
-                } else if (velocity > 120 && _expanded) {
-                  setState(() => _expanded = false);
-                }
-              },
-              onTap: recentMediaSupported
-                  ? () => setState(() => _expanded = !_expanded)
-                  : null,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 7),
-                child: Container(
-                  width: 38,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: context.textTertiary.withValues(alpha: 0.6),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(
-              height: 176,
-              child: PageView(
-                controller: _pageController,
-                children: [
-                  for (final pageItems in pages)
-                    _buildPage(context, isDark, pageItems),
-                ],
-              ),
-            ),
-            // 页面指示器（移到 PageView 外部）
-            Padding(
-              padding: const EdgeInsets.only(top: 2, bottom: 6),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(
-                  pages.length,
-                  (index) => Padding(
-                    padding: EdgeInsets.only(left: index > 0 ? 6 : 0),
+        child: SafeArea(
+          top: false,
+          child: Column(
+            children: [
+              Semantics(
+                button: recentMediaSupported,
+                label: recentMediaSupported
+                    ? (_expanded
+                          ? A11yL10n.of(context).collapse
+                          : A11yL10n.of(context).expand)
+                    : null,
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onVerticalDragEnd: (details) {
+                    final velocity = details.primaryVelocity ?? 0;
+                    if (velocity < -120 && !_expanded) {
+                      setState(() => _expanded = true);
+                    } else if (velocity > 120 && _expanded) {
+                      setState(() => _expanded = false);
+                    }
+                  },
+                  onTap: recentMediaSupported
+                      ? () => setState(() => _expanded = !_expanded)
+                      : null,
+                  child: Padding(
+                    // Tappable handle gets a 118x44pt hit area (was 38x18pt).
+                    padding: recentMediaSupported
+                        ? const EdgeInsets.symmetric(
+                            horizontal: 40,
+                            vertical: 20,
+                          )
+                        : const EdgeInsets.symmetric(vertical: 7),
                     child: Container(
-                      width: 6,
-                      height: 6,
+                      width: 38,
+                      height: 4,
                       decoration: BoxDecoration(
-                        color: _currentPage == index
-                            ? AppColors.textSecondary
-                            : AppColors.textTertiary,
-                        shape: BoxShape.circle,
+                        color: context.textTertiary.withValues(alpha: 0.6),
+                        borderRadius: BorderRadius.circular(2),
                       ),
                     ),
                   ),
                 ),
               ),
-            ),
-            if (recentMediaSupported)
-              Expanded(child: _buildRecentMediaSection(context)),
-          ],
+              SizedBox(
+                height: 176,
+                child: PageView(
+                  controller: _pageController,
+                  children: [
+                    for (final pageItems in pages)
+                      _buildPage(context, isDark, pageItems),
+                  ],
+                ),
+              ),
+              // 页面指示器（移到 PageView 外部）
+              Padding(
+                padding: const EdgeInsets.only(top: 2, bottom: 6),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(
+                    pages.length,
+                    (index) => Padding(
+                      padding: EdgeInsets.only(left: index > 0 ? 6 : 0),
+                      child: Container(
+                        width: 6,
+                        height: 6,
+                        decoration: BoxDecoration(
+                          color: _currentPage == index
+                              ? AppColors.textSecondary
+                              : AppColors.textTertiary,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              if (recentMediaSupported)
+                Expanded(child: _buildRecentMediaSection(context)),
+            ],
+          ),
         ),
       ),
     );
@@ -628,7 +647,6 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
                     if (snapshot?.access == ChatRecentMediaAccess.limited)
                       compact
                           ? IconButton(
-                              visualDensity: VisualDensity.compact,
                               tooltip: manageLabel,
                               onPressed: _manageRecentMediaAccess,
                               icon: const Icon(Icons.tune, size: 20),
@@ -639,7 +657,6 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
                             ),
                     compact
                         ? IconButton(
-                            visualDensity: VisualDensity.compact,
                             tooltip: photosLabel,
                             onPressed: widget.onPhotoPressed,
                             icon: const Icon(
@@ -654,7 +671,6 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
                     if (_selectedRecentMediaIds.isNotEmpty)
                       compact
                           ? IconButton.filled(
-                              visualDensity: VisualDensity.compact,
                               tooltip: sendLabel,
                               onPressed: _sendingRecentMedia
                                   ? null
@@ -814,7 +830,7 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: selected
-                      ? AppColors.primaryOf(context)
+                      ? AppColors.primaryFillOf(context)
                       : Colors.black.withValues(alpha: 0.35),
                   shape: BoxShape.circle,
                   border: Border.all(color: Colors.white, width: 1.5),
@@ -903,7 +919,8 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
   }
 
   ButtonStyle get _compactMediaActionStyle => TextButton.styleFrom(
-    minimumSize: const Size(0, 34),
+    // 44pt minimum hit height (was 34pt with shrinkWrap).
+    minimumSize: const Size(0, 44),
     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
   );
@@ -951,6 +968,9 @@ class _ChatMorePanelState extends State<ChatMorePanel> {
       button: true,
       label: item.label,
       enabled: item.onTap != null,
+      // Keeps the tap actions that excludeSemantics drops.
+      onTap: item.onTap,
+      onLongPress: item.onLongPress,
       excludeSemantics: true,
       child: InkWell(
         onTap: item.onTap,

@@ -122,9 +122,10 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            '$failedCount selected media item(s) could not be sent',
+            S.of(context)?.ui3MediaItemsNotSent(failedCount) ??
+                '$failedCount selected media item(s) could not be sent',
           ),
-          backgroundColor: AppColors.error,
+          backgroundColor: AppColors.errorFill,
         ),
       );
     }
@@ -203,7 +204,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
               S.of(context)?.commonSelectImageFailed(e.toString()) ??
                   'Failed to select media: $e',
             ),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.errorFill,
           ),
         );
       }
@@ -221,15 +222,21 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
             ListTile(
               leading: const Icon(Icons.photo_library_outlined),
               title: Text(S.of(context)?.contactPhotos ?? 'Photos'),
-              subtitle: const Text(
-                'Send photos and videos in chat-friendly format',
+              subtitle: Text(
+                S.of(context)?.ui3PhotosSubtitle ??
+                    'Send photos and videos in chat-friendly format',
               ),
               onTap: () => Navigator.pop(sheetContext, _PhotoSendMode.media),
             ),
             ListTile(
               leading: const Icon(Icons.insert_photo_outlined),
-              title: const Text('Original Images'),
-              subtitle: const Text('Send uncompressed photos as files'),
+              title: Text(
+                S.of(context)?.ui3OriginalImages ?? 'Original Images',
+              ),
+              subtitle: Text(
+                S.of(context)?.ui3OriginalImagesSubtitle ??
+                    'Send uncompressed photos as files',
+              ),
               onTap: () =>
                   Navigator.pop(sheetContext, _PhotoSendMode.originalFile),
             ),
@@ -279,8 +286,11 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Failed to select original images: $e'),
-          backgroundColor: AppColors.error,
+          content: Text(
+            S.of(context)?.commonSelectImageFailed('$e') ??
+                'Failed to select original images: $e',
+          ),
+          backgroundColor: AppColors.errorFill,
         ),
       );
     }
@@ -355,7 +365,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
               S.of(context)?.chatSendImageFailed(e.toString()) ??
                   'Failed to send image: $e',
             ),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.errorFill,
           ),
         );
         return;
@@ -431,7 +441,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
                   S.of(context)?.chatVideoRecordingFailed ??
                       'Video recording failed',
                 ),
-                backgroundColor: AppColors.error,
+                backgroundColor: AppColors.errorFill,
               ),
             );
           }
@@ -450,7 +460,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
                   S.of(context)?.chatVideoRecordingFailed ??
                       'Video recording failed',
                 ),
-                backgroundColor: AppColors.error,
+                backgroundColor: AppColors.errorFill,
               ),
             );
           }
@@ -468,7 +478,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
               S.of(context)?.chatCaptureFailed(e.toString()) ??
                   'Capture failed: $e',
             ),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.errorFill,
           ),
         );
       }
@@ -513,7 +523,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
                   S.of(context)?.chatVideoFileNotExist ??
                       'Video file does not exist',
                 ),
-                backgroundColor: AppColors.error,
+                backgroundColor: AppColors.errorFill,
               ),
             );
           }
@@ -530,7 +540,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
               content: Text(
                 S.of(context)?.chatVideoDataEmpty ?? 'Video data is empty',
               ),
-              backgroundColor: AppColors.error,
+              backgroundColor: AppColors.errorFill,
             ),
           );
         }
@@ -574,7 +584,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
                 S.of(context)?.chatVideoTooLarge ??
                     'Video size cannot exceed 100MB',
               ),
-              backgroundColor: AppColors.error,
+              backgroundColor: AppColors.errorFill,
             ),
           );
         }
@@ -669,7 +679,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
               S.of(context)?.chatSendVideoFailed(e.toString()) ??
                   'Failed to send video: $e',
             ),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.errorFill,
           ),
         );
       }
@@ -699,7 +709,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
                   S.of(context)?.chatImageFileNotExist ??
                       'Image file does not exist',
                 ),
-                backgroundColor: AppColors.error,
+                backgroundColor: AppColors.errorFill,
               ),
             );
           }
@@ -716,7 +726,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
               content: Text(
                 S.of(context)?.commonImageDataEmpty ?? 'Image data is empty',
               ),
-              backgroundColor: AppColors.error,
+              backgroundColor: AppColors.errorFill,
             ),
           );
         }
@@ -837,7 +847,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
               S.of(context)?.chatSendImageFailed(e.toString()) ??
                   'Failed to send image: $e',
             ),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.errorFill,
           ),
         );
       }
@@ -864,7 +874,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
               S.of(context)?.chatPickFileFailed(e.toString()) ??
                   'Failed to pick file: $e',
             ),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.errorFill,
           ),
         );
       }
@@ -918,7 +928,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
               S.of(context)?.chatSendFileFailed(e.toString()) ??
                   'Failed to send file: $e',
             ),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.errorFill,
           ),
         );
       }
@@ -972,8 +982,10 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
         SnackBar(
           content: Text(
             scheduledAt == null
-                ? 'Sending original image: $filename'
-                : 'Scheduled original image: $filename',
+                ? (S.of(context)?.ui3SendingOriginalImage(filename) ??
+                      'Sending original image: $filename')
+                : (S.of(context)?.ui3ScheduledOriginalImage(filename) ??
+                      'Scheduled original image: $filename'),
           ),
           duration: const Duration(seconds: 1),
         ),
@@ -988,8 +1000,11 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Failed to send original image: $e'),
-          backgroundColor: AppColors.error,
+          content: Text(
+            S.of(context)?.chatSendImageFailed('$e') ??
+                'Failed to send original image: $e',
+          ),
+          backgroundColor: AppColors.errorFill,
         ),
       );
     }
@@ -1011,7 +1026,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
                 S.of(context)?.chatVoiceFileNotExist ??
                     'Voice file does not exist',
               ),
-              backgroundColor: AppColors.error,
+              backgroundColor: AppColors.errorFill,
             ),
           );
         }
@@ -1029,7 +1044,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
               content: Text(
                 S.of(context)?.chatVoiceFileEmpty ?? 'Voice file is empty',
               ),
-              backgroundColor: AppColors.error,
+              backgroundColor: AppColors.errorFill,
             ),
           );
         }
@@ -1093,7 +1108,7 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
               S.of(context)?.chatSendVoiceFailed(e.toString()) ??
                   'Failed to send voice: $e',
             ),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.errorFill,
           ),
         );
       }
@@ -1348,12 +1363,15 @@ extension _ChatPageMediaActionsMethods on _ChatPageState {
       return;
     }
 
+    final time =
+        '${scheduledAt.month}/${scheduledAt.day} '
+        '${scheduledAt.hour.toString().padLeft(2, '0')}:'
+        '${scheduledAt.minute.toString().padLeft(2, '0')}';
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          'Scheduled $filename for ${scheduledAt.month}/${scheduledAt.day} '
-          '${scheduledAt.hour.toString().padLeft(2, '0')}:'
-          '${scheduledAt.minute.toString().padLeft(2, '0')}',
+          S.of(context)?.ui3ScheduledFileFor(filename, time) ??
+              'Scheduled $filename for $time',
         ),
         duration: const Duration(seconds: 2),
       ),

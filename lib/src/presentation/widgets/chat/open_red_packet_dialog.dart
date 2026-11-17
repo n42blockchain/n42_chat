@@ -7,6 +7,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../pages/red_packet/send_red_packet_page.dart';
 import '../../../core/theme/app_dimensions.dart';
+import '../common/n42_tap_area.dart';
 
 class SendRedPacketDialog extends StatefulWidget {
   final String receiverName;
@@ -199,11 +200,14 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
         children: [
           Align(
             alignment: Alignment.topRight,
+            // 44pt hit area; the 24pt icon keeps its 12pt inset.
             child: Padding(
-              padding: const EdgeInsets.all(AppDimensions.spacingM),
-              child: GestureDetector(
+              padding: const EdgeInsets.all(2),
+              child: N42TapArea(
                 onTap: () => Navigator.of(context).pop(),
-                child: const Icon(Icons.close, color: Colors.white70, size: 24),
+                tooltip: S.of(context)?.commonClose ?? 'Close',
+                customBorder: const CircleBorder(),
+                child: const Icon(Icons.close, color: Colors.white, size: 24),
               ),
             ),
           ),
@@ -242,7 +246,7 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
             widget.greeting ??
                 S.of(context)?.commonRedPacketDefaultGreeting ??
                 'Best wishes',
-            style: const TextStyle(color: Colors.white70, fontSize: 14),
+            style: const TextStyle(color: Colors.white, fontSize: 14),
           ),
           const SizedBox(height: AppDimensions.spacingXXL),
 
@@ -272,7 +276,8 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
                         child: Text(
                           S.of(context)?.commonOpenRedPacket ?? 'Open',
                           style: const TextStyle(
-                            color: Color(0xFFB8860B),
+                            // 3.8:1 on the gold fill (large bold text).
+                            color: Color(0xFF8B6508),
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
                           ),
@@ -292,7 +297,7 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
           Padding(
             padding: const EdgeInsets.only(bottom: AppDimensions.spacing),
             child: Text(
-              'N42 Red Packet',
+              S.of(context)?.commonN42RedPacket ?? 'N42 Red Packet',
               style: TextStyle(
                 color: Colors.white.withValues(alpha: 0.4),
                 fontSize: 12,
@@ -322,7 +327,7 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
       padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingL),
       child: Text(
         message,
-        style: const TextStyle(color: Colors.white70, fontSize: 16),
+        style: const TextStyle(color: Colors.white, fontSize: 16),
       ),
     );
   }
@@ -341,7 +346,7 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
         children: [
           // Red top section
           Container(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+            padding: const EdgeInsets.fromLTRB(16, 6, 6, 24),
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
@@ -354,11 +359,14 @@ class _OpenRedPacketDialogState extends State<OpenRedPacketDialog>
               children: [
                 Align(
                   alignment: Alignment.topRight,
-                  child: GestureDetector(
+                  // 44pt hit area; the 24pt icon keeps its 16pt inset.
+                  child: N42TapArea(
                     onTap: () => Navigator.of(context).pop(),
+                    tooltip: S.of(context)?.commonClose ?? 'Close',
+                    customBorder: const CircleBorder(),
                     child: const Icon(
                       Icons.close,
-                      color: Colors.white70,
+                      color: Colors.white,
                       size: 24,
                     ),
                   ),

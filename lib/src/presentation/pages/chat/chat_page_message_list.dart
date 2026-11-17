@@ -45,8 +45,8 @@ extension _ChatPageMessageListMethods on _ChatPageState {
                     : state.error!,
               ),
               backgroundColor: reportSucceeded
-                  ? AppColors.success
-                  : AppColors.error,
+                  ? ChatContrast.fillForWhiteText(AppColors.success)
+                  : AppColors.errorFill,
             ),
           );
         }
@@ -321,73 +321,76 @@ extension _ChatPageMessageListMethods on _ChatPageState {
     final isRedacted = message.type == MessageType.redacted;
     final isSelected = !isRedacted && _selectedMessageIds.contains(message.id);
 
-    return GestureDetector(
-      onTap: isRedacted ? null : () => _toggleMessageSelection(message.id),
-      child: Container(
-        key: messageKey,
-        color: isSelected
-            ? ChatColors.of(context).messageSelectedBg
-            : Colors.transparent,
-        child: Row(
-          children: [
-            // 复选框（已撤回的消息显示禁用状态）
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppDimensions.spacingS,
-              ),
-              child: Container(
-                width: 24,
-                height: 24,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: isRedacted
-                      ? context.dividerColor
-                      : (isSelected
-                            ? AppColors.primaryOf(context)
-                            : Colors.transparent),
-                  border: Border.all(
-                    // redacted 用 textTertiary（淡，禁用语义）；可选中状态用 textSecondary
-                    // 保证未选中圆圈在白底上仍清晰可见。
+    return Semantics(
+      checked: isRedacted ? null : isSelected,
+      child: GestureDetector(
+        onTap: isRedacted ? null : () => _toggleMessageSelection(message.id),
+        child: Container(
+          key: messageKey,
+          color: isSelected
+              ? ChatColors.of(context).messageSelectedBg
+              : Colors.transparent,
+          child: Row(
+            children: [
+              // 复选框（已撤回的消息显示禁用状态）
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppDimensions.spacingS,
+                ),
+                child: Container(
+                  width: 24,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
                     color: isRedacted
-                        ? context.textTertiary
+                        ? context.dividerColor
                         : (isSelected
                               ? AppColors.primaryOf(context)
-                              : context.textSecondary),
-                    width: 2,
+                              : Colors.transparent),
+                    border: Border.all(
+                      // redacted 用 textTertiary（淡，禁用语义）；可选中状态用 textSecondary
+                      // 保证未选中圆圈在白底上仍清晰可见。
+                      color: isRedacted
+                          ? context.textTertiary
+                          : (isSelected
+                                ? AppColors.primaryOf(context)
+                                : context.textSecondary),
+                      width: 2,
+                    ),
+                  ),
+                  child: isRedacted
+                      ? Icon(Icons.block, size: 14, color: context.textTertiary)
+                      : (isSelected
+                            ? const Icon(
+                                Icons.check,
+                                size: 16,
+                                color: Colors.white,
+                              )
+                            : null),
+                ),
+              ),
+              // 消息内容
+              Expanded(
+                child: IgnorePointer(
+                  child: MessageItem(
+                    message: message,
+                    isHighlighted: message.id == _highlightedMessageId,
+                    onTap: () {},
+                    onLongPress: () {},
+                    onAvatarTap: () {},
+                    onResend: () {},
+                    isGroupChat: isGroupChat,
+                    showSenderName: showSenderName,
+                    currentUserId: _currentUserId,
+                    onReactionTap: null, // 多选模式下不响应表情点击
+                    onRedPacketTap: null, // 多选模式下不响应红包点击
+                    messageFontSize: _messageFontSize,
+                    showLinkPreview: _showLinkPreviews,
                   ),
                 ),
-                child: isRedacted
-                    ? Icon(Icons.block, size: 14, color: context.textTertiary)
-                    : (isSelected
-                          ? const Icon(
-                              Icons.check,
-                              size: 16,
-                              color: Colors.white,
-                            )
-                          : null),
               ),
-            ),
-            // 消息内容
-            Expanded(
-              child: IgnorePointer(
-                child: MessageItem(
-                  message: message,
-                  isHighlighted: message.id == _highlightedMessageId,
-                  onTap: () {},
-                  onLongPress: () {},
-                  onAvatarTap: () {},
-                  onResend: () {},
-                  isGroupChat: isGroupChat,
-                  showSenderName: showSenderName,
-                  currentUserId: _currentUserId,
-                  onReactionTap: null, // 多选模式下不响应表情点击
-                  onRedPacketTap: null, // 多选模式下不响应红包点击
-                  messageFontSize: _messageFontSize,
-                  showLinkPreview: _showLinkPreviews,
-                ),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -406,7 +409,7 @@ extension _ChatPageMessageListMethods on _ChatPageState {
           vertical: AppDimensions.spacingM,
         ),
         decoration: BoxDecoration(
-          color: AppColors.primaryWithOpacity,
+          color: AppColors.primaryOf(context).withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(AppDimensions.radiusM),
         ),
         child: Row(
@@ -416,7 +419,7 @@ extension _ChatPageMessageListMethods on _ChatPageState {
             Icon(
               Icons.lock_outline,
               size: 16,
-              color: AppColors.primaryOf(context),
+              color: AppColors.primaryOnTintOf(context),
             ),
             const SizedBox(width: AppDimensions.spacingS),
             Flexible(
@@ -425,7 +428,7 @@ extension _ChatPageMessageListMethods on _ChatPageState {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 12,
-                  color: AppColors.primaryOf(context),
+                  color: AppColors.primaryOnTintOf(context),
                   height: 1.4,
                 ),
               ),
@@ -454,101 +457,107 @@ extension _ChatPageMessageListMethods on _ChatPageState {
         final textColor = context.textPrimary;
         final secondaryTextColor = context.textSecondary;
 
-        return GestureDetector(
-          onTap: () => _scrollToMessage(msg.id),
-          child: Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppDimensions.spacingM,
-              vertical: 10,
-            ),
-            decoration: BoxDecoration(
-              color: bgColor,
-              border: Border(
-                bottom: BorderSide(color: context.dividerColor, width: 0.5),
+        return Material(
+          color: bgColor,
+          child: InkWell(
+            onTap: () => _scrollToMessage(msg.id),
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppDimensions.spacingM,
+                vertical: 10,
               ),
-            ),
-            child: Row(
-              children: [
-                // 置顶图标
-                Icon(
-                  Icons.push_pin,
-                  size: 16,
-                  color: AppColors.primaryOf(context),
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(color: context.dividerColor, width: 0.5),
                 ),
-                const SizedBox(width: AppDimensions.spacingS),
-                // 消息内容预览
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        msg.senderName,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.primaryOf(context),
-                        ),
-                      ),
-                      Text(
-                        _getPinnedMessagePreview(msg),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: 13, color: textColor),
-                      ),
-                    ],
+              ),
+              child: Row(
+                children: [
+                  // 置顶图标
+                  Icon(
+                    Icons.push_pin,
+                    size: 16,
+                    color: AppColors.primaryOf(context),
                   ),
-                ),
-                // 多条置顶时显示计数和导航
-                if (state.pinnedMessages.length > 1) ...[
                   const SizedBox(width: AppDimensions.spacingS),
-                  GestureDetector(
-                    onTap: () {
-                      context.read<ChatBloc>().add(
-                        const NavigatePinnedMessage(1),
-                      );
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppDimensions.spacingS,
-                        vertical: AppDimensions.spacingXS,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryOf(context)
-                            .withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(
-                          AppDimensions.radiusL,
+                  // 消息内容预览
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          msg.senderName,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.primaryOnTintOf(context),
+                          ),
                         ),
+                        Text(
+                          _getPinnedMessagePreview(msg),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(fontSize: 13, color: textColor),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // 多条置顶时显示计数和导航
+                  if (state.pinnedMessages.length > 1) ...[
+                    const SizedBox(width: AppDimensions.spacingS),
+                    N42TapArea(
+                      onTap: () {
+                        context.read<ChatBloc>().add(
+                          const NavigatePinnedMessage(1),
+                        );
+                      },
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusL,
                       ),
-                      child: Text(
-                        '${state.currentPinnedIndex + 1}/${state.pinnedMessages.length}',
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: AppColors.primaryOf(context),
-                          fontWeight: FontWeight.w500,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppDimensions.spacingS,
+                          vertical: AppDimensions.spacingXS,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryOf(context)
+                              .withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(
+                            AppDimensions.radiusL,
+                          ),
+                        ),
+                        child: Text(
+                          '${state.currentPinnedIndex + 1}/${state.pinnedMessages.length}',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: AppColors.primaryOnTintOf(context),
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
                     ),
-                  ),
+                  ],
+                  // 关闭按钮（如果有权限可以取消置顶）
+                  if (state.canPinMessages)
+                    IconButton(
+                      icon: Icon(
+                        Icons.close,
+                        size: 16,
+                        color: secondaryTextColor,
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 32,
+                        minHeight: 32,
+                      ),
+                      padding: EdgeInsets.zero,
+                      tooltip: S.of(context)?.conversationUnpin ?? 'Unpin',
+                      onPressed: () {
+                        context.read<ChatBloc>().add(UnpinMessage(msg.id));
+                      },
+                    ),
                 ],
-                // 关闭按钮（如果有权限可以取消置顶）
-                if (state.canPinMessages)
-                  IconButton(
-                    icon: Icon(
-                      Icons.close,
-                      size: 16,
-                      color: secondaryTextColor,
-                    ),
-                    constraints: const BoxConstraints(
-                      minWidth: 32,
-                      minHeight: 32,
-                    ),
-                    padding: EdgeInsets.zero,
-                    onPressed: () {
-                      context.read<ChatBloc>().add(UnpinMessage(msg.id));
-                    },
-                  ),
-              ],
+              ),
             ),
           ),
         );
@@ -623,7 +632,7 @@ extension _ChatPageMessageListMethods on _ChatPageState {
                       replyToText,
                       style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.primaryOf(context),
+                        color: AppColors.primaryOnTintOf(context),
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -631,9 +640,9 @@ extension _ChatPageMessageListMethods on _ChatPageState {
                       state.replyTarget!.content,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
-                        color: AppColors.textSecondary,
+                        color: context.textSecondary,
                       ),
                     ),
                   ],
@@ -643,6 +652,7 @@ extension _ChatPageMessageListMethods on _ChatPageState {
                 icon: const Icon(Icons.close, size: 18),
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                tooltip: l10n?.commonCancel ?? 'Cancel',
                 onPressed: () {
                   context.read<ChatBloc>().add(const SetReplyTarget(null));
                 },
@@ -692,9 +702,13 @@ extension _ChatPageMessageListMethods on _ChatPageState {
                   children: [
                     Text(
                       l10n?.commonEdit ?? 'Edit',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.warning,
+                        color: ChatContrast.onTint(
+                          AppColors.warning,
+                          [context.surfaceColor],
+                          dark: context.isDarkMode,
+                        ),
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -702,9 +716,9 @@ extension _ChatPageMessageListMethods on _ChatPageState {
                       state.editingMessage!.content,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
-                        color: AppColors.textSecondary,
+                        color: context.textSecondary,
                       ),
                     ),
                   ],
@@ -714,6 +728,7 @@ extension _ChatPageMessageListMethods on _ChatPageState {
                 icon: const Icon(Icons.close, size: 18),
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                tooltip: l10n?.commonCancel ?? 'Cancel',
                 onPressed: () {
                   context.read<ChatBloc>().add(const SetEditTarget(null));
                   _inputController.clear();
@@ -775,7 +790,7 @@ extension _ChatPageMessageListMethods on _ChatPageState {
           ),
           _buildMultiSelectAction(
             icon: Icons.undo,
-            label: '撤回',
+            label: S.of(context)?.chatRecall ?? 'Recall',
             enabled: hasOwnSelection,
             onTap: hasOwnSelection ? _recallSelectedMessages : null,
             isDestructive: true,
@@ -802,23 +817,32 @@ extension _ChatPageMessageListMethods on _ChatPageState {
     final color = !enabled
         ? context.textTertiary
         : isDestructive
-        ? AppColors.error
+        ? (context.isDarkMode ? AppColors.error : AppColors.errorFill)
         : context.textPrimary;
 
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppDimensions.spacingL,
-          vertical: AppDimensions.spacingS,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, color: color, size: 24),
-            const SizedBox(height: AppDimensions.spacingXS),
-            Text(label, style: TextStyle(color: color, fontSize: 12)),
-          ],
+    // Equal shares keep four localized labels inside a 320pt-wide bar.
+    return Expanded(
+      child: N42TapArea(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+        child: Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.spacingXS,
+            vertical: AppDimensions.spacingS,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, color: color, size: 24),
+              const SizedBox(height: AppDimensions.spacingXS),
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: color, fontSize: 12),
+              ),
+            ],
+          ),
         ),
       ),
     );

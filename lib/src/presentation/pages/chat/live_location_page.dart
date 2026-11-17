@@ -151,6 +151,7 @@ class _LiveLocationViewState extends State<_LiveLocationView> {
           ),
         ),
         leading: IconButton(
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           icon: Icon(Icons.arrow_back_rounded, color: context.textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
@@ -217,7 +218,7 @@ class _LiveLocationViewState extends State<_LiveLocationView> {
                           );
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.error,
+                          backgroundColor: AppColors.errorFill,
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(
                             vertical: AppDimensions.spacingM,
@@ -238,7 +239,7 @@ class _LiveLocationViewState extends State<_LiveLocationView> {
                       child: ElevatedButton(
                         onPressed: () => _showDurationPicker(context),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryOf(context),
+                          backgroundColor: AppColors.primaryFillOf(context),
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(
                             vertical: AppDimensions.spacingM,
@@ -279,7 +280,7 @@ class _LiveLocationViewState extends State<_LiveLocationView> {
       ),
       subtitle: Text(
         _formatRemaining(context, location),
-        style: TextStyle(color: context.textSecondary, fontSize: 12),
+        style: TextStyle(color: context.textSupporting, fontSize: 12),
       ),
       trailing: Icon(
         Icons.my_location,

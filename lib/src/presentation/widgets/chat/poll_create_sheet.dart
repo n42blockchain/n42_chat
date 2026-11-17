@@ -129,7 +129,12 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
       );
       if (quizCorrectIndex < 0) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Mark a non-empty correct answer')),
+          SnackBar(
+            content: Text(
+              S.of(context)?.ui3PollMarkCorrectAnswer ??
+                  'Mark a non-empty correct answer',
+            ),
+          ),
         );
         return;
       }
@@ -231,7 +236,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                   S.of(context)?.chatPollQuestionLabel ?? 'Poll Question',
                   style: TextStyle(
                     fontSize: 14,
-                    color: AppColors.textSecondaryOf(isDark),
+                    color: context.textSupporting,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -261,14 +266,14 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                       S.of(context)?.chatPollOptionsLabel ?? 'Poll Options',
                       style: TextStyle(
                         fontSize: 14,
-                        color: AppColors.textSecondaryOf(isDark),
+                        color: context.textSupporting,
                       ),
                     ),
                     Text(
                       '${_optionControllers.length}/10',
                       style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.textTertiaryOf(isDark),
+                        color: context.textSupporting,
                       ),
                     ),
                   ],
@@ -282,8 +287,9 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                       children: [
                         if (_isQuiz)
                           IconButton(
-                            tooltip: 'Correct answer',
-                            visualDensity: VisualDensity.compact,
+                            tooltip:
+                                S.of(context)?.a11yCorrectAnswer ??
+                                'Correct answer',
                             onPressed: () =>
                                 setState(() => _correctControllerIndex = index),
                             icon: Icon(
@@ -292,7 +298,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                                   : Icons.radio_button_unchecked,
                               color: _correctControllerIndex == index
                                   ? AppColors.success
-                                  : context.textTertiary,
+                                  : context.textSecondary,
                               size: 20,
                             ),
                           ),
@@ -340,6 +346,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                         if (_optionControllers.length > 2)
                           IconButton(
                             onPressed: () => _removeOption(index),
+                            tooltip: S.of(context)?.commonRemove ?? 'Remove',
                             icon: const Icon(Icons.remove_circle_outline),
                             color: AppColors.error,
                             iconSize: 20,
@@ -357,7 +364,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                       S.of(context)?.chatAddOptionButton ?? 'Add Option',
                     ),
                     style: TextButton.styleFrom(
-                      foregroundColor: AppColors.primaryOf(context),
+                      foregroundColor: AppColors.primaryOnTintOf(context),
                     ),
                   ),
 
@@ -419,9 +426,6 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                                 _maxSelections = value.first;
                               });
                             },
-                            style: const ButtonStyle(
-                              visualDensity: VisualDensity.compact,
-                            ),
                           ),
                         ],
                       ),
@@ -459,7 +463,7 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                       // Quiz 模式：标记正确答案，投票后揭晓
                       Row(
                         children: [
-                          const Text('Quiz mode'),
+                          Text(S.of(context)?.ui3PollQuizMode ?? 'Quiz mode'),
                           const Spacer(),
                           Switch(
                             value: _isQuiz,
@@ -480,7 +484,9 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                           maxLength: 200,
                           maxLines: 2,
                           decoration: InputDecoration(
-                            hintText: 'Answer explanation (optional)',
+                            hintText:
+                                S.of(context)?.ui3PollAnswerExplanationHint ??
+                                'Answer explanation (optional)',
                             counterText: '',
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
@@ -515,9 +521,9 @@ class _PollCreateSheetState extends State<PollCreateSheet> {
                         child: Text(
                           S.of(context)?.chatPollHint ??
                               'Poll will be displayed in chat. Group members can vote.',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
-                            color: AppColors.info,
+                            color: context.textSupporting,
                           ),
                         ),
                       ),

@@ -86,7 +86,12 @@ class _MemberPickerSheetState extends State<MemberPickerSheet> {
   Widget build(BuildContext context) {
     final bgColor = AppColors.surfaceOf(widget.isDark);
     final textColor = AppColors.textPrimaryOf(widget.isDark);
-    final subtextColor = AppColors.textSecondaryOf(widget.isDark);
+    // 72% label over the sheet: >= 4.5:1 in both modes (textSecondary is
+    // about 3.4:1 on white).
+    final subtextColor = Color.alphaBlend(
+      textColor.withValues(alpha: .72),
+      bgColor,
+    );
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.6,

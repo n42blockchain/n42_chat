@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/mini_app_agent_planner.dart';
 import '../../../core/services/mini_app_agent_service.dart';
@@ -76,6 +77,7 @@ class _MiniAppAgentSheetState extends State<MiniAppAgentSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final s = S.of(context);
     final bottom = MediaQuery.of(context).viewInsets.bottom;
     return Container(
       padding: EdgeInsets.fromLTRB(20, 16, 20, 16 + bottom),
@@ -83,63 +85,71 @@ class _MiniAppAgentSheetState extends State<MiniAppAgentSheet> {
         color: context.surfaceColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.auto_awesome, color: AppColors.primaryOf(context)),
-              const SizedBox(width: AppDimensions.spacingS),
-              Text(
-                'AI Assistant',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: context.textPrimary,
+      // Scrolls when the keyboard leaves too little room for the result card.
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.auto_awesome, color: AppColors.primaryOf(context)),
+                const SizedBox(width: AppDimensions.spacingS),
+                Text(
+                  s?.aiAssistant ?? 'AI Assistant',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: context.textPrimary,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppDimensions.spacingXS),
+            Text(
+              s?.ui3MiniAppAgentIntro ??
+                  'Describe what you want to do — I\'ll open the right mini app.',
+              style: TextStyle(fontSize: 13, color: context.textSupporting),
+            ),
+            const SizedBox(height: AppDimensions.spacing),
+            TextField(
+              controller: _controller,
+              autofocus: true,
+              textInputAction: TextInputAction.search,
+              onSubmitted: (_) => _run(),
+              decoration: InputDecoration(
+                hintText: s?.ui3MiniAppAgentExample ?? 'e.g. swap ETH to USDC',
+                border: const OutlineInputBorder(),
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.send),
+                  tooltip: s?.commonSend ?? 'Send',
+                  onPressed: _loading ? null : _run,
                 ),
               ),
-            ],
-          ),
-          const SizedBox(height: AppDimensions.spacingXS),
-          Text(
-            'Describe what you want to do — I\'ll open the right mini app.',
-            style: TextStyle(fontSize: 13, color: context.textSecondary),
-          ),
-          const SizedBox(height: AppDimensions.spacing),
-          TextField(
-            controller: _controller,
-            autofocus: true,
-            textInputAction: TextInputAction.search,
-            onSubmitted: (_) => _run(),
-            decoration: InputDecoration(
-              hintText: 'e.g. swap ETH to USDC',
-              border: const OutlineInputBorder(),
-              suffixIcon: IconButton(
-                icon: const Icon(Icons.send),
-                onPressed: _loading ? null : _run,
-              ),
             ),
-          ),
-          const SizedBox(height: AppDimensions.spacing),
-          if (_loading)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: AppDimensions.spacingM),
-              child: Center(child: CircularProgressIndicator()),
-            )
-          else if (_ran && _plan == null)
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                vertical: AppDimensions.spacingS,
-              ),
-              child: Text(
-                'No matching mini app found. Try rephrasing.',
-                style: TextStyle(color: context.textTertiary),
-              ),
-            )
-          else if (_plan != null)
-            _buildResult(_plan!),
-        ],
+            const SizedBox(height: AppDimensions.spacing),
+            if (_loading)
+              const Padding(
+                padding: EdgeInsets.symmetric(
+                  vertical: AppDimensions.spacingM,
+                ),
+                child: Center(child: CircularProgressIndicator()),
+              )
+            else if (_ran && _plan == null)
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: AppDimensions.spacingS,
+                ),
+                child: Text(
+                  s?.ui3MiniAppAgentNoMatch ??
+                      'No matching mini app found. Try rephrasing.',
+                  style: TextStyle(color: context.textSupporting),
+                ),
+              )
+            else if (_plan != null)
+              _buildResult(_plan!),
+          ],
+        ),
       ),
     );
   }
@@ -171,7 +181,7 @@ class _MiniAppAgentSheetState extends State<MiniAppAgentSheet> {
               ),
               Text(
                 '${(plan.confidence * 100).round()}%',
-                style: TextStyle(fontSize: 12, color: context.textTertiary),
+                style: TextStyle(fontSize: 12, color: context.textSupporting),
               ),
             ],
           ),
@@ -179,7 +189,7 @@ class _MiniAppAgentSheetState extends State<MiniAppAgentSheet> {
             const SizedBox(height: 6),
             Text(
               plan.reason,
-              style: TextStyle(fontSize: 13, color: context.textSecondary),
+              style: TextStyle(fontSize: 13, color: context.textSupporting),
             ),
           ],
           if (plan.params.isNotEmpty) ...[
@@ -204,7 +214,10 @@ class _MiniAppAgentSheetState extends State<MiniAppAgentSheet> {
             child: ElevatedButton.icon(
               onPressed: _open,
               icon: const Icon(Icons.open_in_new, size: 18),
-              label: Text('Open ${plan.appName}'),
+              label: Text(
+                S.of(context)?.ui3MiniAppOpen(plan.appName) ??
+                    'Open ${plan.appName}',
+              ),
             ),
           ),
         ],

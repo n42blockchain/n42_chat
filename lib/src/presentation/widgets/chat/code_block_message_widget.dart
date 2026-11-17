@@ -4,6 +4,7 @@ import 'package:flutter_highlight/flutter_highlight.dart';
 import 'package:flutter_highlight/themes/atom-one-dark.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/utils/a11y_l10n.dart';
 
 /// 代码块消息（`n42.code_block`）
@@ -114,7 +115,7 @@ class CodeBlockMessageWidget extends StatelessWidget {
         children: [
           // 头部：语言徽章 + 复制
           Container(
-            padding: const EdgeInsets.fromLTRB(12, 6, 6, 6),
+            padding: const EdgeInsets.only(left: 12),
             color: Colors.white.withValues(alpha: 0.04),
             child: Row(
               children: [
@@ -135,8 +136,13 @@ class CodeBlockMessageWidget extends StatelessWidget {
                   child: InkWell(
                     borderRadius: BorderRadius.circular(6),
                     onTap: () => _copy(context, parsed.code),
-                    child: Padding(
-                      padding: const EdgeInsets.all(4),
+                    // 44pt hit area (HIG); the header row grows to 44pt.
+                    child: Container(
+                      constraints: const BoxConstraints(
+                        minWidth: 44,
+                        minHeight: 44,
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -147,7 +153,7 @@ class CodeBlockMessageWidget extends StatelessWidget {
                           ),
                           const SizedBox(width: 3),
                           Text(
-                            'Copy',
+                            S.of(context)?.chatCopy ?? 'Copy',
                             style: TextStyle(
                               color: Colors.white.withValues(alpha: 0.6),
                               fontSize: 11,
@@ -179,7 +185,7 @@ class CodeBlockMessageWidget extends StatelessWidget {
                           Text(
                             '$i',
                             style: codeStyle.copyWith(
-                              color: Colors.white.withValues(alpha: 0.28),
+                              color: Colors.white.withValues(alpha: 0.5),
                             ),
                           ),
                       ],
@@ -218,10 +224,12 @@ class CodeBlockMessageWidget extends StatelessWidget {
     messenger.clearSnackBars();
     messenger.showSnackBar(
       SnackBar(
-        content: const Text('Code copied'),
+        content: Text(
+          S.of(context)?.commonCopiedToClipboard ?? 'Copied to clipboard',
+        ),
         duration: const Duration(seconds: 1),
         behavior: SnackBarBehavior.floating,
-        backgroundColor: AppColors.primaryOf(context),
+        backgroundColor: AppColors.primaryFillOf(context),
       ),
     );
   }
