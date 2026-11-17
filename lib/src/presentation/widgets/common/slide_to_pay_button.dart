@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../../../core/theme/app_icons.dart';
 import '../../../core/theme/app_dimensions.dart';
+import '../../../core/theme/chat_contrast.dart';
 
 /// WeChat-inspired slide-to-confirm payment button.
 ///
@@ -137,6 +138,15 @@ class _SlideToPayButtonState extends State<SlideToPayButton>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    // Track-colored labels sit on a 12% track tint; shift the shade until
+    // they reach 4.5:1 (the default amber measures about 1.9:1).
+    final labelColor = ChatContrast.onTint(
+      widget.trackColor,
+      [theme.scaffoldBackgroundColor, theme.colorScheme.surface],
+      dark: theme.brightness == Brightness.dark,
+      alpha: 0.12,
+    );
     return LayoutBuilder(
       builder: (context, constraints) {
         final trackWidth = constraints.maxWidth;
@@ -144,103 +154,111 @@ class _SlideToPayButtonState extends State<SlideToPayButton>
         final thumbLeft = _dragProgress * maxOffset + _padding;
         final fillWidth = thumbLeft + _thumbSize / 2;
 
-        return SizedBox(
-          height: widget.height,
-          child: Stack(
-            clipBehavior: Clip.hardEdge,
-            children: [
-              // ── Track background
-              Positioned.fill(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: widget.trackColor.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(widget.height / 2),
-                    border: Border.all(
-                      color: widget.trackColor.withValues(alpha: 0.35),
-                    ),
-                  ),
-                ),
-              ),
-
-              // ── Filled portion (follows thumb)
-              Positioned(
-                left: 0,
-                top: 0,
-                bottom: 0,
-                width: fillWidth.clamp(0.0, trackWidth),
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: widget.trackColor.withValues(
-                      alpha: (_dragProgress * 0.55).clamp(0.0, 0.55),
-                    ),
-                    borderRadius: BorderRadius.circular(widget.height / 2),
-                  ),
-                ),
-              ),
-
-              // ── Center label — fades out as thumb advances
-              if (!_isCompleted)
-                Center(
-                  child: IgnorePointer(
-                    child: Opacity(
-                      opacity: (1.0 - _dragProgress * 2.0).clamp(0.0, 1.0),
-                      child: Text(
-                        widget.label,
-                        style: TextStyle(
-                          color: widget.trackColor,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: 0.3,
-                        ),
+        // Screen readers cannot drag: a deliberate double-tap confirms.
+        return Semantics(
+          button: true,
+          enabled: !_isCompleted,
+          label: _isCompleted ? widget.confirmingLabel : widget.label,
+          onTap: _isCompleted ? null : _complete,
+          excludeSemantics: true,
+          child: SizedBox(
+            height: widget.height,
+            child: Stack(
+              clipBehavior: Clip.hardEdge,
+              children: [
+                // ── Track background
+                Positioned.fill(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: widget.trackColor.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(widget.height / 2),
+                      border: Border.all(
+                        color: widget.trackColor.withValues(alpha: 0.35),
                       ),
                     ),
                   ),
                 ),
 
-              // ── "Confirming..." state
-              if (_isCompleted)
-                Center(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SizedBox(
-                        width: AppDimensions.spacing,
-                        height: 16,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: widget.trackColor,
-                        ),
+                // ── Filled portion (follows thumb)
+                Positioned(
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
+                  width: fillWidth.clamp(0.0, trackWidth),
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: widget.trackColor.withValues(
+                        alpha: (_dragProgress * 0.55).clamp(0.0, 0.55),
                       ),
-                      const SizedBox(width: AppDimensions.spacingS),
-                      Text(
-                        widget.confirmingLabel,
-                        style: TextStyle(
-                          color: widget.trackColor,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
+                      borderRadius: BorderRadius.circular(widget.height / 2),
+                    ),
                   ),
                 ),
 
-              // ── Draggable thumb
-              Positioned(
-                left: thumbLeft,
-                top: _padding,
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onHorizontalDragUpdate: (d) => _onDragUpdate(d, maxOffset),
-                  onHorizontalDragEnd: _onDragEnd,
-                  child: _Thumb(
-                    size: _thumbSize,
-                    color: widget.trackColor,
-                    isCompleted: _isCompleted,
-                    progress: _dragProgress,
+                // ── Center label — fades out as thumb advances
+                if (!_isCompleted)
+                  Center(
+                    child: IgnorePointer(
+                      child: Opacity(
+                        opacity: (1.0 - _dragProgress * 2.0).clamp(0.0, 1.0),
+                        child: Text(
+                          widget.label,
+                          style: TextStyle(
+                            color: labelColor,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: 0.3,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                // ── "Confirming..." state
+                if (_isCompleted)
+                  Center(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          width: AppDimensions.spacing,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: widget.trackColor,
+                          ),
+                        ),
+                        const SizedBox(width: AppDimensions.spacingS),
+                        Text(
+                          widget.confirmingLabel,
+                          style: TextStyle(
+                            color: labelColor,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                // ── Draggable thumb
+                Positioned(
+                  left: thumbLeft,
+                  top: _padding,
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onHorizontalDragUpdate: (d) => _onDragUpdate(d, maxOffset),
+                    onHorizontalDragEnd: _onDragEnd,
+                    child: _Thumb(
+                      size: _thumbSize,
+                      color: widget.trackColor,
+                      isCompleted: _isCompleted,
+                      progress: _dragProgress,
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },

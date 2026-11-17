@@ -20,6 +20,20 @@ abstract final class ChatContrast {
     return (math.max(la, lb) + 0.05) / (math.min(la, lb) + 0.05);
   }
 
+  /// Fill shade of [color] that carries white text at >= 4.5:1: same hue,
+  /// HSL lightness lowered in 0.5% steps. System blue + white is about
+  /// 4.0:1 (light) / 3.65:1 (dark), system red about 3.55:1.
+  static Color fillForWhiteText(Color color) {
+    const white = Color(0xFFFFFFFF);
+    var hsl = HSLColor.fromColor(color);
+    var result = color;
+    while (ratio(result, white) < minText && hsl.lightness > 0) {
+      hsl = hsl.withLightness(math.max(0, hsl.lightness - 0.005));
+      result = hsl.toColor();
+    }
+    return result;
+  }
+
   /// Shade of [brand] for text on a [brand] tint of up to [alpha] over any
   /// of [surfaces]: darker for light surfaces, lighter for dark ones.
   static Color onTint(

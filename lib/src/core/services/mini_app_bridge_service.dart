@@ -5,9 +5,11 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../../domain/entities/mini_app_entity.dart';
 import '../../integration/wallet_bridge.dart';
 import '../theme/app_colors.dart';
+import '../theme/chat_contrast.dart';
 import '../utils/debug_log.dart';
 import '../utils/secure_uri.dart';
 import 'mini_app_security_service.dart';
@@ -494,24 +496,30 @@ class MiniAppBridgeService {
     BuildContext context,
     Map<String, dynamic>? params,
   ) async {
+    final s = S.of(context);
     final result = await showDialog<bool>(
       context: context,
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.warning_amber_rounded, color: AppColors.warning),
-            SizedBox(width: AppDimensions.spacingS),
-            Text('Confirm Transaction'),
+            const Icon(Icons.warning_amber_rounded, color: AppColors.warning),
+            const SizedBox(width: AppDimensions.spacingS),
+            Flexible(
+              child: Text(
+                s?.ui3MiniAppConfirmTransactionTitle ?? 'Confirm Transaction',
+              ),
+            ),
           ],
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'A Mini App is requesting to send a transaction on your behalf.',
-              style: TextStyle(fontSize: 14),
+            Text(
+              s?.ui3MiniAppConfirmTransactionBody ??
+                  'A Mini App is requesting to send a transaction on your behalf.',
+              style: const TextStyle(fontSize: 14),
             ),
             if (params != null) ...[
               const SizedBox(height: AppDimensions.spacingM),
@@ -532,12 +540,16 @@ class MiniAppBridgeService {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Reject'),
+            child: Text(s?.commonReject ?? 'Reject'),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.warning),
+            // Darkened warning orange keeps the white label at 4.5:1.
+            style: ElevatedButton.styleFrom(
+              backgroundColor: ChatContrast.fillForWhiteText(AppColors.warning),
+              foregroundColor: Colors.white,
+            ),
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Confirm'),
+            child: Text(s?.commonConfirm ?? 'Confirm'),
           ),
         ],
       ),

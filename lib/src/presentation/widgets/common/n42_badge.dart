@@ -143,7 +143,8 @@ class N42Badge extends StatelessWidget {
         maxHeight: AppDimensions.badgeHeight,
       ),
       decoration: BoxDecoration(
-        color: color ?? AppColors.badge,
+        // White count text needs the darkened red (badge red is 3.55:1).
+        color: color ?? AppColors.errorFill,
         borderRadius: BorderRadius.circular(AppDimensions.badgeHeight / 2),
       ),
       child: Center(

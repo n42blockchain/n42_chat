@@ -5,6 +5,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import 'ens_badge.dart';
 import 'n42_avatar.dart';
+import 'n42_tap_area.dart';
 import '../../../core/theme/app_dimensions.dart';
 
 /// Web3 identity card widget.
@@ -162,7 +163,7 @@ class Web3IdentityCard extends StatelessWidget {
                   ),
                 ),
                 // Copy address
-                InkWell(
+                N42TapArea(
                   onTap: () {
                     Clipboard.setData(ClipboardData(text: walletAddress));
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -188,14 +189,14 @@ class Web3IdentityCard extends StatelessWidget {
                         Icon(
                           Icons.copy_rounded,
                           size: 14,
-                          color: AppColors.primaryOf(context),
+                          color: AppColors.primaryOnTintOf(context),
                         ),
                         const SizedBox(width: AppDimensions.spacingXS),
                         Text(
                           l10n?.web3Copy ?? 'Copy',
                           style: TextStyle(
                             fontSize: 12,
-                            color: AppColors.primaryOf(context),
+                            color: AppColors.primaryOnTintOf(context),
                           ),
                         ),
                       ],
@@ -220,7 +221,7 @@ class Web3IdentityCard extends StatelessWidget {
                     style: const TextStyle(fontWeight: FontWeight.w500),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryOf(context),
+                    backgroundColor: AppColors.primaryFillOf(context),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),

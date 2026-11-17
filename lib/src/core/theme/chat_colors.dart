@@ -131,7 +131,8 @@ class ChatColors extends ThemeExtension<ChatColors> {
     receivedText: AppColors.messageTextReceived,
     messageSelectedBg: AppColors.info.withValues(alpha: 0.1),
     senderNameText: AppColors.textSecondary,
-    timeSeparatorText: const Color(0xFF999999),
+    // #999999 measured 2.6:1 on the chat background; 4.5:1+ on #EDEDED.
+    timeSeparatorText: const Color(0xFF636366),
     translatedText: AppColors.textPrimary,
     translatedAccent: const Color(0xFF43A047),
     pollTrack: Colors.grey.shade300,
@@ -167,7 +168,8 @@ class ChatColors extends ThemeExtension<ChatColors> {
     emptyStateIcon: Colors.grey.shade300,
     graphEdge: Colors.black12,
     mutedBadge: AppColors.muted,
-    captionText: AppColors.textTertiary,
+    // Captions are read as text; textTertiary measured 1.6:1.
+    captionText: AppColors.textSecondary,
     dateHeaderText: AppColors.textPrimary,
     chipLabelText: AppColors.textPrimary,
     warningText: Colors.orange.shade800,

@@ -191,7 +191,7 @@ class N42Button extends StatelessWidget {
     double radius,
     double fontSize,
   ) {
-    final bgColor = backgroundColor ?? AppColors.primaryOf(context);
+    final bgColor = backgroundColor ?? AppColors.primaryFillOf(context);
 
     return ElevatedButton(
       onPressed: isDisabled ? null : onPressed,
@@ -255,8 +255,8 @@ class N42Button extends StatelessWidget {
     return ElevatedButton(
       onPressed: isDisabled ? null : onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.error,
-        disabledBackgroundColor: AppColors.error.withValues(alpha: 0.5),
+        backgroundColor: AppColors.errorFill,
+        disabledBackgroundColor: AppColors.errorFill.withValues(alpha: 0.5),
         foregroundColor: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(radius),

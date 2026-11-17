@@ -133,69 +133,70 @@ class _NotificationBannerState extends State<_NotificationBanner>
       child: SlideTransition(
         position: _slideAnimation,
         child: GestureDetector(
-          onTap: () {
-            widget.onDismiss();
-            widget.notification.onTap?.call();
-          },
           onVerticalDragEnd: (details) {
             if (details.primaryVelocity != null &&
                 details.primaryVelocity! < -100) {
               widget.onDismiss();
             }
           },
+          // The card color lives on the Material so the InkWell ripple shows.
           child: Material(
             elevation: 8,
+            color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-            child: Container(
-              padding: const EdgeInsets.all(AppDimensions.spacingM),
-              decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
-                borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-              ),
-              child: Row(
-                children: [
-                  // 头像
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(
-                        AppDimensions.radiusM,
+            child: InkWell(
+              onTap: () {
+                widget.onDismiss();
+                widget.notification.onTap?.call();
+              },
+              borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+              child: Padding(
+                padding: const EdgeInsets.all(AppDimensions.spacingM),
+                child: Row(
+                  children: [
+                    // 头像
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusM,
+                        ),
+                      ),
+                      child: Icon(Icons.person, color: context.textTertiary),
+                    ),
+                    const SizedBox(width: AppDimensions.spacingM),
+                    // 内容
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            widget.notification.title,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            widget.notification.body,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: context.textSupporting,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
                       ),
                     ),
-                    child: Icon(Icons.person, color: context.textTertiary),
-                  ),
-                  const SizedBox(width: AppDimensions.spacingM),
-                  // 内容
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          widget.notification.title,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          widget.notification.body,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: context.textTertiary,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

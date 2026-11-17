@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'app_colors.dart';
 import 'app_dimensions.dart';
 import 'app_text_styles.dart';
+import 'chat_contrast.dart';
 
 /// N42 Chat 主题配置
 ///
@@ -350,7 +351,8 @@ class N42ChatTheme {
       // 主按钮（实心绿）
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: primaryColor,
+          // White labels need the darkened fill to reach 4.5:1.
+          backgroundColor: ChatContrast.fillForWhiteText(primaryColor),
           foregroundColor: Colors.white,
           disabledBackgroundColor: isDark
               ? AppColors.textDisabledDark
@@ -362,6 +364,16 @@ class N42ChatTheme {
           ),
           minimumSize: const Size(44, 44),
           elevation: 0,
+        ),
+      ),
+
+      // Filled buttons default to colorScheme.primary + white (about
+      // 4.0:1 light / 3.65:1 dark for system blue); use the 4.5:1 fill.
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          backgroundColor: ChatContrast.fillForWhiteText(primaryColor),
+          foregroundColor: Colors.white,
+          minimumSize: const Size(44, 44),
         ),
       ),
 
@@ -381,7 +393,14 @@ class N42ChatTheme {
       // 文字按钮——杜绝 Material 3 默认紫色
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: primaryColor,
+          // Brand labels on page/card backgrounds: system blue alone is
+          // about 4.0:1 on white and 3.6:1 on #F2F2F7.
+          foregroundColor: ChatContrast.onTint(
+            primaryColor,
+            [backgroundColor, surfaceColor],
+            dark: isDark,
+            alpha: 0,
+          ),
           textStyle: AppTextStyles.buttonText,
           minimumSize: const Size(44, 44),
         ),

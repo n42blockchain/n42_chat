@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../../domain/entities/mini_app_entity.dart';
 import '../pages/mini_app/mini_app_page.dart';
 
@@ -42,21 +43,25 @@ class MiniAppLauncherHelper {
     if (initialUrl != null) {
       final registered = findBuiltInAppById(app.id);
       if (registered == null || registered.url != app.url) return null;
+      final s = S.of(context);
       final approved = await showDialog<bool>(
         context: context,
         builder: (dialogContext) => AlertDialog(
-          title: Text('Open ${registered.name}?'),
+          title: Text(
+            s?.ui3MiniAppOpenTitle(registered.name) ??
+                'Open ${registered.name}?',
+          ),
           content: Text(
             '${registered.developer ?? registered.name}\n${Uri.parse(registered.url).host}',
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext, false),
-              child: const Text('Cancel'),
+              child: Text(s?.commonCancel ?? 'Cancel'),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(dialogContext, true),
-              child: const Text('Open'),
+              child: Text(s?.ui3MiniAppOpenButton ?? 'Open'),
             ),
           ],
         ),

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../l10n/app_localizations.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_dimensions.dart';
+import '../theme/chat_contrast.dart';
 
 /// BuildContext 扩展方法
 extension ContextExtension on BuildContext {
@@ -167,7 +168,11 @@ extension ContextExtension on BuildContext {
     String message, {
     Duration duration = const Duration(seconds: 3),
   }) {
-    showSnackBar(message, duration: duration, backgroundColor: AppColors.error);
+    showSnackBar(
+      message,
+      duration: duration,
+      backgroundColor: AppColors.errorFill,
+    );
   }
 
   /// 显示成功SnackBar
@@ -178,7 +183,8 @@ extension ContextExtension on BuildContext {
     showSnackBar(
       message,
       duration: duration,
-      backgroundColor: AppColors.success,
+      // Darkened green keeps the snackbar label at 4.5:1.
+      backgroundColor: ChatContrast.fillForWhiteText(AppColors.success),
     );
   }
 
@@ -208,7 +214,7 @@ extension ContextExtension on BuildContext {
             onPressed: () => Navigator.of(context).pop(false),
             child: Text(
               cancel,
-              style: const TextStyle(color: AppColors.textTertiary),
+              style: TextStyle(color: context.textSupporting),
             ),
           ),
           TextButton(
@@ -217,8 +223,13 @@ extension ContextExtension on BuildContext {
               confirm,
               style: TextStyle(
                 color: isDanger
-                    ? AppColors.error
-                    : AppColors.primaryOf(context),
+                    ? ChatContrast.onTint(
+                        AppColors.error,
+                        [context.surfaceColor],
+                        dark: context.isDarkMode,
+                        alpha: 0,
+                      )
+                    : AppColors.primaryOnTintOf(context),
               ),
             ),
           ),

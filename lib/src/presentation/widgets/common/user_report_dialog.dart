@@ -342,7 +342,10 @@ class _ContentReportDialogState extends State<_ContentReportDialog> {
             ),
             if (_error != null) ...[
               const SizedBox(height: 8),
-              Text(_error!, style: const TextStyle(color: AppColors.error)),
+              Text(
+                _error!,
+                style: TextStyle(color: AppColors.errorTextOf(context)),
+              ),
             ],
           ],
         ),

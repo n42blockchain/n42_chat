@@ -9,5 +9,6 @@ export 'n42_button.dart';
 export 'n42_empty_state.dart';
 export 'n42_list_tile.dart';
 export 'n42_search_bar.dart';
+export 'n42_tap_area.dart';
 export 'shareable_link_actions.dart';
 export 'web3_identity_card.dart';

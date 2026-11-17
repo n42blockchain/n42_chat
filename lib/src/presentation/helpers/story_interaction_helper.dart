@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../../core/di/injection.dart';
 import '../../core/utils/debug_log.dart';
 import '../../domain/entities/story_entity.dart';
@@ -37,7 +38,12 @@ class StoryInteractionHelper {
       debugLog('StoryInteractionHelper: Failed to create story reply DM: $e');
       if (!context.mounted) return false;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to send story reply')),
+        SnackBar(
+          content: Text(
+            S.of(context)?.ui3StoryReplySendFailed ??
+                'Failed to send story reply',
+          ),
+        ),
       );
       return false;
     }

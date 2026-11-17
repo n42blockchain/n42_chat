@@ -71,7 +71,7 @@ Future<void> showResolvedShareableLinkActions(
           ),
           ListTile(
             leading: const Icon(Icons.copy_outlined),
-            title: const Text('Copy Link'),
+            title: Text(S.of(context)?.ui3CopyLink ?? 'Copy Link'),
             onTap: () async {
               Navigator.pop(sheetContext);
               await Clipboard.setData(ClipboardData(text: link));
@@ -374,7 +374,7 @@ class _ShareableLinkQrPageState extends State<_ShareableLinkQrPage> {
                   child: OutlinedButton.icon(
                     onPressed: _copyLink,
                     icon: const Icon(Icons.copy_outlined),
-                    label: const Text('Copy Link'),
+                    label: Text(S.of(context)?.ui3CopyLink ?? 'Copy Link'),
                   ),
                 ),
               ],

@@ -418,13 +418,15 @@ class _NotInitializedPageState extends State<_NotInitializedPage> {
               ),
               const SizedBox(height: AppDimensions.spacingM),
               Text(
-                'Chat initialization failed',
+                S.of(context)?.ui3ChatInitFailed ??
+                    'Chat initialization failed',
                 style: TextStyle(fontSize: 16, color: subtitleColor),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppDimensions.spacingS),
               Text(
-                'Please check your network and try again',
+                S.of(context)?.ui3CheckNetworkRetry ??
+                    'Please check your network and try again',
                 style: TextStyle(fontSize: 14, color: subtitleColor),
                 textAlign: TextAlign.center,
               ),
@@ -435,7 +437,7 @@ class _NotInitializedPageState extends State<_NotInitializedPage> {
                 child: ElevatedButton(
                   onPressed: _isRetrying ? null : _retry,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF5B6CFF),
+                    backgroundColor: AppColors.primaryFillOf(context),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(
@@ -455,9 +457,9 @@ class _NotInitializedPageState extends State<_NotInitializedPage> {
                             ),
                           ),
                         )
-                      : const Text(
-                          'Retry',
-                          style: TextStyle(
+                      : Text(
+                          S.of(context)?.commonRetry ?? 'Retry',
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
                           ),

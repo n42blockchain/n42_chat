@@ -14,9 +14,9 @@ final TextStyle _convNameLight =
 final TextStyle _convNameDark =
     AppTextStyles.conversationName.copyWith(color: AppColors.textPrimaryDark);
 final TextStyle _convTimeLight = AppTextStyles.conversationTime
-    .copyWith(color: AppColors.textTertiary);
+    .copyWith(color: AppColors.textSecondary);
 final TextStyle _convTimeDark = AppTextStyles.conversationTime
-    .copyWith(color: AppColors.textTertiaryDark);
+    .copyWith(color: AppColors.textSecondaryDark);
 final TextStyle _convLastMsgLight = AppTextStyles.conversationLastMessage
     .copyWith(color: AppColors.textSecondary);
 final TextStyle _convLastMsgDark = AppTextStyles.conversationLastMessage

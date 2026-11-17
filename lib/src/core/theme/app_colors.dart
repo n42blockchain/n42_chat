@@ -31,6 +31,20 @@ abstract class AppColors {
     ], dark: theme.brightness == Brightness.dark);
   }
 
+  /// Fill for brand-colored surfaces that carry white text (filled buttons,
+  /// solid badges): the host accent darkened until white reaches 4.5:1.
+  static Color primaryFillOf(BuildContext context) =>
+      ChatContrast.fillForWhiteText(primaryOf(context));
+
+  /// Destructive label on page/card backgrounds: [errorFill] (4.5:1 on
+  /// white) in light mode, [error] in dark mode.
+  static Color errorTextOf(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark ? error : errorFill;
+
+  /// Fill for solid destructive buttons carrying white text (4.5:1);
+  /// [error] itself measures about 3.55:1 with white.
+  static final Color errorFill = ChatContrast.fillForWhiteText(error);
+
   // Material 3 defaults used by ThemeData() when an app sets no color scheme.
   static final Color _materialDefaultLight = ThemeData(
     brightness: Brightness.light,
@@ -116,7 +130,11 @@ abstract class AppColors {
   static const Color textPrimaryDark = Color(0xFFFFFFFF);
 
   /// 次要文字 - 浅色模式
-  static const Color textSecondary = Color(0xFF8A8A8E);
+  ///
+  /// #6C6C70 instead of secondaryLabel's #8A8A8E, which measures 3.4:1 on
+  /// white and 3.1:1 on #F2F2F7; this reaches 5.2:1 / 4.7:1 (HIG
+  /// accessibility: 4.5:1 for text up to 17pt).
+  static const Color textSecondary = Color(0xFF6C6C70);
 
   /// 次要文字 - 深色模式
   static const Color textSecondaryDark = Color(0xFF98989D);
@@ -272,12 +290,14 @@ abstract class AppColors {
   /// 离线状态
   static const Color offline = Color(0xFFCCCCCC);
 
-  /// 选中状态 (品牌强调)
-  static const Color selected = Color(0x1A5B6CFF);
+  /// Selected-state tint (10% of [primary]). Prefer
+  /// `primaryOf(context).withValues(alpha: 0.1)` where a context exists so
+  /// the tint follows the host accent.
+  static const Color selected = Color(0x1A007AFF);
 
-  /// 品牌 ripple/highlight（带主色调的 InkWell 反馈）
-  static const Color brandRipple10 = Color(0x1A5B6CFF);
-  static const Color brandRipple05 = Color(0x0D5B6CFF);
+  /// Brand ripple / highlight tints (10% / 5% of [primary]).
+  static const Color brandRipple10 = Color(0x1A007AFF);
+  static const Color brandRipple05 = Color(0x0D007AFF);
 
   /// 按压状态 - 浅色
   static const Color pressed = Color(0x0D000000);
