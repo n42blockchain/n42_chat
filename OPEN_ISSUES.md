@@ -11,6 +11,16 @@ This file tracks unresolved issues intentionally left open during recent agent w
 
 ## Active Issues
 
+### UI-AUDIT-003 Full-page HIG audit follow-ups (2026-11-17)
+
+- Severity: M
+- Added: 2026-11-17
+- Current state: a full-page UI audit (every tappable inventoried at 375/320pt; contrast in light/dark; labels; pressed states; destructive confirmations; 130% text; l10n) logged 869 findings (P0 119, P1 647, P2 103). Fixed on branch `fix/ui-full-20261117`: 113 P0 and the bulk of P1/P2 through shared tokens (`ChatContrast.fillForWhiteText`, `AppColors.primaryFillOf`/`errorFill`/`errorTextOf`, darker `textSecondary`/caption/time-separator, theme Elevated/Filled/TextButton fills) and the new `N42TapArea` (44pt minimum, tooltip/semantic label, ink). 587 UI strings were localized in all 26 locales. Widget screenshots (light/dark, 100%/130%) were compared; physical devices, VoiceOver/TalkBack and platform ripple behavior were not verified.
+- Open owner decisions: chat app bar fits only one or two title characters at 320pt with five trailing actions; scheduled-message cancel has no confirmation (existing tests require immediate cancel); transfer/payment-request/red-packet card and red-packet dialog colors stay below 4.5:1 (brand palette change); voice bubble play row and "To text" link remain below 44pt; game boards (minesweeper, match-3) fall below 44pt per cell by design density; points, governance and bridge modules (~210 strings) remain hard-coded English; story auto-advance has no visible pause; brand TextButton text on white stays near 4.0:1 unless the brand tint darkens; recovery-key reminder pill 3.27:1; NFT avatar badge and social login brand fills below 3:1; Android 48dp is not enforced for custom tap areas (44pt is the floor).
+- Golden baselines: the theme token changes alter `chat_core_*` goldens. Only the Windows baselines were regenerated locally; `chat_core_{light,dark}_{linux,macos}.png` must be regenerated on those runners (the `Chat golden regression` workflow will fail until then).
+- Deferred/dead code reported but untouched: `ChatFolderTabBar`, `ChatCallDialog`, `N42BottomNavBar.defaultItems`.
+- Next step: owner decisions above, then a physical-device pass (iOS and Android, both themes, largest accessibility text size, VoiceOver/TalkBack) on the screens listed in the audit TSV.
+
 ### MATRIX-UPGRADE-001 Tuwunel 1.9.4 acceptance remains open
 
 - Severity: H
