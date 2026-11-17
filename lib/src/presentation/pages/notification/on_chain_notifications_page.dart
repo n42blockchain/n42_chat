@@ -222,7 +222,8 @@ class _OnChainNotificationItem extends StatelessWidget {
 
     return InkWell(
       onTap: onTap,
-      child: Container(
+      // Ink (not Container) so the unread tint does not hide the ripple.
+      child: Ink(
         color: unread
             ? ChatColors.of(context)
                   .brandTintFaint(AppColors.primaryOf(context))
@@ -259,7 +260,7 @@ class _OnChainNotificationItem extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        _formatTime(notification.timestamp),
+                        _formatTime(context, notification.timestamp),
                         style: TextStyle(
                           fontSize: 11,
                           color: context.textSecondary,
@@ -365,14 +366,22 @@ class _OnChainNotificationItem extends StatelessWidget {
     );
   }
 
-  String _formatTime(DateTime time) {
+  String _formatTime(BuildContext context, DateTime time) {
+    final l10n = S.of(context);
     final now = DateTime.now();
     final diff = now.difference(time);
 
-    if (diff.inMinutes < 1) return 'Just now';
-    if (diff.inHours < 1) return '${diff.inMinutes}m ago';
-    if (diff.inDays < 1) return '${diff.inHours}h ago';
-    if (diff.inDays < 7) return '${diff.inDays}d ago';
+    if (diff.inMinutes < 1) return l10n?.chatJustNow ?? 'Just now';
+    if (diff.inHours < 1) {
+      return l10n?.momentMinutesAgo(diff.inMinutes) ??
+          '${diff.inMinutes}m ago';
+    }
+    if (diff.inDays < 1) {
+      return l10n?.momentHoursAgo(diff.inHours) ?? '${diff.inHours}h ago';
+    }
+    if (diff.inDays < 7) {
+      return l10n?.momentDaysAgo(diff.inDays) ?? '${diff.inDays}d ago';
+    }
     return '${time.month}/${time.day}';
   }
 }

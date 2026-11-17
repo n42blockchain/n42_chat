@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../domain/entities/sticker_pack_entity.dart';
 import '../../../domain/entities/sticker_pack_subscription.dart';
 import '../../../domain/repositories/auth_repository.dart';
@@ -337,7 +338,13 @@ class _StickerImportPageState extends State<StickerImportPage> {
                         failure,
                         key: const ValueKey('sticker_import_error'),
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.error,
+                          // Red shaded to 4.5:1 on the page background.
+                          color: ChatContrast.onTint(
+                            Theme.of(context).colorScheme.error,
+                            [context.pageBackground],
+                            dark: context.isDarkMode,
+                            alpha: 0,
+                          ),
                         ),
                       ),
                     ],

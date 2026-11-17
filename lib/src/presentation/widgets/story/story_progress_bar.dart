@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/extensions/context_extension.dart';
-
 /// Story 进度条组件
 ///
 /// 显示在 Story 查看器顶部，用于指示当前 Story 的播放进度：
@@ -125,12 +123,8 @@ class _ProgressSegment extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = context.isDarkMode;
-
-    final bgColor = inactiveColor ??
-        (isDarkMode
-            ? Colors.white.withValues(alpha: 0.3)
-            : Colors.black.withValues(alpha: 0.2));
+    // The bar always sits on story media: use a fixed overlay color.
+    final bgColor = inactiveColor ?? Colors.white.withValues(alpha: 0.3);
 
     final fgColor = activeColor ?? Colors.white;
 

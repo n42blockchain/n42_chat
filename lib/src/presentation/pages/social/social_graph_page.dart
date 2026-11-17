@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../l10n/app_localizations.dart';
+
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
@@ -58,12 +60,13 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
     return Scaffold(
       backgroundColor: context.pageBackground,
       appBar: AppBar(
-        title: const Text('Social Graph'),
+        title: Text(S.of(context)?.ui3SocialGraph ?? 'Social Graph'),
         backgroundColor: context.navBarColor,
         foregroundColor: context.textPrimary,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(AppIcons.back, size: 20),
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -87,6 +90,7 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
       return _buildErrorState(
         state.recommendationsErrorMessage ??
             state.profileErrorMessage ??
+            S.of(context)?.qrcodeUnknownError ??
             'Unknown error',
       );
     }
@@ -103,7 +107,10 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
 
         // Section header
         SliverToBoxAdapter(
-          child: _buildSectionHeader('Recommended Connections'),
+          child: _buildSectionHeader(
+            S.of(context)?.ui3RecommendedConnections ??
+                'Recommended Connections',
+          ),
         ),
 
         // Content
@@ -118,7 +125,9 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
         else if (state.hasRecommendationsError && state.recommendations.isEmpty)
           SliverFillRemaining(
             child: _buildErrorState(
-              state.recommendationsErrorMessage ?? 'Unknown error',
+              state.recommendationsErrorMessage ??
+                  S.of(context)?.qrcodeUnknownError ??
+                  'Unknown error',
             ),
           )
         else if (state.recommendations.isEmpty)
@@ -211,13 +220,19 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
                 Row(
                   children: [
                     _buildStat(
-                      'Portfolio',
+                      S.of(context)?.ui3Portfolio ?? 'Portfolio',
                       '\$${_formatValue(profile.portfolioValueUsd)}',
                     ),
                     _buildStatDivider(),
-                    _buildStat('Chains', '${profile.chains.length}'),
+                    _buildStat(
+                      S.of(context)?.ui3Chains ?? 'Chains',
+                      '${profile.chains.length}',
+                    ),
                     _buildStatDivider(),
-                    _buildStat('Tokens', '${profile.tokenCount}'),
+                    _buildStat(
+                      S.of(context)?.ui3Tokens ?? 'Tokens',
+                      '${profile.tokenCount}',
+                    ),
                     _buildStatDivider(),
                     _buildStat('NFTs', '${profile.nftCount}'),
                   ],
@@ -250,7 +265,7 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
                             fontSize: 11,
                             height: 1.3,
                             fontWeight: FontWeight.w500,
-                            color: AppColors.primaryOf(context),
+                            color: AppColors.primaryOnTintOf(context),
                           ),
                         ),
                       );
@@ -323,7 +338,7 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
             style: TextStyle(
               fontSize: 11,
               height: 1.3,
-              color: context.textSecondary,
+              color: context.textSupporting,
             ),
           ),
         ],
@@ -382,10 +397,10 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.people_outline, size: 56, color: context.textTertiary),
+          Icon(Icons.people_outline, size: 56, color: context.textSecondary),
           const SizedBox(height: AppDimensions.spacingM),
           Text(
-            'No connections found',
+            S.of(context)?.ui3NoConnectionsFound ?? 'No connections found',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
@@ -396,14 +411,15 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
           ),
           const SizedBox(height: AppDimensions.spacingXS),
           Text(
-            'Connections appear as you build on-chain activity',
+            S.of(context)?.ui3ConnectionsHint ??
+                'Connections appear as you build on-chain activity',
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 13,
               height: 1.4,
-              color: context.textTertiary,
+              color: context.textSupporting,
             ),
           ),
         ],
@@ -421,7 +437,8 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
             const Icon(Icons.error_outline, size: 48, color: AppColors.error),
             const SizedBox(height: AppDimensions.spacingM),
             Text(
-              'Failed to load social graph',
+              S.of(context)?.ui3SocialGraphLoadFailed ??
+                  'Failed to load social graph',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
@@ -447,9 +464,9 @@ class _SocialGraphPageState extends State<SocialGraphPage> {
             TextButton.icon(
               onPressed: _loadData,
               icon: const Icon(Icons.refresh, size: 18),
-              label: const Text('Retry'),
+              label: Text(S.of(context)?.commonRetry ?? 'Retry'),
               style: TextButton.styleFrom(
-                foregroundColor: AppColors.primaryOf(context),
+                foregroundColor: AppColors.primaryOnTintOf(context),
               ),
             ),
           ],

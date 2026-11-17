@@ -518,11 +518,11 @@ class _MyQRCodePageState extends State<MyQRCodePage> {
       case _QRCodeStyle.n42:
         return 'N42';
       case _QRCodeStyle.classic:
-        return 'Classic';
+        return S.of(context)?.ui3QrStyleClassic ?? 'Classic';
       case _QRCodeStyle.ocean:
-        return 'Ocean';
+        return S.of(context)?.ui3QrStyleOcean ?? 'Ocean';
       case _QRCodeStyle.berry:
-        return 'Berry';
+        return S.of(context)?.ui3QrStyleBerry ?? 'Berry';
     }
   }
 

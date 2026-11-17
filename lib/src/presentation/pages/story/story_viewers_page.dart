@@ -122,7 +122,7 @@ class _ViewerListTile extends StatelessWidget {
                     ),
                     const SizedBox(height: AppDimensions.spacingXS),
                     Text(
-                      _formatTimeAgo(viewer.viewedAt),
+                      _formatTimeAgo(context, viewer.viewedAt),
                       style: TextStyle(
                         fontSize: 13,
                         color: context.textSecondary,
@@ -142,18 +142,19 @@ class _ViewerListTile extends StatelessWidget {
   }
 
   /// Format time as "X ago" format (e.g., "2h ago")
-  String _formatTimeAgo(DateTime dateTime) {
+  String _formatTimeAgo(BuildContext context, DateTime dateTime) {
+    final l10n = S.of(context);
     final now = DateTime.now();
     final diff = now.difference(dateTime);
 
     if (diff.inMinutes < 1) {
-      return 'Just now';
+      return l10n?.chatJustNow ?? 'Just now';
     } else if (diff.inMinutes < 60) {
-      return '${diff.inMinutes}m ago';
+      return l10n?.momentMinutesAgo(diff.inMinutes) ?? '${diff.inMinutes}m ago';
     } else if (diff.inHours < 24) {
-      return '${diff.inHours}h ago';
+      return l10n?.momentHoursAgo(diff.inHours) ?? '${diff.inHours}h ago';
     } else {
-      return '${diff.inDays}d ago';
+      return l10n?.momentDaysAgo(diff.inDays) ?? '${diff.inDays}d ago';
     }
   }
 }

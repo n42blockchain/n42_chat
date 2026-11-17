@@ -14,6 +14,7 @@ import '../../blocs/story/story_bloc.dart';
 import '../../blocs/story/story_event.dart';
 import '../../blocs/story/story_state.dart';
 import '../media/social_image_preparation.dart';
+import '../../widgets/common/n42_tap_area.dart';
 import '../../widgets/story/story_music_picker.dart';
 
 /// Story creation mode
@@ -104,7 +105,13 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
         if (!mounted) return;
         if (state.hasError) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.error ?? 'Failed to post story')),
+            SnackBar(
+              content: Text(
+                state.error ??
+                    S.of(context)?.ui3StoryPostFailed ??
+                    'Failed to post story',
+              ),
+            ),
           );
           return;
         }
@@ -124,6 +131,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
                   ? _currentTextColor
                   : context.textPrimary,
             ),
+            tooltip: s?.commonClose ?? 'Close',
             onPressed: () => Navigator.of(context).pop(),
           ),
           title: _buildModeSelector(isDark),
@@ -153,7 +161,7 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
                       color: _canPost
                           ? (_mode == StoryMode.text
                                 ? _currentTextColor
-                                : Theme.of(context).primaryColor)
+                                : AppColors.primaryOnTintOf(context))
                           : context.textTertiary,
                       fontWeight: FontWeight.bold,
                     ),
@@ -202,8 +210,10 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
     required Color textColor,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
+    // 44pt hit area around the unchanged label + underline.
+    return N42TapArea(
       onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -298,8 +308,12 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
     final color = _colorOptions[index];
     final isSelected = _selectedColorIndex == index;
 
-    return GestureDetector(
+    return N42TapArea(
       onTap: () => setState(() => _selectedColorIndex = index),
+      semanticLabel:
+          S.of(context)?.a11yStoryBackgroundColor(index + 1) ??
+          'Background color ${index + 1}',
+      customBorder: const CircleBorder(),
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 8),
         width: 36,
@@ -393,56 +407,61 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
   Widget _buildImagePicker() {
     final s = S.of(context);
 
-    return GestureDetector(
-      onTap: _pickImage,
-      child: Container(
-        margin: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: context.surfaceColor,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: context.dividerColor, width: 2),
-        ),
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: AppColors.primaryOf(context).withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
+    final pickerShape = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(16),
+      side: BorderSide(color: context.dividerColor, width: 2),
+    );
+    // Fill on the Material so the pressed ripple is visible.
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Material(
+        color: context.surfaceColor,
+        shape: pickerShape,
+        child: InkWell(
+          onTap: _pickImage,
+          customBorder: pickerShape,
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryOf(context).withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.add_photo_alternate_outlined,
+                    size: 40,
+                    color: AppColors.primaryOf(context),
+                  ),
                 ),
-                child: Icon(
-                  Icons.add_photo_alternate_outlined,
-                  size: 40,
-                  color: AppColors.primaryOf(context),
+                const SizedBox(height: 16),
+                Text(
+                  s?.contactPhotos ?? 'Add Photo',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 18,
+                    height: 1.3,
+                    fontWeight: FontWeight.w500,
+                    color: context.textPrimary,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                s?.contactPhotos ?? 'Add Photo',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 18,
-                  height: 1.3,
-                  fontWeight: FontWeight.w500,
-                  color: context.textPrimary,
+                const SizedBox(height: 8),
+                Text(
+                  s?.ui3StoryTapToSelectImage ?? 'Tap to select an image',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 14,
+                    height: 1.3,
+                    color: context.textSecondary,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Tap to select an image',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 14,
-                  height: 1.3,
-                  color: context.textSecondary,
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -476,13 +495,15 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
         Positioned(
           top: 24,
           right: 24,
-          child: GestureDetector(
+          child: N42TapArea(
             onTap: () {
               setState(() {
                 _imageBytes = null;
                 _imageName = null;
               });
             },
+            tooltip: S.of(context)?.a11yRemoveImage ?? 'Remove image',
+            customBorder: const CircleBorder(),
             child: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
@@ -500,8 +521,9 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
           left: 0,
           right: 0,
           child: Center(
-            child: GestureDetector(
+            child: N42TapArea(
               onTap: _pickImage,
+              borderRadius: BorderRadius.circular(20),
               child: Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 20,
@@ -511,14 +533,14 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
                   color: Colors.black.withValues(alpha: 0.6),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.swap_horiz, color: Colors.white, size: 20),
-                    SizedBox(width: 8),
+                    const Icon(Icons.swap_horiz, color: Colors.white, size: 20),
+                    const SizedBox(width: 8),
                     Text(
-                      'Change',
-                      style: TextStyle(
+                      S.of(context)?.ui3StoryChangeImage ?? 'Change',
+                      style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w500,
                       ),
@@ -557,7 +579,14 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Failed to pick image: $e')));
+        ).showSnackBar(
+          SnackBar(
+            content: Text(
+              S.of(context)?.commonSelectImageFailed(e) ??
+                  'Failed to pick image: $e',
+            ),
+          ),
+        );
       }
     }
   }
@@ -600,7 +629,12 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
       } catch (error) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Unable to read selected music: $error')),
+          SnackBar(
+            content: Text(
+              S.of(context)?.ui3StoryMusicReadFailed('$error') ??
+                  'Unable to read selected music: $error',
+            ),
+          ),
         );
         return;
       }
@@ -649,12 +683,21 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
     final hasMusic =
         _musicSelection != null && _musicSelection!.isEmpty != true;
 
+    final pillColor = _mode == StoryMode.text
+        ? _currentTextColor
+        : AppColors.primaryOnTintOf(context);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: GestureDetector(
+      child: N42TapArea(
         onTap: _showMusicPicker,
+        borderRadius: BorderRadius.circular(20),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          // The 44pt remove target sets the pill height when music is set.
+          padding: EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: hasMusic ? 0 : 8,
+          ),
           decoration: BoxDecoration(
             color: _mode == StoryMode.text
                 ? Colors.white.withValues(alpha: 0.15)
@@ -664,35 +707,31 @@ class _CreateStoryPageState extends State<CreateStoryPage> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                Icons.music_note,
-                size: 16,
-                color: _mode == StoryMode.text
-                    ? _currentTextColor
-                    : AppColors.primaryOf(context),
-              ),
+              Icon(Icons.music_note, size: 16, color: pillColor),
               const SizedBox(width: 6),
               Flexible(
                 child: Text(
-                  hasMusic ? _musicSelection!.fileName : 'Add Music',
+                  hasMusic
+                      ? _musicSelection!.fileName
+                      : (S.of(context)?.storyAddMusic ?? 'Add Music'),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 13,
                     height: 1.3,
-                    color: _mode == StoryMode.text
-                        ? _currentTextColor
-                        : AppColors.primaryOf(context),
+                    color: pillColor,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
               if (hasMusic) ...[
                 const SizedBox(width: 6),
-                GestureDetector(
+                N42TapArea(
                   onTap: () {
                     setState(() => _musicSelection = null);
                   },
+                  tooltip: S.of(context)?.commonRemove ?? 'Remove',
+                  customBorder: const CircleBorder(),
                   child: Icon(
                     Icons.close,
                     size: 14,

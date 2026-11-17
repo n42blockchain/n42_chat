@@ -46,11 +46,12 @@ class _SocialHubView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bgColor = context.pageBackground;
+    final l10n = S.of(context);
 
     return Scaffold(
       backgroundColor: bgColor,
       appBar: N42AppBar(
-        title: 'Stories & Fun',
+        title: l10n?.ui3StoriesAndFun ?? 'Stories & Fun',
         backgroundColor: context.surfaceColor,
       ),
       body: BlocBuilder<StoryBloc, StoryState>(
@@ -85,50 +86,64 @@ class _SocialHubView extends StatelessWidget {
                 child: _ActionGrid(
                   actions: [
                     _QuickAction(
-                      title: 'Create Story',
-                      subtitle: 'Post a text or photo status.',
+                      title: l10n?.ui3CreateStory ?? 'Create Story',
+                      subtitle:
+                          l10n?.ui3CreateStoryDesc ??
+                          'Post a text or photo status.',
                       icon: Icons.add_circle_outline,
                       color: const Color(0xFF3A76F0),
                       onTap: () => _openCreateStory(context),
                     ),
                     _QuickAction(
-                      title: 'Story Camera',
-                      subtitle: 'Jump straight into filters and photo editing.',
+                      title: l10n?.ui3StoryCamera ?? 'Story Camera',
+                      subtitle:
+                          l10n?.ui3StoryCameraDesc ??
+                          'Jump straight into filters and photo editing.',
                       icon: Icons.auto_awesome,
                       color: const Color(0xFF10B981),
                       onTap: () => _openStoryCamera(context),
                     ),
                     _QuickAction(
                       title: S.of(context)?.commonMoments ?? 'Moments',
-                      subtitle: 'Open the full feed and comments.',
+                      subtitle:
+                          l10n?.ui3MomentsDesc ??
+                          'Open the full feed and comments.',
                       icon: Icons.photo_library_outlined,
                       color: const Color(0xFF5865F2),
                       onTap: () => _openMoments(context),
                     ),
                     _QuickAction(
-                      title: 'Moment Camera',
-                      subtitle: 'Create a post and pick media immediately.',
+                      title: l10n?.ui3MomentCamera ?? 'Moment Camera',
+                      subtitle:
+                          l10n?.ui3MomentCameraDesc ??
+                          'Create a post and pick media immediately.',
                       icon: Icons.camera_alt_outlined,
                       color: const Color(0xFFFF9900),
                       onTap: () => _openCreateMoment(context),
                     ),
                     _QuickAction(
                       title: S.of(context)?.discoverGames ?? 'Games',
-                      subtitle: 'Launch the built-in casual game center.',
+                      subtitle:
+                          l10n?.ui3GamesDesc ??
+                          'Launch the built-in casual game center.',
                       icon: Icons.sports_esports_outlined,
                       color: const Color(0xFFE64340),
                       onTap: () => _openGames(context),
                     ),
                     _QuickAction(
-                      title: 'Avatar Studio',
-                      subtitle: 'Decorations, NFT avatar and identity flair.',
+                      title: l10n?.ui3AvatarStudio ?? 'Avatar Studio',
+                      subtitle:
+                          l10n?.ui3AvatarStudioDesc ??
+                          'Decorations, NFT avatar and identity flair.',
                       icon: Icons.face_retouching_natural,
                       color: const Color(0xFF8B5CF6),
                       onTap: () => _openAvatarStudio(context),
                     ),
                     _QuickAction(
-                      title: 'Social Graph',
-                      subtitle: 'On-chain follows, fans and connections.',
+                      title: l10n?.ui3SocialGraph ?? 'Social Graph',
+                      subtitle:
+                          l10n?.ui3SocialGraphDesc ??
+                          'On-chain follows, fans and connections.',
                       icon: Icons.hub_outlined,
                       color: const Color(0xFF0EA5E9),
                       onTap: () => _openSocialGraph(context),
@@ -154,7 +169,8 @@ class _SocialHubView extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Stories, moments, games and avatars',
+            S.of(context)?.ui3SocialHubHeroTitle ??
+                'Stories, moments, games and avatars',
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
@@ -166,7 +182,9 @@ class _SocialHubView extends StatelessWidget {
           ),
           const SizedBox(height: AppDimensions.spacingS),
           Text(
-            'Reuse the existing social stack instead of scattering entry points across chat, profile and discover.',
+            S.of(context)?.ui3SocialHubHeroBody ??
+                'Reuse the existing social stack instead of scattering entry '
+                    'points across chat, profile and discover.',
             maxLines: 3,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
@@ -260,8 +278,11 @@ class _SocialHubView extends StatelessWidget {
     // GetIt not registered），此处必须先判注册再取。
     if (!getIt.isRegistered<SocialGraphBloc>()) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Social graph is not configured on this build'),
+        SnackBar(
+          content: Text(
+            S.of(context)?.ui3SocialGraphNotConfigured ??
+                'Social graph is not configured on this build',
+          ),
         ),
       );
       return;
@@ -271,8 +292,11 @@ class _SocialHubView extends StatelessWidget {
         : null;
     if (address == null || address.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Connect a wallet to view your social graph'),
+        SnackBar(
+          content: Text(
+            S.of(context)?.ui3ConnectWalletForSocialGraph ??
+                'Connect a wallet to view your social graph',
+          ),
         ),
       );
       return;
@@ -300,8 +324,11 @@ class _SocialHubView extends StatelessWidget {
       );
     } catch (_) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Avatar Studio requires a signed-in user'),
+        SnackBar(
+          content: Text(
+            S.of(context)?.ui3AvatarStudioSignIn ??
+                'Avatar Studio requires a signed-in user',
+          ),
         ),
       );
     }
@@ -412,26 +439,26 @@ class _ActionGrid extends StatelessWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: actions.length,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         mainAxisSpacing: 12,
         crossAxisSpacing: 12,
-        childAspectRatio: 0.98,
+        // Fixed chrome (padding + icon + gaps) plus scaled title and 3-line
+        // subtitle, so tiles do not overflow at 320pt or 130% text.
+        mainAxisExtent: 92 + MediaQuery.textScalerOf(context).scale(74),
       ),
       itemBuilder: (context, index) {
         final action = actions[index];
 
+        // Surface color on the Material so the InkWell ripple is visible.
         return Material(
-          color: Colors.transparent,
+          color: context.surfaceColor,
+          borderRadius: BorderRadius.circular(18),
           child: InkWell(
             borderRadius: BorderRadius.circular(18),
             onTap: action.onTap,
             child: Container(
               padding: const EdgeInsets.all(AppDimensions.spacing),
-              decoration: BoxDecoration(
-                color: context.surfaceColor,
-                borderRadius: BorderRadius.circular(18),
-              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

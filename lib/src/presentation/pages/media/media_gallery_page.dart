@@ -144,7 +144,7 @@ class _MediaGalleryPageState extends State<MediaGalleryPage>
             child: TabBar(
               controller: _tabController,
               isScrollable: true,
-              labelColor: AppColors.primaryOf(context),
+              labelColor: AppColors.primaryOnTintOf(context),
               unselectedLabelColor: context.textSecondary,
               indicatorColor: AppColors.primaryOf(context),
               tabs: [
@@ -290,8 +290,7 @@ class _MediaGalleryPageState extends State<MediaGalleryPage>
     final headers = _buildAuthHeaders(thumbnailUrl);
     final isVideo = message.type == MessageType.video;
 
-    return GestureDetector(
-      onTap: () => _openMediaPreview(message),
+    return MergeSemantics(
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.placeholderOf(isDark),
@@ -356,6 +355,20 @@ class _MediaGalleryPageState extends State<MediaGalleryPage>
                   ),
                 ),
               ),
+            // Ink layer above the thumbnail so the pressed state is visible.
+            Positioned.fill(
+              child: Material(
+                type: MaterialType.transparency,
+                child: InkWell(
+                  onTap: () => _openMediaPreview(message),
+                  child: Semantics(
+                    label: isVideo
+                        ? (S.of(context)?.mediaVideos ?? 'Videos')
+                        : (S.of(context)?.mediaImages ?? 'Images'),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -394,7 +407,8 @@ class _MediaGalleryPageState extends State<MediaGalleryPage>
 
   Widget _buildFileListItem(MessageEntity message, bool isDark) {
     final meta = message.metadata;
-    final fileName = meta?.fileName ?? 'Unknown file';
+    final fileName =
+        meta?.fileName ?? S.of(context)?.chatUnknownFile ?? 'Unknown file';
     final fileSize = meta?.formattedSize ?? '';
     final icon = _getFileIcon(meta?.mimeType);
 
@@ -500,7 +514,7 @@ class _MediaGalleryPageState extends State<MediaGalleryPage>
           content: Text(
             '${S.of(context)?.downloadFailed ?? 'Download failed'}: $e',
           ),
-          backgroundColor: AppColors.error,
+          backgroundColor: AppColors.errorFill,
         ),
       );
     }
@@ -585,8 +599,11 @@ class _MediaGalleryPageState extends State<MediaGalleryPage>
     final today = DateTime(now.year, now.month, now.day);
     final dateOnly = DateTime(date.year, date.month, date.day);
 
-    if (dateOnly == today) return 'Today';
-    if (dateOnly == today.subtract(const Duration(days: 1))) return 'Yesterday';
+    final l10n = S.of(context);
+    if (dateOnly == today) return l10n?.favoriteToday ?? 'Today';
+    if (dateOnly == today.subtract(const Duration(days: 1))) {
+      return l10n?.favoriteYesterday ?? 'Yesterday';
+    }
     if (date.year == now.year) return DateFormat('MMM d').format(date);
     return DateFormat('MMM d, yyyy').format(date);
   }

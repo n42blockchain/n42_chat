@@ -249,6 +249,7 @@ class _VideoFeedPageState extends State<VideoFeedPage> {
                             Icons.arrow_back,
                             color: Colors.white,
                           ),
+                          tooltip: S.of(context)?.a11yBack ?? 'Back',
                           onPressed: () => Navigator.of(context).pop(),
                         ),
                       ),
@@ -262,19 +263,19 @@ class _VideoFeedPageState extends State<VideoFeedPage> {
   Widget _buildEmpty() {
     return Stack(
       children: [
-        const Center(
+        Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
+              const Icon(
                 Icons.video_collection_outlined,
                 size: 56,
                 color: Colors.white38,
               ),
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
               Text(
-                'No videos yet',
-                style: TextStyle(color: Colors.white54, fontSize: 15),
+                S.of(context)?.ui3MomentNoVideos ?? 'No videos yet',
+                style: const TextStyle(color: Colors.white54, fontSize: 15),
               ),
             ],
           ),
@@ -285,6 +286,7 @@ class _VideoFeedPageState extends State<VideoFeedPage> {
               alignment: Alignment.topLeft,
               child: IconButton(
                 icon: const Icon(Icons.arrow_back, color: Colors.white),
+                tooltip: S.of(context)?.a11yBack ?? 'Back',
                 onPressed: () => Navigator.of(context).pop(),
               ),
             ),
@@ -463,7 +465,8 @@ class _VideoFeedItemState extends State<_VideoFeedItem> {
             left: 0,
             right: 0,
             bottom: 0,
-            height: 220,
+            // Tall enough to sit behind the sidebar labels too.
+            height: 300,
             child: IgnorePointer(
               child: DecoratedBox(
                 decoration: BoxDecoration(
@@ -498,6 +501,9 @@ class _VideoFeedItemState extends State<_VideoFeedItem> {
           icon: m.isLikedByMe ? Icons.favorite : Icons.favorite_border,
           color: m.isLikedByMe ? AppColors.error : Colors.white,
           label: '${m.likeCount}',
+          semanticLabel: m.isLikedByMe
+              ? (S.of(context)?.momentUnlike ?? 'Unlike')
+              : (S.of(context)?.momentLike ?? 'Like'),
           onTap: widget.onLike,
         ),
         const SizedBox(height: 18),
@@ -522,19 +528,29 @@ class _VideoFeedItemState extends State<_VideoFeedItem> {
     required IconData icon,
     required Color color,
     required String label,
+    String? semanticLabel,
     VoidCallback? onTap,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        children: [
-          Icon(icon, color: color, size: 34),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: const TextStyle(color: Colors.white, fontSize: 12),
+    return Semantics(
+      button: onTap != null,
+      label: semanticLabel,
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        // 44pt-wide hit area around the unchanged 34pt icon.
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minWidth: 44),
+          child: Column(
+            children: [
+              Icon(icon, color: color, size: 34),
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: const TextStyle(color: Colors.white, fontSize: 12),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -546,23 +562,31 @@ class _VideoFeedItemState extends State<_VideoFeedItem> {
       children: [
         InkWell(
           onTap: () => N42Chat.openUserProfile(m.userId, context: context),
-          child: Row(
-            children: [
-              N42Avatar(imageUrl: m.userAvatarUrl, name: m.userName, size: 32),
-              const SizedBox(width: 8),
-              Flexible(
-                child: Text(
-                  m.userName,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 15,
+          // 44pt-tall hit area around the 32pt avatar row.
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 44),
+            child: Row(
+              children: [
+                N42Avatar(
+                  imageUrl: m.userAvatarUrl,
+                  name: m.userName,
+                  size: 32,
+                ),
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Text(
+                    m.userName,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 15,
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
         if (m.hasContent) ...[

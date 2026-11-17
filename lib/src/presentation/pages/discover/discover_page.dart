@@ -69,7 +69,7 @@ class DiscoverPage extends StatelessWidget {
                   color: Color(0xFFEC4899),
                   size: 26,
                 ),
-                title: 'Stories & Fun',
+                title: l10n?.ui3StoriesAndFun ?? 'Stories & Fun',
                 onTap: () => _openSocialHub(context),
               ),
             ],

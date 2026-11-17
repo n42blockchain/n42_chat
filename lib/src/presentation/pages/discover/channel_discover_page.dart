@@ -47,6 +47,8 @@ class _ChannelDiscoverPageState extends State<ChannelDiscoverPage> {
   final Set<String> _joining = <String>{};
   bool _loading = true;
   String? _error;
+  // Resolved in build: _loadChannels runs from initState, where S.of is not allowed.
+  bool _signInRequired = false;
 
   @override
   void initState() {
@@ -71,12 +73,13 @@ class _ChannelDiscoverPageState extends State<ChannelDiscoverPage> {
     setState(() {
       _loading = true;
       _error = null;
+      _signInRequired = false;
     });
     final client = MatrixClientManager.instance.client;
     if (client == null || !client.isLogged()) {
       setState(() {
         _loading = false;
-        _error = 'Sign in to discover public channels';
+        _signInRequired = true;
       });
       return;
     }
@@ -160,7 +163,12 @@ class _ChannelDiscoverPageState extends State<ChannelDiscoverPage> {
     } catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Unable to join ${channel.name}: $error')),
+        SnackBar(
+          content: Text(
+            S.of(context)?.ui3UnableToJoinChannel(channel.name, '$error') ??
+                'Unable to join ${channel.name}: $error',
+          ),
+        ),
       );
     } finally {
       if (mounted) setState(() => _joining.remove(channel.roomId));
@@ -187,7 +195,7 @@ class _ChannelDiscoverPageState extends State<ChannelDiscoverPage> {
                 hintText: l10n?.channelDiscoverSearch ?? 'Search channels...',
                 prefixIcon: const Icon(AppIcons.search, size: 20),
                 suffixIcon: IconButton(
-                  tooltip: 'Search',
+                  tooltip: l10n?.commonSearch ?? 'Search',
                   onPressed: _loadChannels,
                   icon: const Icon(Icons.arrow_forward),
                 ),
@@ -209,15 +217,17 @@ class _ChannelDiscoverPageState extends State<ChannelDiscoverPage> {
   }
 
   Widget _buildCategoryTabs(BuildContext context) {
-    const labels = {
-      ChannelCategory.all: 'All',
-      ChannelCategory.tech: 'Tech',
+    final l10n = S.of(context);
+    final labels = {
+      ChannelCategory.all: l10n?.commonAll ?? 'All',
+      ChannelCategory.tech: l10n?.ui3CategoryTech ?? 'Tech',
       ChannelCategory.defi: 'DeFi',
       ChannelCategory.nft: 'NFT',
-      ChannelCategory.social: 'Social',
+      ChannelCategory.social: l10n?.ui3CategorySocial ?? 'Social',
     };
     return SizedBox(
-      height: 40,
+      // 48 (was 40) so the padded ChoiceChip keeps its 48pt hit height.
+      height: 48,
       child: ListView(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -229,7 +239,7 @@ class _ChannelDiscoverPageState extends State<ChannelDiscoverPage> {
               label: Text(entry.value),
               selected: selected,
               onSelected: (_) => setState(() => _selectedCategory = entry.key),
-              selectedColor: AppColors.primaryOf(context),
+              selectedColor: AppColors.primaryFillOf(context),
               labelStyle: TextStyle(
                 color: selected ? Colors.white : context.textPrimary,
                 fontSize: 13,
@@ -245,6 +255,15 @@ class _ChannelDiscoverPageState extends State<ChannelDiscoverPage> {
 
   Widget _buildChannelList(BuildContext context, S? l10n) {
     if (_loading) return const Center(child: CircularProgressIndicator());
+    if (_signInRequired) {
+      return _DirectoryMessage(
+        icon: Icons.cloud_off_outlined,
+        message:
+            l10n?.ui3SignInToDiscoverChannels ??
+            'Sign in to discover public channels',
+        onRetry: _loadChannels,
+      );
+    }
     if (_error != null) {
       return _DirectoryMessage(
         icon: Icons.cloud_off_outlined,
@@ -256,7 +275,8 @@ class _ChannelDiscoverPageState extends State<ChannelDiscoverPage> {
     if (channels.isEmpty) {
       return _DirectoryMessage(
         icon: Icons.campaign_outlined,
-        message: 'No public channels found',
+        message:
+            l10n?.ui3NoPublicChannels ?? 'No public channels found',
         onRetry: _loadChannels,
       );
     }
@@ -339,14 +359,17 @@ class _DirectoryMessage extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 56, color: context.textTertiary),
+          Icon(icon, size: 56, color: context.textSecondary),
           const SizedBox(height: 12),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 32),
             child: Text(message, textAlign: TextAlign.center),
           ),
           const SizedBox(height: 14),
-          OutlinedButton(onPressed: onRetry, child: const Text('Retry')),
+          OutlinedButton(
+            onPressed: onRetry,
+            child: Text(S.of(context)?.commonRetry ?? 'Retry'),
+          ),
         ],
       ),
     );

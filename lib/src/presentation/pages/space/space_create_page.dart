@@ -96,10 +96,10 @@ class _SpaceCreatePageState extends State<SpaceCreatePage> {
 
               TextFormField(
                 controller: _tagsCtrl,
-                decoration: const InputDecoration(
-                  labelText: 'Tags',
+                decoration: InputDecoration(
+                  labelText: S.of(context)?.contactTags ?? 'Tags',
                   hintText: '#defi #trading #n42',
-                  border: OutlineInputBorder(),
+                  border: const OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: AppDimensions.spacingXL),
@@ -214,46 +214,52 @@ class _TypeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        padding: const EdgeInsets.all(AppDimensions.spacing),
-        decoration: BoxDecoration(
-          color: selected
-              ? AppColors.primaryOf(context).withValues(alpha: 0.1)
-              : context.surfaceColor,
-          border: Border.all(
-            color: selected ? AppColors.primaryOf(context) : Colors.transparent,
-            width: 2,
-          ),
-          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(
-              icon,
+    return Semantics(
+      button: true,
+      selected: selected,
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          padding: const EdgeInsets.all(AppDimensions.spacing),
+          decoration: BoxDecoration(
+            color: selected
+                ? AppColors.primaryOf(context).withValues(alpha: 0.1)
+                : context.surfaceColor,
+            border: Border.all(
               color: selected
                   ? AppColors.primaryOf(context)
-                  : context.textSecondary,
+                  : Colors.transparent,
+              width: 2,
             ),
-            const SizedBox(height: AppDimensions.spacingS),
-            Text(
-              title,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
+            borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(
+                icon,
                 color: selected
                     ? AppColors.primaryOf(context)
-                    : context.textPrimary,
+                    : context.textSecondary,
               ),
-            ),
-            const SizedBox(height: AppDimensions.spacingXS),
-            Text(
-              subtitle,
-              style: TextStyle(fontSize: 12, color: context.textSecondary),
-            ),
-          ],
+              const SizedBox(height: AppDimensions.spacingS),
+              Text(
+                title,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: selected
+                      ? AppColors.primaryOf(context)
+                      : context.textPrimary,
+                ),
+              ),
+              const SizedBox(height: AppDimensions.spacingXS),
+              Text(
+                subtitle,
+                style: TextStyle(fontSize: 12, color: context.textSecondary),
+              ),
+            ],
+          ),
         ),
       ),
     );

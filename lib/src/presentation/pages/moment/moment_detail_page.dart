@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/moment_entity.dart';
 import '../../blocs/contact/contact_bloc.dart';
@@ -142,6 +143,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
               ),
               IconButton(
                 icon: const Icon(Icons.share_outlined),
+                tooltip: s?.commonShare ?? 'Share',
                 onPressed: () => MomentForwardSheet.show(context, moment),
               ),
             ],
@@ -182,8 +184,8 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                                     children: [
                                       Text(
                                         moment.userName,
-                                        style: const TextStyle(
-                                          color: AppColors.info,
+                                        style: TextStyle(
+                                          color: _nameColor(isDark),
                                           fontWeight: FontWeight.w600,
                                           fontSize: 16,
                                         ),
@@ -534,8 +536,8 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                     children: [
                       Text(
                         comment.userName,
-                        style: const TextStyle(
-                          color: AppColors.info,
+                        style: TextStyle(
+                          color: _nameColor(isDark),
                           fontWeight: FontWeight.w500,
                           fontSize: 14,
                         ),
@@ -544,8 +546,8 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                         const Text(' ▸ '),
                         Text(
                           comment.replyToUserName ?? '',
-                          style: const TextStyle(
-                            color: AppColors.info,
+                          style: TextStyle(
+                            color: _nameColor(isDark),
                             fontWeight: FontWeight.w500,
                             fontSize: 14,
                           ),
@@ -591,6 +593,9 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
         children: [
           // 点赞按钮
           IconButton(
+            tooltip: moment.isLikedByMe
+                ? (s?.momentUnlike ?? 'Unlike')
+                : (s?.momentLike ?? 'Like'),
             onPressed: () {
               final bloc = context.read<MomentBloc>();
               if (moment.isLikedByMe) {
@@ -634,6 +639,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
                   if (_replyToUserName != null)
                     IconButton(
                       icon: const Icon(Icons.close, size: 18),
+                      tooltip: s?.commonCancel ?? 'Cancel',
                       onPressed: _clearReplyTarget,
                     ),
                 ],
@@ -643,6 +649,7 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
 
           // 发送按钮
           IconButton(
+            tooltip: s?.commonSend ?? 'Send',
             onPressed: _isSubmittingComment ? null : _sendComment,
             icon: Icon(Icons.send, color: Theme.of(context).primaryColor),
           ),
@@ -650,6 +657,14 @@ class _MomentDetailPageState extends State<MomentDetailPage> {
       ),
     );
   }
+
+  /// Name link color: AppColors.info is 2.5:1 on white, so shade it to 4.5:1.
+  Color _nameColor(bool isDark) => ChatContrast.onTint(
+    AppColors.info,
+    [context.surfaceColor],
+    dark: isDark,
+    alpha: 0,
+  );
 
   void _setReplyTarget(MomentComment comment) {
     setState(() {

@@ -5,6 +5,7 @@ import 'package:get_it/get_it.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../domain/entities/message_entity.dart';
 import '../../../domain/entities/account_action_origin.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
@@ -48,10 +49,12 @@ class _FavoriteListView extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
+            tooltip: S.of(context)?.commonSearch ?? 'Search',
             onPressed: () => _showSearch(context),
           ),
           IconButton(
             icon: const Icon(Icons.add),
+            tooltip: S.of(context)?.commonAdd ?? 'Add',
             onPressed: () => _showAddOptions(context),
           ),
         ],
@@ -158,7 +161,7 @@ class _FavoriteListView extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13,
                       color: isSelected
-                          ? AppColors.primaryOf(context)
+                          ? AppColors.primaryOnTintOf(context)
                           : context.textSecondary,
                       fontWeight: isSelected
                           ? FontWeight.w600
@@ -193,6 +196,8 @@ class _FavoriteListView extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
+          // Tap mirrors long-press so the options are not gesture-only.
+          onTap: () => _showFavoriteOptions(context, favorite),
           onLongPress: () => _showFavoriteOptions(context, favorite),
           borderRadius: BorderRadius.circular(8),
           child: Padding(
@@ -285,7 +290,7 @@ class _FavoriteListView extends StatelessWidget {
           Text(
             S.of(context)?.favoriteLongPressToFavorite ??
                 'Long press message to favorite',
-            style: const TextStyle(fontSize: 14, color: AppColors.textTertiary),
+            style: TextStyle(fontSize: 14, color: context.textSecondary),
           ),
         ],
       ),
@@ -529,13 +534,23 @@ class _FavoriteListView extends StatelessWidget {
               ),
             ],
             ListTile(
-              leading: const Icon(Icons.delete, color: AppColors.error),
+              leading: Icon(Icons.delete, color: _dangerColor(sheetContext)),
               title: Text(
                 S.of(context)?.commonDelete ?? 'Delete',
-                style: const TextStyle(color: AppColors.error),
+                style: TextStyle(color: _dangerColor(sheetContext)),
               ),
-              onTap: () {
+              onTap: () async {
                 Navigator.pop(sheetContext);
+                final s = S.of(context);
+                final confirmed = await context.showConfirmDialog(
+                  title: s?.favoriteDeleteFavorite ?? 'Delete Favorite',
+                  content:
+                      s?.favoriteDeleteFavoriteConfirm ??
+                      'Are you sure you want to delete this favorite?',
+                  confirmText: s?.commonDelete ?? 'Delete',
+                  isDanger: true,
+                );
+                if (!confirmed || !context.mounted) return;
                 context.read<FavoriteBloc>().add(
                   DeleteFavorite(
                     favorite.id,
@@ -630,6 +645,18 @@ class _FavoriteListView extends StatelessWidget {
           '${time.month}/${time.day}';
     }
   }
+}
+
+/// Red shade that reaches 4.5:1 on the current surface (AppColors.error is
+/// about 3.55:1 on white).
+Color _dangerColor(BuildContext context) {
+  final theme = Theme.of(context);
+  return ChatContrast.onTint(
+    AppColors.error,
+    [theme.colorScheme.surface],
+    dark: theme.brightness == Brightness.dark,
+    alpha: 0,
+  );
 }
 
 class _FavoriteSearchDialog extends StatefulWidget {
@@ -750,7 +777,7 @@ class _FavoriteNoteDialogState extends State<_FavoriteNoteDialog> {
               if (_failed)
                 Text(
                   l10n?.commonSaveFailed ?? 'Save failed',
-                  style: const TextStyle(color: AppColors.error),
+                  style: TextStyle(color: _dangerColor(context)),
                 ),
             ],
           ),
@@ -831,34 +858,37 @@ class _FavoriteLinkDialogState extends State<_FavoriteLinkDialog> {
       canPop: !_saving,
       child: AlertDialog(
         title: Text(l10n?.favoriteLink ?? 'Favorite Link'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: _titleController,
-              enabled: !_saving,
-              autofocus: true,
-              decoration: InputDecoration(
-                hintText: l10n?.favoriteLinkTitle ?? 'Link title',
-                border: const OutlineInputBorder(),
+        // Scrollable so both fields stay reachable above the keyboard.
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _titleController,
+                enabled: !_saving,
+                autofocus: true,
+                decoration: InputDecoration(
+                  hintText: l10n?.favoriteLinkTitle ?? 'Link title',
+                  border: const OutlineInputBorder(),
+                ),
               ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _urlController,
-              enabled: !_saving,
-              keyboardType: TextInputType.url,
-              decoration: InputDecoration(
-                hintText: l10n?.favoriteLinkUrl ?? 'https://',
-                border: const OutlineInputBorder(),
+              const SizedBox(height: 12),
+              TextField(
+                controller: _urlController,
+                enabled: !_saving,
+                keyboardType: TextInputType.url,
+                decoration: InputDecoration(
+                  hintText: l10n?.favoriteLinkUrl ?? 'https://',
+                  border: const OutlineInputBorder(),
+                ),
               ),
-            ),
-            if (_failed)
-              Text(
-                l10n?.commonSaveFailed ?? 'Save failed',
-                style: const TextStyle(color: AppColors.error),
-              ),
-          ],
+              if (_failed)
+                Text(
+                  l10n?.commonSaveFailed ?? 'Save failed',
+                  style: TextStyle(color: _dangerColor(context)),
+                ),
+            ],
+          ),
         ),
         actions: [
           TextButton(
@@ -960,7 +990,7 @@ class _FavoriteAnnotationDialogState extends State<_FavoriteAnnotationDialog> {
                   padding: const EdgeInsets.only(top: 12),
                   child: Text(
                     l10n?.commonSaveFailed ?? 'Save failed',
-                    style: const TextStyle(color: AppColors.error),
+                    style: TextStyle(color: _dangerColor(context)),
                   ),
                 ),
             ],

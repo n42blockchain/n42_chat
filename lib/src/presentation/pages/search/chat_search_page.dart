@@ -135,14 +135,17 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
         children: [
           IconButton(
             icon: Icon(AppIcons.back, color: context.textPrimary),
+            tooltip: MaterialLocalizations.of(context).backButtonTooltip,
             onPressed: () => Navigator.pop(context),
           ),
           Expanded(
             child: Container(
-              height: 36,
+              // 44pt min keeps the clear button a full tap target and lets
+              // 130% text grow instead of clipping.
+              constraints: const BoxConstraints(minHeight: 44),
               decoration: BoxDecoration(
                 color: context.pageBackground,
-                borderRadius: BorderRadius.circular(18),
+                borderRadius: BorderRadius.circular(22),
               ),
               child: TextField(
                 controller: _searchController,
@@ -161,6 +164,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
                   suffixIcon: _searchController.text.isNotEmpty
                       ? IconButton(
                           icon: const Icon(Icons.close, size: 18),
+                          tooltip: S.of(context)?.commonClear ?? 'Clear',
                           onPressed: _clearSearch,
                         )
                       : null,
@@ -203,6 +207,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
                   ),
               ],
             ),
+            tooltip: S.of(context)?.mediaEditorFilter ?? 'Filter',
             onPressed: _showFilters,
           ),
         ],
@@ -232,7 +237,9 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
       return Center(
         child: N42EmptyState.noSearchResult(
           title: S.of(context)?.searchNoResults ?? 'No results',
-          description: 'Try different keywords',
+          description:
+              S.of(context)?.ui3TryDifferentKeywords ??
+              'Try different keywords',
         ),
       );
     }
@@ -257,7 +264,10 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
               if (results.filter != null) ...[
                 const SizedBox(height: AppDimensions.spacingXS),
                 Text(
-                  'Filters active: ${results.filter!.activeCount}',
+                  S.of(context)?.ui3FiltersActive(
+                        results.filter!.activeCount,
+                      ) ??
+                      'Filters active: ${results.filter!.activeCount}',
                   style: TextStyle(fontSize: 12, color: context.textSecondary),
                 ),
               ],
@@ -273,9 +283,9 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
               if (index >= results.messages.length) {
                 return ListTile(
                   title: Text(
-                    'Load more',
+                    S.of(context)?.ui3LoadMore ?? 'Load more',
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: AppColors.primaryOf(context)),
+                    style: TextStyle(color: AppColors.primaryOnTintOf(context)),
                   ),
                   onTap: state.isSearching
                       ? null

@@ -7,6 +7,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/story_entity.dart';
+import '../common/n42_tap_area.dart';
 import 'story_ring.dart';
 
 /// Story 横向滚动栏
@@ -154,27 +155,36 @@ class StoryBar extends StatelessWidget {
                         size: avatarSize,
                       ),
                     ),
-                  // 添加按钮
+                  // 添加按钮: 44pt hit area inside the avatar box, the
+                  // 22pt badge stays in the bottom-right corner.
                   Positioned(
                     right: 0,
                     bottom: 0,
-                    child: GestureDetector(
+                    child: N42TapArea(
                       onTap: onAddStory,
-                      child: Container(
-                        width: 22,
-                        height: 22,
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryOf(context),
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: context.surfaceColor,
-                            width: 2,
+                      tooltip: S.of(context)?.a11yStoryAdd ?? 'Add story',
+                      customBorder: const CircleBorder(),
+                      child: SizedBox.square(
+                        dimension: N42TapArea.minTarget,
+                        child: Align(
+                          alignment: Alignment.bottomRight,
+                          child: Container(
+                            width: 22,
+                            height: 22,
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryOf(context),
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: context.surfaceColor,
+                                width: 2,
+                              ),
+                            ),
+                            child: const Icon(
+                              Icons.add,
+                              size: 14,
+                              color: Colors.white,
+                            ),
                           ),
-                        ),
-                        child: const Icon(
-                          Icons.add,
-                          size: 14,
-                          color: Colors.white,
                         ),
                       ),
                     ),

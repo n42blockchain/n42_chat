@@ -84,7 +84,7 @@ class _SpaceListViewState extends State<_SpaceListView>
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.errorMessage!),
-              backgroundColor: AppColors.error,
+              backgroundColor: AppColors.errorFill,
             ),
           );
           context.read<SpaceBloc>().add(const ClearSpaceError());
@@ -246,6 +246,7 @@ class _DiscoverSpacesTab extends StatelessWidget {
                   suffixIcon: searchController.text.isNotEmpty
                       ? IconButton(
                           icon: const Icon(Icons.clear),
+                          tooltip: S.of(context)?.commonClear ?? 'Clear',
                           onPressed: () {
                             searchController.clear();
                             onSearch('');
@@ -348,19 +349,23 @@ class _SpaceListItem extends StatelessWidget {
           const SizedBox(height: 2),
           Row(
             children: [
-              Icon(Icons.people_outline, size: 14, color: context.textTertiary),
+              Icon(
+                Icons.people_outline,
+                size: 14,
+                color: context.textSupporting,
+              ),
               const SizedBox(width: AppDimensions.spacingXS),
               Text(
                 '${space.memberCount}',
-                style: TextStyle(fontSize: 12, color: context.textTertiary),
+                style: TextStyle(fontSize: 12, color: context.textSupporting),
               ),
               const SizedBox(width: AppDimensions.spacingM),
-              Icon(Icons.tag, size: 14, color: context.textTertiary),
+              Icon(Icons.tag, size: 14, color: context.textSupporting),
               const SizedBox(width: AppDimensions.spacingXS),
               Text(
                 S.of(context)?.spacesChannelsCount(space.channelCount) ??
                     '${space.channelCount} channels',
-                style: TextStyle(fontSize: 12, color: context.textTertiary),
+                style: TextStyle(fontSize: 12, color: context.textSupporting),
               ),
             ],
           ),

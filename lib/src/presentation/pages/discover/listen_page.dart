@@ -201,7 +201,9 @@ class _ListenPageState extends State<ListenPage> {
       if (mounted && generation == _playGeneration) {
         setState(() {
           _playing = false;
-          _error = 'Unable to play ${track.title}: $error';
+          _error =
+              S.of(context)?.ui3UnableToPlay(track.title, '$error') ??
+              'Unable to play ${track.title}: $error';
         });
       }
     }
@@ -266,7 +268,10 @@ class _ListenPageState extends State<ListenPage> {
             MaterialBanner(
               content: Text(_error!),
               actions: [
-                TextButton(onPressed: _refresh, child: const Text('Retry')),
+                TextButton(
+                  onPressed: _refresh,
+                  child: Text(S.of(context)?.commonRetry ?? 'Retry'),
+                ),
               ],
             ),
           Expanded(child: _buildFeed(context)),
@@ -287,7 +292,9 @@ class _ListenPageState extends State<ListenPage> {
               controller: _searchController,
               onChanged: (value) => setState(() => _query = value),
               decoration: InputDecoration(
-                hintText: 'Search songs, artists, or friends',
+                hintText:
+                    S.of(context)?.ui3SearchMusicHint ??
+                    'Search songs, artists, or friends',
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: _query.isEmpty
                     ? null
@@ -296,6 +303,7 @@ class _ListenPageState extends State<ListenPage> {
                           _searchController.clear();
                           setState(() => _query = '');
                         },
+                        tooltip: S.of(context)?.commonClear ?? 'Clear',
                         icon: const Icon(Icons.close),
                       ),
                 filled: true,
@@ -308,12 +316,15 @@ class _ListenPageState extends State<ListenPage> {
             ),
             const SizedBox(height: 8),
             SegmentedButton<bool>(
-              segments: const [
-                ButtonSegment(value: false, label: Text('For You')),
+              segments: [
+                ButtonSegment(
+                  value: false,
+                  label: Text(S.of(context)?.ui3ForYou ?? 'For You'),
+                ),
                 ButtonSegment(
                   value: true,
-                  label: Text('Liked'),
-                  icon: Icon(Icons.favorite_outline, size: 18),
+                  label: Text(S.of(context)?.ui3Liked ?? 'Liked'),
+                  icon: const Icon(Icons.favorite_outline, size: 18),
                 ),
               ],
               selected: {_favoritesOnly},
@@ -338,10 +349,13 @@ class _ListenPageState extends State<ListenPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.headphones, size: 60, color: context.textTertiary),
+              Icon(Icons.headphones, size: 60, color: context.textSecondary),
               const SizedBox(height: 14),
               Text(
-                _favoritesOnly ? 'No liked music yet' : 'No music Stories yet',
+                _favoritesOnly
+                    ? S.of(context)?.ui3NoLikedMusic ?? 'No liked music yet'
+                    : S.of(context)?.ui3NoMusicStories ??
+                          'No music Stories yet',
                 style: TextStyle(
                   color: context.textPrimary,
                   fontWeight: FontWeight.w600,
@@ -351,8 +365,10 @@ class _ListenPageState extends State<ListenPage> {
               const SizedBox(height: 8),
               Text(
                 _favoritesOnly
-                    ? 'Tap the heart beside a song to keep it here.'
-                    : 'Music shared in Stories will appear here.',
+                    ? S.of(context)?.ui3LikedMusicHint ??
+                          'Tap the heart beside a song to keep it here.'
+                    : S.of(context)?.ui3MusicStoriesHint ??
+                          'Music shared in Stories will appear here.',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: context.textSecondary),
               ),
@@ -410,13 +426,16 @@ class _ListenPageState extends State<ListenPage> {
               ),
             ),
             subtitle: Text(
-              '${track.artist} · shared by ${track.story.userName}',
+              S.of(context)?.ui3SharedBy(track.artist, track.story.userName) ??
+                  '${track.artist} · shared by ${track.story.userName}',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
             trailing: IconButton(
               key: ValueKey('listen-favorite-${track.story.id}'),
-              tooltip: liked ? 'Unlike' : 'Like',
+              tooltip: liked
+                  ? S.of(context)?.momentUnlike ?? 'Unlike'
+                  : S.of(context)?.momentLike ?? 'Like',
               onPressed: () => _toggleFavorite(track),
               icon: Icon(
                 liked ? Icons.favorite : Icons.favorite_border,
@@ -481,14 +500,20 @@ class _ListenPageState extends State<ListenPage> {
                   ),
                   IconButton(
                     onPressed: _playPrevious,
+                    tooltip:
+                        S.of(context)?.a11yPreviousTrack ?? 'Previous track',
                     icon: const Icon(Icons.skip_previous),
                   ),
                   IconButton.filled(
                     onPressed: () => _play(track),
+                    tooltip: _playing
+                        ? S.of(context)?.a11yPause ?? 'Pause'
+                        : S.of(context)?.a11yPlay ?? 'Play',
                     icon: Icon(_playing ? Icons.pause : Icons.play_arrow),
                   ),
                   IconButton(
                     onPressed: _playNext,
+                    tooltip: S.of(context)?.a11yNextTrack ?? 'Next track',
                     icon: const Icon(Icons.skip_next),
                   ),
                 ],

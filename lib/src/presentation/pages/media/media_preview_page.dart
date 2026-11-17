@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:video_player/video_player.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/utils/matrix_utils.dart' as mx_utils;
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
@@ -208,7 +209,12 @@ class _MediaPreviewPageState extends State<MediaPreviewPage> {
               child: Center(
                 child: Text(
                   '${_currentIndex + 1} / ${widget.items.length}',
-                  style: const TextStyle(color: Colors.white70, fontSize: 14),
+                  // Shadow keeps the counter legible over bright media.
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 14,
+                    shadows: [Shadow(color: Colors.black54, blurRadius: 4)],
+                  ),
                 ),
               ),
             ),
@@ -250,27 +256,33 @@ class _MediaPreviewPageState extends State<MediaPreviewPage> {
           alignment: Alignment.center,
           children: [
             VideoPlayer(_videoController!),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  _videoController!.value.isPlaying
-                      ? _videoController!.pause()
-                      : _videoController!.play();
-                });
-              },
-              child: AnimatedOpacity(
-                opacity: _videoController!.value.isPlaying ? 0.0 : 1.0,
-                duration: const Duration(milliseconds: 200),
-                child: Container(
-                  padding: const EdgeInsets.all(AppDimensions.spacingM),
-                  decoration: const BoxDecoration(
-                    color: Colors.black45,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.play_arrow,
-                    color: Colors.white,
-                    size: 48,
+            Semantics(
+              button: true,
+              label: _videoController!.value.isPlaying
+                  ? (S.of(context)?.a11yPause ?? 'Pause')
+                  : (S.of(context)?.a11yPlay ?? 'Play'),
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _videoController!.value.isPlaying
+                        ? _videoController!.pause()
+                        : _videoController!.play();
+                  });
+                },
+                child: AnimatedOpacity(
+                  opacity: _videoController!.value.isPlaying ? 0.0 : 1.0,
+                  duration: const Duration(milliseconds: 200),
+                  child: Container(
+                    padding: const EdgeInsets.all(AppDimensions.spacingM),
+                    decoration: const BoxDecoration(
+                      color: Colors.black45,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.play_arrow,
+                      color: Colors.white,
+                      size: 48,
+                    ),
                   ),
                 ),
               ),
@@ -311,6 +323,7 @@ class _MediaPreviewPageState extends State<MediaPreviewPage> {
         children: [
           IconButton(
             icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+            tooltip: S.of(context)?.a11yBack ?? 'Back',
             onPressed: () => Navigator.of(context).pop(),
           ),
           Expanded(
@@ -357,10 +370,12 @@ class _MediaPreviewPageState extends State<MediaPreviewPage> {
         children: [
           IconButton(
             icon: const Icon(Icons.download, color: Colors.white),
+            tooltip: S.of(context)?.chatDownload ?? 'Download',
             onPressed: widget.onDownload,
           ),
           IconButton(
             icon: const Icon(Icons.forward, color: Colors.white),
+            tooltip: S.of(context)?.commonForward ?? 'Forward',
             onPressed: widget.onForward != null
                 ? () => widget.onForward!(_currentIndex)
                 : null,

@@ -121,16 +121,19 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
           // 返回按钮
           IconButton(
             icon: Icon(AppIcons.back, color: context.textPrimary),
+            tooltip: MaterialLocalizations.of(context).backButtonTooltip,
             onPressed: () => Navigator.pop(context),
           ),
 
           // 搜索框
           Expanded(
             child: Container(
-              height: 36,
+              // 44pt min keeps the clear button a full tap target and lets
+              // 130% text grow instead of clipping.
+              constraints: const BoxConstraints(minHeight: 44),
               decoration: BoxDecoration(
                 color: context.pageBackground,
-                borderRadius: BorderRadius.circular(18),
+                borderRadius: BorderRadius.circular(22),
               ),
               child: TextField(
                 key: const ValueKey<String>('chat_global_search_input'),
@@ -152,6 +155,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
                   suffixIcon: _searchController.text.isNotEmpty
                       ? IconButton(
                           icon: const Icon(Icons.close, size: 18),
+                          tooltip: S.of(context)?.commonClear ?? 'Clear',
                           onPressed: _clearSearch,
                         )
                       : null,
@@ -192,6 +196,7 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
                   ),
               ],
             ),
+            tooltip: S.of(context)?.mediaEditorFilter ?? 'Filter',
             onPressed: _showFilters,
           ),
         ],
@@ -284,7 +289,10 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
             child: Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                'Message filters active: ${state.results.messageFilter!.activeCount}',
+                S.of(context)?.ui3MessageFiltersActive(
+                      state.results.messageFilter!.activeCount,
+                    ) ??
+                    'Message filters active: ${state.results.messageFilter!.activeCount}',
                 style: TextStyle(fontSize: 12, color: context.textSecondary),
               ),
             ),
@@ -341,50 +349,56 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
   ) {
     final isSelected = type == selectedType;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppDimensions.spacingXS,
-        vertical: 6,
-      ),
+    // The whole 44pt-tall strip cell is the hit area, not just the pill.
+    return Semantics(
+      button: true,
+      selected: isSelected,
       child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: () {
           context.read<SearchBloc>().add(ChangeSearchType(type));
         },
-        child: Container(
+        child: Padding(
           padding: const EdgeInsets.symmetric(
-            horizontal: AppDimensions.spacing,
+            horizontal: AppDimensions.spacingXS,
             vertical: 6,
           ),
-          decoration: BoxDecoration(
-            color: isSelected
-                ? AppColors.primaryOf(context)
-                : context.pageBackground,
-            borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                  color: isSelected ? Colors.white : context.textPrimary,
-                ),
-              ),
-              if (count > 0) ...[
-                const SizedBox(width: AppDimensions.spacingXS),
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppDimensions.spacing,
+              vertical: 6,
+            ),
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? AppColors.primaryFillOf(context)
+                  : context.pageBackground,
+              borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
                 Text(
-                  '($count)',
+                  label,
                   style: TextStyle(
-                    fontSize: 12,
-                    color: isSelected
-                        ? Colors.white.withValues(alpha: 0.8)
-                        : context.textSecondary,
+                    fontSize: 13,
+                    fontWeight: isSelected
+                        ? FontWeight.w600
+                        : FontWeight.normal,
+                    color: isSelected ? Colors.white : context.textPrimary,
                   ),
                 ),
+                if (count > 0) ...[
+                  const SizedBox(width: AppDimensions.spacingXS),
+                  Text(
+                    '($count)',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: isSelected ? Colors.white : context.textSecondary,
+                    ),
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
         ),
       ),

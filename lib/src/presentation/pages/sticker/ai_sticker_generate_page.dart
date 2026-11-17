@@ -2,11 +2,13 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/services/ai_service.dart';
 import '../../../core/services/ai_sticker_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
+import '../../../core/theme/chat_contrast.dart';
 
 /// AI 生成贴纸页
 ///
@@ -70,7 +72,11 @@ class _AiStickerGeneratePageState extends State<AiStickerGeneratePage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            ok ? 'Added to "AI Stickers"' : 'Failed to add sticker',
+            ok
+                ? (S.of(context)?.ui3StickerAddedToAi ??
+                      'Added to "AI Stickers"')
+                : (S.of(context)?.ui3StickerAddOneFailed ??
+                      'Failed to add sticker'),
           ),
         ),
       );
@@ -87,8 +93,9 @@ class _AiStickerGeneratePageState extends State<AiStickerGeneratePage> {
 
   @override
   Widget build(BuildContext context) {
+    final s = S.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('AI Sticker')),
+      appBar: AppBar(title: Text(s?.ui3StickerAiSticker ?? 'AI Sticker')),
       body: Padding(
         padding: const EdgeInsets.all(AppDimensions.spacing),
         child: Column(
@@ -99,10 +106,12 @@ class _AiStickerGeneratePageState extends State<AiStickerGeneratePage> {
               minLines: 1,
               maxLines: 3,
               textInputAction: TextInputAction.done,
-              decoration: const InputDecoration(
-                labelText: 'Describe your sticker',
-                hintText: 'e.g. a happy orange cat with sunglasses',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: s?.ui3StickerPromptLabel ?? 'Describe your sticker',
+                hintText:
+                    s?.ui3StickerPromptHint ??
+                    'e.g. a happy orange cat with sunglasses',
+                border: const OutlineInputBorder(),
               ),
               onSubmitted: (_) => _generate(),
             ),
@@ -116,7 +125,11 @@ class _AiStickerGeneratePageState extends State<AiStickerGeneratePage> {
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
                   : const Icon(Icons.auto_awesome),
-              label: Text(_generating ? 'Generating…' : 'Generate'),
+              label: Text(
+                _generating
+                    ? (s?.ui3StickerGenerating ?? 'Generating…')
+                    : (s?.ui3StickerGenerate ?? 'Generate'),
+              ),
             ),
             const SizedBox(height: AppDimensions.spacingL),
             Expanded(child: Center(child: _buildPreview())),
@@ -131,7 +144,11 @@ class _AiStickerGeneratePageState extends State<AiStickerGeneratePage> {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Icon(Icons.add_reaction_outlined),
-                label: Text(_adding ? 'Adding…' : 'Add to stickers'),
+                label: Text(
+                  _adding
+                      ? (s?.ui3StickerAdding ?? 'Adding…')
+                      : (s?.ui3StickerAddToStickers ?? 'Add to stickers'),
+                ),
               ),
             ],
           ],
@@ -145,11 +162,22 @@ class _AiStickerGeneratePageState extends State<AiStickerGeneratePage> {
       return Text(
         _error!,
         textAlign: TextAlign.center,
-        style: const TextStyle(color: AppColors.error),
+        style: TextStyle(
+          // Red shaded to 4.5:1 on the page background.
+          color: ChatContrast.onTint(
+            AppColors.error,
+            [Theme.of(context).scaffoldBackgroundColor],
+            dark: Theme.of(context).brightness == Brightness.dark,
+            alpha: 0,
+          ),
+        ),
       );
     }
     if (_generating) {
-      return const Text('Generating your sticker…');
+      return Text(
+        S.of(context)?.ui3StickerGeneratingPreview ??
+            'Generating your sticker…',
+      );
     }
     final preview = _preview;
     if (preview != null) {
@@ -163,14 +191,18 @@ class _AiStickerGeneratePageState extends State<AiStickerGeneratePage> {
         ),
       );
     }
-    return const Opacity(
+    return Opacity(
       opacity: 0.6,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.auto_awesome, size: 48),
-          SizedBox(height: AppDimensions.spacingS),
-          Text('Describe a sticker and tap Generate'),
+          const Icon(Icons.auto_awesome, size: 48),
+          const SizedBox(height: AppDimensions.spacingS),
+          Text(
+            S.of(context)?.ui3StickerGenerateEmpty ??
+                'Describe a sticker and tap Generate',
+            textAlign: TextAlign.center,
+          ),
         ],
       ),
     );

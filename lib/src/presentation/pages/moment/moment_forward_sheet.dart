@@ -128,7 +128,7 @@ class _MomentForwardSheetState extends State<MomentForwardSheet> {
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 13,
-                  color: context.isDarkMode ? Colors.white70 : Colors.black54,
+                  color: context.textSupporting,
                 ),
               ),
             ),
@@ -207,11 +207,10 @@ class _MomentForwardSheetState extends State<MomentForwardSheet> {
       maxChildSize: 0.9,
       minChildSize: 0.3,
       builder: (context, scrollController) {
-        return Container(
-          decoration: BoxDecoration(
-            color: context.surfaceColor,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-          ),
+        // Surface color on the Material so list-row ink stays visible.
+        return Material(
+          color: context.surfaceColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
           child: Column(
             children: [
               // 顶部拖拽指示器
@@ -246,7 +245,7 @@ class _MomentForwardSheetState extends State<MomentForwardSheet> {
                 child: TextField(
                   onChanged: (v) => setState(() => _searchQuery = v),
                   decoration: InputDecoration(
-                    hintText: s?.momentSelectFriends ?? 'Search',
+                    hintText: s?.commonSearch ?? 'Search',
                     prefixIcon: const Icon(Icons.search, size: 20),
                     filled: true,
                     fillColor: AppColors.inputBgOf(isDark),

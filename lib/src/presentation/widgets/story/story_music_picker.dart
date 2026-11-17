@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../common/n42_tap_area.dart';
 import '../../../core/theme/chat_colors.dart';
 import '../../../core/utils/debug_log.dart';
 import '../../../core/theme/app_dimensions.dart';
@@ -192,9 +193,14 @@ class _StoryMusicPickerState extends State<StoryMusicPicker> {
               child: Row(
                 children: [
                   // 播放/暂停按钮
-                  GestureDetector(
+                  // 44pt hit area; Ink keeps the ripple above the fill.
+                  N42TapArea(
                     onTap: _togglePlayPause,
-                    child: Container(
+                    tooltip: _isPlaying
+                        ? (l10n?.a11yPause ?? 'Pause')
+                        : (l10n?.a11yPlay ?? 'Play'),
+                    customBorder: const CircleBorder(),
+                    child: Ink(
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
@@ -242,7 +248,7 @@ class _StoryMusicPickerState extends State<StoryMusicPicker> {
                           '${_formatDuration(_position)} / ${_formatDuration(_duration)} ${l10n?.storyMusicPreview ?? "(max 15s)"}',
                           style: TextStyle(
                             fontSize: 11,
-                            color: AppColors.textTertiaryOf(isDark),
+                            color: AppColors.textSecondaryOf(isDark),
                           ),
                         ),
                       ],
@@ -250,6 +256,7 @@ class _StoryMusicPickerState extends State<StoryMusicPicker> {
                   ),
                   // 删除按钮
                   IconButton(
+                    tooltip: l10n?.commonRemove ?? 'Remove',
                     onPressed: _removeMusic,
                     icon: const Icon(
                       Icons.close,
@@ -294,7 +301,7 @@ class _StoryMusicPickerState extends State<StoryMusicPicker> {
               child: ElevatedButton(
                 onPressed: _confirmSelection,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryOf(context),
+                  backgroundColor: AppColors.primaryFillOf(context),
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(
                     vertical: AppDimensions.spacingM,

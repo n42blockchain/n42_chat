@@ -81,7 +81,7 @@ class _ChatSearchBarState extends State<ChatSearchBar> {
         }
 
         return Container(
-          height: 48,
+          constraints: const BoxConstraints(minHeight: 48),
           color: context.surfaceColor,
           padding: const EdgeInsets.symmetric(
             horizontal: AppDimensions.spacingS,
@@ -91,7 +91,8 @@ class _ChatSearchBarState extends State<ChatSearchBar> {
               // 搜索输入框
               Expanded(
                 child: Container(
-                  height: 32,
+                  // minHeight (not a fixed 32pt) keeps 130% text unclipped.
+                  constraints: const BoxConstraints(minHeight: 32),
                   decoration: BoxDecoration(
                     color: context.pageBackground,
                     borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
@@ -99,6 +100,7 @@ class _ChatSearchBarState extends State<ChatSearchBar> {
                   child: TextField(
                     controller: _controller,
                     focusNode: _focusNode,
+                    textAlignVertical: TextAlignVertical.center,
                     decoration: InputDecoration(
                       hintText: S.of(context)?.searchInChat ?? 'Search in chat',
                       hintStyle: TextStyle(
@@ -141,6 +143,7 @@ class _ChatSearchBarState extends State<ChatSearchBar> {
               // 上一个/下一个按钮
               IconButton(
                 icon: const Icon(Icons.keyboard_arrow_up, size: 24),
+                tooltip: S.of(context)?.a11yPreviousResult ?? 'Previous result',
                 onPressed: hasPrevious ? _onPrevious : null,
                 color: hasPrevious
                     ? context.textPrimary
@@ -148,6 +151,7 @@ class _ChatSearchBarState extends State<ChatSearchBar> {
               ),
               IconButton(
                 icon: const Icon(Icons.keyboard_arrow_down, size: 24),
+                tooltip: S.of(context)?.a11yNextResult ?? 'Next result',
                 onPressed: hasNext ? _onNext : null,
                 color: hasNext ? context.textPrimary : context.textSecondary,
               ),
@@ -155,6 +159,7 @@ class _ChatSearchBarState extends State<ChatSearchBar> {
               // 关闭按钮
               IconButton(
                 icon: const Icon(Icons.close, size: 20),
+                tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
                 onPressed: widget.onClose,
                 color: context.textPrimary,
               ),

@@ -10,6 +10,7 @@ import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/ai_sticker_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../domain/entities/sticker_pack_entity.dart';
 import '../../../domain/repositories/sticker_repository.dart';
 import 'ai_sticker_generate_page.dart';
@@ -34,6 +35,9 @@ class _StickerStorePageState extends State<StickerStorePage>
   List<StickerPack> _storePacks = [];
   String? _selectedCategory;
   bool _isLoading = true;
+
+  /// Packs with an install request in flight (blocks double taps).
+  final Set<String> _installingIds = {};
 
   @override
   void initState() {
@@ -89,23 +93,26 @@ class _StickerStorePageState extends State<StickerStorePage>
   /// 新建自定义贴纸包（输入名称 → 创建 → 进入管理页上传贴纸）。
   Future<void> _createPack() async {
     final controller = TextEditingController();
+    final s = S.of(context);
     final name = await showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('New sticker pack'),
+        title: Text(s?.ui3StickerNewPack ?? 'New sticker pack'),
         content: TextField(
           controller: controller,
           autofocus: true,
-          decoration: const InputDecoration(hintText: 'Pack name'),
+          decoration: InputDecoration(
+            hintText: s?.ui3StickerPackName ?? 'Pack name',
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
+            child: Text(s?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, controller.text.trim()),
-            child: const Text('Create'),
+            child: Text(s?.ui3StickerCreate ?? 'Create'),
           ),
         ],
       ),
@@ -114,8 +121,13 @@ class _StickerStorePageState extends State<StickerStorePage>
     final pack = await _repository.createCustomPack(name: name);
     if (!mounted) return;
     if (pack == null) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Failed to create pack')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            S.of(context)?.ui3StickerCreateFailed ?? 'Failed to create pack',
+          ),
+        ),
+      );
       return;
     }
     await _openCustomPack(pack.id);
@@ -132,35 +144,59 @@ class _StickerStorePageState extends State<StickerStorePage>
   }
 
   Future<void> _installPack(StickerPack pack) async {
-    final success = await _repository.installPack(pack.id);
+    if (_installingIds.contains(pack.id)) return;
+    setState(() => _installingIds.add(pack.id));
+    final bool success;
+    try {
+      success = await _repository.installPack(pack.id);
+    } finally {
+      if (mounted) setState(() => _installingIds.remove(pack.id));
+    }
     if (!mounted) return;
     if (success) {
       setState(() {
         _installedPacks.add(pack.copyWith(isInstalled: true));
       });
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Installed "${pack.name}"')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              S.of(context)?.ui3StickerInstalled(pack.name) ??
+                  'Installed "${pack.name}"',
+            ),
+          ),
+        );
       }
     }
   }
 
   Future<void> _uninstallPack(StickerPack pack) async {
+    final s = S.of(context);
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Remove Sticker Pack'),
-        content: Text('Remove "${pack.name}" from your stickers?'),
+        title: Text(s?.ui3StickerRemovePackTitle ?? 'Remove Sticker Pack'),
+        content: Text(
+          s?.ui3StickerRemovePackConfirm(pack.name) ??
+              'Remove "${pack.name}" from your stickers?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel'),
+            child: Text(s?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text(
-              'Remove',
-              style: TextStyle(color: AppColors.error),
+            child: Text(
+              s?.commonRemove ?? 'Remove',
+              style: TextStyle(
+                color: ChatContrast.onTint(
+                  AppColors.error,
+                  [Theme.of(ctx).colorScheme.surface],
+                  dark: Theme.of(ctx).brightness == Brightness.dark,
+                  alpha: 0,
+                ),
+              ),
             ),
           ),
         ],
@@ -176,8 +212,14 @@ class _StickerStorePageState extends State<StickerStorePage>
         _installedPacks.removeWhere((p) => p.id == pack.id);
       });
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Removed "${pack.name}"')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              S.of(context)?.ui3StickerRemoved(pack.name) ??
+                  'Removed "${pack.name}"',
+            ),
+          ),
+        );
       }
     }
   }
@@ -217,25 +259,25 @@ class _StickerStorePageState extends State<StickerStorePage>
             onPressed: _openImport,
           ),
           IconButton(
-            tooltip: 'New pack',
+            tooltip: S.of(context)?.ui3StickerNewPack ?? 'New sticker pack',
             icon: const Icon(Icons.create_new_folder_outlined),
             onPressed: _createPack,
           ),
           if (getIt<AiStickerService>().isAvailable)
             IconButton(
-              tooltip: 'AI Sticker',
+              tooltip: S.of(context)?.ui3StickerAiSticker ?? 'AI Sticker',
               icon: const Icon(Icons.auto_awesome),
               onPressed: _openAiGenerate,
             ),
         ],
         bottom: TabBar(
           controller: _tabController,
-          labelColor: AppColors.primaryOf(context),
+          labelColor: AppColors.primaryOnTintOf(context),
           unselectedLabelColor: context.textSecondary,
           indicatorColor: AppColors.primaryOf(context),
-          tabs: const [
-            Tab(text: 'Store'),
-            Tab(text: 'My Stickers'),
+          tabs: [
+            Tab(text: S.of(context)?.ui3StickerStoreTab ?? 'Store'),
+            Tab(text: S.of(context)?.ui3StickerMyStickersTab ?? 'My Stickers'),
           ],
         ),
       ),
@@ -271,7 +313,7 @@ class _StickerStorePageState extends State<StickerStorePage>
         itemBuilder: (context, index) {
           if (index == 0) {
             return _buildCategoryChip(
-              'All',
+              S.of(context)?.commonAll ?? 'All',
               '🌟',
               _selectedCategory == null,
               () => setState(() => _selectedCategory = null),
@@ -299,44 +341,51 @@ class _StickerStorePageState extends State<StickerStorePage>
     VoidCallback onTap,
     bool isDark,
   ) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppDimensions.spacingXS,
-        vertical: 6,
-      ),
-      child: GestureDetector(
+    // The 6pt vertical padding is inside the tap target so the whole 44pt bar
+    // height is hittable; transparent Material keeps the ripple visible.
+    return Material(
+      type: MaterialType.transparency,
+      child: InkWell(
         onTap: onTap,
-        child: Container(
+        borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
+        child: Padding(
           padding: const EdgeInsets.symmetric(
-            horizontal: AppDimensions.spacingM,
+            horizontal: AppDimensions.spacingXS,
+            vertical: 6,
           ),
-          decoration: BoxDecoration(
-            color: isSelected
-                ? AppColors.primaryOf(context).withValues(alpha: 0.1)
-                : AppColors.inputBgOf(isDark),
-            borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
-            border: isSelected
-                ? Border.all(color: AppColors.primaryOf(context))
-                : null,
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(icon, style: const TextStyle(fontSize: 16)),
-              const SizedBox(width: AppDimensions.spacingXS),
-              Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 13,
-                  height: 1.3,
-                  color: isSelected
-                      ? AppColors.primaryOnTintOf(context)
-                      : context.textPrimary,
+          // Ink paints the chip fill on the Material so the ripple shows.
+          child: Ink(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppDimensions.spacingM,
+            ),
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? AppColors.primaryOf(context).withValues(alpha: 0.1)
+                  : AppColors.inputBgOf(isDark),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
+              border: isSelected
+                  ? Border.all(color: AppColors.primaryOf(context))
+                  : null,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(icon, style: const TextStyle(fontSize: 16)),
+                const SizedBox(width: AppDimensions.spacingXS),
+                Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 13,
+                    height: 1.3,
+                    color: isSelected
+                        ? AppColors.primaryOnTintOf(context)
+                        : context.textPrimary,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -375,7 +424,7 @@ class _StickerStorePageState extends State<StickerStorePage>
             ),
             const SizedBox(height: AppDimensions.spacing),
             Text(
-              'No stickers found',
+              S.of(context)?.ui3StickerNoneFound ?? 'No stickers found',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(height: 1.3, color: context.textSecondary),
@@ -458,7 +507,8 @@ class _StickerStorePageState extends State<StickerStorePage>
                       ),
                       if (pack.author != null)
                         Text(
-                          'by ${pack.author}',
+                          S.of(context)?.ui3StickerByAuthor(pack.author!) ??
+                              'by ${pack.author}',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
@@ -476,29 +526,32 @@ class _StickerStorePageState extends State<StickerStorePage>
                   OutlinedButton(
                     onPressed: () => _openCustomPack(pack.id),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.primaryOf(context),
+                      foregroundColor: AppColors.primaryOnTintOf(context),
                       side: BorderSide(color: AppColors.primaryOf(context)),
                     ),
-                    child: const Text('Manage'),
+                    child: Text(S.of(context)?.ui3StickerManage ?? 'Manage'),
                   )
                 // 安装/已安装按钮
                 else if (isInstalled)
                   OutlinedButton(
                     onPressed: () => _uninstallPack(pack),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.grey,
+                      // Colors.grey label was 2.7:1 on the card.
+                      foregroundColor: context.textSupporting,
                       side: const BorderSide(color: Colors.grey),
                     ),
-                    child: const Text('Remove'),
+                    child: Text(S.of(context)?.commonRemove ?? 'Remove'),
                   )
                 else
                   ElevatedButton(
-                    onPressed: () => _installPack(pack),
+                    onPressed: _installingIds.contains(pack.id)
+                        ? null
+                        : () => _installPack(pack),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryOf(context),
+                      backgroundColor: AppColors.primaryFillOf(context),
                       foregroundColor: Colors.white,
                     ),
-                    child: const Text('Add'),
+                    child: Text(S.of(context)?.commonAdd ?? 'Add'),
                   ),
               ],
             ),
@@ -556,7 +609,8 @@ class _StickerStorePageState extends State<StickerStorePage>
                 ),
                 const SizedBox(width: AppDimensions.spacingXS),
                 Text(
-                  '${pack.stickerCount} stickers',
+                  S.of(context)?.ui3StickerCount(pack.stickerCount) ??
+                      '${pack.stickerCount} stickers',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
@@ -586,7 +640,8 @@ class _StickerStorePageState extends State<StickerStorePage>
             ),
             const SizedBox(height: AppDimensions.spacing),
             Text(
-              'No stickers installed',
+              S.of(context)?.ui3StickerNoneInstalled ??
+                  'No stickers installed',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
@@ -597,22 +652,25 @@ class _StickerStorePageState extends State<StickerStorePage>
             ),
             const SizedBox(height: AppDimensions.spacingS),
             Text(
-              'Get stickers from the store',
+              S.of(context)?.ui3StickerGetFromStore ??
+                  'Get stickers from the store',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 13,
                 height: 1.3,
-                color: AppColors.textTertiaryOf(isDark),
+                color: context.textSecondary,
               ),
             ),
             const SizedBox(height: AppDimensions.spacingXL),
             ElevatedButton.icon(
               onPressed: () => _tabController.animateTo(0),
               icon: const Icon(Icons.store),
-              label: const Text('Browse Store'),
+              label: Text(
+                S.of(context)?.ui3StickerBrowseStore ?? 'Browse Store',
+              ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryOf(context),
+                backgroundColor: AppColors.primaryFillOf(context),
                 foregroundColor: Colors.white,
               ),
             ),

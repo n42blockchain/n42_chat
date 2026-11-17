@@ -199,7 +199,8 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
     } catch (_) {
       if (mounted) {
         _showError(
-          'NFC unavailable or tag not supported. Enable NFC, try another tag, or use QR.',
+          S.of(context)?.ui3NfcUnavailable ??
+              'NFC unavailable or tag not supported. Enable NFC, try another tag, or use QR.',
         );
       }
     } finally {
@@ -367,115 +368,120 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                     right: 20,
                     bottom: 20 + MediaQuery.viewInsetsOf(ctx).bottom,
                   ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        amountLine,
-                        style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        payment.receiverAddress,
-                        style: const TextStyle(
-                          fontSize: 13,
-                          fontFamily: 'monospace',
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                      if (payment.memo != null && payment.memo!.isNotEmpty) ...[
-                        const SizedBox(height: 8),
-                        Text(payment.memo!),
-                      ],
-                      if (exact)
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                         Text(
-                          _assetLabel(selected!),
-                          key: const ValueKey('scan_selected_asset'),
-                        )
-                      else ...[
-                        const SizedBox(height: 12),
-                        DropdownButtonFormField<TokenInfo>(
-                          key: const ValueKey('scan_asset_selector'),
-                          isExpanded: true,
-                          initialValue: selected,
-                          hint: Text(
-                            S.of(ctx)?.transferPleaseSelectToken ??
-                                'Please select a token',
-                          ),
-                          items: candidates
-                              .map(
-                                (asset) => DropdownMenuItem(
-                                  value: asset,
-                                  child: _assetChoice(asset),
-                                ),
-                              )
-                              .toList(),
-                          onChanged: (value) =>
-                              setSheetState(() => selected = value),
-                        ),
-                        if (selected != null)
-                          Text(_assetLabel(selected!), softWrap: true),
-                      ],
-                      if (!payment.hasAmount) ...[
-                        const SizedBox(height: 16),
-                        TextField(
-                          controller: amountController,
-                          keyboardType: const TextInputType.numberWithOptions(
-                            decimal: true,
-                          ),
-                          decoration: InputDecoration(
-                            labelText: S.of(ctx)?.transferAmount ?? 'Amount',
-                            suffixText: selected?.symbol,
-                            errorText: amountError,
+                          amountLine,
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
-                      ],
-                      const SizedBox(height: 20),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: OutlinedButton(
-                              onPressed: () => Navigator.pop(ctx),
-                              child: Text(S.of(ctx)?.commonCancel ?? 'Cancel'),
+                        const SizedBox(height: 8),
+                        Text(
+                          payment.receiverAddress,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontFamily: 'monospace',
+                            color: ctx.textSupporting,
+                          ),
+                        ),
+                        if (payment.memo != null &&
+                            payment.memo!.isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          Text(payment.memo!),
+                        ],
+                        if (exact)
+                          Text(
+                            _assetLabel(selected!),
+                            key: const ValueKey('scan_selected_asset'),
+                          )
+                        else ...[
+                          const SizedBox(height: 12),
+                          DropdownButtonFormField<TokenInfo>(
+                            key: const ValueKey('scan_asset_selector'),
+                            isExpanded: true,
+                            initialValue: selected,
+                            hint: Text(
+                              S.of(ctx)?.transferPleaseSelectToken ??
+                                  'Please select a token',
                             ),
+                            items: candidates
+                                .map(
+                                  (asset) => DropdownMenuItem(
+                                    value: asset,
+                                    child: _assetChoice(asset),
+                                  ),
+                                )
+                                .toList(),
+                            onChanged: (value) =>
+                                setSheetState(() => selected = value),
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: () {
-                                final amount = payment.hasAmount
-                                    ? payment.amount.trim()
-                                    : amountController.text.trim();
-                                if (selected == null ||
-                                    !isValidPaymentAmountForDecimals(
-                                      amount,
-                                      selected!.decimals,
-                                    )) {
-                                  setSheetState(() {
-                                    amountError = selected == null
-                                        ? (S
-                                                  .of(ctx)
-                                                  ?.transferPleaseSelectToken ??
-                                              'Please select a token')
-                                        : (S
-                                                  .of(ctx)
-                                                  ?.transferPleaseEnterValidAmount ??
-                                              'Please enter a valid amount');
-                                  });
-                                  return;
-                                }
-                                Navigator.pop(ctx, amount);
-                              },
-                              child: Text(S.of(ctx)?.commonConfirm ?? 'Pay'),
+                          if (selected != null)
+                            Text(_assetLabel(selected!), softWrap: true),
+                        ],
+                        if (!payment.hasAmount) ...[
+                          const SizedBox(height: 16),
+                          TextField(
+                            controller: amountController,
+                            keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
+                            decoration: InputDecoration(
+                              labelText: S.of(ctx)?.transferAmount ?? 'Amount',
+                              suffixText: selected?.symbol,
+                              errorText: amountError,
                             ),
                           ),
                         ],
-                      ),
-                    ],
+                        const SizedBox(height: 20),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: () => Navigator.pop(ctx),
+                                child: Text(
+                                  S.of(ctx)?.commonCancel ?? 'Cancel',
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  final amount = payment.hasAmount
+                                      ? payment.amount.trim()
+                                      : amountController.text.trim();
+                                  if (selected == null ||
+                                      !isValidPaymentAmountForDecimals(
+                                        amount,
+                                        selected!.decimals,
+                                      )) {
+                                    setSheetState(() {
+                                      amountError = selected == null
+                                          ? (S
+                                                    .of(ctx)
+                                                    ?.transferPleaseSelectToken ??
+                                                'Please select a token')
+                                          : (S
+                                                    .of(ctx)
+                                                    ?.transferPleaseEnterValidAmount ??
+                                                'Please enter a valid amount');
+                                    });
+                                    return;
+                                  }
+                                  Navigator.pop(ctx, amount);
+                                },
+                                child: Text(S.of(ctx)?.commonConfirm ?? 'Pay'),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               );
@@ -575,10 +581,16 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
         Navigator.of(context).pop();
         return true;
       }
-      _showError(result.errorMessage ?? 'Payment failed');
+      _showError(
+        result.errorMessage ??
+            S.of(context)?.blocPaymentFailed ??
+            'Payment failed',
+      );
     } catch (e) {
       if (!mounted) return false;
-      _showError('Payment failed: $e');
+      _showError(
+        '${S.of(context)?.blocPaymentFailed ?? 'Payment failed'}: $e',
+      );
     }
     return false;
   }
@@ -704,6 +716,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.close, color: Colors.white),
+          tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -714,7 +727,9 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
         actions: [
           IconButton(
             key: const ValueKey('scan_nfc_button'),
-            tooltip: _isReadingNfc ? 'Cancel NFC' : 'Read NFC tag',
+            tooltip: _isReadingNfc
+                ? S.of(context)?.ui3CancelNfc ?? 'Cancel NFC'
+                : S.of(context)?.ui3ReadNfcTag ?? 'Read NFC tag',
             icon: Icon(
               _isReadingNfc ? Icons.close : Icons.nfc,
               color: Colors.white,
@@ -746,6 +761,9 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                 _torchEnabled ? Icons.flash_on : Icons.flash_off,
                 color: _torchEnabled ? Colors.yellow : Colors.white,
               ),
+              tooltip: _torchEnabled
+                  ? S.of(context)?.a11yFlashlightOff ?? 'Turn off flashlight'
+                  : S.of(context)?.a11yFlashlightOn ?? 'Turn on flashlight',
               onPressed: _isProcessing || _isPickingImage ? null : _toggleTorch,
             ),
         ],
@@ -753,11 +771,12 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
       body: Column(
         children: [
           if (_isReadingNfc)
-            const Padding(
-              padding: EdgeInsets.all(16),
+            Padding(
+              padding: const EdgeInsets.all(16),
               child: Text(
-                'Hold your phone near the service tag.',
-                style: TextStyle(color: Colors.white),
+                S.of(context)?.ui3HoldNearNfcTag ??
+                    'Hold your phone near the service tag.',
+                style: const TextStyle(color: Colors.white),
               ),
             ),
           if (_scanError != null)
@@ -846,7 +865,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                   ElevatedButton(
                     onPressed: _checkCameraPermission,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryOf(context),
+                      backgroundColor: AppColors.primaryFillOf(context),
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 24,
@@ -1089,7 +1108,7 @@ class _ScanQRPageState extends State<ScanQRPage> with WidgetsBindingObserver {
                 ? null
                 : _submitManualInput,
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryOf(context),
+              backgroundColor: AppColors.primaryFillOf(context),
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),

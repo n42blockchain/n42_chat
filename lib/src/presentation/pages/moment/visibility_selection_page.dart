@@ -122,6 +122,7 @@ class _VisibilitySelectionPageState extends State<VisibilitySelectionPage> {
         ),
         leading: IconButton(
           icon: Icon(Icons.close, color: textColor),
+          tooltip: s?.commonClose ?? 'Close',
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -134,7 +135,7 @@ class _VisibilitySelectionPageState extends State<VisibilitySelectionPage> {
             child: TextField(
               onChanged: (v) => setState(() => _searchQuery = v),
               decoration: InputDecoration(
-                hintText: s?.momentSelectFriends ?? 'Search',
+                hintText: s?.commonSearch ?? 'Search',
                 prefixIcon: const Icon(Icons.search, size: 20),
                 filled: true,
                 fillColor: AppColors.inputBgOf(isDark),
@@ -184,7 +185,8 @@ class _VisibilitySelectionPageState extends State<VisibilitySelectionPage> {
                         ),
                         selected: allSelected,
                         onSelected: (_) => _toggleTag(tag),
-                        selectedColor: AppColors.primaryOf(context),
+                        // Fill shade keeps the white label at 4.5:1.
+                        selectedColor: AppColors.primaryFillOf(context),
                         backgroundColor: AppColors.inputBgOf(isDark),
                         checkmarkColor: Colors.white,
                       );
@@ -269,7 +271,7 @@ class _VisibilitySelectionPageState extends State<VisibilitySelectionPage> {
                       ? null
                       : () => Navigator.of(context).pop(_selectedIds.toList()),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryOf(context),
+                    backgroundColor: AppColors.primaryFillOf(context),
                     foregroundColor: Colors.white,
                     disabledBackgroundColor: AppColors.inputBgOf(isDark),
                     shape: RoundedRectangleBorder(

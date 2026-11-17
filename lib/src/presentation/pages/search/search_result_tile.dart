@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../core/utils/date_utils.dart' as chat_date;
 import '../../../domain/entities/search_result_entity.dart';
 import '../../widgets/common/common_widgets.dart';
@@ -195,7 +196,16 @@ class SearchResultTile extends StatelessWidget {
           ),
           child: Text(
             _getTypeLabel(context),
-            style: TextStyle(fontSize: 10, color: _getTypeColor()),
+            style: TextStyle(
+              fontSize: 10,
+              // Readable shade of the type color on its 10% tint (4.5:1).
+              color: ChatContrast.onTint(
+                _getTypeColor(),
+                [context.surfaceColor],
+                dark: context.isDarkMode,
+                alpha: 0.1,
+              ),
+            ),
           ),
         ),
       ],

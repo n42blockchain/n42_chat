@@ -10,6 +10,7 @@ import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/chat_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/moment_entity.dart';
 import '../../blocs/contact/contact_bloc.dart';
@@ -17,6 +18,7 @@ import '../../blocs/moment/moment_bloc.dart';
 import '../../blocs/moment/moment_event.dart';
 import '../../blocs/moment/moment_state.dart';
 import '../../widgets/common/n42_avatar.dart';
+import '../../widgets/common/n42_tap_area.dart';
 import '../chat/viewers/video_player_page.dart';
 import 'create_moment_page.dart';
 import 'moment_forward_sheet.dart';
@@ -184,7 +186,7 @@ class _MomentListViewState extends State<_MomentListView> {
               if (!_isUserMode)
                 IconButton(
                   icon: const Icon(Icons.video_collection_outlined),
-                  tooltip: 'Videos',
+                  tooltip: s?.ui3MomentVideos ?? 'Videos',
                   onPressed: () => Navigator.of(context).push(
                     MaterialPageRoute<void>(
                       builder: (_) => const VideoFeedPage(),
@@ -194,6 +196,7 @@ class _MomentListViewState extends State<_MomentListView> {
               if (!_isUserMode)
                 IconButton(
                   icon: const Icon(Icons.camera_alt_outlined),
+                  tooltip: s?.ui3MomentCreateTitle ?? 'Create Moment',
                   onPressed: () => _openCreateMoment(context),
                 ),
             ],
@@ -267,6 +270,7 @@ class _MomentListViewState extends State<_MomentListView> {
       floatingActionButton: _isUserMode || _isActionMenuVisible
           ? null
           : FloatingActionButton(
+              tooltip: s?.ui3MomentCreateTitle ?? 'Create Moment',
               onPressed: () => _openCreateMoment(context),
               child: const Icon(Icons.add),
             ),
@@ -434,8 +438,8 @@ class _MomentTile extends StatelessWidget {
                   moment.userName,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: AppColors.info,
+                  style: TextStyle(
+                    color: _nameColor(context.surfaceColor),
                     fontWeight: FontWeight.w500,
                     height: 1.3,
                   ),
@@ -684,7 +688,7 @@ class _MomentTile extends StatelessWidget {
           child: Icon(
             Icons.lock_outline,
             size: 13,
-            color: context.textTertiary,
+            color: context.textSecondary,
           ),
         );
       case MomentVisibility.partial:
@@ -693,7 +697,7 @@ class _MomentTile extends StatelessWidget {
           child: Icon(
             Icons.group_outlined,
             size: 13,
-            color: context.textTertiary,
+            color: context.textSecondary,
           ),
         );
       case MomentVisibility.excluded:
@@ -702,7 +706,7 @@ class _MomentTile extends StatelessWidget {
           child: Icon(
             Icons.person_off_outlined,
             size: 13,
-            color: context.textTertiary,
+            color: context.textSecondary,
           ),
         );
       case MomentVisibility.public:
@@ -714,19 +718,28 @@ class _MomentTile extends StatelessWidget {
   Widget _buildInteractionBar(BuildContext context) {
     return Builder(
       builder: (buttonContext) => GestureDetector(
-        onTap: () => _showActionPopup(context, buttonContext),
         onSecondaryTapDown: (details) => _showActionPopup(
           context,
           buttonContext,
           pointerPosition: details.globalPosition,
         ),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: AppColors.inputBgOf(isDark),
-            borderRadius: BorderRadius.circular(4),
+        // 44pt hit area around the unchanged 34x26 pill.
+        child: N42TapArea(
+          onTap: () => _showActionPopup(context, buttonContext),
+          tooltip: S.of(context)?.commonMore ?? 'More',
+          borderRadius: BorderRadius.circular(4),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: AppColors.inputBgOf(isDark),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Icon(
+              Icons.more_horiz,
+              size: 18,
+              color: context.textSecondary,
+            ),
           ),
-          child: Icon(Icons.more_horiz, size: 18, color: context.textSecondary),
         ),
       ),
     );
@@ -882,8 +895,8 @@ class _MomentTile extends StatelessWidget {
                     visibleLikes.map((l) => l.userName).join(', '),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: AppColors.info,
+                    style: TextStyle(
+                      color: _nameColor(AppColors.inputBgOf(isDark)),
                       fontSize: 13,
                       height: 1.4,
                     ),
@@ -905,8 +918,8 @@ class _MomentTile extends StatelessWidget {
                   children: [
                     TextSpan(
                       text: comment.userName,
-                      style: const TextStyle(
-                        color: AppColors.info,
+                      style: TextStyle(
+                        color: _nameColor(AppColors.inputBgOf(isDark)),
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -916,8 +929,8 @@ class _MomentTile extends StatelessWidget {
                       ),
                       TextSpan(
                         text: comment.replyToUserName,
-                        style: const TextStyle(
-                          color: AppColors.info,
+                        style: TextStyle(
+                          color: _nameColor(AppColors.inputBgOf(isDark)),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -940,6 +953,11 @@ class _MomentTile extends StatelessWidget {
     }
     return {};
   }
+
+  /// Name link color: AppColors.info is 2.5:1 on white, so shade it to 4.5:1
+  /// on [background].
+  Color _nameColor(Color background) =>
+      ChatContrast.onTint(AppColors.info, [background], dark: isDark, alpha: 0);
 
   void _openMediaViewer(BuildContext context, int index) {
     if (index >= moment.media.length) return;
@@ -1188,7 +1206,14 @@ class _MomentDeleteDialogState extends State<_MomentDeleteDialog> {
                   )
                 : Text(
                     s?.commonDelete ?? 'Delete',
-                    style: const TextStyle(color: AppColors.error),
+                    style: TextStyle(
+                      color: ChatContrast.onTint(
+                        AppColors.error,
+                        [Theme.of(context).colorScheme.surface],
+                        dark: Theme.of(context).brightness == Brightness.dark,
+                        alpha: 0,
+                      ),
+                    ),
                   ),
           ),
         ],

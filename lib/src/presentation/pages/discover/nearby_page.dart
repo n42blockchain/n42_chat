@@ -102,8 +102,13 @@ class _NearbyPageState extends State<NearbyPage> {
   }
 
   Future<NearbyCoordinate> _loadDeviceLocation() async {
+    // Read strings before the first await (no BuildContext across gaps).
+    final l10n = S.of(context);
     if (!await Geolocator.isLocationServiceEnabled()) {
-      throw Exception('Location Services are turned off');
+      throw Exception(
+        l10n?.ui3LocationServicesOff ??
+            'Location Services are turned off',
+      );
     }
 
     var permission = await Geolocator.checkPermission();
@@ -111,10 +116,16 @@ class _NearbyPageState extends State<NearbyPage> {
       permission = await Geolocator.requestPermission();
     }
     if (permission == LocationPermission.denied) {
-      throw Exception('Location permission was denied');
+      throw Exception(
+        l10n?.ui3LocationPermissionDenied ??
+            'Location permission was denied',
+      );
     }
     if (permission == LocationPermission.deniedForever) {
-      throw Exception('Enable location permission in system settings');
+      throw Exception(
+        l10n?.ui3EnableLocationInSettings ??
+            'Enable location permission in system settings',
+      );
     }
 
     final position = await Geolocator.getCurrentPosition(
@@ -136,7 +147,7 @@ class _NearbyPageState extends State<NearbyPage> {
         actions: [
           if (_enabled)
             IconButton(
-              tooltip: 'Refresh',
+              tooltip: S.of(context)?.ui3Refresh ?? 'Refresh',
               onPressed: _loading ? null : _enableAndLoad,
               icon: const Icon(Icons.refresh),
             ),
@@ -168,7 +179,8 @@ class _NearbyPageState extends State<NearbyPage> {
             ),
             const SizedBox(height: 24),
             Text(
-              'Discover nearby public posts',
+              S.of(context)?.ui3NearbyIntroTitle ??
+                  'Discover nearby public posts',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: context.textPrimary,
@@ -178,8 +190,10 @@ class _NearbyPageState extends State<NearbyPage> {
             ),
             const SizedBox(height: 12),
             Text(
-              'Your location is used once on this device to sort public Moments. '
-              'It is not uploaded, broadcast, or shown to other people.',
+              S.of(context)?.ui3NearbyIntroBody ??
+                  'Your location is used once on this device to sort public '
+                      'Moments. It is not uploaded, broadcast, or shown to '
+                      'other people.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: context.textSecondary,
@@ -194,7 +208,9 @@ class _NearbyPageState extends State<NearbyPage> {
                 key: const ValueKey('nearby-enable'),
                 onPressed: _enableAndLoad,
                 icon: const Icon(Icons.location_on_outlined),
-                label: const Text('Use my location'),
+                label: Text(
+                  S.of(context)?.ui3UseMyLocation ?? 'Use my location',
+                ),
               ),
             ),
           ],
@@ -210,17 +226,19 @@ class _NearbyPageState extends State<NearbyPage> {
     if (_error != null) {
       return _NearbyMessage(
         icon: Icons.location_off_outlined,
-        title: 'Nearby is unavailable',
+        title: S.of(context)?.ui3NearbyUnavailable ?? 'Nearby is unavailable',
         message: _error!,
-        actionLabel: 'Try again',
+        actionLabel: S.of(context)?.commonTryAgain ?? 'Try again',
         onAction: _enableAndLoad,
       );
     }
     if (_people.isEmpty) {
-      return const _NearbyMessage(
+      return _NearbyMessage(
         icon: Icons.people_outline,
-        title: 'No nearby posts yet',
-        message: 'Public Moments with a location will appear here.',
+        title: S.of(context)?.ui3NoNearbyPosts ?? 'No nearby posts yet',
+        message:
+            S.of(context)?.ui3NoNearbyPostsHint ??
+            'Public Moments with a location will appear here.',
       );
     }
 
@@ -238,8 +256,9 @@ class _NearbyPageState extends State<NearbyPage> {
               color: AppColors.primaryOf(context).withValues(alpha: 0.08),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               child: Text(
-                'Approximate distance · public location posts only',
-                style: TextStyle(color: context.textSecondary, fontSize: 12),
+                S.of(context)?.ui3NearbyDistanceNote ??
+                    'Approximate distance · public location posts only',
+                style: TextStyle(color: context.textSupporting, fontSize: 12),
               ),
             );
           }
@@ -263,7 +282,8 @@ class _NearbyPageState extends State<NearbyPage> {
             subtitle: Text(
               person.moment.content?.trim().isNotEmpty == true
                   ? person.moment.content!.trim()
-                  : 'Public location post',
+                  : S.of(context)?.ui3PublicLocationPost ??
+                        'Public location post',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -317,7 +337,7 @@ class _NearbyMessage extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 56, color: context.textTertiary),
+            Icon(icon, size: 56, color: context.textSecondary),
             const SizedBox(height: 16),
             Text(
               title,

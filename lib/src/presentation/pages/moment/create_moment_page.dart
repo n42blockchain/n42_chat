@@ -18,6 +18,7 @@ import '../../blocs/contact/contact_bloc.dart';
 import '../../blocs/moment/moment_bloc.dart';
 import '../../blocs/moment/moment_event.dart';
 import '../../blocs/moment/moment_state.dart';
+import '../../widgets/common/n42_tap_area.dart';
 import '../media/social_image_preparation.dart';
 import 'visibility_selection_page.dart';
 import '../../../core/utils/debug_log.dart';
@@ -108,7 +109,11 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
           Navigator.of(context).pop();
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.errorMessage ?? 'Error')),
+            SnackBar(
+              content: Text(
+                state.errorMessage ?? S.of(context)?.chatError ?? 'Error',
+              ),
+            ),
           );
         }
       },
@@ -118,7 +123,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
           title: Text(
             widget.videoOnly
                 ? s?.videoPublish ?? 'Publish video'
-                : 'Create Moment',
+                : s?.ui3MomentCreateTitle ?? 'Create Moment',
           ),
           backgroundColor: context.surfaceColor,
           actions: [
@@ -177,7 +182,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
                   maxLines: 5,
                   maxLength: 500,
                   decoration: InputDecoration(
-                    hintText: "What's on your mind?",
+                    hintText: s?.ui3MomentContentHint ?? "What's on your mind?",
                     border: InputBorder.none,
                     counterStyle: TextStyle(color: context.textSecondary),
                   ),
@@ -202,7 +207,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
                     if (!widget.videoOnly)
                       _buildOptionTile(
                         icon: Icons.photo_library,
-                        title: 'Add Photos',
+                        title: s?.ui3MomentAddPhotos ?? 'Add Photos',
                         onTap: _pickImages,
                         isDark: isDark,
                       ),
@@ -216,12 +221,16 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
                     Divider(height: 1, color: context.dividerColor),
                     _buildOptionTile(
                       icon: Icons.location_on,
-                      title: _location?.displayText ?? 'Add Location',
+                      title:
+                          _location?.displayText ??
+                          s?.ui3MomentAddLocation ??
+                          'Add Location',
                       onTap: _selectLocation,
                       isDark: isDark,
                       trailing: _location != null
                           ? IconButton(
                               icon: const Icon(Icons.close, size: 20),
+                              tooltip: s?.commonRemove ?? 'Remove',
                               onPressed: () => setState(() => _location = null),
                             )
                           : null,
@@ -244,6 +253,7 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
   }
 
   Widget _buildMediaPreview() {
+    final s = S.of(context);
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -256,7 +266,8 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
           Row(
             children: [
               Text(
-                'Selected Media (${_selectedMedia.length})',
+                s?.ui3MomentSelectedMedia(_selectedMedia.length) ??
+                    'Selected Media (${_selectedMedia.length})',
                 style: TextStyle(
                   fontWeight: FontWeight.w500,
                   color: context.textPrimary,
@@ -264,8 +275,8 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
               ),
               const Spacer(),
               TextButton(
-                onPressed: () => setState(() => _selectedMedia.clear()),
-                child: const Text('Clear All'),
+                onPressed: _confirmClearMedia,
+                child: Text(s?.ui3MomentClearAll ?? 'Clear All'),
               ),
             ],
           ),
@@ -305,12 +316,15 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
                         size: 32,
                       ),
                     ),
+                  // 44pt hit area around the unchanged 24pt remove badge.
                   Positioned(
-                    top: 4,
-                    right: 4,
-                    child: GestureDetector(
+                    top: 0,
+                    right: 0,
+                    child: N42TapArea(
                       onTap: () =>
                           setState(() => _selectedMedia.removeAt(index)),
+                      tooltip: s?.a11yRemoveImage ?? 'Remove image',
+                      customBorder: const CircleBorder(),
                       child: Container(
                         padding: const EdgeInsets.all(4),
                         decoration: const BoxDecoration(
@@ -516,7 +530,9 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
             ListTile(
               leading: const Icon(Icons.public),
               title: Text(s?.momentVisibilityPublic ?? 'Public'),
-              subtitle: const Text('All friends can see'),
+              subtitle: Text(
+                s?.ui3MomentVisibilityPublicDesc ?? 'All friends can see',
+              ),
               trailing: _visibility == MomentVisibility.public
                   ? Icon(Icons.check, color: AppColors.primaryOf(context))
                   : null,
@@ -532,7 +548,9 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
             ListTile(
               leading: const Icon(Icons.lock),
               title: Text(s?.momentVisibilityPrivate ?? 'Private'),
-              subtitle: const Text('Only you can see'),
+              subtitle: Text(
+                s?.ui3MomentVisibilityPrivateDesc ?? 'Only you can see',
+              ),
               trailing: _visibility == MomentVisibility.private
                   ? Icon(Icons.check, color: AppColors.primaryOf(context))
                   : null,
@@ -548,7 +566,9 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
             ListTile(
               leading: const Icon(Icons.group),
               title: Text(s?.momentVisibilityPartial ?? 'Selected Friends'),
-              subtitle: const Text('Choose who can see'),
+              subtitle: Text(
+                s?.ui3MomentVisibilityPartialDesc ?? 'Choose who can see',
+              ),
               trailing: _visibility == MomentVisibility.partial
                   ? Icon(Icons.check, color: AppColors.primaryOf(context))
                   : null,
@@ -562,7 +582,10 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
               title: Text(
                 s?.momentVisibilityExcluded ?? 'Exclude Some Friends',
               ),
-              subtitle: const Text('Hide from specific friends'),
+              subtitle: Text(
+                s?.ui3MomentVisibilityExcludedDesc ??
+                    'Hide from specific friends',
+              ),
               trailing: _visibility == MomentVisibility.excluded
                   ? Icon(Icons.check, color: AppColors.primaryOf(context))
                   : null,
@@ -615,9 +638,24 @@ class _CreateMomentPageState extends State<CreateMomentPage> {
     }
   }
 
+  Future<void> _confirmClearMedia() async {
+    final s = S.of(context);
+    final confirmed = await context.showConfirmDialog(
+      title: s?.ui3MomentClearAll ?? 'Clear All',
+      content:
+          s?.ui3MomentClearMediaConfirm ?? 'Remove all selected photos/videos?',
+      confirmText: s?.commonClear ?? 'Clear',
+      isDanger: true,
+    );
+    if (!confirmed || !mounted) return;
+    setState(() => _selectedMedia.clear());
+  }
+
   void _postMoment() {
     if (widget.videoOnly && !_selectedMedia.any((item) => item.isVideo)) return;
     final bloc = context.read<MomentBloc>();
+    // Ignore repeat taps while a post is already in flight.
+    if (bloc.state.isPosting) return;
 
     if (_selectedMedia.isEmpty) {
       // 纯文字动态

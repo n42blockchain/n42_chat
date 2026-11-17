@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/extensions/context_extension.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../domain/entities/social/social_connection.dart';
 import '../../../domain/entities/social/social_recommendation.dart';
 import '../../../core/theme/app_dimensions.dart';
@@ -83,7 +85,7 @@ class SimilarityCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: AppDimensions.spacingS),
-                      _buildSimilarityBadge(),
+                      _buildSimilarityBadge(context),
                     ],
                   ),
                   const SizedBox(height: AppDimensions.spacingXS),
@@ -143,7 +145,7 @@ class SimilarityCard extends StatelessWidget {
     );
   }
 
-  Widget _buildSimilarityBadge() {
+  Widget _buildSimilarityBadge(BuildContext context) {
     final percent = recommendation.similarityPercent;
     final badgeColor = percent >= 60
         ? AppColors.primary
@@ -165,7 +167,13 @@ class SimilarityCard extends StatelessWidget {
         style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w600,
-          color: badgeColor,
+          // Shade of the badge color that reaches 4.5:1 on its 12% tint.
+          color: ChatContrast.onTint(
+            badgeColor,
+            [context.surfaceColor],
+            dark: context.isDarkMode,
+            alpha: 0.12,
+          ),
         ),
       ),
     );
@@ -180,7 +188,7 @@ class SimilarityCard extends StatelessWidget {
       return Padding(
         padding: const EdgeInsets.only(right: 6),
         child: Tooltip(
-          message: _labelForType(type),
+          message: _labelForType(context, type),
           child: Icon(icon, size: 16, color: iconColor),
         ),
       );
@@ -188,21 +196,20 @@ class SimilarityCard extends StatelessWidget {
   }
 
   Widget _buildConnectButton(BuildContext context) {
-    return SizedBox(
-      height: 28,
-      child: TextButton(
-        onPressed: onConnect,
-        style: TextButton.styleFrom(
-          backgroundColor: AppColors.primaryOf(context).withValues(alpha: 0.1),
-          foregroundColor: AppColors.primaryOf(context),
-          padding: const EdgeInsets.symmetric(horizontal: 14),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
-          textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-        ),
-        child: const Text('Connect'),
+    // Visual pill stays 28pt tall; the padded tap target keeps the hit
+    // area at 48pt.
+    return TextButton(
+      onPressed: onConnect,
+      style: TextButton.styleFrom(
+        backgroundColor: AppColors.primaryOf(context).withValues(alpha: 0.1),
+        foregroundColor: AppColors.primaryOnTintOf(context),
+        minimumSize: const Size(0, 28),
+        padding: const EdgeInsets.symmetric(horizontal: 14),
+        tapTargetSize: MaterialTapTargetSize.padded,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
       ),
+      child: Text(S.of(context)?.ui3Connect ?? 'Connect'),
     );
   }
 
@@ -229,18 +236,19 @@ class SimilarityCard extends StatelessWidget {
     }
   }
 
-  String _labelForType(ConnectionType type) {
+  String _labelForType(BuildContext context, ConnectionType type) {
+    final l10n = S.of(context);
     switch (type) {
       case ConnectionType.commonTokens:
-        return 'Common tokens';
+        return l10n?.ui3CommonTokens ?? 'Common tokens';
       case ConnectionType.commonNfts:
-        return 'Shared NFTs';
+        return l10n?.ui3SharedNfts ?? 'Shared NFTs';
       case ConnectionType.transactionHistory:
-        return 'Transaction history';
+        return l10n?.ui3TransactionHistory ?? 'Transaction history';
       case ConnectionType.commonDaos:
-        return 'Common DAOs';
+        return l10n?.ui3CommonDaos ?? 'Common DAOs';
       case ConnectionType.commonChains:
-        return 'Same chains';
+        return l10n?.ui3SameChains ?? 'Same chains';
     }
   }
 }

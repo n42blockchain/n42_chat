@@ -126,6 +126,9 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Delete'));
     await tester.pumpAndSettle();
+    // Deletion now asks for confirmation first.
+    await tester.tap(find.widgetWithText(TextButton, 'Delete'));
+    await tester.pumpAndSettle();
     verify(() => repository.unsaveMessage('image')).called(1);
     expect(tester.takeException(), isNull);
   });

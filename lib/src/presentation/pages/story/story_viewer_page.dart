@@ -17,6 +17,7 @@ import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/story_entity.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../widgets/common/n42_avatar.dart';
+import '../../widgets/common/n42_tap_area.dart';
 import '../../widgets/story/story_progress_bar.dart';
 import 'story_viewers_page.dart';
 import '../../../core/utils/debug_log.dart';
@@ -719,13 +720,14 @@ class _StoryContentState extends State<_StoryContent> {
         ),
         const Spacer(),
         // 底部渐变
+        // Covers the viewers row / reply bar so white labels stay legible.
         Container(
-          height: 100,
+          height: 160,
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.bottomCenter,
               end: Alignment.topCenter,
-              colors: [Colors.black38, Colors.transparent],
+              colors: [Colors.black54, Colors.transparent],
             ),
           ),
         ),
@@ -796,10 +798,11 @@ class _StoryContentState extends State<_StoryContent> {
               ),
               const SizedBox(height: 2),
               Text(
-                _formatTimeAgo(story.createdAt),
+                _formatTimeAgo(context, story.createdAt),
                 style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.7),
+                  color: Colors.white.withValues(alpha: 0.85),
                   fontSize: 12,
+                  shadows: const [Shadow(color: Colors.black45, blurRadius: 4)],
                 ),
               ),
             ],
@@ -808,7 +811,11 @@ class _StoryContentState extends State<_StoryContent> {
 
         // 音乐指示器
         if (story.hasMusic) ...[
-          GestureDetector(
+          N42TapArea(
+            tooltip: _isMusicPlaying
+                ? (S.of(context)?.a11yPause ?? 'Pause')
+                : (S.of(context)?.a11yPlay ?? 'Play'),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusL),
             onTap: () {
               if (_musicPlayer == null) return;
               if (_isMusicPlaying) {
@@ -840,7 +847,7 @@ class _StoryContentState extends State<_StoryContent> {
                   ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 80),
                     child: Text(
-                      story.musicTitle ?? 'Music',
+                      story.musicTitle ?? S.of(context)?.commonMusic ?? 'Music',
                       style: const TextStyle(color: Colors.white, fontSize: 11),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -857,8 +864,9 @@ class _StoryContentState extends State<_StoryContent> {
         IconButton(
           onPressed: onClose,
           icon: const Icon(Icons.close, color: Colors.white, size: 28),
+          tooltip: S.of(context)?.commonClose ?? 'Close',
           padding: EdgeInsets.zero,
-          constraints: const BoxConstraints(),
+          constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
         ),
       ],
     );
@@ -903,8 +911,9 @@ class _StoryContentState extends State<_StoryContent> {
         child: Row(
           children: [
             Expanded(
-              child: GestureDetector(
+              child: N42TapArea(
                 onTap: _isDeletingStory ? null : widget.onViewersPressed,
+                borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                 child: Row(
                   children: [
                     Icon(
@@ -970,7 +979,8 @@ class _StoryContentState extends State<_StoryContent> {
           children: [
             Expanded(
               child: Container(
-                height: 40,
+                // minHeight keeps the field from clipping at large text.
+                constraints: const BoxConstraints(minHeight: 40),
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(20),
@@ -1008,8 +1018,9 @@ class _StoryContentState extends State<_StoryContent> {
                   ? null
                   : () => _handleReplySubmit(_replyController.text),
               icon: const Icon(Icons.send, color: Colors.white, size: 22),
+              tooltip: l10n?.commonSend ?? 'Send',
               padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
+              constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
             ),
           ],
         ),
@@ -1051,7 +1062,10 @@ class _StoryContentState extends State<_StoryContent> {
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(S.of(context)?.commonRetry ?? 'Failed to send reply'),
+        content: Text(
+          S.of(context)?.ui3StoryReplySendFailed ??
+              'Failed to send story reply',
+        ),
       ),
     );
   }
@@ -1066,7 +1080,7 @@ class _StoryContentState extends State<_StoryContent> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(l10n?.commonDelete ?? 'Delete'),
-        content: const Text('Delete this story?'),
+        content: Text(l10n?.ui3StoryDeleteConfirm ?? 'Delete this story?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
@@ -1102,23 +1116,26 @@ class _StoryContentState extends State<_StoryContent> {
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(l10n?.commonRetry ?? 'Failed to delete story')),
+      SnackBar(
+        content: Text(l10n?.ui3StoryDeleteFailed ?? 'Failed to delete story'),
+      ),
     );
   }
 
   /// 格式化时间为 "X 小时前" 等格式
-  String _formatTimeAgo(DateTime dateTime) {
+  String _formatTimeAgo(BuildContext context, DateTime dateTime) {
+    final l10n = S.of(context);
     final now = DateTime.now();
     final diff = now.difference(dateTime);
 
     if (diff.inMinutes < 1) {
-      return 'Just now';
+      return l10n?.chatJustNow ?? 'Just now';
     } else if (diff.inMinutes < 60) {
-      return '${diff.inMinutes}m ago';
+      return l10n?.momentMinutesAgo(diff.inMinutes) ?? '${diff.inMinutes}m ago';
     } else if (diff.inHours < 24) {
-      return '${diff.inHours}h ago';
+      return l10n?.momentHoursAgo(diff.inHours) ?? '${diff.inHours}h ago';
     } else {
-      return '${diff.inDays}d ago';
+      return l10n?.momentDaysAgo(diff.inDays) ?? '${diff.inDays}d ago';
     }
   }
 }

@@ -6,11 +6,13 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../../core/di/injection.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../core/utils/matrix_utils.dart' as mx_utils;
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/sticker_pack_entity.dart';
 import '../../../domain/repositories/sticker_repository.dart';
 import '../../../core/theme/app_dimensions.dart';
+import '../../widgets/common/n42_tap_area.dart';
 
 /// 自定义贴纸包管理页
 ///
@@ -75,30 +77,45 @@ class _CustomStickerPackPageState extends State<CustomStickerPackPage> {
       }
       _changed = _changed || added > 0;
       await _load();
-      _snack('Added $added sticker(s)');
+      if (!mounted) return;
+      _snack(
+        S.of(context)?.ui3StickerAddedCount(added) ??
+            'Added $added sticker(s)',
+      );
     } catch (e) {
-      _snack('Failed to add: $e');
+      if (!mounted) return;
+      _snack(S.of(context)?.ui3StickerAddFailed('$e') ?? 'Failed to add: $e');
     } finally {
       if (mounted) setState(() => _busy = false);
     }
   }
 
   Future<void> _removeSticker(Sticker sticker) async {
+    final s = S.of(context);
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Remove sticker'),
-        content: const Text('Remove this sticker from the pack?'),
+        title: Text(s?.ui3StickerRemoveTitle ?? 'Remove sticker'),
+        content: Text(
+          s?.ui3StickerRemoveConfirm ?? 'Remove this sticker from the pack?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel'),
+            child: Text(s?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text(
-              'Remove',
-              style: TextStyle(color: AppColors.error),
+            child: Text(
+              s?.commonRemove ?? 'Remove',
+              style: TextStyle(
+                color: ChatContrast.onTint(
+                  AppColors.error,
+                  [Theme.of(ctx).colorScheme.surface],
+                  dark: Theme.of(ctx).brightness == Brightness.dark,
+                  alpha: 0,
+                ),
+              ),
             ),
           ),
         ],
@@ -113,29 +130,33 @@ class _CustomStickerPackPageState extends State<CustomStickerPackPage> {
       _changed = true;
       await _load();
     } else {
-      _snack('Failed to remove');
+      if (!mounted) return;
+      _snack(S.of(context)?.ui3StickerRemoveFailed ?? 'Failed to remove');
     }
   }
 
   Future<void> _rename() async {
     final controller = TextEditingController(text: _pack?.name ?? '');
+    final s = S.of(context);
     final newName = await showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Rename pack'),
+        title: Text(s?.ui3StickerRenamePack ?? 'Rename pack'),
         content: TextField(
           controller: controller,
           autofocus: true,
-          decoration: const InputDecoration(hintText: 'Pack name'),
+          decoration: InputDecoration(
+            hintText: s?.ui3StickerPackName ?? 'Pack name',
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
+            child: Text(s?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, controller.text.trim()),
-            child: const Text('Save'),
+            child: Text(s?.commonSave ?? 'Save'),
           ),
         ],
       ),
@@ -146,29 +167,40 @@ class _CustomStickerPackPageState extends State<CustomStickerPackPage> {
       _changed = true;
       await _load();
     } else {
-      _snack('Failed to rename');
+      if (!mounted) return;
+      _snack(S.of(context)?.ui3StickerRenameFailed ?? 'Failed to rename');
     }
   }
 
   Future<void> _deletePack() async {
+    final s = S.of(context);
+    final packName = _pack?.name ?? s?.ui3StickerThisPack ?? 'this pack';
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Delete pack'),
+        title: Text(s?.ui3StickerDeletePack ?? 'Delete pack'),
         content: Text(
-          'Delete "${_pack?.name ?? 'this pack'}" and all its '
-          'stickers? This cannot be undone.',
+          s?.ui3StickerDeletePackConfirm(packName) ??
+              'Delete "$packName" and all its '
+                  'stickers? This cannot be undone.',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel'),
+            child: Text(s?.commonCancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text(
-              'Delete',
-              style: TextStyle(color: AppColors.error),
+            child: Text(
+              s?.commonDelete ?? 'Delete',
+              style: TextStyle(
+                color: ChatContrast.onTint(
+                  AppColors.error,
+                  [Theme.of(ctx).colorScheme.surface],
+                  dark: Theme.of(ctx).brightness == Brightness.dark,
+                  alpha: 0,
+                ),
+              ),
             ),
           ),
         ],
@@ -180,23 +212,24 @@ class _CustomStickerPackPageState extends State<CustomStickerPackPage> {
     if (ok) {
       Navigator.of(context).pop(true); // 返回并通知 store 刷新
     } else {
-      _snack('Failed to delete');
+      _snack(S.of(context)?.ui3StickerDeleteFailed ?? 'Failed to delete');
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final pack = _pack;
+    final s = S.of(context);
     return PopScope(
       canPop: true,
       onPopInvokedWithResult: (didPop, _) {},
       child: Scaffold(
         appBar: AppBar(
-          title: Text(pack?.name ?? 'Sticker Pack'),
+          title: Text(pack?.name ?? s?.ui3StickerPack ?? 'Sticker Pack'),
           actions: [
             IconButton(
               key: const ValueKey('sticker_pack_publish'),
-              tooltip: S.of(context)?.commonShare ?? 'Share',
+              tooltip: s?.commonShare ?? 'Share',
               icon: const Icon(Icons.share_outlined),
               onPressed: pack == null || _busy
                   ? null
@@ -208,12 +241,12 @@ class _CustomStickerPackPageState extends State<CustomStickerPackPage> {
                     ),
             ),
             IconButton(
-              tooltip: 'Rename',
+              tooltip: s?.ui3StickerRenamePack ?? 'Rename pack',
               icon: const Icon(Icons.edit_outlined),
               onPressed: pack == null ? null : _rename,
             ),
             IconButton(
-              tooltip: 'Delete pack',
+              tooltip: s?.ui3StickerDeletePack ?? 'Delete pack',
               icon: const Icon(Icons.delete_outline),
               onPressed: pack == null ? null : _deletePack,
             ),
@@ -228,7 +261,11 @@ class _CustomStickerPackPageState extends State<CustomStickerPackPage> {
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
               : const Icon(Icons.add_photo_alternate_outlined),
-          label: Text(_busy ? 'Adding…' : 'Add stickers'),
+          label: Text(
+            _busy
+                ? (s?.ui3StickerAdding ?? 'Adding…')
+                : (s?.ui3StickerAddStickers ?? 'Add stickers'),
+          ),
         ),
         body: _buildBody(),
       ),
@@ -241,16 +278,22 @@ class _CustomStickerPackPageState extends State<CustomStickerPackPage> {
     }
     final pack = _pack;
     if (pack == null) {
-      return const Center(child: Text('Pack not found'));
+      return Center(
+        child: Text(S.of(context)?.ui3StickerPackNotFound ?? 'Pack not found'),
+      );
     }
     if (pack.stickers.isEmpty) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.add_photo_alternate_outlined, size: 56),
-            SizedBox(height: AppDimensions.spacingM),
-            Text('Tap "Add stickers" to upload images'),
+            const Icon(Icons.add_photo_alternate_outlined, size: 56),
+            const SizedBox(height: AppDimensions.spacingM),
+            Text(
+              S.of(context)?.ui3StickerEmptyHint ??
+                  'Tap "Add stickers" to upload images',
+              textAlign: TextAlign.center,
+            ),
           ],
         ),
       );
@@ -271,21 +314,32 @@ class _CustomStickerPackPageState extends State<CustomStickerPackPage> {
           child: Stack(
             children: [
               Positioned.fill(child: _StickerThumb(sticker: sticker)),
+              // 44pt hit area in the tile corner; the 18pt badge keeps its
+              // 2pt inset.
               Positioned(
-                top: 2,
-                right: 2,
-                child: InkWell(
+                top: 0,
+                right: 0,
+                child: N42TapArea(
                   onTap: () => _removeSticker(sticker),
-                  child: Container(
-                    decoration: const BoxDecoration(
-                      color: Colors.black54,
-                      shape: BoxShape.circle,
-                    ),
-                    padding: const EdgeInsets.all(2),
-                    child: const Icon(
-                      Icons.close,
-                      size: 14,
-                      color: Colors.white,
+                  tooltip: S.of(context)?.commonRemove ?? 'Remove',
+                  child: SizedBox(
+                    width: N42TapArea.minTarget,
+                    height: N42TapArea.minTarget,
+                    child: Align(
+                      alignment: Alignment.topRight,
+                      child: Container(
+                        margin: const EdgeInsets.all(2),
+                        decoration: const BoxDecoration(
+                          color: Colors.black54,
+                          shape: BoxShape.circle,
+                        ),
+                        padding: const EdgeInsets.all(2),
+                        child: const Icon(
+                          Icons.close,
+                          size: 14,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
                   ),
                 ),

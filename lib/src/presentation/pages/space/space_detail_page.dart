@@ -7,6 +7,7 @@ import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/chat_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../data/datasources/matrix/matrix_client_manager.dart';
 import '../../../domain/entities/conversation_entity.dart';
@@ -68,7 +69,7 @@ class _SpaceDetailPageState extends State<SpaceDetailPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.errorMessage!),
-              backgroundColor: AppColors.error,
+              backgroundColor: AppColors.errorFill,
             ),
           );
           context.read<SpaceBloc>().add(const ClearSpaceError());
@@ -341,7 +342,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
         if (getIt.isRegistered<GovernanceBloc>())
           IconButton(
             // 与 ProposalsListPage 的 AppBar 同款硬编码（governance 尚无 l10n key）
-            tooltip: 'Governance',
+            tooltip: S.of(context)?.a11yGovernance ?? 'Governance',
             icon: const Icon(Icons.how_to_vote_outlined),
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute<void>(
@@ -371,7 +372,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
                 value: 'delete',
                 child: Text(
                   S.of(context)?.spacesDelete ?? 'Delete Community',
-                  style: const TextStyle(color: AppColors.error),
+                  style: TextStyle(color: AppColors.errorTextOf(context)),
                 ),
               ),
             ],
@@ -468,7 +469,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
       child: OutlinedButton.icon(
         onPressed: () => _showSpaceLinkActions(context),
         icon: const Icon(Icons.share_outlined),
-        label: const Text('Share'),
+        label: Text(S.of(context)?.commonShare ?? 'Share'),
       ),
     );
 
@@ -488,7 +489,9 @@ class _SpaceDetailScaffold extends StatelessWidget {
                     )
                   : const Icon(Icons.exit_to_app),
               label: Text(S.of(context)?.spacesLeave ?? 'Leave Community'),
-              style: OutlinedButton.styleFrom(foregroundColor: AppColors.error),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.errorTextOf(context),
+              ),
             ),
           ),
         ],
@@ -526,11 +529,16 @@ class _SpaceDetailScaffold extends StatelessWidget {
       resolveLink: () => getIt<ISpaceRepository>().getSpaceInviteLink(space.id),
       presentation: ShareableLinkPresentation(
         entityName: space.name,
-        linkLabel: 'Community Link',
-        qrCodeTitle: 'Community QR Code',
-        qrCodeSubtitle: 'Scan to join this community and browse its channels',
-        errorPrefix: 'Failed to load community link',
-        copySuccessMessage: 'Community link copied',
+        linkLabel: S.of(context)?.ui3CommunityLink ?? 'Community Link',
+        qrCodeTitle: S.of(context)?.ui3CommunityQrCode ?? 'Community QR Code',
+        qrCodeSubtitle:
+            S.of(context)?.ui3CommunityQrSubtitle ??
+            'Scan to join this community and browse its channels',
+        errorPrefix:
+            S.of(context)?.ui3CommunityLinkLoadFailed ??
+            'Failed to load community link',
+        copySuccessMessage:
+            S.of(context)?.ui3CommunityLinkCopied ?? 'Community link copied',
         icon: Icons.hub_outlined,
       ),
     );
@@ -606,7 +614,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
               style: TextStyle(
                 fontSize: 12,
                 height: 1.3,
-                color: context.textTertiary,
+                color: context.textSupporting,
               ),
             ),
             const Spacer(),
@@ -679,7 +687,8 @@ class _SpaceDetailScaffold extends StatelessWidget {
             if (_isAdmin)
               IconButton(
                 icon: const Icon(Icons.delete_outline, size: 18),
-                color: AppColors.error.withValues(alpha: 0.7),
+                color: AppColors.errorTextOf(context),
+                tooltip: S.of(context)?.spacesDeleteChannel ?? 'Delete Channel',
                 onPressed: () => _confirmDeleteChannel(context, child),
               ),
             Icon(AppIcons.chevron, color: context.textSecondary),
@@ -821,7 +830,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
             child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+            style: FilledButton.styleFrom(backgroundColor: AppColors.errorFill),
             onPressed: () {
               context.read<SpaceBloc>().add(
                 DeleteChannel(space.id, child.roomId),
@@ -850,7 +859,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
             child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+            style: FilledButton.styleFrom(backgroundColor: AppColors.errorFill),
             onPressed: () {
               Navigator.pop(ctx);
               onLeaveConfirmed();
@@ -916,7 +925,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
               onConfirm(value);
               Navigator.pop(ctx);
             },
-            child: const Text('Save'),
+            child: Text(S.of(context)?.commonSave ?? 'Save'),
           ),
         ],
       ),
@@ -938,7 +947,7 @@ class _SpaceDetailScaffold extends StatelessWidget {
             child: Text(S.of(context)?.commonCancel ?? 'Cancel'),
           ),
           FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+            style: FilledButton.styleFrom(backgroundColor: AppColors.errorFill),
             onPressed: () {
               Navigator.pop(ctx);
               onDeleteConfirmed();
@@ -1136,6 +1145,8 @@ class _MembersBottomSheet extends StatelessWidget {
                 if (isAdmin)
                   IconButton(
                     icon: const Icon(Icons.person_add_outlined),
+                    tooltip:
+                        S.of(context)?.spacesInviteMember ?? 'Invite Member',
                     onPressed: () => _showInviteDialog(context),
                   ),
               ],
@@ -1173,7 +1184,7 @@ class _MembersBottomSheet extends StatelessWidget {
                       color: context.textSecondary,
                     ),
                   ),
-                  trailing: _buildRoleBadge(m.role, isDark),
+                  trailing: _buildRoleBadge(ctx, m.role, isDark),
                   onLongPress:
                       _canManageMember(m) ||
                           _canPromoteToAdmin(m) ||
@@ -1189,16 +1200,16 @@ class _MembersBottomSheet extends StatelessWidget {
     );
   }
 
-  Widget _buildRoleBadge(GroupRole role, bool isDark) {
+  Widget _buildRoleBadge(BuildContext context, GroupRole role, bool isDark) {
     Color color;
     String label;
     switch (role) {
       case GroupRole.owner:
         color = AppColors.warning;
-        label = 'Owner';
+        label = S.of(context)?.groupOwner ?? 'Owner';
       case GroupRole.admin:
         color = AppColors.info;
-        label = 'Admin';
+        label = S.of(context)?.groupAdmin ?? 'Admin';
       case GroupRole.member:
         return const SizedBox.shrink();
     }
@@ -1219,7 +1230,13 @@ class _MembersBottomSheet extends StatelessWidget {
           fontSize: 11,
           height: 1.3,
           fontWeight: FontWeight.w500,
-          color: color,
+          // Readable shade on the 15% tint (orange/blue are 2.2/3.6:1).
+          color: ChatContrast.onTint(
+            color,
+            [context.surfaceColor],
+            dark: isDark,
+            alpha: 0.15,
+          ),
         ),
       ),
     );
@@ -1276,7 +1293,22 @@ class _MembersBottomSheet extends StatelessWidget {
                           ) ??
                       'Kick ${member.displayName.isNotEmpty ? member.displayName : member.userId}',
                 ),
-                onTap: () {
+                onTap: () async {
+                  final confirmed = await context.showConfirmDialog(
+                    title:
+                        S
+                            .of(context)
+                            ?.spacesKickMemberTitle(_memberName(member)) ??
+                        'Kick ${_memberName(member)}',
+                    content:
+                        S.of(context)?.ui3KickMemberConfirm(
+                          _memberName(member),
+                        ) ??
+                        '${_memberName(member)} will be removed from this '
+                            'community.',
+                    isDanger: true,
+                  );
+                  if (!confirmed || !context.mounted) return;
                   context.read<SpaceBloc>().add(
                     KickMember(spaceId, member.userId),
                   );
@@ -1298,7 +1330,22 @@ class _MembersBottomSheet extends StatelessWidget {
                           ) ??
                       'Ban ${member.displayName.isNotEmpty ? member.displayName : member.userId}',
                 ),
-                onTap: () {
+                onTap: () async {
+                  final confirmed = await context.showConfirmDialog(
+                    title:
+                        S
+                            .of(context)
+                            ?.spacesBanMemberTitle(_memberName(member)) ??
+                        'Ban ${_memberName(member)}',
+                    content:
+                        S.of(context)?.ui3BanMemberConfirm(
+                          _memberName(member),
+                        ) ??
+                        '${_memberName(member)} will be removed and cannot '
+                            'rejoin.',
+                    isDanger: true,
+                  );
+                  if (!confirmed || !context.mounted) return;
                   context.read<SpaceBloc>().add(
                     BanMember(spaceId, member.userId),
                   );
@@ -1311,6 +1358,9 @@ class _MembersBottomSheet extends StatelessWidget {
       ),
     );
   }
+
+  String _memberName(GroupMember member) =>
+      member.displayName.isNotEmpty ? member.displayName : member.userId;
 
   void _showInviteDialog(BuildContext context) {
     final ctrl = TextEditingController();

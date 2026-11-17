@@ -2,10 +2,12 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../l10n/app_localizations.dart';
 
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/chat_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../data/models/social/social_similarity_model.dart';
 import '../../blocs/social/social_graph_bloc.dart';
@@ -77,12 +79,13 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
     return Scaffold(
       backgroundColor: context.pageBackground,
       appBar: AppBar(
-        title: const Text('Similarity'),
+        title: Text(S.of(context)?.ui3Similarity ?? 'Similarity'),
         backgroundColor: context.navBarColor,
         foregroundColor: context.textPrimary,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(AppIcons.back, size: 20),
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -101,7 +104,11 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
           }
 
           if (state.hasSimilarityError) {
-            return _buildError(state.similarityErrorMessage ?? 'Unknown error');
+            return _buildError(
+              state.similarityErrorMessage ??
+                  S.of(context)?.qrcodeUnknownError ??
+                  'Unknown error',
+            );
           }
 
           final resolvedSimilarity = similarity!;
@@ -269,11 +276,17 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
                       fontSize: 32,
                       height: 1.2,
                       fontWeight: FontWeight.w700,
-                      color: _scoreColor(percent),
+                      // Orange score text is 2.2:1; use a readable shade.
+                      color: ChatContrast.onTint(
+                        _scoreColor(percent),
+                        [context.pageBackground],
+                        dark: isDark,
+                        alpha: 0,
+                      ),
                     ),
                   ),
                   Text(
-                    'Similarity',
+                    S.of(context)?.ui3Similarity ?? 'Similarity',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
@@ -302,7 +315,7 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Breakdown',
+            S.of(context)?.ui3Breakdown ?? 'Breakdown',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
@@ -314,21 +327,21 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
           ),
           const SizedBox(height: 14),
           _buildDimensionBar(
-            'Token Holdings',
+            S.of(context)?.ui3TokenHoldings ?? 'Token Holdings',
             similarity.tokenOverlap,
             '43%',
             isDark,
           ),
           const SizedBox(height: 10),
           _buildDimensionBar(
-            'NFT Collections',
+            S.of(context)?.ui3NftCollections ?? 'NFT Collections',
             similarity.nftOverlap,
             '36%',
             isDark,
           ),
           const SizedBox(height: 10),
           _buildDimensionBar(
-            'Chain Usage',
+            S.of(context)?.ui3ChainUsage ?? 'Chain Usage',
             similarity.chainUsage,
             '21%',
             isDark,
@@ -336,18 +349,18 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
           if (similarity.transactionInteraction > 0) ...[
             const SizedBox(height: 10),
             _buildDimensionBar(
-              'Transactions',
+              S.of(context)?.ui3Transactions ?? 'Transactions',
               similarity.transactionInteraction,
-              'Not weighted',
+              S.of(context)?.ui3NotWeighted ?? 'Not weighted',
               isDark,
             ),
           ],
           if (similarity.daoMembership > 0) ...[
             const SizedBox(height: 10),
             _buildDimensionBar(
-              'DAO Membership',
+              S.of(context)?.ui3DaoMembership ?? 'DAO Membership',
               similarity.daoMembership,
-              'Not weighted',
+              S.of(context)?.ui3NotWeighted ?? 'Not weighted',
               isDark,
             ),
           ],
@@ -385,7 +398,8 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
             ),
             const SizedBox(width: AppDimensions.spacingS),
             Text(
-              '$percent% (weight: $weight)',
+              S.of(context)?.ui3PercentWithWeight(percent, weight) ??
+                  '$percent% (weight: $weight)',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
@@ -426,7 +440,8 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Common On-Chain Activity',
+            S.of(context)?.ui3CommonOnChainActivity ??
+                'Common On-Chain Activity',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
@@ -439,28 +454,32 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
           const SizedBox(height: AppDimensions.spacingM),
           _buildCommonItemRow(
             Icons.token_outlined,
-            'Shared Tokens',
+            S.of(context)?.ui3SharedTokens ?? 'Shared Tokens',
             _formatCommonItems(
               similarity.commonTokens,
-              emptyLabel: 'No shared tokens found',
+              emptyLabel:
+                  S.of(context)?.ui3NoSharedTokens ?? 'No shared tokens found',
             ),
           ),
           const Divider(height: 20),
           _buildCommonItemRow(
             Icons.collections_outlined,
-            'Shared NFT Collections',
+            S.of(context)?.ui3SharedNftCollections ?? 'Shared NFT Collections',
             _formatCommonItems(
               similarity.commonNftCollections,
-              emptyLabel: 'No shared NFT collections found',
+              emptyLabel:
+                  S.of(context)?.ui3NoSharedNftCollections ??
+                  'No shared NFT collections found',
             ),
           ),
           const Divider(height: 20),
           _buildCommonItemRow(
             Icons.link,
-            'Shared Chains',
+            S.of(context)?.ui3SharedChains ?? 'Shared Chains',
             _formatCommonItems(
               similarity.commonChains,
-              emptyLabel: 'No shared chains found',
+              emptyLabel:
+                  S.of(context)?.ui3NoSharedChains ?? 'No shared chains found',
             ),
           ),
         ],
@@ -478,7 +497,11 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
             color: AppColors.primaryOf(context).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(AppDimensions.radiusM),
           ),
-          child: Icon(icon, size: 18, color: AppColors.primaryOf(context)),
+          child: Icon(
+            icon,
+            size: 18,
+            color: AppColors.primaryOnTintOf(context),
+          ),
         ),
         const SizedBox(width: AppDimensions.spacingM),
         Expanded(
@@ -523,7 +546,8 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
             const Icon(Icons.error_outline, size: 48, color: AppColors.error),
             const SizedBox(height: AppDimensions.spacingM),
             Text(
-              'Failed to calculate similarity',
+              S.of(context)?.ui3SimilarityFailed ??
+                  'Failed to calculate similarity',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
@@ -556,9 +580,9 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
                 );
               },
               icon: const Icon(Icons.refresh, size: 18),
-              label: const Text('Retry'),
+              label: Text(S.of(context)?.commonRetry ?? 'Retry'),
               style: TextButton.styleFrom(
-                foregroundColor: AppColors.primaryOf(context),
+                foregroundColor: AppColors.primaryOnTintOf(context),
               ),
             ),
           ],
@@ -612,7 +636,8 @@ class _UserSimilarityPageState extends State<UserSimilarityPage>
     final previewItems = normalizedItems.take(maxPreviewItems).join(', ');
     final remaining = normalizedItems.length - maxPreviewItems;
     if (remaining > 0) {
-      return '$previewItems +$remaining more';
+      return S.of(context)?.ui3ItemsAndMore(previewItems, remaining) ??
+          '$previewItems +$remaining more';
     }
     return previewItems;
   }
