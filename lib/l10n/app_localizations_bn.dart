@@ -1966,6 +1966,9 @@ class SBn extends S {
   String get searchClearHistory => 'পরিষ্কার';
 
   @override
+  String get searchClearHistoryConfirm => 'সব সাম্প্রতিক অনুসন্ধান মুছবেন?';
+
+  @override
   String searchNoResultsForQuery(String query) {
     return '\"$query\" এর জন্য কোন ফলাফল পাওয়া যায়নি';
   }

@@ -1969,6 +1969,9 @@ class SMr extends S {
   String get searchClearHistory => 'साफ';
 
   @override
+  String get searchClearHistoryConfirm => 'सर्व अलीकडील शोध साफ करायचे?';
+
+  @override
   String searchNoResultsForQuery(String query) {
     return '\"$query\" साठी आम्हाला कोणतेही परिणाम आढळले नाहीत';
   }

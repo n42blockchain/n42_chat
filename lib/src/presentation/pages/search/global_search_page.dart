@@ -234,7 +234,17 @@ class _GlobalSearchPageState extends State<GlobalSearchPage> {
               ),
             ),
             TextButton(
-              onPressed: () {
+              onPressed: () async {
+                final s = S.of(context);
+                final confirmed = await context.showConfirmDialog(
+                  title: s?.searchHistory ?? 'Search History',
+                  content:
+                      s?.searchClearHistoryConfirm ??
+                      'Clear all recent searches?',
+                  confirmText: s?.searchClearHistory ?? 'Clear',
+                  isDanger: true,
+                );
+                if (!confirmed || !mounted) return;
                 context.read<SearchBloc>().add(const ClearSearchHistory());
               },
               child: Text(S.of(context)?.searchClearHistory ?? 'Clear'),

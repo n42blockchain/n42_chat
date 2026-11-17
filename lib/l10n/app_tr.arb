@@ -826,6 +826,7 @@
   "searchPlaceholder": "Kişi, grup ve mesajlarda ara",
   "searchEnterKeywordToSearch": "Aramaya başlamak için anahtar kelime girin",
   "searchClearHistory": "Temizle",
+  "searchClearHistoryConfirm": "Son aramaların tümü temizlensin mi?",
   "searchNoResultsForQuery": "\"{query}\" için sonuç bulunamadı",
   "@searchNoResultsForQuery": {
     "placeholders": {

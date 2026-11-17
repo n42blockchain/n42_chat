@@ -650,6 +650,7 @@
   "searchPlaceholder": "搜索聯繫人、羣聊、消息",
   "searchEnterKeywordToSearch": "輸入關鍵詞開始搜索",
   "searchClearHistory": "清除",
+  "searchClearHistoryConfirm": "清除所有最近的搜尋紀錄？",
   "searchNoResultsForQuery": "沒有找到\"{query}\"相關的結果",
   "searchAllResults": "全部",
   "searchInChat": "在聊天中搜索",

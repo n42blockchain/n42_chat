@@ -826,6 +826,7 @@
   "searchPlaceholder": "Cerca contatti, gruppi, messaggi",
   "searchEnterKeywordToSearch": "Inserisci parola chiave per cercare",
   "searchClearHistory": "Cancella",
+  "searchClearHistoryConfirm": "Cancellare tutte le ricerche recenti?",
   "searchNoResultsForQuery": "Nessun risultato per \"{query}\"",
   "@searchNoResultsForQuery": {
     "placeholders": {

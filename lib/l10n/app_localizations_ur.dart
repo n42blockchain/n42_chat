@@ -1970,6 +1970,9 @@ class SUr extends S {
   String get searchClearHistory => 'صاف';
 
   @override
+  String get searchClearHistoryConfirm => 'تمام حالیہ تلاشیں صاف کریں؟';
+
+  @override
   String searchNoResultsForQuery(String query) {
     return '\"$query\" کے لیے کوئی نتیجہ نہیں ملا';
   }

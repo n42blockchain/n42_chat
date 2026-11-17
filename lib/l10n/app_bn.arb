@@ -826,6 +826,7 @@
   "searchPlaceholder": "পরিচিতি, গোষ্ঠী, বার্তা অনুসন্ধান করুন",
   "searchEnterKeywordToSearch": "অনুসন্ধান শুরু করতে কীওয়ার্ড লিখুন",
   "searchClearHistory": "পরিষ্কার",
+  "searchClearHistoryConfirm": "সব সাম্প্রতিক অনুসন্ধান মুছবেন?",
   "searchNoResultsForQuery": "\"{query}\" এর জন্য কোন ফলাফল পাওয়া যায়নি",
   "@searchNoResultsForQuery": {
     "placeholders": {

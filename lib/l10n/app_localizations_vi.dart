@@ -1952,6 +1952,9 @@ class SVi extends S {
   String get searchClearHistory => 'Xoa';
 
   @override
+  String get searchClearHistoryConfirm => 'Xóa tất cả tìm kiếm gần đây?';
+
+  @override
   String searchNoResultsForQuery(String query) {
     return 'Khong tim thay ket qua cho \"$query\"';
   }

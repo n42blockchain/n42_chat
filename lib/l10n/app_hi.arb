@@ -826,6 +826,7 @@
   "searchPlaceholder": "संपर्क, समूह, संदेश खोजें",
   "searchEnterKeywordToSearch": "खोज शुरू करने के लिए कीवर्ड दर्ज करें",
   "searchClearHistory": "स्पष्ट",
+  "searchClearHistoryConfirm": "सभी हाल की खोजें साफ़ करें?",
   "searchNoResultsForQuery": "\"{query}\" के लिए कोई परिणाम नहीं मिला",
   "@searchNoResultsForQuery": {
     "placeholders": {

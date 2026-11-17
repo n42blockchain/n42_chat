@@ -594,6 +594,7 @@ final _labels = <(String, String Function(S))>[
   ('searchPlaceholder', (s) => s.searchPlaceholder),
   ('searchEnterKeywordToSearch', (s) => s.searchEnterKeywordToSearch),
   ('searchClearHistory', (s) => s.searchClearHistory),
+  ('searchClearHistoryConfirm', (s) => s.searchClearHistoryConfirm),
   ('searchAllResults', (s) => s.searchAllResults),
   ('searchInChat', (s) => s.searchInChat),
   ('searchContactLabel', (s) => s.searchContactLabel),
@@ -2459,7 +2460,7 @@ void main() {
     expect((await S.delegate.load(const Locale('zh', 'TW'))).groupPublish, '發佈');
   });
   test('all supported locales provide readable labels', () async {
-    expect(_labels, hasLength(1718));
+    expect(_labels, hasLength(1719));
     expect(_formattedLabels, hasLength(185));
     expect(_labels.map((entry) => entry.$1).toSet(), hasLength(_labels.length));
     final emptyLabels = <String>[];

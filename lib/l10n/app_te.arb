@@ -826,6 +826,7 @@
   "searchPlaceholder": "పరిచయాలు, సమూహాలు, సందేశాలను శోధించండి",
   "searchEnterKeywordToSearch": "శోధనను ప్రారంభించడానికి కీవర్డ్‌ని నమోదు చేయండి",
   "searchClearHistory": "క్లియర్",
+  "searchClearHistoryConfirm": "అన్ని ఇటీవలి శోధనలను క్లియర్ చేయాలా?",
   "searchNoResultsForQuery": "\"{query}\" కోసం ఫలితాలు కనుగొనబడలేదు",
   "@searchNoResultsForQuery": {
     "placeholders": {

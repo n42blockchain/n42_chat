@@ -826,6 +826,7 @@
   "searchPlaceholder": "Vyhledávání kontaktů, skupin, zpráv",
   "searchEnterKeywordToSearch": "Zadejte klíčové slovo pro zahájení vyhledávání",
   "searchClearHistory": "Jasný",
+  "searchClearHistoryConfirm": "Vymazat všechna nedávná hledání?",
   "searchNoResultsForQuery": "Pro výraz \"{query}\" nebyly nalezeny žádné výsledky",
   "@searchNoResultsForQuery": {
     "placeholders": {

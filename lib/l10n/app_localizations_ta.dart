@@ -1980,6 +1980,10 @@ class STa extends S {
   String get searchClearHistory => 'தெளிவு';
 
   @override
+  String get searchClearHistoryConfirm =>
+      'சமீபத்திய அனைத்துத் தேடல்களையும் அழிக்கவா?';
+
+  @override
   String searchNoResultsForQuery(String query) {
     return '\"$query\" க்கான முடிவுகள் எதுவும் இல்லை';
   }

@@ -1984,6 +1984,10 @@ class STe extends S {
   String get searchClearHistory => 'క్లియర్';
 
   @override
+  String get searchClearHistoryConfirm =>
+      'అన్ని ఇటీవలి శోధనలను క్లియర్ చేయాలా?';
+
+  @override
   String searchNoResultsForQuery(String query) {
     return '\"$query\" కోసం ఫలితాలు కనుగొనబడలేదు';
   }

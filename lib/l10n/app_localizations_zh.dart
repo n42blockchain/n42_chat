@@ -1921,6 +1921,9 @@ class SZh extends S {
   String get searchClearHistory => '清除';
 
   @override
+  String get searchClearHistoryConfirm => '清除所有最近的搜索记录？';
+
+  @override
   String searchNoResultsForQuery(String query) {
     return '沒有找到\"$query\"相關的結果';
   }
@@ -9992,6 +9995,9 @@ class SZhTw extends SZh {
 
   @override
   String get searchClearHistory => '清除';
+
+  @override
+  String get searchClearHistoryConfirm => '清除所有最近的搜尋紀錄？';
 
   @override
   String searchNoResultsForQuery(String query) {

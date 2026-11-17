@@ -826,6 +826,7 @@
   "searchPlaceholder": "संपर्क, गट, संदेश शोधा",
   "searchEnterKeywordToSearch": "शोध सुरू करण्यासाठी कीवर्ड प्रविष्ट करा",
   "searchClearHistory": "साफ",
+  "searchClearHistoryConfirm": "सर्व अलीकडील शोध साफ करायचे?",
   "searchNoResultsForQuery": "\"{query}\" साठी आम्हाला कोणतेही परिणाम आढळले नाहीत",
   "@searchNoResultsForQuery": {
     "placeholders": {

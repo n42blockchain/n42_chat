@@ -826,6 +826,7 @@
   "searchPlaceholder": "البحث في جهات الاتصال والمجموعات والرسائل",
   "searchEnterKeywordToSearch": "أدخل الكلمة الرئيسية لبدء البحث",
   "searchClearHistory": "واضح",
+  "searchClearHistoryConfirm": "مسح عمليات البحث الأخيرة بالكامل؟",
   "searchNoResultsForQuery": "لم يتم العثور على أي نتائج \"{query}\"",
   "@searchNoResultsForQuery": {
     "placeholders": {

@@ -1952,6 +1952,9 @@ class SEn extends S {
   String get searchClearHistory => 'Clear';
 
   @override
+  String get searchClearHistoryConfirm => 'Clear all recent searches?';
+
+  @override
   String searchNoResultsForQuery(String query) {
     return 'No results found for \"$query\"';
   }

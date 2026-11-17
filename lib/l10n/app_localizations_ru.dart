@@ -1976,6 +1976,9 @@ class SRu extends S {
   String get searchClearHistory => 'Очистить';
 
   @override
+  String get searchClearHistoryConfirm => 'Очистить всю историю поиска?';
+
+  @override
   String searchNoResultsForQuery(String query) {
     return 'Результаты не найдены для \"$query\"';
   }

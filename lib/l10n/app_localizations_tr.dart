@@ -1967,6 +1967,9 @@ class STr extends S {
   String get searchClearHistory => 'Temizle';
 
   @override
+  String get searchClearHistoryConfirm => 'Son aramaların tümü temizlensin mi?';
+
+  @override
   String searchNoResultsForQuery(String query) {
     return '\"$query\" için sonuç bulunamadı';
   }

@@ -1955,6 +1955,9 @@ class SAr extends S {
   String get searchClearHistory => 'واضح';
 
   @override
+  String get searchClearHistoryConfirm => 'مسح عمليات البحث الأخيرة بالكامل؟';
+
+  @override
   String searchNoResultsForQuery(String query) {
     return 'لم يتم العثور على أي نتائج \"$query\"';
   }

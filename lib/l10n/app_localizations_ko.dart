@@ -1926,6 +1926,9 @@ class SKo extends S {
   String get searchClearHistory => '지우기';
 
   @override
+  String get searchClearHistoryConfirm => '최근 검색 기록을 모두 삭제하시겠습니까?';
+
+  @override
   String searchNoResultsForQuery(String query) {
     return '\"$query\"에 대한 결과 없음';
   }

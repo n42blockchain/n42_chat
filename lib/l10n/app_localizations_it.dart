@@ -1970,6 +1970,10 @@ class SIt extends S {
   String get searchClearHistory => 'Cancella';
 
   @override
+  String get searchClearHistoryConfirm =>
+      'Cancellare tutte le ricerche recenti?';
+
+  @override
   String searchNoResultsForQuery(String query) {
     return 'Nessun risultato per \"$query\"';
   }

@@ -3677,6 +3677,12 @@ abstract class S {
   /// **'Clear'**
   String get searchClearHistory;
 
+  /// No description provided for @searchClearHistoryConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear all recent searches?'**
+  String get searchClearHistoryConfirm;
+
   /// No description provided for @searchNoResultsForQuery.
   ///
   /// In en, this message translates to:

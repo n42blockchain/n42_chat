@@ -1972,6 +1972,9 @@ class SDe extends S {
   String get searchClearHistory => 'Löschen';
 
   @override
+  String get searchClearHistoryConfirm => 'Gesamten Suchverlauf löschen?';
+
+  @override
   String searchNoResultsForQuery(String query) {
     return 'Keine Ergebnisse für \"$query\" gefunden';
   }

@@ -826,6 +826,7 @@
   "searchPlaceholder": "தொடர்புகள், குழுக்கள், செய்திகளைத் தேடுங்கள்",
   "searchEnterKeywordToSearch": "தேடலைத் தொடங்க முக்கிய சொல்லை உள்ளிடவும்",
   "searchClearHistory": "தெளிவு",
+  "searchClearHistoryConfirm": "சமீபத்திய அனைத்துத் தேடல்களையும் அழிக்கவா?",
   "searchNoResultsForQuery": "\"{query}\" க்கான முடிவுகள் எதுவும் இல்லை",
   "@searchNoResultsForQuery": {
     "placeholders": {

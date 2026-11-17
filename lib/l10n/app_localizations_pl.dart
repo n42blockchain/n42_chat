@@ -1977,6 +1977,10 @@ class SPl extends S {
   String get searchClearHistory => 'Wyczysc';
 
   @override
+  String get searchClearHistoryConfirm =>
+      'Wyczyścić wszystkie ostatnie wyszukiwania?';
+
+  @override
   String searchNoResultsForQuery(String query) {
     return 'Brak wynikow dla \"$query\"';
   }

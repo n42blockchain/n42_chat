@@ -826,6 +826,7 @@
   "searchPlaceholder": "Tim lien he, nhom, tin nhan",
   "searchEnterKeywordToSearch": "Nhap tu khoa de bat dau tim kiem",
   "searchClearHistory": "Xoa",
+  "searchClearHistoryConfirm": "Xóa tất cả tìm kiếm gần đây?",
   "searchNoResultsForQuery": "Khong tim thay ket qua cho \"{query}\"",
   "@searchNoResultsForQuery": {
     "placeholders": {

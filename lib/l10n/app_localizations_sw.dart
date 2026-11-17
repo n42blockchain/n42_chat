@@ -1973,6 +1973,10 @@ class SSw extends S {
   String get searchClearHistory => 'Wazi';
 
   @override
+  String get searchClearHistoryConfirm =>
+      'Futa utafutaji wote wa hivi karibuni?';
+
+  @override
   String searchNoResultsForQuery(String query) {
     return 'Hakuna matokeo yaliyopatikana ya \"$query\"';
   }

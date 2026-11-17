@@ -1967,6 +1967,9 @@ class SCs extends S {
   String get searchClearHistory => 'Jasný';
 
   @override
+  String get searchClearHistoryConfirm => 'Vymazat všechna nedávná hledání?';
+
+  @override
   String searchNoResultsForQuery(String query) {
     return 'Pro výraz \"$query\" nebyly nalezeny žádné výsledky';
   }

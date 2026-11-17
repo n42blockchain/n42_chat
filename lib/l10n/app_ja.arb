@@ -826,6 +826,7 @@
   "searchPlaceholder": "連絡先、グループ、メッセージを検索",
   "searchEnterKeywordToSearch": "キーワードを入力して検索を開始",
   "searchClearHistory": "クリア",
+  "searchClearHistoryConfirm": "最近の検索履歴をすべて消去しますか？",
   "searchNoResultsForQuery": "「{query}」の検索結果が見つかりませんでした",
   "@searchNoResultsForQuery": {
     "placeholders": {

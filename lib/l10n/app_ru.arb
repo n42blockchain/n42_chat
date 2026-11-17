@@ -826,6 +826,7 @@
   "searchPlaceholder": "Поиск контактов, групп, сообщений",
   "searchEnterKeywordToSearch": "Введите ключевое слово для поиска",
   "searchClearHistory": "Очистить",
+  "searchClearHistoryConfirm": "Очистить всю историю поиска?",
   "searchNoResultsForQuery": "Результаты не найдены для \"{query}\"",
   "@searchNoResultsForQuery": {
     "placeholders": {

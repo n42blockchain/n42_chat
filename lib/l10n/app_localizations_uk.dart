@@ -1973,6 +1973,10 @@ class SUk extends S {
   String get searchClearHistory => 'ясно';
 
   @override
+  String get searchClearHistoryConfirm =>
+      'Очистити всю нещодавню історію пошуку?';
+
+  @override
   String searchNoResultsForQuery(String query) {
     return 'Немає результатів для \"$query\"';
   }

@@ -1984,6 +1984,9 @@ class SPt extends S {
   String get searchClearHistory => 'Limpar';
 
   @override
+  String get searchClearHistoryConfirm => 'Limpar todas as pesquisas recentes?';
+
+  @override
   String searchNoResultsForQuery(String query) {
     return 'Nenhum resultado encontrado para \"$query\"';
   }
@@ -10408,6 +10411,9 @@ class SPtBr extends SPt {
 
   @override
   String get searchClearHistory => 'Limpar';
+
+  @override
+  String get searchClearHistoryConfirm => 'Limpar todas as pesquisas recentes?';
 
   @override
   String searchNoResultsForQuery(String query) {

@@ -1991,6 +1991,10 @@ class SFr extends S {
   String get searchClearHistory => 'Effacer';
 
   @override
+  String get searchClearHistoryConfirm =>
+      'Effacer toutes les recherches récentes ?';
+
+  @override
   String searchNoResultsForQuery(String query) {
     return 'Aucun resultat trouve pour \"$query\"';
   }

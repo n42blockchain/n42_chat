@@ -826,6 +826,7 @@
   "searchPlaceholder": "Cari kontak, grup, pesan",
   "searchEnterKeywordToSearch": "Masukkan kata kunci untuk mulai mencari",
   "searchClearHistory": "Hapus",
+  "searchClearHistoryConfirm": "Hapus semua pencarian terbaru?",
   "searchNoResultsForQuery": "Tidak ada hasil ditemukan untuk \"{query}\"",
   "@searchNoResultsForQuery": {
     "placeholders": {

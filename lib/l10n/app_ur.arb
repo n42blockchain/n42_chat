@@ -826,6 +826,7 @@
   "searchPlaceholder": "رابطے، گروپس، پیغامات تلاش کریں۔",
   "searchEnterKeywordToSearch": "تلاش شروع کرنے کے لیے کلیدی لفظ درج کریں۔",
   "searchClearHistory": "صاف",
+  "searchClearHistoryConfirm": "تمام حالیہ تلاشیں صاف کریں؟",
   "searchNoResultsForQuery": "\"{query}\" کے لیے کوئی نتیجہ نہیں ملا",
   "@searchNoResultsForQuery": {
     "placeholders": {

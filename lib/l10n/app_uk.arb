@@ -826,6 +826,7 @@
   "searchPlaceholder": "Пошук контактів, груп, повідомлень",
   "searchEnterKeywordToSearch": "Введіть ключове слово, щоб почати пошук",
   "searchClearHistory": "ясно",
+  "searchClearHistoryConfirm": "Очистити всю нещодавню історію пошуку?",
   "searchNoResultsForQuery": "Немає результатів для \"{query}\"",
   "@searchNoResultsForQuery": {
     "placeholders": {

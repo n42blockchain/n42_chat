@@ -1970,6 +1970,9 @@ class SId extends S {
   String get searchClearHistory => 'Hapus';
 
   @override
+  String get searchClearHistoryConfirm => 'Hapus semua pencarian terbaru?';
+
+  @override
   String searchNoResultsForQuery(String query) {
     return 'Tidak ada hasil ditemukan untuk \"$query\"';
   }

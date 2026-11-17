@@ -1925,6 +1925,9 @@ class SJa extends S {
   String get searchClearHistory => 'クリア';
 
   @override
+  String get searchClearHistoryConfirm => '最近の検索履歴をすべて消去しますか？';
+
+  @override
   String searchNoResultsForQuery(String query) {
     return '「$query」の検索結果が見つかりませんでした';
   }

@@ -1977,6 +1977,10 @@ class SEs extends S {
   String get searchClearHistory => 'Borrar';
 
   @override
+  String get searchClearHistoryConfirm =>
+      '¿Borrar todas las búsquedas recientes?';
+
+  @override
   String searchNoResultsForQuery(String query) {
     return 'No se encontraron resultados para \"$query\"';
   }

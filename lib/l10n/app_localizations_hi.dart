@@ -1967,6 +1967,9 @@ class SHi extends S {
   String get searchClearHistory => 'स्पष्ट';
 
   @override
+  String get searchClearHistoryConfirm => 'सभी हाल की खोजें साफ़ करें?';
+
+  @override
   String searchNoResultsForQuery(String query) {
     return '\"$query\" के लिए कोई परिणाम नहीं मिला';
   }
