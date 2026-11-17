@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/subscription_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../domain/entities/subscription_entity.dart';
 import '../../../core/theme/app_dimensions.dart';
 
@@ -25,6 +27,9 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
   List<SubscriptionPlan> _plans = const [];
   bool _loading = true;
 
+  /// Plan or subscription id whose request is in flight; blocks repeat taps.
+  String? _busyId;
+
   @override
   void initState() {
     super.initState();
@@ -43,39 +48,80 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
   }
 
   Future<void> _subscribe(SubscriptionPlan plan) async {
-    await _service.subscribe(plan);
-    await _load();
+    if (_busyId != null) return;
+    setState(() => _busyId = plan.id);
+    try {
+      await _service.subscribe(plan);
+      await _load();
+    } finally {
+      if (mounted) setState(() => _busyId = null);
+    }
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Subscribed to ${plan.name}'),
-        backgroundColor: AppColors.primaryOf(context),
+        content: Text(
+          S.of(context)?.ui3SubscribedTo(plan.name) ??
+              'Subscribed to ${plan.name}',
+        ),
+        backgroundColor: AppColors.primaryFillOf(context),
         duration: const Duration(seconds: 2),
       ),
     );
   }
 
   Future<void> _cancel(UserSubscription sub) async {
-    await _service.cancel(sub.id);
-    await _load();
+    if (_busyId != null) return;
+    final l10n = S.of(context);
+    final confirmed = await context.showConfirmDialog(
+      title: l10n?.ui3CancelSubscriptionTitle ?? 'Cancel subscription?',
+      content:
+          l10n?.ui3CancelSubscriptionConfirm(sub.plan.name) ??
+          'Your subscription to ${sub.plan.name} stays active until it '
+              'expires and will not renew.',
+      isDanger: true,
+    );
+    if (!confirmed || !mounted) return;
+    setState(() => _busyId = sub.id);
+    try {
+      await _service.cancel(sub.id);
+      await _load();
+    } finally {
+      if (mounted) setState(() => _busyId = null);
+    }
+  }
+
+  Future<void> _toggleAutoRenew(UserSubscription sub) async {
+    if (_busyId != null) return;
+    setState(() => _busyId = sub.id);
+    try {
+      await _service.toggleAutoRenew(sub.id);
+      await _load();
+    } finally {
+      if (mounted) setState(() => _busyId = null);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = S.of(context);
     return Scaffold(
       backgroundColor: context.pageBackground,
       appBar: AppBar(
         title: Text(
           widget.creatorName == null
-              ? 'Subscriptions'
-              : '${widget.creatorName} · Plans',
+              ? (l10n?.ui3ProfileSubscriptions ?? 'Subscriptions')
+              : (l10n?.ui3CreatorPlans(widget.creatorName!) ??
+                    '${widget.creatorName} · Plans'),
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _createPlan,
-        backgroundColor: AppColors.primaryOf(context),
+        backgroundColor: AppColors.primaryFillOf(context),
         icon: const Icon(Icons.add, color: Colors.white),
-        label: const Text('New plan', style: TextStyle(color: Colors.white)),
+        label: Text(
+          l10n?.ui3NewPlan ?? 'New plan',
+          style: const TextStyle(color: Colors.white),
+        ),
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
@@ -85,11 +131,13 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 96),
                 children: [
                   if (_mySubs.isNotEmpty) ...[
-                    _sectionTitle('My subscriptions'),
+                    _sectionTitle(
+                      l10n?.ui3MySubscriptions ?? 'My subscriptions',
+                    ),
                     ..._mySubs.map(_buildMySubCard),
                     const SizedBox(height: AppDimensions.spacingL),
                   ],
-                  _sectionTitle('Available plans'),
+                  _sectionTitle(l10n?.ui3AvailablePlans ?? 'Available plans'),
                   if (_plans.isEmpty)
                     _emptyPlans()
                   else
@@ -119,13 +167,17 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
     padding: const EdgeInsets.symmetric(vertical: 28),
     alignment: Alignment.center,
     child: Text(
-      'No plans yet · tap “New plan” to create one',
-      style: TextStyle(color: context.textTertiary),
+      S.of(context)?.ui3NoPlansYet ??
+          'No plans yet · tap “New plan” to create one',
+      // textTertiary is decorative only (1.7:1 on light surfaces).
+      style: TextStyle(color: context.textSecondary),
     ),
   );
 
   Widget _buildMySubCard(UserSubscription sub) {
+    final l10n = S.of(context);
     final active = sub.isActive;
+    final busy = _busyId != null;
     final statusColor = active
         ? AppColors.success
         : (sub.status == SubscriptionStatus.cancelled
@@ -161,8 +213,23 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
-                    active ? '${sub.daysLeft}d left' : sub.status.name,
-                    style: TextStyle(color: statusColor, fontSize: 11),
+                    active
+                        ? (l10n?.ui3DaysLeft(sub.daysLeft) ??
+                              '${sub.daysLeft}d left')
+                        : sub.status == SubscriptionStatus.cancelled
+                        ? (l10n?.ui3SubscriptionCancelled ?? 'Cancelled')
+                        : (l10n?.commonExpired ?? 'Expired'),
+                    style: TextStyle(
+                      // Text-safe shade on the 12% tint (raw green/orange/
+                      // grey measured 1.7-2.2:1).
+                      color: ChatContrast.onTint(
+                        statusColor,
+                        [context.surfaceColor],
+                        dark: context.isDarkMode,
+                        alpha: 0.12,
+                      ),
+                      fontSize: 11,
+                    ),
                   ),
                 ),
               ],
@@ -178,18 +245,22 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   TextButton(
-                    onPressed: () =>
-                        _service.toggleAutoRenew(sub.id).then((_) => _load()),
+                    onPressed: busy ? null : () => _toggleAutoRenew(sub),
                     child: Text(
-                      sub.autoRenew ? 'Auto-renew: on' : 'Auto-renew: off',
+                      sub.autoRenew
+                          ? (l10n?.ui3AutoRenewOn ?? 'Auto-renew: on')
+                          : (l10n?.ui3AutoRenewOff ?? 'Auto-renew: off'),
                     ),
                   ),
                   TextButton(
-                    onPressed: () => _cancel(sub),
+                    onPressed: busy ? null : () => _cancel(sub),
                     style: TextButton.styleFrom(
-                      foregroundColor: AppColors.error,
+                      // errorFill keeps 4.5:1 on light surfaces.
+                      foregroundColor: context.isDarkMode
+                          ? AppColors.error
+                          : AppColors.errorFill,
                     ),
-                    child: const Text('Cancel'),
+                    child: Text(l10n?.commonCancel ?? 'Cancel'),
                   ),
                 ],
               ),
@@ -262,12 +333,19 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                 ),
                 const Spacer(),
                 ElevatedButton(
-                  onPressed: () => _subscribe(plan),
+                  // Disabled while any request is in flight (no double pay).
+                  onPressed: _busyId != null ? null : () => _subscribe(plan),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryOf(context),
+                    backgroundColor: AppColors.primaryFillOf(context),
                     foregroundColor: Colors.white,
                   ),
-                  child: const Text('Subscribe'),
+                  child: _busyId == plan.id
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Text(S.of(context)?.ui3Subscribe ?? 'Subscribe'),
                 ),
               ],
             ),
@@ -287,54 +365,64 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
     final descC = TextEditingController();
     final benefitsC = TextEditingController();
     var period = SubscriptionPeriod.monthly;
+    final l10n = S.of(context);
 
     final created = await showDialog<bool>(
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setLocal) => AlertDialog(
           backgroundColor: context.surfaceColor,
-          title: const Text('New plan'),
+          title: Text(l10n?.ui3NewPlan ?? 'New plan'),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
                   controller: nameC,
-                  decoration: const InputDecoration(labelText: 'Name'),
+                  decoration: InputDecoration(
+                    labelText: l10n?.profileName ?? 'Name',
+                  ),
                 ),
                 TextField(
                   controller: priceC,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'Price (e.g. 9.9 USDT)',
+                  decoration: InputDecoration(
+                    labelText:
+                        l10n?.ui3PlanPriceLabel ?? 'Price (e.g. 9.9 USDT)',
                   ),
                 ),
                 TextField(
                   controller: descC,
-                  decoration: const InputDecoration(
-                    labelText: 'Description (optional)',
+                  decoration: InputDecoration(
+                    labelText:
+                        l10n?.ui3PlanDescriptionLabel ??
+                        'Description (optional)',
                   ),
                 ),
                 TextField(
                   controller: benefitsC,
-                  decoration: const InputDecoration(
-                    labelText: 'Benefits (comma separated)',
+                  decoration: InputDecoration(
+                    labelText:
+                        l10n?.ui3PlanBenefitsLabel ??
+                        'Benefits (comma separated)',
                   ),
                 ),
                 const SizedBox(height: AppDimensions.spacingS),
-                Row(
+                // Wrap (not Row): the chips no longer overflow at 320pt
+                // width or 130% text size.
+                Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: AppDimensions.spacingS,
                   children: [
-                    const Text('Period:'),
-                    const SizedBox(width: AppDimensions.spacingM),
+                    Text(l10n?.ui3PlanPeriod ?? 'Period:'),
                     ChoiceChip(
-                      label: const Text('Monthly'),
+                      label: Text(l10n?.ui3Monthly ?? 'Monthly'),
                       selected: period == SubscriptionPeriod.monthly,
                       onSelected: (_) =>
                           setLocal(() => period = SubscriptionPeriod.monthly),
                     ),
-                    const SizedBox(width: AppDimensions.spacingS),
                     ChoiceChip(
-                      label: const Text('Yearly'),
+                      label: Text(l10n?.ui3Yearly ?? 'Yearly'),
                       selected: period == SubscriptionPeriod.yearly,
                       onSelected: (_) =>
                           setLocal(() => period = SubscriptionPeriod.yearly),
@@ -347,11 +435,11 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancel'),
+              child: Text(l10n?.commonCancel ?? 'Cancel'),
             ),
             TextButton(
               onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('Create'),
+              child: Text(l10n?.ui3Create ?? 'Create'),
             ),
           ],
         ),

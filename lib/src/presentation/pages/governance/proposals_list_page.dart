@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../domain/entities/governance/proposal_entity.dart';
 import '../../blocs/governance/governance_bloc.dart';
 import '../../blocs/governance/governance_event.dart';
@@ -10,6 +11,8 @@ import '../../blocs/governance/governance_state.dart';
 import 'create_proposal_page.dart';
 import 'proposal_detail_page.dart';
 import '../../../core/theme/app_dimensions.dart';
+import '../../../../l10n/app_localizations.dart';
+import '../../widgets/common/n42_tap_area.dart';
 
 /// Page displaying a list of governance proposals for a Snapshot space.
 ///
@@ -146,6 +149,8 @@ class _ProposalsListPageState extends State<ProposalsListPage> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
+        tooltip:
+            S.of(context)?.a11yGovernanceCreateProposal ?? 'Create proposal',
         onPressed: () => _navigateToCreate(),
         backgroundColor: AppColors.primaryOf(context),
         child: const Icon(Icons.add, color: Colors.white),
@@ -154,11 +159,9 @@ class _ProposalsListPageState extends State<ProposalsListPage> {
   }
 
   Widget _buildFilterChips(bool isDark) {
+    // No vertical padding: each chip owns a 44pt tap area instead.
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppDimensions.spacing,
-        vertical: AppDimensions.spacingS,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacing),
       color: context.surfaceColor,
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -229,7 +232,7 @@ class _ProposalsListPageState extends State<ProposalsListPage> {
             style: TextStyle(
               fontSize: 14,
               height: 1.4,
-              color: context.textTertiary,
+              color: context.textSupporting,
             ),
           ),
         ],
@@ -331,29 +334,33 @@ class _FilterChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppDimensions.spacing,
-          vertical: 6,
-        ),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.primaryOf(context)
-              : AppColors.dividerThinOf(isDark),
-          borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
-        ),
-        child: Text(
-          label,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            fontSize: 13,
-            height: 1.3,
-            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-            color: isSelected ? Colors.white : context.textSecondary,
+    return Semantics(
+      selected: isSelected,
+      child: N42TapArea(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.spacing,
+            vertical: 6,
+          ),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? AppColors.primaryFillOf(context)
+                : AppColors.dividerThinOf(isDark),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
+          ),
+          child: Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 13,
+              height: 1.3,
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+              color: isSelected ? Colors.white : context.textSupporting,
+            ),
           ),
         ),
       ),
@@ -374,105 +381,112 @@ class _ProposalCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: AppDimensions.spacingM),
-        padding: const EdgeInsets.all(AppDimensions.spacing),
-        decoration: BoxDecoration(
-          color: context.surfaceColor,
+    return Container(
+      margin: const EdgeInsets.only(bottom: AppDimensions.spacingM),
+      decoration: BoxDecoration(
+        color: context.surfaceColor,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+        boxShadow: isDark
+            ? null
+            : [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+      ),
+      // Ink on a transparent Material so the pressed state shows on the card.
+      child: Material(
+        type: MaterialType.transparency,
+        child: InkWell(
+          onTap: onTap,
           borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-          boxShadow: isDark
-              ? null
-              : [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.04),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // State badge and time
-            Row(
+          child: Padding(
+            padding: const EdgeInsets.all(AppDimensions.spacing),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildStateBadge(),
-                const Spacer(),
-                Text(
-                  _formatTimeRemaining(),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 12,
-                    height: 1.3,
-                    color: context.textTertiary,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            // Title
-            Text(
-              proposal.title,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 16,
-                height: 1.35,
-                fontWeight: FontWeight.w600,
-                color: context.textPrimary,
-              ),
-            ),
-            const SizedBox(height: AppDimensions.spacingS),
-            // Author
-            Row(
-              children: [
-                Icon(
-                  Icons.person_outline,
-                  size: 14,
-                  color: context.textTertiary,
-                ),
-                const SizedBox(width: AppDimensions.spacingXS),
-                Flexible(
-                  child: Text(
-                    _shortenAddress(proposal.author),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 13,
-                      height: 1.3,
-                      color: context.textSecondary,
+                // State badge and time
+                Row(
+                  children: [
+                    _buildStateBadge(context),
+                    const Spacer(),
+                    Text(
+                      _formatTimeRemaining(),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 12,
+                        height: 1.3,
+                        color: context.textSupporting,
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-                const Spacer(),
-                Icon(
-                  Icons.how_to_vote_outlined,
-                  size: 14,
-                  color: context.textTertiary,
-                ),
-                const SizedBox(width: AppDimensions.spacingXS),
+                const SizedBox(height: 10),
+                // Title
                 Text(
-                  '${proposal.votesCount} votes',
-                  maxLines: 1,
+                  proposal.title,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontSize: 13,
-                    height: 1.3,
-                    color: context.textSecondary,
+                    fontSize: 16,
+                    height: 1.35,
+                    fontWeight: FontWeight.w600,
+                    color: context.textPrimary,
                   ),
+                ),
+                const SizedBox(height: AppDimensions.spacingS),
+                // Author
+                Row(
+                  children: [
+                    Icon(
+                      Icons.person_outline,
+                      size: 14,
+                      color: context.textTertiary,
+                    ),
+                    const SizedBox(width: AppDimensions.spacingXS),
+                    Flexible(
+                      child: Text(
+                        _shortenAddress(proposal.author),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 13,
+                          height: 1.3,
+                          color: context.textSecondary,
+                        ),
+                      ),
+                    ),
+                    const Spacer(),
+                    Icon(
+                      Icons.how_to_vote_outlined,
+                      size: 14,
+                      color: context.textTertiary,
+                    ),
+                    const SizedBox(width: AppDimensions.spacingXS),
+                    Text(
+                      '${proposal.votesCount} votes',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 13,
+                        height: 1.3,
+                        color: context.textSecondary,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildStateBadge() {
+  Widget _buildStateBadge(BuildContext context) {
     Color badgeColor;
     String label;
 
@@ -508,7 +522,12 @@ class _ProposalCard extends StatelessWidget {
           fontSize: 11,
           height: 1.3,
           fontWeight: FontWeight.w600,
-          color: badgeColor,
+          // Text-safe shade of the state color on its 15% tint.
+          color: ChatContrast.onTint(
+            badgeColor,
+            [context.surfaceColor],
+            dark: isDark,
+          ),
         ),
       ),
     );

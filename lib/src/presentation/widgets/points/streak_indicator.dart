@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/chat_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../core/theme/app_dimensions.dart';
 
 /// Streak indicator widget showing consecutive active days.
@@ -142,10 +143,15 @@ class _StreakIndicatorState extends State<StreakIndicator>
                   ),
                   child: Text(
                     '${_multiplier}x',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFFFF6B35),
+                      // Text-safe shade of the flame orange on its tint.
+                      color: ChatContrast.onTint(
+                        const Color(0xFFFF6B35),
+                        [context.surfaceColor],
+                        dark: isDark,
+                      ),
                     ),
                   ),
                 ),
@@ -251,7 +257,7 @@ class _DayDot extends StatelessWidget {
             fontSize: 11,
             fontWeight: isToday ? FontWeight.w600 : FontWeight.w400,
             color: isToday
-                ? AppColors.primaryOf(context)
+                ? AppColors.primaryOnTintOf(context)
                 : context.textSecondary,
           ),
         ),
@@ -279,7 +285,7 @@ class _DayDot extends StatelessWidget {
                 : Icon(
                     Icons.circle_outlined,
                     size: 14,
-                    color: context.textTertiary,
+                    color: context.textSecondary,
                   ),
           ),
         ),

@@ -7,7 +7,9 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/chat_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../core/theme/app_icons.dart';
+import '../../widgets/common/n42_tap_area.dart';
 import '../../widgets/common/slide_to_pay_button.dart';
 import '../../../core/theme/app_dimensions.dart';
 
@@ -37,6 +39,13 @@ class _SendTransferPageState extends State<SendTransferPage> {
   RegExp? _cachedAmountRegex;
   String? _cachedAmountPattern;
   final List<String> _tokens = ['CNY', 'ETH', 'USDT', 'BTC'];
+
+  /// Transfer amber.
+  static const Color _amber = Color(0xFFF9A825);
+
+  /// Amber fill that carries white text/icons at >= 4.5:1 (raw amber is
+  /// about 1.9:1 with white).
+  static final Color _amberFill = ChatContrast.fillForWhiteText(_amber);
 
   /// 获取当前币种的小数位数限制
   int get _decimalPlaces {
@@ -144,7 +153,7 @@ class _SendTransferPageState extends State<SendTransferPage> {
       backgroundColor: bgColor,
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF9A825),
+        backgroundColor: _amberFill,
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
@@ -251,9 +260,16 @@ class _SendTransferPageState extends State<SendTransferPage> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       // 币种选择
-                      GestureDetector(
+                      // 44pt hit area around the unchanged token pill.
+                      N42TapArea(
                         onTap: _showTokenPicker,
-                        child: Container(
+                        tooltip:
+                            S.of(context)?.chatSelectCurrency ??
+                            'Select currency',
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusM,
+                        ),
+                        child: Ink(
                           padding: const EdgeInsets.symmetric(
                             horizontal: AppDimensions.spacingM,
                             vertical: AppDimensions.spacingS,
@@ -354,7 +370,14 @@ class _SendTransferPageState extends State<SendTransferPage> {
                     S.of(context)?.slideToPayLabel ?? '→→→  Slide to confirm',
                 confirmingLabel:
                     S.of(context)?.slideToPayConfirming ?? 'Confirming...',
-                trackColor: const Color(0xFFF9A825),
+                // Label is drawn in trackColor on a 12% tint of it: use a
+                // shade that reaches 4.5:1 there (raw amber is ~1.8:1).
+                trackColor: ChatContrast.onTint(
+                  _amber,
+                  [bgColor],
+                  dark: isDark,
+                  alpha: 0.12,
+                ),
                 onConfirmed: () {
                   unawaited(_send());
                 },
@@ -398,7 +421,7 @@ class _SendTransferPageState extends State<SendTransferPage> {
               (token) => ListTile(
                 title: Text(token, style: TextStyle(color: textColor)),
                 trailing: _selectedToken == token
-                    ? const Icon(Icons.check, color: Color(0xFFF9A825))
+                    ? Icon(Icons.check, color: _amberFill)
                     : null,
                 onTap: () {
                   setState(() {

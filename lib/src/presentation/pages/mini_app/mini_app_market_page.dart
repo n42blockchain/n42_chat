@@ -81,7 +81,7 @@ class _MiniAppMarketPageState extends State<MiniAppMarketPage>
           isScrollable: true,
           tabAlignment: TabAlignment.start,
           indicatorColor: AppColors.primaryOf(context),
-          labelColor: AppColors.primaryOf(context),
+          labelColor: AppColors.primaryOnTintOf(context),
           unselectedLabelColor: context.textSecondary,
           tabs: [
             Tab(text: l10n?.miniAppCategoryAll ?? 'All'),
@@ -238,6 +238,8 @@ class _AppListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = S.of(context);
+    final users = _formatCount(app.userCount ?? 0);
     return Card(
       margin: const EdgeInsets.only(bottom: AppDimensions.spacingS),
       color: context.surfaceColor,
@@ -297,10 +299,10 @@ class _AppListTile extends StatelessWidget {
                               ),
                             ),
                             child: Text(
-                              'Official',
+                              l10n?.ui3MiniAppOfficial ?? 'Official',
                               style: TextStyle(
                                 fontSize: 10,
-                                color: AppColors.primaryOf(context),
+                                color: AppColors.primaryOnTintOf(context),
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -320,7 +322,7 @@ class _AppListTile extends StatelessWidget {
                     if (app.userCount != null) ...[
                       const SizedBox(height: AppDimensions.spacingXS),
                       Text(
-                        '${_formatCount(app.userCount!)} users',
+                        l10n?.ui3MiniAppUserCount(users) ?? '$users users',
                         style: TextStyle(
                           fontSize: 11,
                           color: context.textSecondary,
@@ -362,52 +364,57 @@ class _FeaturedCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 120,
-        decoration: BoxDecoration(
-          color: context.surfaceColor,
+    return Container(
+      width: 120,
+      decoration: BoxDecoration(
+        color: context.surfaceColor,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: context.dividerColor, width: 0.5),
+      ),
+      // Ink on a transparent Material so the pressed state shows on the card.
+      child: Material(
+        type: MaterialType.transparency,
+        child: InkWell(
+          onTap: onTap,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: context.dividerColor, width: 0.5),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 56,
-              height: 56,
-              decoration: BoxDecoration(
-                color: _categoryColor(app.category).withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(14),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: _categoryColor(app.category).withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(
+                  _categoryIcon(app.category),
+                  color: _categoryColor(app.category),
+                  size: 30,
+                ),
               ),
-              child: Icon(
-                _categoryIcon(app.category),
-                color: _categoryColor(app.category),
-                size: 30,
+              const SizedBox(height: AppDimensions.spacingS),
+              Text(
+                app.name,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: context.textPrimary,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
-            ),
-            const SizedBox(height: AppDimensions.spacingS),
-            Text(
-              app.name,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: context.textPrimary,
+              const SizedBox(height: 2),
+              Text(
+                app.category.label,
+                style: TextStyle(
+                  fontSize: 10,
+                  color: AppColors.textSecondaryOf(isDark),
+                ),
               ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 2),
-            Text(
-              app.category.label,
-              style: TextStyle(
-                fontSize: 10,
-                color: AppColors.textSecondaryOf(isDark),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

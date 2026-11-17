@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../domain/entities/points/points_balance.dart';
 import '../../blocs/points/points_bloc.dart';
 import '../../blocs/points/points_event.dart';
@@ -197,7 +198,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
             style: TextStyle(
               fontSize: 14,
               height: 1.4,
-              color: context.textTertiary,
+              color: context.textSupporting,
             ),
           ),
         ],
@@ -313,12 +314,13 @@ class _PodiumItem extends StatelessWidget {
             CircleAvatar(
               radius: rank == 1 ? 28 : 22,
               backgroundColor: isCurrentUser
-                  ? AppColors.primaryOf(context)
+                  ? AppColors.primaryFillOf(context)
                   : medalColor,
               child: Text(
                 _shortName(balance.userId),
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  // Light medal fills (gold, silver) need a dark label.
+                  color: isCurrentUser ? Colors.white : _onMedal,
                   fontWeight: FontWeight.w700,
                   fontSize: 12,
                 ),
@@ -337,7 +339,7 @@ class _PodiumItem extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w700,
-                    color: Colors.white,
+                    color: _onMedal,
                   ),
                 ),
               ),
@@ -347,7 +349,8 @@ class _PodiumItem extends StatelessWidget {
         const SizedBox(height: 10),
         // Pedestal
         Container(
-          height: height - 80,
+          // minHeight so the points label is not clipped at large text sizes.
+          constraints: BoxConstraints(minHeight: height - 80),
           decoration: BoxDecoration(
             color: medalColor.withValues(alpha: 0.2),
             borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
@@ -389,6 +392,9 @@ class _PodiumItem extends StatelessWidget {
       ],
     );
   }
+
+  /// Dark label for the gold / silver / bronze medal fills (>= 4.5:1).
+  static const Color _onMedal = Color(0xDD000000);
 
   String _shortName(String userId) {
     if (userId.length <= 2) return userId.toUpperCase();
@@ -449,8 +455,8 @@ class _LeaderboardTile extends StatelessWidget {
           CircleAvatar(
             radius: 18,
             backgroundColor: isCurrentUser
-                ? AppColors.primaryOf(context)
-                : AppColors.textTertiary,
+                ? AppColors.primaryFillOf(context)
+                : ChatContrast.fillForWhiteText(AppColors.textSecondary),
             child: Text(
               _shortName(balance.userId),
               style: const TextStyle(
@@ -486,7 +492,7 @@ class _LeaderboardTile extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12,
                       height: 1.3,
-                      color: context.textTertiary,
+                      color: context.textSupporting,
                     ),
                   ),
               ],

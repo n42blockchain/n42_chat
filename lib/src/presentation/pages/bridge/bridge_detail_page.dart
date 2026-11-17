@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../integration/bridge/bridge_manager.dart';
 import '../../../integration/bridge/bridge_platform.dart';
 import '../../../integration/bridge/bridge_state.dart';
@@ -36,6 +37,15 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
 
   BridgePlatformInfo get _info =>
       BridgePlatformRegistry.getInfo(widget.platform);
+
+  /// Text-safe shade of [color] on the section surface (4.5:1); system
+  /// red / orange and many platform brand colors fail on white.
+  Color _onSurface(Color color) => ChatContrast.onTint(
+    color,
+    [context.surfaceColor],
+    dark: context.isDarkMode,
+    alpha: 0,
+  );
 
   @override
   void initState() {
@@ -97,7 +107,9 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            style: TextButton.styleFrom(
+              foregroundColor: _onSurface(AppColors.error),
+            ),
             child: const Text('Disconnect'),
           ),
         ],
@@ -239,7 +251,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
             style: TextStyle(
               fontSize: 14,
               height: 1.4,
-              color: context.textTertiary,
+              color: context.textSupporting,
             ),
           ),
         ],
@@ -265,7 +277,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
               fontSize: 13,
               height: 1.3,
               fontWeight: FontWeight.w500,
-              color: context.textTertiary,
+              color: context.textSupporting,
               letterSpacing: 0.5,
             ),
           ),
@@ -299,7 +311,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
                           style: TextStyle(
                             fontSize: 14,
                             height: 1.3,
-                            color: context.textTertiary,
+                            color: context.textSupporting,
                           ),
                         ),
                       ),
@@ -323,16 +335,16 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
         icon = Icons.check_circle;
       case BridgeConnectionStatus.connecting:
       case BridgeConnectionStatus.reconnecting:
-        color = AppColors.warning;
+        color = _onSurface(AppColors.warning);
         icon = Icons.sync;
       case BridgeConnectionStatus.error:
         color = AppColors.error;
         icon = Icons.error;
       case BridgeConnectionStatus.disconnected:
-        color = AppColors.textTertiary;
+        color = context.textSecondary;
         icon = Icons.remove_circle_outline;
       case BridgeConnectionStatus.notAvailable:
-        color = AppColors.textTertiary;
+        color = context.textSecondary;
         icon = Icons.block;
     }
 
@@ -359,7 +371,8 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
   Widget _buildActionsSection(bool isDark) {
     final bgColor = context.surfaceColor;
 
-    return Container(
+    // Material (not a colored Container) so the ListTile ink is visible.
+    return Material(
       color: bgColor,
       child: Column(
         children: [
@@ -413,15 +426,16 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
     VoidCallback? onTap,
   }) {
     final defaultColor = context.textPrimary;
+    final tint = color == null ? defaultColor : _onSurface(color);
 
     return ListTile(
-      leading: Icon(icon, color: color ?? defaultColor, size: 22),
+      leading: Icon(icon, color: tint, size: 22),
       title: Text(
         title,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
-          color: color ?? defaultColor,
+          color: tint,
           fontSize: 16,
           height: 1.3,
         ),
@@ -454,7 +468,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
               fontSize: 13,
               height: 1.3,
               fontWeight: FontWeight.w500,
-              color: context.textTertiary,
+              color: context.textSupporting,
               letterSpacing: 0.5,
             ),
           ),
@@ -500,7 +514,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
             style: TextStyle(
               fontSize: 14,
               height: 1.4,
-              color: context.textTertiary,
+              color: context.textSupporting,
             ),
           ),
           const SizedBox(height: AppDimensions.spacing),
@@ -517,7 +531,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
               child: Text(
                 'QR Code\n(from bridge bot)',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: AppColors.textTertiary),
+                style: TextStyle(color: AppColors.textSecondary),
               ),
             ),
           ),
@@ -528,7 +542,7 @@ class _BridgeDetailPageState extends State<BridgeDetailPage> {
 
   Widget _buildInfoSection(bool isDark) {
     final bgColor = context.surfaceColor;
-    final textColor = context.textTertiary;
+    final textColor = context.textSupporting;
 
     return Container(
       color: bgColor,

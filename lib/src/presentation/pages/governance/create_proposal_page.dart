@@ -11,6 +11,7 @@ import '../../blocs/governance/governance_bloc.dart';
 import '../../blocs/governance/governance_event.dart';
 import '../../blocs/governance/governance_state.dart';
 import '../../../core/theme/app_dimensions.dart';
+import '../../../../l10n/app_localizations.dart';
 
 /// Page for creating a new governance proposal.
 ///
@@ -41,6 +42,10 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
   DateTime _startTime = DateTime.now().add(const Duration(hours: 1));
   DateTime _endTime = DateTime.now().add(const Duration(days: 3));
   bool _submitInFlight = false;
+
+  /// True while the confirm dialog is open; blocks a second dialog from a
+  /// fast double tap.
+  bool _confirmOpen = false;
 
   @override
   void dispose() {
@@ -142,6 +147,7 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
   }
 
   Future<void> _submitProposal() async {
+    if (_confirmOpen || _submitInFlight) return;
     if (!_formKey.currentState!.validate()) return;
 
     final choices = _choiceControllers
@@ -157,6 +163,7 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
     }
 
     // Confirm submission
+    _confirmOpen = true;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -178,6 +185,7 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
         ],
       ),
     );
+    _confirmOpen = false;
 
     if (confirmed == true && mounted) {
       setState(() => _submitInFlight = true);
@@ -218,15 +226,17 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
             _submitInFlight = false;
             Navigator.of(context).pop(true);
           } else if (_submitInFlight &&
-              state.status == GovernanceStatus.error &&
-              state.errorMessage != null) {
+              state.status == GovernanceStatus.error) {
+            // Re-enable the submit button on any error.
             setState(() => _submitInFlight = false);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.errorMessage!),
-                backgroundColor: AppColors.error,
-              ),
-            );
+            if (state.errorMessage != null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.errorMessage!),
+                  backgroundColor: AppColors.error,
+                ),
+              );
+            }
           }
         },
         builder: (context, state) {
@@ -250,7 +260,9 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
                       const SizedBox(height: AppDimensions.spacingXL),
                       _buildDateTimeSection(context),
                       const SizedBox(height: AppDimensions.spacingXXL),
-                      _buildSubmitButton(isDark, isCreating),
+                      // Disabled for the whole request, not only while the
+                      // bloc reports creating (prevents a double submit).
+                      _buildSubmitButton(isDark, isCreating || _submitInFlight),
                       const SizedBox(height: AppDimensions.spacingXXL),
                     ],
                   ),
@@ -296,7 +308,7 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
             controller: _titleController,
             decoration: InputDecoration(
               hintText: 'Enter proposal title...',
-              hintStyle: TextStyle(color: context.textTertiary),
+              hintStyle: TextStyle(color: context.textSecondary),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                 borderSide: const BorderSide(color: AppColors.inputBorder),
@@ -352,7 +364,7 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
             controller: _bodyController,
             decoration: InputDecoration(
               hintText: 'Describe your proposal...',
-              hintStyle: TextStyle(color: context.textTertiary),
+              hintStyle: TextStyle(color: context.textSecondary),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                 borderSide: const BorderSide(color: AppColors.inputBorder),
@@ -409,7 +421,7 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
                 style: TextStyle(
                   fontSize: 13,
                   height: 1.3,
-                  color: context.textTertiary,
+                  color: context.textSupporting,
                 ),
               ),
             ],
@@ -441,7 +453,7 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
                       controller: _choiceControllers[index],
                       decoration: InputDecoration(
                         hintText: 'Choice ${index + 1}',
-                        hintStyle: TextStyle(color: context.textTertiary),
+                        hintStyle: TextStyle(color: context.textSecondary),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(
                             AppDimensions.radiusM,
@@ -476,17 +488,17 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
                   ),
                   // Remove button
                   if (_choiceControllers.length > 2)
+                    // Default IconButton constraints: 48x48 hit area.
                     IconButton(
+                      tooltip:
+                          S.of(context)?.a11yGovernanceRemoveChoice ??
+                          'Remove choice',
                       icon: const Icon(
                         Icons.remove_circle_outline,
                         color: AppColors.error,
                         size: 20,
                       ),
                       onPressed: () => _removeChoice(index),
-                      padding: const EdgeInsets.only(
-                        left: AppDimensions.spacingXS,
-                      ),
-                      constraints: const BoxConstraints(),
                     ),
                 ],
               ),
@@ -501,7 +513,7 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
               icon: const Icon(Icons.add, size: 18),
               label: const Text('Add Choice'),
               style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.primaryOf(context),
+                foregroundColor: AppColors.primaryOnTintOf(context),
                 side: BorderSide(
                   color: AppColors.primaryOf(context).withValues(alpha: 0.5),
                 ),
@@ -553,7 +565,7 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
             style: TextStyle(
               fontSize: 12,
               height: 1.3,
-              color: context.textTertiary,
+              color: context.textSupporting,
             ),
           ),
         ],
@@ -572,7 +584,7 @@ class _CreateProposalPageState extends State<CreateProposalPage> {
                 unawaited(_submitProposal());
               },
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primaryOf(context),
+          backgroundColor: AppColors.primaryFillOf(context),
           disabledBackgroundColor: ChatColors.of(context).buttonDisabledBg,
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
@@ -631,39 +643,47 @@ class _DateTimeTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingM),
-        child: Row(
-          children: [
-            Icon(Icons.calendar_today, size: 18, color: context.textSecondary),
-            const SizedBox(width: AppDimensions.spacingM),
-            Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 14,
-                height: 1.3,
+    // Transparent Material: the ink would otherwise paint under the card.
+    return Material(
+      type: MaterialType.transparency,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingM),
+          child: Row(
+            children: [
+              Icon(
+                Icons.calendar_today,
+                size: 18,
                 color: context.textSecondary,
               ),
-            ),
-            const Spacer(),
-            Text(
-              _formatDateTime(dateTime),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 14,
-                height: 1.3,
-                fontWeight: FontWeight.w500,
-                color: context.textPrimary,
+              const SizedBox(width: AppDimensions.spacingM),
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 14,
+                  height: 1.3,
+                  color: context.textSecondary,
+                ),
               ),
-            ),
-            const SizedBox(width: AppDimensions.spacingXS),
-            Icon(AppIcons.chevron, size: 20, color: context.textTertiary),
-          ],
+              const Spacer(),
+              Text(
+                _formatDateTime(dateTime),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 14,
+                  height: 1.3,
+                  fontWeight: FontWeight.w500,
+                  color: context.textPrimary,
+                ),
+              ),
+              const SizedBox(width: AppDimensions.spacingXS),
+              Icon(AppIcons.chevron, size: 20, color: context.textTertiary),
+            ],
+          ),
         ),
       ),
     );

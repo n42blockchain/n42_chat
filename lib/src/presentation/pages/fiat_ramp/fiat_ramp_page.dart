@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/fiat_ramp_service.dart';
@@ -57,10 +58,11 @@ class _FiatRampPageState extends State<FiatRampPage> {
   @override
   Widget build(BuildContext context) {
     final available = _service?.isAvailable ?? false;
+    final s = S.of(context);
     return Scaffold(
       backgroundColor: context.pageBackground,
       appBar: AppBar(
-        title: const Text('Buy / Sell crypto'),
+        title: Text(s?.ui3FiatRampTitle ?? 'Buy / Sell crypto'),
         bottom: available
             ? PreferredSize(
                 preferredSize: const Size.fromHeight(48),
@@ -69,9 +71,15 @@ class _FiatRampPageState extends State<FiatRampPage> {
                     bottom: AppDimensions.spacingS,
                   ),
                   child: SegmentedButton<bool>(
-                    segments: const [
-                      ButtonSegment(value: true, label: Text('Buy')),
-                      ButtonSegment(value: false, label: Text('Sell')),
+                    segments: [
+                      ButtonSegment(
+                        value: true,
+                        label: Text(s?.ui3FiatRampBuy ?? 'Buy'),
+                      ),
+                      ButtonSegment(
+                        value: false,
+                        label: Text(s?.ui3FiatRampSell ?? 'Sell'),
+                      ),
                     ],
                     selected: {_isBuy},
                     onSelectionChanged: (s) {
@@ -109,7 +117,9 @@ class _FiatRampPageState extends State<FiatRampPage> {
             ),
             const SizedBox(height: AppDimensions.spacing),
             Text(
-              'Fiat on/off-ramp not configured',
+              S.of(context)?.ui3FiatRampNotConfigured ??
+                  'Fiat on/off-ramp not configured',
+              textAlign: TextAlign.center,
               style: TextStyle(
                 color: context.textPrimary,
                 fontSize: 16,
@@ -126,10 +136,10 @@ class _FiatRampPageState extends State<FiatRampPage> {
             const SizedBox(height: AppDimensions.spacingL),
             FilledButton(
               style: FilledButton.styleFrom(
-                backgroundColor: AppColors.primaryOf(context),
+                backgroundColor: AppColors.primaryFillOf(context),
               ),
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Back'),
+              child: Text(S.of(context)?.a11yBack ?? 'Back'),
             ),
           ],
         ),

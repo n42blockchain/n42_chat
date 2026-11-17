@@ -9,7 +9,6 @@ import 'package:share_plus/share_plus.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extension.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/debug_log.dart';
 import '../../../core/utils/payment_request_uri.dart';
 import '../../../core/utils/payment_asset_match.dart';
@@ -153,7 +152,7 @@ class _MerchantQrPageState extends State<MerchantQrPage> {
     return Scaffold(
       backgroundColor: context.pageBackground,
       appBar: N42AppBar(
-        title: 'Merchant QR',
+        title: l10n?.ui3TransferMerchantQrTitle ?? 'Merchant QR',
         showBackButton: true,
         onBackPressed: () => Navigator.pop(context),
       ),
@@ -222,6 +221,7 @@ class _MerchantQrPageState extends State<MerchantQrPage> {
                     child: Text(
                       l10n?.transferQrCodeGenerateFailed ??
                           'QR code generation failed',
+                      style: const TextStyle(color: _qrCardText),
                     ),
                   ),
                 ),
@@ -234,6 +234,7 @@ class _MerchantQrPageState extends State<MerchantQrPage> {
                     l10n?.transferAssetUnavailable ??
                         'Payment asset is unavailable',
                     textAlign: TextAlign.center,
+                    style: const TextStyle(color: _qrCardText),
                   ),
                 ),
               ),
@@ -256,7 +257,7 @@ class _MerchantQrPageState extends State<MerchantQrPage> {
               style: const TextStyle(
                 fontSize: 12,
                 fontFamily: 'monospace',
-                color: AppColors.textSecondary,
+                color: _qrCardSecondaryText,
               ),
             ),
           ],
@@ -264,6 +265,11 @@ class _MerchantQrPageState extends State<MerchantQrPage> {
       ),
     );
   }
+
+  /// Text on the always-white QR card (theme text would be white in dark
+  /// mode; AppColors.textSecondary is 3.4:1 on white).
+  static const Color _qrCardText = Colors.black87;
+  static const Color _qrCardSecondaryText = Color(0xFF6C6C70);
 
   Widget _buildForm(S? l10n) {
     return Container(
@@ -339,7 +345,9 @@ class _MerchantQrPageState extends State<MerchantQrPage> {
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             decoration: InputDecoration(
               labelText: l10n?.commonTransferAmount ?? 'Amount',
-              hintText: 'Leave empty for open amount',
+              hintText:
+                  l10n?.ui3TransferOpenAmountHint ??
+                  'Leave empty for open amount',
               border: const OutlineInputBorder(),
               suffixText: _selectedToken?.symbol,
             ),
@@ -368,6 +376,7 @@ class _MerchantQrPageState extends State<MerchantQrPage> {
               ),
               IconButton(
                 icon: const Icon(Icons.copy, size: 18),
+                tooltip: l10n?.chatCopy ?? 'Copy',
                 onPressed: () {
                   final address = _receiveAddress;
                   if (address == null) return;

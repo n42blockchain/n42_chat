@@ -310,6 +310,7 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
         backgroundColor: context.surfaceColor,
         elevation: 0,
         leading: IconButton(
+          tooltip: l10n?.commonClose ?? 'Close',
           icon: const Icon(Icons.close),
           onPressed: () => Navigator.pop(context),
         ),
@@ -337,6 +338,8 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
                 children: [
                   Text(
                     widget.app.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -345,6 +348,8 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
                   ),
                   Text(
                     widget.app.developer ?? 'N42',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 11,
                       color: context.textSecondary,
@@ -358,6 +363,7 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
         actions: [
           // 刷新按钮
           IconButton(
+            tooltip: l10n?.a11yRefresh ?? 'Refresh',
             icon: const Icon(Icons.refresh, size: 20),
             onPressed: _retryLoad,
           ),
@@ -408,7 +414,7 @@ class _MiniAppPageState extends State<MiniAppPage> with WidgetsBindingObserver {
                   Uri.parse(_security.config.upgradeUrl!),
                   mode: LaunchMode.externalApplication,
                 ),
-                child: const Text('Update N42'),
+                child: Text(l10n?.ui3MiniAppUpdateN42 ?? 'Update N42'),
               ),
 
             Icon(

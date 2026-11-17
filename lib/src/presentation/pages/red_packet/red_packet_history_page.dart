@@ -6,6 +6,7 @@ import '../../../core/extensions/context_extension.dart';
 import '../../../core/services/red_packet_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/chat_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../domain/entities/red_packet_entity.dart';
 import 'red_packet_detail_page.dart';
 import '../../../core/theme/app_dimensions.dart';
@@ -85,7 +86,7 @@ class _RedPacketHistoryPageState extends State<RedPacketHistoryPage>
             Tab(text: l10n?.redPacketReceived ?? 'Received'),
           ],
           indicatorColor: AppColors.primaryOf(context),
-          labelColor: AppColors.primaryOf(context),
+          labelColor: AppColors.primaryOnTintOf(context),
           unselectedLabelColor: context.textSecondary,
         ),
       ),
@@ -118,8 +119,8 @@ class _RedPacketHistoryPageState extends State<RedPacketHistoryPage>
             ),
             const SizedBox(height: AppDimensions.spacingM),
             Text(
-              'No red packets yet',
-              style: TextStyle(color: AppColors.textTertiaryOf(isDark)),
+              S.of(context)?.ui3RedPacketHistoryEmpty ?? 'No red packets yet',
+              style: TextStyle(color: context.textSupporting),
             ),
           ],
         ),
@@ -149,10 +150,16 @@ class _RedPacketHistoryPageState extends State<RedPacketHistoryPage>
       RedPacketLifecycle.completed => l10n?.redPacketClaimed ?? 'Claimed',
       RedPacketLifecycle.expired => l10n?.redPacketExpired ?? 'Expired',
     };
+    // Status labels are 12pt text: use shades that reach 4.5:1 on the card.
     final statusColor = switch (rp.lifecycle) {
-      RedPacketLifecycle.active => AppColors.primaryOf(context),
-      RedPacketLifecycle.completed => AppColors.success,
-      RedPacketLifecycle.expired => context.textTertiary,
+      RedPacketLifecycle.active => AppColors.primaryOnTintOf(context),
+      RedPacketLifecycle.completed => ChatContrast.onTint(
+        AppColors.success,
+        [context.surfaceColor],
+        dark: isDark,
+        alpha: 0,
+      ),
+      RedPacketLifecycle.expired => context.textSupporting,
     };
 
     return Card(
@@ -178,7 +185,9 @@ class _RedPacketHistoryPageState extends State<RedPacketHistoryPage>
           ),
         ),
         title: Text(
-          rp.greeting.isNotEmpty ? rp.greeting : 'Red Packet',
+          rp.greeting.isNotEmpty
+              ? rp.greeting
+              : (l10n?.profileRedPacket ?? 'Red Packet'),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
@@ -191,7 +200,7 @@ class _RedPacketHistoryPageState extends State<RedPacketHistoryPage>
           '${rp.createdAt.month}/${rp.createdAt.day} '
           '${rp.createdAt.hour.toString().padLeft(2, '0')}:'
           '${rp.createdAt.minute.toString().padLeft(2, '0')}',
-          style: TextStyle(fontSize: 12, color: context.textTertiary),
+          style: TextStyle(fontSize: 12, color: context.textSupporting),
         ),
         trailing: Text(
           statusText,

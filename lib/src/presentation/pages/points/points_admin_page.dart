@@ -7,6 +7,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/chat_colors.dart';
 import '../../../domain/entities/points/points_config.dart';
 import '../../../domain/entities/points/reward_rule.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../blocs/points/points_bloc.dart';
 import '../../blocs/points/points_event.dart';
 import '../../blocs/points/points_state.dart';
@@ -115,7 +116,7 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
               child: Text(
                 'Save',
                 style: TextStyle(
-                  color: AppColors.primaryOf(context),
+                  color: AppColors.primaryOnTintOf(context),
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -222,6 +223,8 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
               _buildSection(
                 title: 'Reward Rules',
                 trailing: IconButton(
+                  tooltip:
+                      S.of(context)?.a11yPointsAddRule ?? 'Add reward rule',
                   icon: Icon(
                     Icons.add_circle_outline,
                     color: AppColors.primaryOf(context),
@@ -413,7 +416,7 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
           ),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: TextStyle(color: context.textTertiary),
+            hintStyle: TextStyle(color: context.textSecondary),
             filled: true,
             fillColor: ChatColors.of(context).formFieldFill,
             border: OutlineInputBorder(
@@ -534,7 +537,7 @@ class _PointsAdminPageState extends State<PointsAdminPage> {
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryOf(context),
+                    backgroundColor: AppColors.primaryFillOf(context),
                     foregroundColor: Colors.white,
                   ),
                   onPressed: () {
@@ -624,7 +627,7 @@ class _RuleTile extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12,
                     height: 1.3,
-                    color: context.textTertiary,
+                    color: context.textSupporting,
                   ),
                 ),
               ],
@@ -636,10 +639,11 @@ class _RuleTile extends StatelessWidget {
             activeTrackColor: AppColors.primaryOf(context),
           ),
           IconButton(
+            tooltip: S.of(context)?.commonDelete ?? 'Delete',
             icon: Icon(
               Icons.delete_outline,
               size: 20,
-              color: context.textTertiary,
+              color: context.textSupporting,
             ),
             onPressed: onDelete,
           ),

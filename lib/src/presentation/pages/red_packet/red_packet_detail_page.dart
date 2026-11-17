@@ -161,8 +161,10 @@ class RedPacketDetailPage extends StatelessWidget {
                         textAlign: TextAlign.center,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.7),
+                        // Fixed overlay color: white reaches 4.0-4.9:1 on the
+                        // red header (white 70% was 2.7-3.1:1).
+                        style: const TextStyle(
+                          color: Colors.white,
                           fontSize: 15,
                           height: 1.4,
                         ),
@@ -219,16 +221,16 @@ class RedPacketDetailPage extends StatelessWidget {
                                     'Saved to balance, can transfer directly',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  color: Colors.white.withValues(alpha: 0.7),
+                                style: const TextStyle(
+                                  color: Colors.white,
                                   fontSize: 14,
                                   height: 1.3,
                                 ),
                               ),
                             ),
-                            Icon(
+                            const Icon(
                               AppIcons.chevron,
-                              color: Colors.white.withValues(alpha: 0.7),
+                              color: Colors.white,
                               size: 18,
                             ),
                           ],
@@ -272,8 +274,8 @@ class RedPacketDetailPage extends StatelessWidget {
                                   'Reply with this emoji',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.9),
+                              style: const TextStyle(
+                                color: Colors.white,
                                 fontSize: 14,
                                 height: 1.3,
                               ),
@@ -293,7 +295,7 @@ class RedPacketDetailPage extends StatelessWidget {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
-                            color: Colors.white70,
+                            color: Colors.white,
                             fontSize: 16,
                             height: 1.4,
                           ),
@@ -526,8 +528,9 @@ class _BestLuckBadge extends StatelessWidget {
           const SizedBox(width: 2),
           Text(
             label,
+            // Dark label: white on the gold gradient was 1.4-2.3:1.
             style: const TextStyle(
-              color: Colors.white,
+              color: Color(0xFF3D2600),
               fontSize: 10,
               fontWeight: FontWeight.w600,
             ),

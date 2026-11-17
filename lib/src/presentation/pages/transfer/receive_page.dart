@@ -5,7 +5,6 @@ import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/payment_asset_match.dart';
 import '../../../core/utils/payment_request_uri.dart';
 import '../../../integration/wallet_bridge.dart';
@@ -152,6 +151,7 @@ class _ReceivePageState extends State<ReceivePage> {
             title: S.of(context)?.transferReceive ?? 'Receive',
             leading: IconButton(
               icon: const Icon(Icons.close),
+              tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
               onPressed: () => Navigator.pop(context),
             ),
           ),
@@ -209,7 +209,9 @@ class _ReceivePageState extends State<ReceivePage> {
 
           // 商户收款码（带金额二维码）
           N42Button(
-            text: 'Merchant QR (with amount)',
+            text:
+                S.of(context)?.ui3TransferMerchantQrWithAmount ??
+                'Merchant QR (with amount)',
             type: N42ButtonType.secondary,
             onPressed: () {
               Navigator.push(
@@ -279,6 +281,7 @@ class _ReceivePageState extends State<ReceivePage> {
                 child: Text(
                   S.of(context)?.transferQrCodeGenerateFailed ??
                       'QR code generation failed',
+                  style: const TextStyle(color: _qrCardText),
                 ),
               ),
             )
@@ -289,21 +292,24 @@ class _ReceivePageState extends State<ReceivePage> {
                 child: Text(
                   S.of(context)?.transferAssetUnavailable ??
                       'Payment asset is unavailable',
+                  style: const TextStyle(color: _qrCardText),
                 ),
               ),
             ),
           const SizedBox(height: 16),
           Text(
             S.of(context)?.transferScanQrToPayMe ?? 'Scan QR code to pay me',
-            style: const TextStyle(
-              fontSize: 14,
-              color: AppColors.textSecondary,
-            ),
+            style: const TextStyle(fontSize: 14, color: _qrCardSecondaryText),
           ),
         ],
       ),
     );
   }
+
+  /// Text on the always-white QR card (theme text would be white in dark
+  /// mode; AppColors.textSecondary is 3.4:1 on white).
+  static const Color _qrCardText = Colors.black87;
+  static const Color _qrCardSecondaryText = Color(0xFF6C6C70);
 
   bool _hasIdentity(TokenInfo asset) =>
       asset.chain != null ||
@@ -415,6 +421,7 @@ class _ReceivePageState extends State<ReceivePage> {
               ),
               IconButton(
                 icon: const Icon(Icons.copy, size: 20),
+                tooltip: S.of(context)?.chatCopy ?? 'Copy',
                 onPressed: () {
                   Clipboard.setData(ClipboardData(text: walletAddress));
                   ScaffoldMessenger.of(context).showSnackBar(

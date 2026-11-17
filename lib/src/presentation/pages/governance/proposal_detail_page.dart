@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/chat_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../domain/entities/governance/proposal_entity.dart';
 import '../../../domain/entities/governance/vote_entity.dart';
 import '../../blocs/governance/governance_bloc.dart';
@@ -39,6 +40,9 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
   int? _selectedChoice;
   bool _isLoadingDetail = false;
   bool _voteInFlight = false;
+
+  /// True while the vote confirm dialog is open (blocks a second dialog).
+  bool _confirmOpen = false;
 
   @override
   void initState() {
@@ -87,16 +91,17 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
               _voteInFlight = false;
               _selectedChoice = null;
             });
-          } else if ((state.status == GovernanceStatus.error &&
-                  (_voteInFlight || _isLoadingDetail)) &&
-              state.errorMessage != null) {
+          } else if (state.status == GovernanceStatus.error &&
+              (_voteInFlight || _isLoadingDetail)) {
             final wasVoting = _voteInFlight;
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.errorMessage!),
-                backgroundColor: AppColors.error,
-              ),
-            );
+            if (state.errorMessage != null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.errorMessage!),
+                  backgroundColor: AppColors.error,
+                ),
+              );
+            }
             if (mounted) {
               setState(() {
                 _voteInFlight = false;
@@ -244,6 +249,13 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
         label = 'Executed';
     }
 
+    // Text-safe shade of the state color on its 15% tint.
+    final labelColor = ChatContrast.onTint(
+      badgeColor,
+      [context.surfaceColor],
+      dark: context.isDarkMode,
+    );
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
@@ -258,7 +270,7 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
           fontSize: 12,
           height: 1.3,
           fontWeight: FontWeight.w600,
-          color: badgeColor,
+          color: labelColor,
         ),
       ),
     );
@@ -268,7 +280,14 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
     final text = proposal.hasEnded
         ? 'Ended'
         : _formatDuration(proposal.timeRemaining);
-    final color = proposal.isActive ? AppColors.success : context.textTertiary;
+    final color = proposal.isActive
+        ? ChatContrast.onTint(
+            AppColors.success,
+            [context.surfaceColor],
+            dark: context.isDarkMode,
+            alpha: 0,
+          )
+        : context.textSupporting;
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -360,7 +379,7 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
                 style: TextStyle(
                   fontSize: 12,
                   height: 1.3,
-                  color: context.textTertiary,
+                  color: context.textSupporting,
                 ),
               ),
             ],
@@ -386,7 +405,9 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
   // -- Voting section: choice selection + cast vote button --
 
   Widget _buildVotingSection(ProposalEntity proposal, GovernanceState state) {
-    final isVoting = _voteInFlight && state.status == GovernanceStatus.voting;
+    // Treat the whole request as in flight (not only the bloc's voting
+    // state) so the vote cannot be submitted twice.
+    final isVoting = _voteInFlight;
 
     return Container(
       padding: const EdgeInsets.all(AppDimensions.spacing),
@@ -454,7 +475,7 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
                   ? () => _castVote(proposal)
                   : null,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryOf(context),
+                backgroundColor: AppColors.primaryFillOf(context),
                 disabledBackgroundColor: ChatColors.of(context)
                     .buttonDisabledBg,
                 foregroundColor: Colors.white,
@@ -490,9 +511,10 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
 
   void _castVote(ProposalEntity proposal) {
     final choice = _selectedChoice;
-    if (choice == null) return;
+    if (choice == null || _confirmOpen || _voteInFlight) return;
 
     // Show confirmation dialog
+    _confirmOpen = true;
     showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -513,6 +535,7 @@ class _ProposalDetailPageState extends State<ProposalDetailPage> {
         ],
       ),
     ).then((confirmed) {
+      _confirmOpen = false;
       if (confirmed == true && mounted) {
         setState(() => _voteInFlight = true);
         context.read<GovernanceBloc>().add(

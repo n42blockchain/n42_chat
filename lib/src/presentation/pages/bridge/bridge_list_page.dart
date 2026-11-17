@@ -5,11 +5,13 @@ import 'package:flutter/material.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../integration/bridge/bridge_manager.dart';
 import '../../../integration/bridge/bridge_platform.dart';
 import '../../../integration/bridge/bridge_state.dart';
 import 'bridge_detail_page.dart';
 import '../../../core/theme/app_dimensions.dart';
+import '../../../../l10n/app_localizations.dart';
 
 /// Page displaying all available bridge platforms and their connection status.
 ///
@@ -96,6 +98,7 @@ class _BridgeListPageState extends State<BridgeListPage> {
         actions: [
           if (!_isLoading)
             IconButton(
+              tooltip: S.of(context)?.a11yRefresh ?? 'Refresh',
               icon: const Icon(Icons.refresh),
               onPressed: _refreshBridges,
             ),
@@ -150,7 +153,7 @@ class _BridgeListPageState extends State<BridgeListPage> {
         style: TextStyle(
           fontSize: 13,
           fontWeight: FontWeight.w500,
-          color: context.textTertiary,
+          color: context.textSupporting,
           letterSpacing: 0.5,
         ),
       ),
@@ -168,8 +171,9 @@ class _BridgeListPageState extends State<BridgeListPage> {
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 0.5),
-      color: bgColor,
       child: ListTile(
+        // tileColor is painted as Ink, so the pressed state stays visible.
+        tileColor: bgColor,
         leading: Container(
           width: 40,
           height: 40,
@@ -181,7 +185,7 @@ class _BridgeListPageState extends State<BridgeListPage> {
           ),
           child: Icon(
             info.icon,
-            color: state.isAvailable ? info.brandColor : context.textTertiary,
+            color: state.isAvailable ? info.brandColor : context.textSecondary,
             size: 22,
           ),
         ),
@@ -190,7 +194,7 @@ class _BridgeListPageState extends State<BridgeListPage> {
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w500,
-            color: state.isAvailable ? textColor : context.textTertiary,
+            color: state.isAvailable ? textColor : context.textSecondary,
           ),
         ),
         subtitle: Text(
@@ -225,18 +229,25 @@ class _BridgeListPageState extends State<BridgeListPage> {
   }
 
   Color _getStatusColor(BridgeState state) {
+    // Text-safe shades: system orange / red are 2.2:1 / 3.55:1 on white.
+    Color onSurface(Color color) => ChatContrast.onTint(
+      color,
+      [context.surfaceColor],
+      dark: context.isDarkMode,
+      alpha: 0,
+    );
     switch (state.status) {
       case BridgeConnectionStatus.connected:
-        return AppColors.primaryOf(context);
+        return AppColors.primaryOnTintOf(context);
       case BridgeConnectionStatus.connecting:
       case BridgeConnectionStatus.reconnecting:
-        return AppColors.warning;
+        return onSurface(AppColors.warning);
       case BridgeConnectionStatus.error:
-        return AppColors.error;
+        return onSurface(AppColors.error);
       case BridgeConnectionStatus.disconnected:
-        return AppColors.textTertiary;
+        return context.textSupporting;
       case BridgeConnectionStatus.notAvailable:
-        return AppColors.textTertiary;
+        return context.textSupporting;
     }
   }
 
@@ -275,7 +286,7 @@ class _BridgeListPageState extends State<BridgeListPage> {
         'Bridge availability depends on server configuration. '
         'Contact your server admin to enable additional bridges.',
         textAlign: TextAlign.center,
-        style: TextStyle(fontSize: 12, color: context.textTertiary),
+        style: TextStyle(fontSize: 12, color: context.textSupporting),
       ),
     );
   }

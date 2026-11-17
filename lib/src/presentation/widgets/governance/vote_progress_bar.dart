@@ -96,15 +96,19 @@ class VoteProgressBar extends StatelessWidget {
                 style: TextStyle(fontSize: 12, color: secondaryTextColor),
               ),
               const SizedBox(width: AppDimensions.spacingS),
-              SizedBox(
-                width: 48,
+              // minWidth (not a fixed width) so "100.0%" is not wrapped at
+              // large text sizes.
+              ConstrainedBox(
+                constraints: const BoxConstraints(minWidth: 48),
                 child: Text(
                   _percentageText,
                   textAlign: TextAlign.right,
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: isWinner ? AppColors.primaryOf(context) : textColor,
+                    color: isWinner
+                        ? AppColors.primaryOnTintOf(context)
+                        : textColor,
                   ),
                 ),
               ),

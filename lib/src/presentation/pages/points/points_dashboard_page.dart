@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../domain/entities/points/points_transaction.dart';
 import '../../blocs/points/points_bloc.dart';
 import '../../blocs/points/points_event.dart';
@@ -63,6 +64,7 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
         actions: [
           if (widget.isAdmin)
             IconButton(
+              tooltip: S.of(context)?.commonSettings ?? 'Settings',
               icon: const Icon(Icons.settings_outlined),
               onPressed: () => _navigateToAdmin(),
             ),
@@ -133,7 +135,11 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
       padding: const EdgeInsets.all(AppDimensions.spacingL),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [AppColors.primaryOf(context), AppColors.primaryDark],
+          // Fill shades keep the white labels at >= 4.5:1.
+          colors: [
+            AppColors.primaryFillOf(context),
+            ChatContrast.fillForWhiteText(AppColors.primaryDark),
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -153,7 +159,7 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
             'Total Points',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(fontSize: 14, height: 1.3, color: Colors.white70),
+            style: TextStyle(fontSize: 14, height: 1.3, color: Colors.white),
           ),
           const SizedBox(height: AppDimensions.spacingXS),
           Text(
@@ -354,7 +360,7 @@ class _PointsDashboardPageState extends State<PointsDashboardPage> {
               style: TextStyle(
                 fontSize: 13,
                 height: 1.3,
-                color: context.textTertiary,
+                color: context.textSupporting,
               ),
             ),
           ],
@@ -521,7 +527,7 @@ class _BalanceStat extends StatelessWidget {
           style: const TextStyle(
             fontSize: 11,
             height: 1.3,
-            color: Colors.white60,
+            color: Colors.white,
           ),
         ),
         const SizedBox(height: 2),
@@ -620,32 +626,36 @@ class _ActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        decoration: BoxDecoration(
-          color: context.surfaceColor,
-          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-          border: Border.all(color: context.dividerColor),
-        ),
-        child: Row(
+    // Material + InkWell so the pressed state is visible on the card.
+    return Material(
+      color: context.surfaceColor,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+        side: BorderSide(color: context.dividerColor),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 20, color: AppColors.primaryOf(context)),
-            const SizedBox(width: AppDimensions.spacingS),
-            Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 14,
-                height: 1.3,
-                fontWeight: FontWeight.w500,
-                color: context.textPrimary,
+              Icon(icon, size: 20, color: AppColors.primaryOf(context)),
+              const SizedBox(width: AppDimensions.spacingS),
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 14,
+                  height: 1.3,
+                  fontWeight: FontWeight.w500,
+                  color: context.textPrimary,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -660,6 +670,12 @@ class _TransactionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isPositive = transaction.isEarned;
+    // Text-safe shades: system green is 2.2:1 and red 3.55:1 on white.
+    final amountColor = ChatContrast.onTint(
+      isPositive ? AppColors.success : AppColors.error,
+      [context.surfaceColor],
+      dark: context.isDarkMode,
+    );
 
     return Container(
       margin: const EdgeInsets.only(bottom: AppDimensions.spacingS),
@@ -683,7 +699,7 @@ class _TransactionTile extends StatelessWidget {
                   ? Icons.add_circle_outline
                   : Icons.remove_circle_outline,
               size: 20,
-              color: isPositive ? AppColors.success : AppColors.error,
+              color: amountColor,
             ),
           ),
           const SizedBox(width: AppDimensions.spacingM),
@@ -710,7 +726,7 @@ class _TransactionTile extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12,
                     height: 1.3,
-                    color: context.textTertiary,
+                    color: context.textSupporting,
                   ),
                 ),
               ],
@@ -724,7 +740,7 @@ class _TransactionTile extends StatelessWidget {
               fontSize: 16,
               height: 1.3,
               fontWeight: FontWeight.w700,
-              color: isPositive ? AppColors.success : AppColors.error,
+              color: amountColor,
             ),
           ),
         ],

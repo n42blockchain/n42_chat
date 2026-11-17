@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import '../../../core/utils/payment_request_uri.dart';
 import '../../../core/utils/payment_asset_match.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +10,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../integration/wallet_bridge.dart';
 import '../../blocs/transfer/transfer_bloc.dart';
 import '../../blocs/transfer/transfer_event.dart';
@@ -45,6 +48,11 @@ class _TransferPageState extends State<TransferPage> {
   bool _isAddressValid = false;
   String? _scanError;
   WalletUserInfo? _recipientInfo;
+
+  /// Set when a transfer/payment event is dispatched; blocks double submit
+  /// until the bloc reports a failure (success pops the page).
+  bool _isSubmitting = false;
+  Timer? _submitReleaseTimer;
 
   bool get _isPaymentRequestMode => widget.paymentRequest != null;
   bool get _hasExactRequest =>
@@ -125,6 +133,7 @@ class _TransferPageState extends State<TransferPage> {
 
   @override
   void dispose() {
+    _submitReleaseTimer?.cancel();
     _addressController.dispose();
     _amountController.dispose();
     _memoController.dispose();
@@ -143,6 +152,7 @@ class _TransferPageState extends State<TransferPage> {
   }
 
   void _submitTransfer() {
+    if (_isSubmitting) return;
     final address = _addressController.text.trim();
     final amount = _amountController.text.trim();
     final memo = _memoController.text.trim();
@@ -227,6 +237,7 @@ class _TransferPageState extends State<TransferPage> {
       return;
     }
 
+    setState(() => _isSubmitting = true);
     if (_isPaymentRequestMode) {
       final request = widget.paymentRequest!;
       context.read<TransferBloc>().add(
@@ -242,6 +253,7 @@ class _TransferPageState extends State<TransferPage> {
           assetId: exactMatch ? selected.assetId : null,
         ),
       );
+      _releaseSubmitIfRejected();
       return;
     }
 
@@ -258,6 +270,24 @@ class _TransferPageState extends State<TransferPage> {
         assetId: exactMatch ? selected.assetId : null,
       ),
     );
+    _releaseSubmitIfRejected();
+  }
+
+  /// A pre-validation failure equal to the current state is deduplicated by
+  /// the bloc and never reaches the listener; release the guard when the
+  /// dispatch did not start processing.
+  void _releaseSubmitIfRejected() {
+    final bloc = context.read<TransferBloc>();
+    // Cancelled in dispose so no timer outlives the page.
+    _submitReleaseTimer?.cancel();
+    _submitReleaseTimer = Timer(Duration.zero, () {
+      if (!mounted || !_isSubmitting) return;
+      final status = bloc.state.status;
+      if (status != TransferBlocStatus.processing &&
+          status != TransferBlocStatus.success) {
+        setState(() => _isSubmitting = false);
+      }
+    });
   }
 
   @override
@@ -266,6 +296,9 @@ class _TransferPageState extends State<TransferPage> {
 
     return BlocConsumer<TransferBloc, TransferState>(
       listener: (context, state) {
+        if (state.status == TransferBlocStatus.failure && _isSubmitting) {
+          setState(() => _isSubmitting = false);
+        }
         if (state.status == TransferBlocStatus.addressValidated &&
             state.validatedAddress == _addressController.text.trim()) {
           setState(() {
@@ -453,7 +486,7 @@ class _TransferPageState extends State<TransferPage> {
           if (!_isPaymentRequestMode) ...[
             IconButton(
               icon: const Icon(Icons.content_paste_rounded, size: 20),
-              tooltip: 'Paste',
+              tooltip: MaterialLocalizations.of(context).pasteButtonLabel,
               onPressed: () async {
                 final data = await Clipboard.getData(Clipboard.kTextPlain);
                 if (!mounted) return;
@@ -547,10 +580,16 @@ class _TransferPageState extends State<TransferPage> {
                         'Address verified',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    // Green text on the page needs a darker shade (2.2:1 raw).
+                    style: TextStyle(
                       fontSize: 12,
                       height: 1.3,
-                      color: AppColors.success,
+                      color: ChatContrast.onTint(
+                        AppColors.success,
+                        [context.pageBackground],
+                        dark: isDark,
+                        alpha: 0,
+                      ),
                     ),
                   ),
               ],
@@ -574,148 +613,155 @@ class _TransferPageState extends State<TransferPage> {
         borderRadius: BorderRadius.circular(12),
       ),
       constraints: const BoxConstraints(maxHeight: 240),
-      child: SingleChildScrollView(
-        child: Column(
-          children: visibleTokens.map((token) {
-            final isSelected = identical(_selectedToken, token);
-            final balance = _hasAssetIdentity(token)
-                ? '--'
-                : (balances[token.symbol] ?? '0');
+      // Transparent Material above the card color so row ripples are visible.
+      child: Material(
+        type: MaterialType.transparency,
+        child: SingleChildScrollView(
+          child: Column(
+            children: visibleTokens.map((token) {
+              final isSelected = identical(_selectedToken, token);
+              final balance = _hasAssetIdentity(token)
+                  ? '--'
+                  : (balances[token.symbol] ?? '0');
 
-            return InkWell(
-              onTap: _hasExactRequest
-                  ? null
-                  : () {
-                      setState(() {
-                        _selectedToken = token;
-                      });
-                    },
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? AppColors.primaryOf(context).withValues(alpha: 0.1)
-                      : Colors.transparent,
-                  border: Border(
-                    bottom: BorderSide(color: context.dividerColor, width: 0.5),
+              return InkWell(
+                onTap: _hasExactRequest
+                    ? null
+                    : () {
+                        setState(() {
+                          _selectedToken = token;
+                        });
+                      },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
                   ),
-                ),
-                child: Row(
-                  children: [
-                    // 代币图标
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: context.pageBackground,
-                        shape: BoxShape.circle,
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? AppColors.primaryOf(context).withValues(alpha: 0.1)
+                        : Colors.transparent,
+                    border: Border(
+                      bottom: BorderSide(
+                        color: context.dividerColor,
+                        width: 0.5,
                       ),
-                      child: Center(
-                        child: Text(
-                          token.symbol.substring(
-                            0,
-                            token.symbol.length.clamp(0, 2),
-                          ),
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primaryOf(context),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      // 代币图标
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: context.pageBackground,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Center(
+                          child: Text(
+                            token.symbol.substring(
+                              0,
+                              token.symbol.length.clamp(0, 2),
+                            ),
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primaryOnTintOf(context),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    // 代币信息
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      const SizedBox(width: 12),
+                      // 代币信息
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              token.symbol,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 16,
+                                height: 1.3,
+                                fontWeight: FontWeight.w500,
+                                color: context.textPrimary,
+                              ),
+                            ),
+                            Text(
+                              token.name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 12,
+                                height: 1.3,
+                                color: context.textSecondary,
+                              ),
+                            ),
+                            if (_hasAssetIdentity(token))
+                              Text(
+                                '${token.chain ?? '?'} / ${token.network ?? '?'} · ${token.assetType ?? '?'}',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: context.textSecondary,
+                                ),
+                              ),
+                            if (token.assetId != null)
+                              Text(
+                                token.assetId!,
+                                softWrap: true,
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: context.textSecondary,
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                      // 余额
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            token.symbol,
+                            balance,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: 14,
                               height: 1.3,
                               fontWeight: FontWeight.w500,
                               color: context.textPrimary,
                             ),
                           ),
                           Text(
-                            token.name,
+                            S.of(context)?.transferAvailable ?? 'Available',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                              fontSize: 12,
+                              fontSize: 11,
                               height: 1.3,
                               color: context.textSecondary,
                             ),
                           ),
-                          if (_hasAssetIdentity(token))
-                            Text(
-                              '${token.chain ?? '?'} / ${token.network ?? '?'} · ${token.assetType ?? '?'}',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: context.textSecondary,
-                              ),
-                            ),
-                          if (token.assetId != null)
-                            Text(
-                              token.assetId!,
-                              softWrap: true,
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: context.textSecondary,
-                              ),
-                            ),
                         ],
                       ),
-                    ),
-                    // 余额
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          balance,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 14,
-                            height: 1.3,
-                            fontWeight: FontWeight.w500,
-                            color: context.textPrimary,
-                          ),
+                      const SizedBox(width: 8),
+                      // 选中标记
+                      if (isSelected)
+                        Icon(
+                          Icons.check_circle,
+                          color: AppColors.primaryOf(context),
+                          size: 20,
                         ),
-                        Text(
-                          S.of(context)?.transferAvailable ?? 'Available',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 11,
-                            height: 1.3,
-                            color: context.textSecondary,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(width: 8),
-                    // 选中标记
-                    if (isSelected)
-                      Icon(
-                        Icons.check_circle,
-                        color: AppColors.primaryOf(context),
-                        size: 20,
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            );
-          }).toList(),
+              );
+            }).toList(),
+          ),
         ),
       ),
     );
@@ -838,6 +884,7 @@ class _TransferPageState extends State<TransferPage> {
         text: _isPaymentRequestMode
             ? (S.of(context)?.commonPayment ?? 'Payment')
             : (S.of(context)?.transferConfirmTransfer ?? 'Confirm Transfer'),
+        isLoading: _isSubmitting,
         onPressed: _submitTransfer,
       ),
     );

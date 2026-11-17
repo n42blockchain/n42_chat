@@ -7,7 +7,9 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/chat_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../core/theme/app_icons.dart';
+import '../../widgets/common/n42_tap_area.dart';
 
 class SendRedPacketPage extends StatefulWidget {
   /// 接收者名称
@@ -54,6 +56,12 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
   String? _cachedAmountPattern;
 
   final List<String> _tokens = ['CNY', 'ETH', 'USDT', 'BTC'];
+
+  /// Accent fill that carries white labels at >= 4.5:1 (raw #E85D04 is
+  /// about 3.5:1 with white).
+  static final Color _accentFill = ChatContrast.fillForWhiteText(
+    const Color(0xFFE85D04),
+  );
 
   /// 可用的红包封面
   static const List<_RedPacketCover> _covers = [
@@ -132,6 +140,19 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
     '🐏',
     '🐔',
   ];
+
+  String _coverName(BuildContext context, _RedPacketCover cover) {
+    final s = S.of(context);
+    final localized = switch (cover.id) {
+      'gold' => s?.ui3RedPacketCoverGolden,
+      'purple' => s?.ui3RedPacketCoverPurple,
+      'blue' => s?.ui3RedPacketCoverOceanBlue,
+      'green' => s?.ui3RedPacketCoverNatureGreen,
+      'pink' => s?.ui3RedPacketCoverRosePink,
+      _ => s?.ui3RedPacketCoverClassic,
+    };
+    return localized ?? cover.name;
+  }
 
   double get _amount {
     final text = _amountController.text.trim();
@@ -326,26 +347,39 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                       color: AppColors.warning.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Row(
-                      children: [
-                        Icon(
-                          Icons.info_outline,
-                          size: 18,
-                          color: AppColors.warning,
-                        ),
-                        SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            // 硬编码英文:l10n 未含此 key;红包上链落地时再补 l10n。
-                            'Demo red packet — an in-chat record only, '
-                            'no real on-chain asset is transferred.',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: AppColors.warning,
+                    child: Builder(
+                      builder: (context) {
+                        // Orange on its own 12% tint is about 1.8:1; derive a
+                        // shade that reaches 4.5:1 over the page background.
+                        final warningText = ChatContrast.onTint(
+                          AppColors.warning,
+                          [bgColor],
+                          dark: context.isDarkMode,
+                          alpha: 0.12,
+                        );
+                        return Row(
+                          children: [
+                            Icon(
+                              Icons.info_outline,
+                              size: 18,
+                              color: warningText,
                             ),
-                          ),
-                        ),
-                      ],
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                S.of(context)?.ui3RedPacketDemoNotice ??
+                                    'Demo red packet — an in-chat record '
+                                        'only, no real on-chain asset is '
+                                        'transferred.',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: warningText,
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
                     ),
                   ),
 
@@ -357,9 +391,14 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         // 代币选择
-                        GestureDetector(
+                        // 44pt hit area around the unchanged token pill.
+                        N42TapArea(
                           onTap: _showTokenPicker,
-                          child: Container(
+                          tooltip:
+                              S.of(context)?.chatSelectCurrency ??
+                              'Select currency',
+                          borderRadius: BorderRadius.circular(4),
+                          child: Ink(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 8,
                               vertical: 4,
@@ -447,6 +486,8 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                             Icons.emoji_emotions_outlined,
                             color: secondaryTextColor,
                           ),
+                          tooltip:
+                              S.of(context)?.chatSelectEmoji ?? 'Select Emoji',
                           onPressed: _showEmojiPicker,
                         ),
                       ),
@@ -476,7 +517,10 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                _covers[_selectedCoverIndex].name,
+                                _coverName(
+                                  context,
+                                  _covers[_selectedCoverIndex],
+                                ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
@@ -604,7 +648,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                               }
                             : null,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFE85D04),
+                          backgroundColor: _accentFill,
                           disabledBackgroundColor:
                               ChatColors.of(context).redPacketDisabledBg,
                           foregroundColor: Colors.white,
@@ -648,7 +692,7 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: secondaryTextColor.withValues(alpha: 0.6),
+                        color: context.textSupporting,
                         fontSize: 12,
                         height: 1.4,
                       ),
@@ -707,36 +751,40 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
     final surfaceColor = context.surfaceColor;
     final textColor = context.textPrimary;
 
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(
-          color: surfaceColor,
+    // Material + InkWell so tappable rows show a pressed state.
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: Material(
+        color: surfaceColor,
+        borderRadius: BorderRadius.circular(10),
+        child: InkWell(
+          onTap: onTap,
           borderRadius: BorderRadius.circular(10),
-        ),
-        child:
-            child ??
-            Row(
-              children: [
-                if (label != null)
-                  Flexible(
-                    child: Text(
-                      label,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: textColor,
-                        fontSize: 16,
-                        height: 1.3,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            child:
+                child ??
+                Row(
+                  children: [
+                    if (label != null)
+                      Flexible(
+                        child: Text(
+                          label,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: textColor,
+                            fontSize: 16,
+                            height: 1.3,
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                const SizedBox(width: 8),
-                ?trailing,
-              ],
-            ),
+                    const SizedBox(width: 8),
+                    ?trailing,
+                  ],
+                ),
+          ),
+        ),
       ),
     );
   }
@@ -749,13 +797,15 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
   ) {
     final secondaryTextColor = context.textSecondary;
 
-    return GestureDetector(
+    // 44pt hit area around the unchanged chip; Ink keeps the ripple visible.
+    return N42TapArea(
       onTap: onTap,
-      child: Container(
+      borderRadius: BorderRadius.circular(4),
+      child: Ink(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
           color: selected
-              ? const Color(0xFFE85D04)
+              ? _accentFill
               : ChatColors.of(context).redPacketFieldBg,
           borderRadius: BorderRadius.circular(4),
         ),
@@ -858,16 +908,17 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
+                  // Cells of >= 44pt (spacing moved inside each cell so the
+                  // whole cell is tappable): 7 columns at 375pt, 6 at 320pt.
                   child: GridView.builder(
                     gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 8,
-                          mainAxisSpacing: 8,
-                          crossAxisSpacing: 8,
+                        const SliverGridDelegateWithMaxCrossAxisExtent(
+                          maxCrossAxisExtent: 52,
                         ),
                     itemCount: _emojis.length,
                     itemBuilder: (context, index) {
-                      return GestureDetector(
+                      return InkWell(
+                        borderRadius: BorderRadius.circular(8),
                         onTap: () {
                           // 在当前光标位置插入表情
                           final text = _greetingController.text;
@@ -886,15 +937,18 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                           );
                           Navigator.pop(ctx);
                         },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: ChatColors.of(context).redPacketFieldBg,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Center(
-                            child: Text(
-                              _emojis[index],
-                              style: const TextStyle(fontSize: 24),
+                        child: Padding(
+                          padding: const EdgeInsets.all(4),
+                          child: Ink(
+                            decoration: BoxDecoration(
+                              color: ChatColors.of(context).redPacketFieldBg,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Center(
+                              child: Text(
+                                _emojis[index],
+                                style: const TextStyle(fontSize: 24),
+                              ),
                             ),
                           ),
                         ),
@@ -1024,10 +1078,15 @@ class _SendRedPacketPageState extends State<SendRedPacketPage> {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              cover.name,
+                              _coverName(context, cover),
                               style: TextStyle(
                                 color: isSelected
-                                    ? const Color(0xFFE85D04)
+                                    ? ChatContrast.onTint(
+                                        const Color(0xFFE85D04),
+                                        [surfaceColor],
+                                        dark: context.isDarkMode,
+                                        alpha: 0,
+                                      )
                                     : secondaryTextColor,
                                 fontSize: 12,
                                 fontWeight: isSelected

@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/extensions/context_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/chat_colors.dart';
+import '../../../core/theme/chat_contrast.dart';
 import '../../../domain/entities/points/redemption_item.dart';
 import '../../blocs/points/points_bloc.dart';
 import '../../blocs/points/points_event.dart';
@@ -116,7 +117,9 @@ class _RedemptionPageState extends State<RedemptionPage> {
                             crossAxisCount: 2,
                             mainAxisSpacing: 12,
                             crossAxisSpacing: 12,
-                            childAspectRatio: 0.75,
+                            // Fixed extent: room for a 44pt redeem button and
+                            // 130% text at 320pt width.
+                            mainAxisExtent: 280,
                           ),
                       delegate: SliverChildBuilderDelegate((context, index) {
                         final item = state.redemptionItems[index];
@@ -219,7 +222,7 @@ class _RedemptionPageState extends State<RedemptionPage> {
             style: TextStyle(
               fontSize: 14,
               height: 1.3,
-              color: context.textTertiary,
+              color: context.textSupporting,
             ),
           ),
         ],
@@ -341,7 +344,7 @@ class _RedemptionPageState extends State<RedemptionPage> {
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryOf(context),
+                backgroundColor: AppColors.primaryFillOf(context),
                 foregroundColor: Colors.white,
               ),
               onPressed: () {
@@ -387,6 +390,13 @@ class _RedemptionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDisabled = !item.canRedeem || !canAfford || isBusy;
+    // System red is 3.55:1 on white; use a text-safe shade of it.
+    final errorText = ChatContrast.onTint(
+      AppColors.error,
+      [context.surfaceColor],
+      dark: context.isDarkMode,
+      alpha: 0,
+    );
 
     return Container(
       decoration: BoxDecoration(
@@ -447,7 +457,7 @@ class _RedemptionCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 11,
                       height: 1.4,
-                      color: context.textTertiary,
+                      color: context.textSupporting,
                     ),
                   ),
                   const Spacer(),
@@ -463,8 +473,8 @@ class _RedemptionCard extends StatelessWidget {
                           height: 1.3,
                           fontWeight: FontWeight.w700,
                           color: canAfford
-                              ? AppColors.primaryOf(context)
-                              : AppColors.error,
+                              ? AppColors.primaryOnTintOf(context)
+                              : errorText,
                         ),
                       ),
                       const Spacer(),
@@ -477,8 +487,8 @@ class _RedemptionCard extends StatelessWidget {
                             fontSize: 11,
                             height: 1.3,
                             color: item.isInStock
-                                ? context.textTertiary
-                                : AppColors.error,
+                                ? context.textSupporting
+                                : errorText,
                           ),
                         ),
                     ],
@@ -487,12 +497,12 @@ class _RedemptionCard extends StatelessWidget {
                   // Redeem button
                   SizedBox(
                     width: double.infinity,
-                    height: 30,
+                    height: 44,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: isDisabled
                             ? ChatColors.of(context).disabledFill
-                            : AppColors.primaryOf(context),
+                            : AppColors.primaryFillOf(context),
                         foregroundColor: isDisabled
                             ? AppColors.textDisabled
                             : Colors.white,
