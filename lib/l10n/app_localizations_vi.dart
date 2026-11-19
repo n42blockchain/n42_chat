@@ -7646,19 +7646,6 @@ class SVi extends S {
   String get ui3QrStyleBerry => 'Quả mọng';
 
   @override
-  String get ui3NfcUnavailable =>
-      'NFC không khả dụng hoặc thẻ không được hỗ trợ. Hãy bật NFC, thử thẻ khác hoặc dùng mã QR.';
-
-  @override
-  String get ui3CancelNfc => 'Hủy NFC';
-
-  @override
-  String get ui3ReadNfcTag => 'Đọc thẻ NFC';
-
-  @override
-  String get ui3HoldNearNfcTag => 'Đưa điện thoại lại gần thẻ dịch vụ.';
-
-  @override
   String get a11yFlashlightOn => 'Bật đèn pin';
 
   @override

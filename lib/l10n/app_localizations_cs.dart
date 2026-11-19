@@ -7689,19 +7689,6 @@ class SCs extends S {
   String get ui3QrStyleBerry => 'Bobule';
 
   @override
-  String get ui3NfcUnavailable =>
-      'NFC není k dispozici nebo štítek není podporován. Zapněte NFC, zkuste jiný štítek nebo použijte QR.';
-
-  @override
-  String get ui3CancelNfc => 'Zrušit NFC';
-
-  @override
-  String get ui3ReadNfcTag => 'Načíst štítek NFC';
-
-  @override
-  String get ui3HoldNearNfcTag => 'Přiložte telefon ke štítku služby.';
-
-  @override
   String get a11yFlashlightOn => 'Zapnout svítilnu';
 
   @override

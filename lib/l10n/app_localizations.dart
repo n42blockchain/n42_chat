@@ -13971,30 +13971,6 @@ abstract class S {
   /// **'Berry'**
   String get ui3QrStyleBerry;
 
-  /// No description provided for @ui3NfcUnavailable.
-  ///
-  /// In en, this message translates to:
-  /// **'NFC unavailable or tag not supported. Enable NFC, try another tag, or use QR.'**
-  String get ui3NfcUnavailable;
-
-  /// No description provided for @ui3CancelNfc.
-  ///
-  /// In en, this message translates to:
-  /// **'Cancel NFC'**
-  String get ui3CancelNfc;
-
-  /// No description provided for @ui3ReadNfcTag.
-  ///
-  /// In en, this message translates to:
-  /// **'Read NFC tag'**
-  String get ui3ReadNfcTag;
-
-  /// No description provided for @ui3HoldNearNfcTag.
-  ///
-  /// In en, this message translates to:
-  /// **'Hold your phone near the service tag.'**
-  String get ui3HoldNearNfcTag;
-
   /// No description provided for @a11yFlashlightOn.
   ///
   /// In en, this message translates to:

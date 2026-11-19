@@ -7657,19 +7657,6 @@ class SBn extends S {
   String get ui3QrStyleBerry => 'বেরি';
 
   @override
-  String get ui3NfcUnavailable =>
-      'NFC উপলভ্য নয় বা ট্যাগটি সমর্থিত নয়। NFC চালু করুন, অন্য ট্যাগ চেষ্টা করুন বা QR ব্যবহার করুন।';
-
-  @override
-  String get ui3CancelNfc => 'NFC বাতিল করুন';
-
-  @override
-  String get ui3ReadNfcTag => 'NFC ট্যাগ পড়ুন';
-
-  @override
-  String get ui3HoldNearNfcTag => 'আপনার ফোনটি সার্ভিস ট্যাগের কাছে ধরুন।';
-
-  @override
   String get a11yFlashlightOn => 'ফ্ল্যাশলাইট চালু করুন';
 
   @override

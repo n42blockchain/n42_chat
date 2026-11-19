@@ -7654,19 +7654,6 @@ class SHi extends S {
   String get ui3QrStyleBerry => 'बेरी';
 
   @override
-  String get ui3NfcUnavailable =>
-      'NFC उपलब्ध नहीं है या टैग समर्थित नहीं है। NFC चालू करें, दूसरा टैग आज़माएं या QR का उपयोग करें।';
-
-  @override
-  String get ui3CancelNfc => 'NFC रद्द करें';
-
-  @override
-  String get ui3ReadNfcTag => 'NFC टैग पढ़ें';
-
-  @override
-  String get ui3HoldNearNfcTag => 'अपना फ़ोन सर्विस टैग के पास रखें।';
-
-  @override
   String get a11yFlashlightOn => 'फ़्लैशलाइट चालू करें';
 
   @override

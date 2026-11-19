@@ -7620,19 +7620,6 @@ class SEn extends S {
   String get ui3QrStyleBerry => 'Berry';
 
   @override
-  String get ui3NfcUnavailable =>
-      'NFC unavailable or tag not supported. Enable NFC, try another tag, or use QR.';
-
-  @override
-  String get ui3CancelNfc => 'Cancel NFC';
-
-  @override
-  String get ui3ReadNfcTag => 'Read NFC tag';
-
-  @override
-  String get ui3HoldNearNfcTag => 'Hold your phone near the service tag.';
-
-  @override
   String get a11yFlashlightOn => 'Turn on flashlight';
 
   @override

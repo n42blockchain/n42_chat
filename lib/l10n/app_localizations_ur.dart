@@ -7669,19 +7669,6 @@ class SUr extends S {
   String get ui3QrStyleBerry => 'بیری';
 
   @override
-  String get ui3NfcUnavailable =>
-      'NFC دستیاب نہیں یا ٹیگ معاون نہیں۔ NFC آن کریں، کوئی اور ٹیگ آزمائیں یا QR استعمال کریں۔';
-
-  @override
-  String get ui3CancelNfc => 'NFC منسوخ کریں';
-
-  @override
-  String get ui3ReadNfcTag => 'NFC ٹیگ پڑھیں';
-
-  @override
-  String get ui3HoldNearNfcTag => 'اپنا فون سروس ٹیگ کے قریب رکھیں۔';
-
-  @override
   String get a11yFlashlightOn => 'فلیش لائٹ آن کریں';
 
   @override

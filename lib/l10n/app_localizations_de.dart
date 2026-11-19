@@ -7732,19 +7732,6 @@ class SDe extends S {
   String get ui3QrStyleBerry => 'Beere';
 
   @override
-  String get ui3NfcUnavailable =>
-      'NFC nicht verfügbar oder Tag nicht unterstützt. Aktiviere NFC, versuche einen anderen Tag oder nutze QR.';
-
-  @override
-  String get ui3CancelNfc => 'NFC abbrechen';
-
-  @override
-  String get ui3ReadNfcTag => 'NFC-Tag lesen';
-
-  @override
-  String get ui3HoldNearNfcTag => 'Halte dein Telefon an den Service-Tag.';
-
-  @override
   String get a11yFlashlightOn => 'Taschenlampe einschalten';
 
   @override

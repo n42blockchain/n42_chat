@@ -7406,18 +7406,6 @@ class SZh extends S {
   String get ui3QrStyleBerry => '莓果';
 
   @override
-  String get ui3NfcUnavailable => 'NFC 不可用或不支持该标签。请开启 NFC、换一个标签或使用二维码。';
-
-  @override
-  String get ui3CancelNfc => '取消 NFC';
-
-  @override
-  String get ui3ReadNfcTag => '读取 NFC 标签';
-
-  @override
-  String get ui3HoldNearNfcTag => '请将手机靠近服务标签。';
-
-  @override
   String get a11yFlashlightOn => '打开手电筒';
 
   @override
@@ -15482,18 +15470,6 @@ class SZhTw extends SZh {
 
   @override
   String get ui3QrStyleBerry => '莓果';
-
-  @override
-  String get ui3NfcUnavailable => 'NFC 無法使用或不支援此標籤。請開啟 NFC、換一個標籤或使用 QR 碼。';
-
-  @override
-  String get ui3CancelNfc => '取消 NFC';
-
-  @override
-  String get ui3ReadNfcTag => '讀取 NFC 標籤';
-
-  @override
-  String get ui3HoldNearNfcTag => '請將手機靠近服務標籤。';
 
   @override
   String get a11yFlashlightOn => '開啟手電筒';
