@@ -7708,20 +7708,6 @@ class SSw extends S {
   String get ui3QrStyleBerry => 'Beri';
 
   @override
-  String get ui3NfcUnavailable =>
-      'NFC haipatikani au lebo haitumiki. Washa NFC, jaribu lebo nyingine, au tumia QR.';
-
-  @override
-  String get ui3CancelNfc => 'Ghairi NFC';
-
-  @override
-  String get ui3ReadNfcTag => 'Soma lebo ya NFC';
-
-  @override
-  String get ui3HoldNearNfcTag =>
-      'Shikilia simu yako karibu na lebo ya huduma.';
-
-  @override
   String get a11yFlashlightOn => 'Washa tochi';
 
   @override

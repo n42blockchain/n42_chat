@@ -7482,19 +7482,6 @@ class SKo extends S {
   String get ui3QrStyleBerry => '베리';
 
   @override
-  String get ui3NfcUnavailable =>
-      'NFC를 사용할 수 없거나 지원되지 않는 태그입니다. NFC를 켜거나 다른 태그를 시도하거나 QR을 사용하세요.';
-
-  @override
-  String get ui3CancelNfc => 'NFC 취소';
-
-  @override
-  String get ui3ReadNfcTag => 'NFC 태그 읽기';
-
-  @override
-  String get ui3HoldNearNfcTag => '휴대폰을 서비스 태그에 가까이 대세요.';
-
-  @override
   String get a11yFlashlightOn => '손전등 켜기';
 
   @override

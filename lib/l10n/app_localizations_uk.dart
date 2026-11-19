@@ -7711,19 +7711,6 @@ class SUk extends S {
   String get ui3QrStyleBerry => 'Ягода';
 
   @override
-  String get ui3NfcUnavailable =>
-      'NFC недоступний або мітка не підтримується. Увімкніть NFC, спробуйте іншу мітку або скористайтеся QR.';
-
-  @override
-  String get ui3CancelNfc => 'Скасувати NFC';
-
-  @override
-  String get ui3ReadNfcTag => 'Зчитати NFC-мітку';
-
-  @override
-  String get ui3HoldNearNfcTag => 'Піднесіть телефон до мітки сервісу.';
-
-  @override
   String get a11yFlashlightOn => 'Увімкнути ліхтарик';
 
   @override

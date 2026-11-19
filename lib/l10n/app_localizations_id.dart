@@ -7676,19 +7676,6 @@ class SId extends S {
   String get ui3QrStyleBerry => 'Beri';
 
   @override
-  String get ui3NfcUnavailable =>
-      'NFC tidak tersedia atau tag tidak didukung. Aktifkan NFC, coba tag lain, atau gunakan QR.';
-
-  @override
-  String get ui3CancelNfc => 'Batalkan NFC';
-
-  @override
-  String get ui3ReadNfcTag => 'Baca tag NFC';
-
-  @override
-  String get ui3HoldNearNfcTag => 'Dekatkan ponsel Anda ke tag layanan.';
-
-  @override
   String get a11yFlashlightOn => 'Nyalakan senter';
 
   @override

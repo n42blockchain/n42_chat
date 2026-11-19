@@ -7758,20 +7758,6 @@ class SFr extends S {
   String get ui3QrStyleBerry => 'Baie';
 
   @override
-  String get ui3NfcUnavailable =>
-      'NFC indisponible ou tag non pris en charge. Activez NFC, essayez un autre tag ou utilisez le QR.';
-
-  @override
-  String get ui3CancelNfc => 'Annuler NFC';
-
-  @override
-  String get ui3ReadNfcTag => 'Lire un tag NFC';
-
-  @override
-  String get ui3HoldNearNfcTag =>
-      'Approchez votre téléphone du tag du service.';
-
-  @override
   String get a11yFlashlightOn => 'Allumer la lampe torche';
 
   @override

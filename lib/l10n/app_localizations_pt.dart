@@ -7719,20 +7719,6 @@ class SPt extends S {
   String get ui3QrStyleBerry => 'Baga';
 
   @override
-  String get ui3NfcUnavailable =>
-      'NFC indisponível ou etiqueta não suportada. Ative o NFC, experimente outra etiqueta ou use QR.';
-
-  @override
-  String get ui3CancelNfc => 'Cancelar NFC';
-
-  @override
-  String get ui3ReadNfcTag => 'Ler etiqueta NFC';
-
-  @override
-  String get ui3HoldNearNfcTag =>
-      'Aproxime o telemóvel da etiqueta do serviço.';
-
-  @override
   String get a11yFlashlightOn => 'Ligar lanterna';
 
   @override
@@ -16144,19 +16130,6 @@ class SPtBr extends SPt {
 
   @override
   String get ui3QrStyleBerry => 'Frutas vermelhas';
-
-  @override
-  String get ui3NfcUnavailable =>
-      'NFC indisponível ou tag não compatível. Ative o NFC, tente outra tag ou use QR.';
-
-  @override
-  String get ui3CancelNfc => 'Cancelar NFC';
-
-  @override
-  String get ui3ReadNfcTag => 'Ler tag NFC';
-
-  @override
-  String get ui3HoldNearNfcTag => 'Aproxime o celular da tag do serviço.';
 
   @override
   String get a11yFlashlightOn => 'Ligar lanterna';

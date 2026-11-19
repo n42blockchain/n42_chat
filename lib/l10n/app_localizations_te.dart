@@ -7715,19 +7715,6 @@ class STe extends S {
   String get ui3QrStyleBerry => 'బెర్రీ';
 
   @override
-  String get ui3NfcUnavailable =>
-      'NFC అందుబాటులో లేదు లేదా ట్యాగ్‌కు మద్దతు లేదు. NFCని ఆన్ చేయండి, వేరే ట్యాగ్ ప్రయత్నించండి లేదా QR ఉపయోగించండి.';
-
-  @override
-  String get ui3CancelNfc => 'NFC రద్దు చేయండి';
-
-  @override
-  String get ui3ReadNfcTag => 'NFC ట్యాగ్ చదవండి';
-
-  @override
-  String get ui3HoldNearNfcTag => 'మీ ఫోన్‌ను సర్వీస్ ట్యాగ్ దగ్గర పట్టుకోండి.';
-
-  @override
   String get a11yFlashlightOn => 'ఫ్లాష్‌లైట్ ఆన్ చేయండి';
 
   @override

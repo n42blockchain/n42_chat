@@ -7709,19 +7709,6 @@ class SRu extends S {
   String get ui3QrStyleBerry => 'Ягода';
 
   @override
-  String get ui3NfcUnavailable =>
-      'NFC недоступен или метка не поддерживается. Включите NFC, попробуйте другую метку или используйте QR.';
-
-  @override
-  String get ui3CancelNfc => 'Отменить NFC';
-
-  @override
-  String get ui3ReadNfcTag => 'Считать NFC-метку';
-
-  @override
-  String get ui3HoldNearNfcTag => 'Поднесите телефон к метке сервиса.';
-
-  @override
   String get a11yFlashlightOn => 'Включить фонарик';
 
   @override

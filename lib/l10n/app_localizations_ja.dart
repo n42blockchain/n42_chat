@@ -7477,19 +7477,6 @@ class SJa extends S {
   String get ui3QrStyleBerry => 'ベリー';
 
   @override
-  String get ui3NfcUnavailable =>
-      'NFC が利用できないか、タグに対応していません。NFC を有効にするか、別のタグを試すか、QR を使用してください。';
-
-  @override
-  String get ui3CancelNfc => 'NFC をキャンセル';
-
-  @override
-  String get ui3ReadNfcTag => 'NFC タグを読み取る';
-
-  @override
-  String get ui3HoldNearNfcTag => 'スマートフォンをサービスタグに近づけてください。';
-
-  @override
   String get a11yFlashlightOn => 'ライトをオン';
 
   @override
