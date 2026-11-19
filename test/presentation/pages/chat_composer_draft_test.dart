@@ -400,6 +400,8 @@ void main() {
         expect(controller.text, 'saved account text');
         await tester.tap(find.byIcon(Icons.more_horiz));
         await tester.pumpAndSettle();
+        await tester.tap(find.text('Settings'));
+        await tester.pumpAndSettle();
         expect(find.byType(ChatDetailPage), findsOneWidget);
         if (scenario.startsWith('recover full route')) {
           final scheduled = find.text('Scheduled messages');

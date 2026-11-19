@@ -7741,6 +7741,20 @@ class STa extends S {
   String get ui3QrStyleBerry => 'பெர்ரி';
 
   @override
+  String get ui3NfcUnavailable =>
+      'NFC கிடைக்கவில்லை அல்லது டேக் ஆதரிக்கப்படவில்லை. NFC-ஐ இயக்கவும், வேறு டேக்கை முயலவும் அல்லது QR-ஐப் பயன்படுத்தவும்.';
+
+  @override
+  String get ui3CancelNfc => 'NFC-ஐ ரத்துசெய்';
+
+  @override
+  String get ui3ReadNfcTag => 'NFC டேக்கைப் படி';
+
+  @override
+  String get ui3HoldNearNfcTag =>
+      'உங்கள் தொலைபேசியை சேவை டேக் அருகே பிடிக்கவும்.';
+
+  @override
   String get a11yFlashlightOn => 'டார்ச்சை இயக்கு';
 
   @override

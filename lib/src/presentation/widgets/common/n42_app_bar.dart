@@ -49,6 +49,10 @@ class N42AppBar extends StatelessWidget implements PreferredSizeWidget {
   /// 状态栏样式
   final SystemUiOverlayStyle? systemOverlayStyle;
 
+  /// 左侧槽宽度（默认 AppBar 为 56）。设置后默认返回按钮靠左对齐放入该槽，
+  /// 便于与更宽的右侧操作区保持等宽，使标题居中。
+  final double? leadingWidth;
+
   const N42AppBar({
     super.key,
     this.title,
@@ -63,6 +67,7 @@ class N42AppBar extends StatelessWidget implements PreferredSizeWidget {
     this.elevation = 0,
     this.centerTitle = true,
     this.systemOverlayStyle,
+    this.leadingWidth,
   });
 
   @override
@@ -81,20 +86,17 @@ class N42AppBar extends StatelessWidget implements PreferredSizeWidget {
       foregroundColor: fgColor,
       elevation: elevation,
       centerTitle: centerTitle,
-      systemOverlayStyle: systemOverlayStyle ??
-          (isDark
-              ? SystemUiOverlayStyle.light
-              : SystemUiOverlayStyle.dark),
+      systemOverlayStyle:
+          systemOverlayStyle ??
+          (isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark),
       leading: _buildLeading(context, fgColor),
+      leadingWidth: leadingWidth,
       title: _buildTitle(fgColor),
       actions: actions,
       bottom: showDivider
           ? PreferredSize(
               preferredSize: const Size.fromHeight(0.5),
-              child: Container(
-                height: 0.5,
-                color: context.dividerColor,
-              ),
+              child: Container(height: 0.5, color: context.dividerColor),
             )
           : null,
     );
@@ -104,7 +106,7 @@ class N42AppBar extends StatelessWidget implements PreferredSizeWidget {
     if (leading != null) return leading;
 
     if (showBackButton && Navigator.of(context).canPop()) {
-      return IconButton(
+      final back = IconButton(
         icon: Icon(
           AppIcons.back,
           color: fgColor,
@@ -116,6 +118,8 @@ class N42AppBar extends StatelessWidget implements PreferredSizeWidget {
         tooltip: MaterialLocalizations.of(context).backButtonTooltip,
         onPressed: onBackPressed ?? () => Navigator.of(context).pop(),
       );
+      if (leadingWidth == null) return back;
+      return Align(alignment: AlignmentDirectional.centerStart, child: back);
     }
 
     return null;
@@ -166,7 +170,8 @@ class N42SliverAppBar extends StatelessWidget {
       expandedHeight: expandedHeight,
       elevation: 0,
       scrolledUnderElevation: 0,
-      title: titleWidget ??
+      title:
+          titleWidget ??
           (title != null
               ? Text(
                   title!,
@@ -180,4 +185,3 @@ class N42SliverAppBar extends StatelessWidget {
     );
   }
 }
-

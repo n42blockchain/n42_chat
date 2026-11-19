@@ -7729,6 +7729,20 @@ class SEs extends S {
   String get ui3QrStyleBerry => 'Baya';
 
   @override
+  String get ui3NfcUnavailable =>
+      'NFC no disponible o etiqueta no compatible. Activa NFC, prueba otra etiqueta o usa QR.';
+
+  @override
+  String get ui3CancelNfc => 'Cancelar NFC';
+
+  @override
+  String get ui3ReadNfcTag => 'Leer etiqueta NFC';
+
+  @override
+  String get ui3HoldNearNfcTag =>
+      'Acerca el teléfono a la etiqueta del servicio.';
+
+  @override
   String get a11yFlashlightOn => 'Encender linterna';
 
   @override

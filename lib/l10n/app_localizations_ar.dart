@@ -7628,6 +7628,19 @@ class SAr extends S {
   String get ui3QrStyleBerry => 'توت';
 
   @override
+  String get ui3NfcUnavailable =>
+      'NFC غير متاح أو العلامة غير مدعومة. فعّل NFC أو جرّب علامة أخرى أو استخدم رمز QR.';
+
+  @override
+  String get ui3CancelNfc => 'إلغاء NFC';
+
+  @override
+  String get ui3ReadNfcTag => 'قراءة علامة NFC';
+
+  @override
+  String get ui3HoldNearNfcTag => 'قرّب هاتفك من علامة الخدمة.';
+
+  @override
   String get a11yFlashlightOn => 'تشغيل المصباح';
 
   @override

@@ -7710,6 +7710,19 @@ class SIt extends S {
   String get ui3QrStyleBerry => 'Bacca';
 
   @override
+  String get ui3NfcUnavailable =>
+      'NFC non disponibile o tag non supportato. Attiva l\'NFC, prova un altro tag o usa il QR.';
+
+  @override
+  String get ui3CancelNfc => 'Annulla NFC';
+
+  @override
+  String get ui3ReadNfcTag => 'Leggi tag NFC';
+
+  @override
+  String get ui3HoldNearNfcTag => 'Avvicina il telefono al tag del servizio.';
+
+  @override
   String get a11yFlashlightOn => 'Accendi torcia';
 
   @override

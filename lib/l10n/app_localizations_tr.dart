@@ -7668,6 +7668,19 @@ class STr extends S {
   String get ui3QrStyleBerry => 'Böğürtlen';
 
   @override
+  String get ui3NfcUnavailable =>
+      'NFC kullanılamıyor veya etiket desteklenmiyor. NFC\'yi açın, başka bir etiket deneyin ya da QR kullanın.';
+
+  @override
+  String get ui3CancelNfc => 'NFC\'yi iptal et';
+
+  @override
+  String get ui3ReadNfcTag => 'NFC etiketini oku';
+
+  @override
+  String get ui3HoldNearNfcTag => 'Telefonunuzu hizmet etiketine yaklaştırın.';
+
+  @override
   String get a11yFlashlightOn => 'Feneri aç';
 
   @override

@@ -7721,6 +7721,19 @@ class SPl extends S {
   String get ui3QrStyleBerry => 'Jagoda';
 
   @override
+  String get ui3NfcUnavailable =>
+      'NFC niedostępne lub tag nieobsługiwany. Włącz NFC, użyj innego tagu lub kodu QR.';
+
+  @override
+  String get ui3CancelNfc => 'Anuluj NFC';
+
+  @override
+  String get ui3ReadNfcTag => 'Odczytaj tag NFC';
+
+  @override
+  String get ui3HoldNearNfcTag => 'Zbliż telefon do tagu usługi.';
+
+  @override
   String get a11yFlashlightOn => 'Włącz latarkę';
 
   @override

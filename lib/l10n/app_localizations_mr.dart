@@ -7657,6 +7657,19 @@ class SMr extends S {
   String get ui3QrStyleBerry => 'बेरी';
 
   @override
+  String get ui3NfcUnavailable =>
+      'NFC उपलब्ध नाही किंवा टॅग समर्थित नाही. NFC सुरू करा, दुसरा टॅग वापरून पहा किंवा QR वापरा.';
+
+  @override
+  String get ui3CancelNfc => 'NFC रद्द करा';
+
+  @override
+  String get ui3ReadNfcTag => 'NFC टॅग वाचा';
+
+  @override
+  String get ui3HoldNearNfcTag => 'तुमचा फोन सर्व्हिस टॅगजवळ धरा.';
+
+  @override
   String get a11yFlashlightOn => 'फ्लॅशलाइट सुरू करा';
 
   @override

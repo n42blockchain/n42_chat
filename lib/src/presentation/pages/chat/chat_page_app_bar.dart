@@ -1,9 +1,8 @@
 // ignore_for_file: invalid_use_of_protected_member
 part of 'chat_page.dart';
 
-/// Below this logical width the full action row leaves too little room for the
-/// title, so secondary actions move into an overflow menu.
-const double _chatAppBarCompactWidth = 360;
+/// Minimum tappable size for each top bar button (iOS 44pt).
+const double _chatAppBarButtonSize = 44;
 
 /// AppBar 构建相关方法
 extension _ChatPageAppBarMethods on _ChatPageState {
@@ -19,7 +18,6 @@ extension _ChatPageAppBarMethods on _ChatPageState {
     );
     final memberCount =
         _groupMemberCountOverride ?? widget.conversation.memberCount;
-    final compact = MediaQuery.sizeOf(context).width < _chatAppBarCompactWidth;
 
     return N42AppBar(
       titleWidget: BlocBuilder<ChatBloc, ChatState>(
@@ -83,100 +81,89 @@ extension _ChatPageAppBarMethods on _ChatPageState {
           );
         },
       ),
-      showBackButton: widget.onBack != null,
+      // Always let N42AppBar build the back button (shown only when the route
+      // can pop) so it is left-aligned in the leading slot.
+      showBackButton: true,
       onBackPressed: widget.onBack ?? () => Navigator.of(context).pop(),
-      actions: compact
-          ? _buildCompactAppBarActions()
-          : _buildFullAppBarActions(),
+      // Group chats center the title between equal 44pt slots (back button vs.
+      // the "..." menu). Direct chats keep the call buttons on the right and let
+      // the title fill the space between the back button and the actions, like a
+      // normal left-anchored AppBar title, so it stays usable at narrow widths.
+      centerTitle: widget.conversation.isGroup,
+      leadingWidth: widget.conversation.isGroup ? _chatAppBarButtonSize : null,
+      actions: _buildAppBarActions(),
     );
   }
 
-  List<Widget> _buildFullAppBarActions() {
+  /// Private chats keep voice and video in the top bar; group chats have none.
+  /// Everything else lives in the "..." menu.
+  List<Widget> _buildAppBarActions() {
+    final s = S.of(context);
     return [
-      if (widget.conversation.isGroup)
-        IconButton(
-          icon: const Icon(Icons.mark_chat_unread_outlined),
-          tooltip: S.of(context)!.chatCatchUp,
-          onPressed: _openCatchUp,
-        ),
-      // 私聊显示通话按钮
       if (!widget.conversation.isGroup) ...[
-        IconButton(
-          icon: const Icon(Icons.phone_outlined),
+        _buildAppBarCallButton(
+          icon: Icons.phone_outlined,
+          tooltip: s?.commonVoiceCall ?? 'Voice Call',
           onPressed: _startVoiceCall,
-          tooltip: S.of(context)?.commonVoiceCall ?? 'Voice Call',
         ),
-        IconButton(
-          icon: const Icon(Icons.videocam_outlined),
+        _buildAppBarCallButton(
+          icon: Icons.videocam_outlined,
+          tooltip: s?.chatVideoCall ?? 'Video Call',
           onPressed: _startVideoCall,
-          tooltip: S.of(context)?.chatVideoCall ?? 'Video Call',
         ),
       ],
-      // 群聊：话题按钮（如果有子频道）
-      if (widget.conversation.isGroup)
-        IconButton(
-          icon: const Icon(Icons.forum_outlined),
-          tooltip: S.of(context)?.groupTopics ?? 'Topics',
-          onPressed: _openGroupTopics,
-        ),
-      if (getIt.isRegistered<IAiRepository>())
-        IconButton(
-          icon: const Icon(Icons.auto_awesome_outlined),
-          onPressed: _onAiAppBarPressed,
-          tooltip: S.of(context)?.aiAssistant ?? 'AI Assistant',
-        ),
-      IconButton(
-        icon: const Icon(Icons.search),
-        onPressed: _toggleSearch,
-        tooltip: S.of(context)?.commonSearch ?? 'Search',
-      ),
-      IconButton(
-        icon: const Icon(Icons.more_horiz),
-        onPressed: widget.onMorePressed ?? _openChatSettings,
-        tooltip: S.of(context)?.commonMore ?? 'More',
-      ),
+      _buildAppBarMoreButton(),
     ];
   }
 
-  /// Narrow screens keep one primary action, search and an overflow menu.
-  List<Widget> _buildCompactAppBarActions() {
+  Widget _buildAppBarCallButton({
+    required IconData icon,
+    required String tooltip,
+    required VoidCallback onPressed,
+  }) {
+    // IconButton enforces a 48pt minimum on its own, so the 44pt size is set by
+    // the tight SizedBox around it.
+    return SizedBox(
+      width: _chatAppBarButtonSize,
+      height: _chatAppBarButtonSize,
+      child: IconButton(
+        icon: Icon(icon),
+        tooltip: tooltip,
+        onPressed: onPressed,
+        padding: EdgeInsets.zero,
+      ),
+    );
+  }
+
+  /// Single "..." menu for the secondary actions. Sized to 44pt explicitly
+  /// because PopupMenuButton's own minimum is 48pt.
+  Widget _buildAppBarMoreButton() {
     final isGroup = widget.conversation.isGroup;
     final s = S.of(context);
-    return [
-      if (isGroup)
-        IconButton(
-          icon: const Icon(Icons.mark_chat_unread_outlined),
-          tooltip: s!.chatCatchUp,
-          onPressed: _openCatchUp,
-        )
-      else
-        IconButton(
-          icon: const Icon(Icons.phone_outlined),
-          onPressed: _startVoiceCall,
-          tooltip: s?.commonVoiceCall ?? 'Voice Call',
-        ),
-      IconButton(
-        icon: const Icon(Icons.search),
-        onPressed: _toggleSearch,
-        tooltip: s?.commonSearch ?? 'Search',
-      ),
-      PopupMenuButton<VoidCallback>(
+    return SizedBox(
+      width: _chatAppBarButtonSize,
+      height: _chatAppBarButtonSize,
+      child: PopupMenuButton<VoidCallback>(
         icon: const Icon(Icons.more_horiz),
-        // 24pt icon + 2 x 10pt padding keeps the 44pt minimum hit area.
+        // 24pt icon + 2 x 10pt padding = 44pt.
         padding: const EdgeInsets.all(10),
         tooltip: s?.commonMore ?? 'More',
         onSelected: (action) => action(),
         itemBuilder: (context) => [
-          if (isGroup)
+          if (isGroup) ...[
+            PopupMenuItem<VoidCallback>(
+              value: _openCatchUp,
+              child: Text(s?.chatCatchUp ?? 'Catch up'),
+            ),
             PopupMenuItem<VoidCallback>(
               value: _openGroupTopics,
               child: Text(s?.groupTopics ?? 'Topics'),
-            )
-          else
-            PopupMenuItem<VoidCallback>(
-              value: _startVideoCall,
-              child: Text(s?.chatVideoCall ?? 'Video Call'),
             ),
+          ],
+          PopupMenuItem<VoidCallback>(
+            value: _toggleSearch,
+            child: Text(s?.commonSearch ?? 'Search'),
+          ),
           if (getIt.isRegistered<IAiRepository>())
             PopupMenuItem<VoidCallback>(
               value: _onAiAppBarPressed,
@@ -188,7 +175,7 @@ extension _ChatPageAppBarMethods on _ChatPageState {
           ),
         ],
       ),
-    ];
+    );
   }
 
   Future<void> _openCatchUp() async {
